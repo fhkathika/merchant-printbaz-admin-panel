@@ -7,8 +7,8 @@ const AllMerchants = () => {
   
   useEffect(()=>{
     const getOrders = async () => {
-    //  await fetch('https://mserver.printbaz.com/alluser') //for main site
-     await fetch('http://localhost:5000/alluser') //for testing site
+     await fetch('https://mserver.printbaz.com/alluser') //for main site
+    //  await fetch('http://localhost:5000/alluser') //for testing site
     .then(res=>res.json())
     .then(data => setAllMerchant(data))
     }
