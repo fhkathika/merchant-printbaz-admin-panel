@@ -4,18 +4,16 @@ import "../../css/style.css";
 import useGetMongoData from "../../hooks/useGetMongoData";
 
 const ViewClient = () => {
-  const [approvalRequest, setApprovalRequest] = useState();
   const { orderAll } = useGetMongoData();
   const location = useLocation();
   const viewClient = location.state ? location?.state?.merchants : null;
-  console.log("viewClient", viewClient);
-  console.log("orderAll", orderAll);
+
   const handleInputChange = async (e) => {
     const status = e.target.value; // the new status
     // status === "request" && setApprovalRequest("request");
     // status === "ban" && setApprovalRequest("ban");
     // status === "approved" && setApprovalRequest("approved");
-    console.log("sttaus",status);
+ 
     //  await fetch('https://mserver.printbaz.com/update-approval/${viewClient?._id') //for main site
 
     //   await fetch(`http://localhost:5000/update-approval/${viewClient?._id}`, { //for testing site
@@ -327,24 +325,26 @@ const ViewClient = () => {
                           onChange={(e) => handleInputChange(e)}
                         >
                           <option value={viewClient?.approval}>
-                            {viewClient?.approval}
+                            {viewClient?.approval=== "approved"&& "Approved" }
+                            {viewClient?.approval=== "request"&& "Request" }
+                            {viewClient?.approval=== "ban"&& "Ban" }
                           </option>
                           {viewClient?.approval === "approved" && (
                             <>
-                              <option value="ban">banned</option>
-                              <option value="request">request</option>
+                              <option value="ban">Ban</option>
+                              <option value="request">Request</option>
                             </>
                           )}
                           {viewClient?.approval === "request" && (
                             <>
-                              <option value="approved">approved</option>
-                              <option value="ban">banned</option>
+                              <option value="approved">Approved</option>
+                              <option value="ban">Ban</option>
                             </>
                           )}
                           {viewClient?.approval === "ban" && (
                             <>
-                              <option value="approved">approved</option>
-                              <option value="request">request</option>
+                              <option value="approved">Approved</option>
+                              <option value="request">Request</option>
                             </>
                           )}
                         </select>

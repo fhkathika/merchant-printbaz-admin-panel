@@ -1,7 +1,12 @@
 import React from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useLocation } from 'react-router-dom';
 
 const ViewOrder = () => {
+  const location = useLocation();
+  const viewOrder = location.state ? location?.state?.orders : null;
+  const viewClient = location.state?.matchingMerchant;
+  console.log(viewOrder);
+  console.log("matchingMerchant",viewClient);
     return (
         <div>
           <meta charSet="UTF-8" />
@@ -84,16 +89,16 @@ const ViewOrder = () => {
             <div className="row">
               <div className="col-lg-12 col-sm-12">
                 <div className="view-client-title my-3">
-                  <a href="order-list.html"><span style={{fontSize: '30px'}}>
-                      &lt; </span> View Order Details</a>
+                  <Link to="/orderList"><span style={{fontSize: '30px'}}>
+                      &lt; </span> View Order Details</Link>
                 </div>
               </div>
             </div>
             <div className="row">
               <div className="col-12">
                 <div className="order-id bg-white p-4  shadow-sm">
-                  <h3 className="d-inline-block font-weight-bold">ORDER #DQ130323GKKW22 &nbsp;</h3>
-                  <button className="status-btn d-inline-block py-2 px-3 font-weight-bold">Delivered</button>
+                  <h3 className="d-inline-block font-weight-bold">ORDER {viewOrder?._id} &nbsp;</h3>
+                  <button className="status-btn d-inline-block py-2 px-3 font-weight-bold">{viewOrder?.orderStatus}</button>
                 </div>
               </div>
             </div>
@@ -139,15 +144,15 @@ const ViewOrder = () => {
                     </div>
                     <div className="col-md-6 col-sm-12">
                       <h5>Name</h5>
-                      <p>Ridwan Rafi</p>
+                      <p>{viewClient?.name}</p>
                     </div>
                     <div className="col-md-6 col-sm-12">
                       <h5>Brand Name</h5>
-                      <p>Artistic ABIR</p>
+                      <p>{viewClient?.brandName}</p>
                     </div>
                     <div className="col-12">
                       <h5>Email</h5>
-                      <p>abiralikhan098@gmail.com</p>
+                      <p>{viewClient?.email}</p>
                     </div>
                   </div>
                 </div>
@@ -160,15 +165,15 @@ const ViewOrder = () => {
                     </div>
                     <div className="col-md-6 col-sm-12">
                       <h5>Name</h5>
-                      <p>Ridwan Rafi</p>
+                      <p>{viewOrder?.name}</p>
                     </div>
                     <div className="col-md-6 col-sm-12">
                       <h5>Phone</h5>
-                      <p>01782159720</p>
+                      <p>{viewOrder?.phone}</p>
                     </div>
                     <div className="col-12">
                       <h5>Address</h5>
-                      <p>Shonir Akhra (Kacchi Bhai Er Goli, Nurpur)</p>
+                      <p>{viewOrder?.address}</p>
                     </div>
                   </div>
                 </div>
@@ -179,15 +184,15 @@ const ViewOrder = () => {
                     <div className="col-12">
                       <h3 className="all-title">Cost of Order</h3>
                       <h6>Printbaz Cost</h6>
-                      <p>100 BDT</p>
+                      <p>{viewOrder?.printbazcost} BDT</p>
                       <h6>Delivery Fee</h6>
-                      <p>100 BDT</p>
+                      <p>{viewOrder?.deliveryFee} BDT</p>
                       <h6>Collect Amount</h6>
-                      <p>100 BDT</p>
+                      <p>{viewOrder?.collectAmount} BDT</p>
                       <h6>Cash Handling Fee</h6>
-                      <p>100 BDT</p>
+                      <p>2% BDT</p>
                       <h6>Receivable Amount</h6>
-                      <p>100 BDT</p>
+                      <p>{viewOrder?.recvMoney} BDT</p>
                     </div>
                   </div>
                 </div>
@@ -199,6 +204,7 @@ const ViewOrder = () => {
                       <h3 className="all-title">Order Details</h3>
                     </div>
                   </div>
+               
                   <div className="row order-list-title">
                     <div className="col-2">
                       <h4>Color</h4>
@@ -219,18 +225,20 @@ const ViewOrder = () => {
                       <h4>Picture</h4>
                     </div>
                   </div>
-                  <div className="row order-tab">
+                  {
+                    viewOrder?.orderDetailArr?.map(orderDetail=><>
+                      <div className="row order-tab">
                     <div className="col-2">
-                      <p>Black</p>
+                      <p>{orderDetail?.color}</p>
                     </div>
                     <div className="col-2">
-                      M
+                      {orderDetail?.teshirtSize}
                     </div>
                     <div className="col-2">
-                      5
+                      {orderDetail?.quantity}
                     </div>
                     <div className="col-2">
-                      10"X10"
+                   {orderDetail?.teshirtSize}
                     </div>
                     <div className="col-lg-2">
                       <div className="card file">
@@ -281,130 +289,10 @@ const ViewOrder = () => {
                       </div>
                     </div>
                   </div>
-                  <div className="row order-tab">
-                    <div className="col-2">
-                      <p>Black</p>
-                    </div>
-                    <div className="col-2">
-                      L
-                    </div>
-                    <div className="col-2">
-                      10
-                    </div>
-                    <div className="col-2">
-                      5"X5"
-                    </div>
-                    <div className="col-lg-2">
-                      <div className="card file">
-                        <ul className="file-options dropdown">
-                          <a className="dropdown-toggle" href="#" data-bs-toggle="dropdown" aria-expanded="false">
-                            <i className="material-icons">more_vert</i>
-                          </a>
-                          <ul className="dropdown-menu dropdown-menu-right">
-                            <li>
-                              <a className="dropdown-item" href="#">View Details</a>
-                            </li>
-                            <li>
-                              <a className="dropdown-item" href="#">Download</a>
-                            </li>
-                            <li>
-                              <a className="dropdown-item" href="#">Copy Link</a>
-                            </li>
-                          </ul>
-                        </ul>
-                        <div className="card-body file-info">
-                          <p>Typography.eps</p>
-                          <span className="file-size">1009.2kb</span><br />
-                        </div>
-                      </div>
-                    </div>
-                    <div className="col-lg-2">
-                      <div className="card file">
-                        <ul className="file-options dropdown">
-                          <a className="dropdown-toggle" href="#" data-bs-toggle="dropdown" aria-expanded="false">
-                            <i className="material-icons">more_vert</i>
-                          </a>
-                          <ul className="dropdown-menu dropdown-menu-right">
-                            <li>
-                              <a className="dropdown-item" href="#">View Details</a>
-                            </li>
-                            <li>
-                              <a className="dropdown-item" href="#">Download</a>
-                            </li>
-                            <li>
-                              <a className="dropdown-item" href="#">Copy Link</a>
-                            </li>
-                          </ul>
-                        </ul>
-                        <div className="card-body file-info">
-                          <p>T-Shirt Picture.png</p>
-                          <span className="file-size">200.0kb</span><br />
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                  <div className="row order-tab">
-                    <div className="col-2">
-                      <p>Black</p>
-                    </div>
-                    <div className="col-2">
-                      XL
-                    </div>
-                    <div className="col-2">
-                      1
-                    </div>
-                    <div className="col-2">
-                      10"X14"
-                    </div>
-                    <div className="col-lg-2">
-                      <div className="card file">
-                        <ul className="file-options dropdown">
-                          <a className="dropdown-toggle" href="#" data-bs-toggle="dropdown" aria-expanded="false">
-                            <i className="material-icons">more_vert</i>
-                          </a>
-                          <ul className="dropdown-menu dropdown-menu-right">
-                            <li>
-                              <a className="dropdown-item" href="#">View Details</a>
-                            </li>
-                            <li>
-                              <a className="dropdown-item" href="#">Download</a>
-                            </li>
-                            <li>
-                              <a className="dropdown-item" href="#">Copy Link</a>
-                            </li>
-                          </ul>
-                        </ul>
-                        <div className="card-body file-info">
-                          <p>Digital Art.ai</p>
-                          <span className="file-size">1009.2kb</span><br />
-                        </div>
-                      </div>
-                    </div>
-                    <div className="col-lg-2">
-                      <div className="card file">
-                        <ul className="file-options dropdown">
-                          <a className="dropdown-toggle" href="#" data-bs-toggle="dropdown" aria-expanded="false">
-                            <i className="material-icons">more_vert</i>
-                          </a>
-                          <ul className="dropdown-menu dropdown-menu-right">
-                            <li>
-                              <a className="dropdown-item" href="#">View Details</a>
-                            </li>
-                            <li>
-                              <a className="dropdown-item" href="#">Download</a>
-                            </li>
-                            <li>
-                              <a className="dropdown-item" href="#">Copy Link</a>
-                            </li>
-                          </ul>
-                        </ul>
-                        <div className="card-body file-info">
-                          <p>Demo Image.jpeg</p>
-                          <span className="file-size">200.0kb</span><br />
-                        </div>
-                      </div>
-                    </div>
-                  </div>
+                    </>)
+                  }
+                
+                 
                 </div>
               </div>
             </div>

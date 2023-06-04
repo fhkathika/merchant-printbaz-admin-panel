@@ -1,7 +1,30 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
+import useGetMongoData from '../../hooks/useGetMongoData';
 
 const OrderList = () => {
+  const { orderAll } = useGetMongoData();
+  const [allMerchant,setAllMerchant]=useState([])
+  console.log("orderAll", orderAll);
+  useEffect(()=>{
+    const getOrders = async () => {
+     await fetch('https://mserver.printbaz.com/alluser') //for main site
+    //  await fetch('http://localhost:5000/alluser') //for testing site
+    .then(res=>res.json())
+    .then(data => setAllMerchant(data))
+    }
+    getOrders()
+},[allMerchant])
+let matchingMerchant
+
+  orderAll.map((orders,index)=>
+  {
+    matchingMerchant = allMerchant.find(merchant => merchant?.email === orders?.userMail)
+  }
+ 
+    )
+  
+
     return (
         <div>
           <meta charSet="UTF-8" />
@@ -142,31 +165,42 @@ const OrderList = () => {
                   <h4>Status</h4>
                 </div>
               </div>
-              <Link to="/viewOrder">
-                <div className="row client-list">
-                  <div className="col-lg-2 col-sm-12">
-                    <p>Abir Ali Khan</p>
+              {
+                orderAll.map((orders,index)=>
+                <>
+                   
+                  <Link to={`/viewOrder/${orders?._id}`} state={{orders,matchingMerchant}}>
+                  <div key={orders?._id} className="row client-list">
+                    <div className="col-lg-2 col-sm-12">
+                     {/* Display the corresponding allMerchant name */}
+          {index < allMerchant.length && <p>{allMerchant[index]?.name}</p>}
+                   
+                    </div>
+                    <div className="col-lg-2 col-sm-12">
+                      <p>{orders?._id}</p>
+                    </div>
+                    <div className="col-lg-3 col-sm-12">
+                      <p>{orders?.name}</p>
+                      <p>{orders?.address}</p>
+                      <p>{orders?.phone}</p>
+                    </div>
+                    <div className="col-lg-2 col-sm-12">
+                      <p className="p-status-btn">{orders?.paymentStatus}</p>
+                    </div>
+                    <div className="col-lg-2 col-sm-12">
+                      <p>{orders?.recvMoney} TK</p>
+                    </div>
+                    <div className="col-lg-1 col-sm-12">
+                      <p className="status-btn">{orders?.orderStatus}</p>
+                      <p style={{fontSize: '14px'}}>{orders?.createdAt}</p>
+                    </div>
                   </div>
-                  <div className="col-lg-2 col-sm-12">
-                    <p>1684051962640</p>
-                  </div>
-                  <div className="col-lg-3 col-sm-12">
-                    <p>Abir Ali Khan</p>
-                    <p>Tara Medical Center, Mirpur 11, Dhaka, Bangladesh</p>
-                    <p>01956821703</p>
-                  </div>
-                  <div className="col-lg-2 col-sm-12">
-                    <p className="p-status-btn">Paid</p>
-                  </div>
-                  <div className="col-lg-2 col-sm-12">
-                    <p>137.2 TK</p>
-                  </div>
-                  <div className="col-lg-1 col-sm-12">
-                    <p className="status-btn">Delivery</p>
-                    <p style={{fontSize: '14px'}}>05 May 2023</p>
-                  </div>
-                </div>
-              </Link>
+                </Link>
+                </>
+             
+                  )
+              }
+          
              
             </div>
           </div>
