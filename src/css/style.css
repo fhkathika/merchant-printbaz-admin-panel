@@ -1,0 +1,9 @@
+
+    .new-line {
+        display: inline;
+        white-space: initial;
+        word-break: break-all
+    }
+    .colorTag{
+        color: red;
+    }

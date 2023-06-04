@@ -4,7 +4,8 @@ import { Link } from 'react-router-dom';
 const AllMerchants = () => {
   const [allMerchant,setAllMerchant]=useState([])
   const [filterUser,setFilterUsers]=useState('all')
-  
+  const [filterEmail,setFilterEmail]=useState('')
+
   useEffect(()=>{
     const getOrders = async () => {
      await fetch('https://mserver.printbaz.com/alluser') //for main site
@@ -18,9 +19,19 @@ const handleInputChange = (event, index) => {
   const { name, value } = event.target;
   setFilterUsers(value)
 }
+const handleEmailChange = (e) => {
+  const value = e.target.value;
+  console.log(value);
+  setFilterEmail(value);
+}
+
+console.log("filterEmail",filterEmail);
 let pendingUsers=allMerchant?.filter(users=>users?.approval==="request");
 let approvedUsers=allMerchant?.filter(users=>users?.approval==="approved");
 let bannedUsers=allMerchant?.filter(users=>users?.approval==="ban");
+let searchByEmail = allMerchant?.filter(userEmail => userEmail?.email.includes(filterEmail));
+
+console.log(searchByEmail);
     return (
         <div>
         <meta charSet="UTF-8" />
@@ -116,7 +127,7 @@ let bannedUsers=allMerchant?.filter(users=>users?.approval==="ban");
             </div>
             <div className="col-lg-2 col-sm-12">
               <label htmlFor="email-filter">Email:</label>
-              <input type="email" id="email-filter" className="form-control" />
+              <input type="email" id="email-filter" className="form-control"  onChange={(e) =>  handleEmailChange(e)}/>
             </div>
             <div className="col-lg-2 col-sm-12">
               <label htmlFor="date-filter">Date:</label>
@@ -152,6 +163,42 @@ let bannedUsers=allMerchant?.filter(users=>users?.approval==="ban");
               <h4>Status</h4>
             </div>
           </div>
+          {
+          filterEmail &&  searchByEmail?.map((merchants)=><>
+             <Link key={merchants?._id} to={`/viewClient/${merchants?._id}`} state={{merchants}}>
+            <div className="row client-list">
+              <div className="col-lg-2 col-sm-12">
+                <p>{merchants?._id}</p>
+              </div>
+              <div className="col-lg-2 col-sm-12">
+                <p>{merchants?.name}</p>
+              </div>
+              <div className="col-lg-2 col-sm-12">
+                <p>{merchants?.brandName}</p>
+              </div>
+              <div className="col-lg-2 col-sm-12">
+                <p>{merchants?.email}</p>
+              </div>
+              <div className="col-lg-2 col-sm-12">
+                <p>{merchants?.createdAt?.slice(0,10)}</p>
+              </div>
+              <div className="col-lg-2 col-sm-12">
+                {
+                  merchants?.approval==="requiest" &&   <p className="status-btn" style={{backgroundColor:"red"}} >{merchants?.approval}</p>
+                }
+                 {
+                  merchants?.approval==="approved" &&   <p className="status-btn"  >{merchants?.approval}</p>
+                } 
+                 {
+                  merchants?.approval==="ban" &&   <p className="status-btn" style={{backgroundColor:"blue"}}  >{merchants?.approval}</p>
+                }
+              
+              </div>
+            </div>
+          </Link>
+            </>)
+          }
+        
           {
             filterUser==="pending" &&  pendingUsers.map(merchants=><>
                <Link key={merchants?._id} to={`/viewClient/${merchants?._id}`} state={{merchants}}>
@@ -282,6 +329,7 @@ let bannedUsers=allMerchant?.filter(users=>users?.approval==="ban");
           </Link>
             </>)
           }
+        
           
          
         </div>
