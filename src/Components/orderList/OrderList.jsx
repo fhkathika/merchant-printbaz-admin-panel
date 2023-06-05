@@ -17,13 +17,7 @@ const OrderList = () => {
 },[allMerchant])
 let matchingMerchant
 
-  orderAll.map((orders,index)=>
-  {
-    matchingMerchant = allMerchant.find(merchant => merchant?.email === orders?.userMail)
-  }
  
-    )
-  
 
     return (
         <div>
@@ -135,10 +129,11 @@ let matchingMerchant
                 <select id="status-filter" className="form-control">
                   <option value>None</option>
                   <option value="Pending">Pending</option>
+                  <option value="on-hold">On Hold</option>
                   <option value="Approved">Approved</option>
                   <option value="in-production">In Production</option>
-                  <option value="on-hold">On Hold</option>
-                  <option value="delivery">Delivery</option>
+                  <option value="out for delivery">Out for delivery</option>
+                 <option value="delivered">Delivered</option>
                   <option value="payment-released">Payment Released</option>
                   <option value="returned">Returned</option>
                 </select>
@@ -166,14 +161,15 @@ let matchingMerchant
                 </div>
               </div>
               {
-                orderAll.map((orders,index)=>
-                <>
-               
-                  <Link to={`/viewOrder/${orders?._id}`} state={{orders,matchingMerchant}}>
+                orderAll.map((orders,index)=>{ 
+                matchingMerchant = allMerchant.find(merchant => merchant?.email === orders?.userMail)
+               return (
+                  <Link to={`/viewOrder/${orders?._id}`} state={{orders,matchingMerchant}} key={index}>
                   <div key={orders?._id} className="row client-list">
                     <div className="col-lg-2 col-sm-12">
                      {/* Display the corresponding allMerchant name */}
-          {index < allMerchant.length && <p>{allMerchant[index]?.name}</p>}
+                     <p>{matchingMerchant?.name}</p>
+          {/* {index < allMerchant.length && <p>{allMerchant[index]?.name}</p>} */}
                    
                     </div>
                     <div className="col-lg-2 col-sm-12">
@@ -196,9 +192,11 @@ let matchingMerchant
                     </div>
                   </div>
                 </Link>
-                </>
-             
+               
+               )
+                }
                   )
+               
               }
           
              

@@ -6,7 +6,77 @@ const ViewOrder = () => {
   const viewOrder = location.state ? location?.state?.orders : null;
   const viewClient = location.state?.matchingMerchant;
   console.log(viewOrder);
-  console.log("matchingMerchant",viewClient);
+  
+
+  const handleInputChange = async (e) => {
+    const status = e.target.value; // the new status
+  console.log("status",status);
+
+    //   await fetch(`http://localhost:5000/update-approval/${viewClient?._id}`, { //for testing site
+    try {
+      const response = await fetch(
+        
+        `https://mserver.printbaz.com/updateOrderStatus/${viewOrder?._id}`,
+      // `http://localhost:5000/updateOrderStatus/${viewOrder?._id}`,
+        {
+          method: "PUT",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({ orderStatus: status }),
+        }
+      );
+  
+      if (response.ok) {
+        // Update the approval status in the viewClient object
+        viewOrder.orderStatus = status;
+  
+        console.log("Success:", viewOrder);
+        // Update your state or perform any other necessary operations with the updated viewClient object
+      } else {
+        console.error("status Error:", response);
+        // Handle error here
+      }
+    } catch (error) {
+      console.error("Error:", error.message);
+      // Handle error here
+    }
+  };
+  const getViewClientColor = (status) => {
+    if (status === "Pending") {
+      return "Orange";
+    }
+    if (status === "Approved") {
+      return "green";
+    } 
+    if (status === "on-hold") {
+      return "yellow";
+    }
+      if (status === "in-production") {
+      return "blue";
+    }
+      if (status === "out for delivery") {
+      return "sea green";
+    }  
+    if (status === "delivered") {
+      return "sea green";
+    } 
+     if (status === "payment-released") {
+      return "sea green";
+    } 
+        if (status === "returned") {
+      return "red";
+    }
+    // you can add more conditions here or just return a default color
+    // return "defaultColor";
+  };
+  function downloadImage(fileUrl) {
+    const link = document.createElement('a');
+    link.href = fileUrl;
+    link.download = true;
+    link.click();
+  }
+  
     return (
         <div>
           <meta charSet="UTF-8" />
@@ -98,7 +168,127 @@ const ViewOrder = () => {
               <div className="col-12">
                 <div className="order-id bg-white p-4  shadow-sm">
                   <h3 className="d-inline-block font-weight-bold">ORDER {viewOrder?._id} &nbsp;</h3>
-                  <button className="status-btn d-inline-block py-2 px-3 font-weight-bold">{viewOrder?.orderStatus}</button>
+                  {/* <button className="status-btn d-inline-block py-2 px-3 font-weight-bold">{viewOrder?.orderStatus}</button> */}
+               
+                  <div
+                        className=" d-inline-block  font-weight-bold"
+                        style={{ marginBottom: "20px" }}
+                      >
+                        <select
+                          id="status-filter"
+                          className="status-btn"
+                          style={{
+                            border: "none",
+                            padding: "8px",
+                            backgroundColor: getViewClientColor(
+                              viewOrder?.orderStatus
+                            ),
+                          }}
+                          onChange={(e) => handleInputChange(e)}
+                        >
+                          <option value={viewOrder?.orderStatus}>
+                            {viewOrder?.orderStatus=== "Pending"&& "Pending" }
+                            {viewOrder?.orderStatus=== "on-hold"&& "On Hold" }
+                            {viewOrder?.orderStatus=== "Approved"&& "Approved" }
+                            {viewOrder?.orderStatus=== "in-production"&& "In Production" }
+                            {viewOrder?.orderStatus=== "out for delivery"&& "Out for delivery" }
+                            {viewOrder?.orderStatus=== "delivered"&& "Delivered" }
+                            {viewOrder?.orderStatus=== "payment-released"&& "Payment Released" }
+                            {viewOrder?.orderStatus=== "returned"&& "returned" }
+                        
+                          </option>
+                          {viewOrder?.orderStatus === "Approved" && (
+                            <>
+                              <option value="Pending">Pending</option>
+                              <option value="on-hold">On Hold</option>
+                              <option value="in-production">In Production</option>
+                              <option value="out for delivery">Out for delivery</option>
+                              <option value="delivered">Delivered</option>
+                              <option value="payment-released">Payment Released</option>
+                              <option value="returned">Returned</option>
+                            </>
+                          )}
+                          {viewOrder?.orderStatus === "Pending" && (
+                            <>
+                             
+                              <option value="on-hold">On Hold</option>
+                              <option value="Approved">Approved</option>
+                              <option value="in-production">In Production</option>
+                              <option value="out for delivery">Out for delivery</option>
+                              <option value="delivered">Delivered</option>
+                              <option value="payment-released">Payment Released</option>
+                              <option value="returned">Returned</option>
+                            </>
+                          )}
+                          {viewOrder?.orderStatus === "on-hold" && (
+                            <>
+                             <option value="Pending">Pending</option>
+                             <option value="Approved">Approved</option>
+                              <option value="in-production">In Production</option>
+                              <option value="out for delivery">Out for delivery</option>
+                              <option value="delivered">Delivered</option>
+                              <option value="payment-released">Payment Released</option>
+                              <option value="returned">Returned</option>
+                            </>
+                          )}  
+                            {viewOrder?.orderStatus === "in-production" && (
+                            <>
+                                <option value="on-hold">On Hold</option>
+                             <option value="Pending">Pending</option>
+                             <option value="Approved">Approved</option>
+                              <option value="out for delivery">Out for delivery</option>
+                              <option value="delivered">Delivered</option>
+                              <option value="payment-released">Payment Released</option>
+                              <option value="returned">Returned</option>
+                            </>
+                          )}  
+                              {viewOrder?.orderStatus === "out for delivery" && (
+                            <>
+                                <option value="on-hold">On Hold</option>
+                             <option value="Pending">Pending</option>
+                             <option value="Approved">Approved</option>
+                             <option value="in-production">In Production</option>
+                              <option value="delivered">Delivered</option>
+                              <option value="payment-released">Payment Released</option>
+                              <option value="returned">Returned</option>
+                            </>
+                          )}
+                            {viewOrder?.orderStatus === "delivered" && (
+                            <>
+                                <option value="on-hold">On Hold</option>
+                             <option value="Pending">Pending</option>
+                             <option value="Approved">Approved</option>
+                             <option value="in-production">In Production</option>
+                             <option value="out for delivery">Out for delivery</option>
+                              <option value="payment-released">Payment Released</option>
+                              <option value="returned">Returned</option>
+                            </>
+                          )} 
+                           {viewOrder?.orderStatus === "payment-released" && (
+                            <>
+                                <option value="on-hold">On Hold</option>
+                             <option value="Pending">Pending</option>
+                             <option value="Approved">Approved</option>
+                             <option value="in-production">In Production</option>
+                             <option value="out for delivery">Out for delivery</option>
+                             <option value="delivered">Delivered</option>
+                              <option value="returned">Returned</option>
+                            </>
+                          )}  
+                          {viewOrder?.orderStatus === "returned" && (
+                            <>
+                                <option value="on-hold">On Hold</option>
+                             <option value="Pending">Pending</option>
+                             <option value="Approved">Approved</option>
+                             <option value="in-production">In Production</option>
+                             <option value="out for delivery">Out for delivery</option>
+                             <option value="delivered">Delivered</option>
+                             <option value="payment-released">Payment Released</option>
+                             
+                            </>
+                          )}
+                        </select>
+                      </div>
                 </div>
               </div>
             </div>
@@ -113,24 +303,57 @@ const ViewOrder = () => {
                   <div className="row trak-status">
                     <div className="col-lg-3 col-md-6 col-sm-12 text-center mb-3">
                       <img src="https://media.discordapp.net/attachments/1069579536842379305/1102868453112680478/ic-confirmed-red.f41e73a9.png" alt="" />
+                     {
+                      viewOrder?.orderStatus==="returned"|| viewOrder?.orderStatus==="Approved" || viewOrder?.orderStatus==="in-production" ||  viewOrder?.orderStatus==="out for delivery" ||  viewOrder?.orderStatus==="payment-released"||   viewOrder?.orderStatus==="delivered"    ?
                       <img src="https://media.discordapp.net/attachments/1069579536842379305/1102872711228821544/check_2.png" alt="" style={{width: '25px'}} />
+                      :
+                      <img src="https://media.discordapp.net/attachments/1069579536842379305/1102872711610515456/remove.png" alt="" style={{width: '25px'}} />
+
+                     }
+                     
                       <p>Accepted</p>
                     </div>
                     <div className="col-lg-3 col-md-6 col-sm-12 text-center mb-3">
                       <img src="https://media.discordapp.net/attachments/1069579536842379305/1102868452777140255/ic-picked-red.94cd32af.png" alt="" />
-                      <img src="https://media.discordapp.net/attachments/1069579536842379305/1102872711228821544/check_2.png" alt="" style={{width: '25px'}} />
-                      <p>Product Ready</p>
-                    </div>
-                    <div className="col-lg-3 col-md-6 col-sm-12 text-center mb-3">
-                      <img src="https://media.discordapp.net/attachments/1069579536842379305/1102868453691494400/ic-inTransit-red.fc3e88dd.png" alt="" />
-                      <img src="https://media.discordapp.net/attachments/1069579536842379305/1102872711228821544/check_2.png" alt="" style={{width: '25px'}} />
+                      {
+                      viewOrder?.orderStatus==="returned"|| viewOrder?.orderStatus==="in-production" ||  viewOrder?.orderStatus==="out for delivery" ||  viewOrder?.orderStatus==="payment-released"||   viewOrder?.orderStatus==="delivered"    ?
+                     
+                       
+                       <img src="https://media.discordapp.net/attachments/1069579536842379305/1102872711228821544/check_2.png" alt="" style={{width: '25px'}} />
+                       :
+                       <img src="https://media.discordapp.net/attachments/1069579536842379305/1102872711610515456/remove.png" alt="" style={{width: '25px'}} /> 
+                      }
+                     
+                      <p>In Production</p>
+                    </div>  
+                      <div className="col-lg-3 col-md-6 col-sm-12 text-center mb-3">
+                      <img src="https://media.discordapp.net/attachments/1069579536842379305/1102868452777140255/ic-picked-red.94cd32af.png" alt="" />
+                      {
+                       viewOrder?.orderStatus==="returned"|| viewOrder?.orderStatus==="out for delivery" ||  viewOrder?.orderStatus==="payment-released"||  viewOrder?.orderStatus==="delivered"   ?
+                     
+                       
+                       <img src="https://media.discordapp.net/attachments/1069579536842379305/1102872711228821544/check_2.png" alt="" style={{width: '25px'}} />
+                       :
+                       <img src="https://media.discordapp.net/attachments/1069579536842379305/1102872711610515456/remove.png" alt="" style={{width: '25px'}} /> 
+                      }
+                     
                       <p>Out for Delivery</p>
-                    </div>
-                    <div className="col-lg-3 col-md-6 col-sm-12 text-center mb-3">
-                      <img src="https://media.discordapp.net/attachments/1069579536842379305/1102868453402103818/ic-delivered-red.2e305d4e.png" alt="" />
-                      <img src="https://media.discordapp.net/attachments/1069579536842379305/1102872711610515456/remove.png" alt="" style={{width: '25px'}} />
+                    </div>  
+                     <div className="col-lg-3 col-md-6 col-sm-12 text-center mb-3">
+                      <img src="https://media.discordapp.net/attachments/1069579536842379305/1102868452777140255/ic-picked-red.94cd32af.png" alt="" />
+                      {
+                   viewOrder?.orderStatus==="returned"|| viewOrder?.orderStatus==="in-production" ||   viewOrder?.orderStatus==="payment-released"|| viewOrder?.orderStatus==="delivered"  ?
+                     
+                       
+                       <img src="https://media.discordapp.net/attachments/1069579536842379305/1102872711228821544/check_2.png" alt="" style={{width: '25px'}} />
+                       :
+                       <img src="https://media.discordapp.net/attachments/1069579536842379305/1102872711610515456/remove.png" alt="" style={{width: '25px'}} /> 
+                      }
+                     
                       <p>Delivered</p>
                     </div>
+                    
+                   
                   </div>
                 </div>
               </div>
@@ -226,8 +449,8 @@ const ViewOrder = () => {
                     </div>
                   </div>
                   {
-                    viewOrder?.orderDetailArr?.map(orderDetail=><>
-                      <div className="row order-tab">
+                    viewOrder?.orderDetailArr?.map((orderDetail,index)=><>
+                      <div className="row order-tab" key={index}>
                     <div className="col-2">
                       <p>{orderDetail?.color}</p>
                     </div>
@@ -241,52 +464,93 @@ const ViewOrder = () => {
                    {orderDetail?.teshirtSize}
                     </div>
                     <div className="col-lg-2">
-                      <div className="card file">
-                        <ul className="file-options dropdown">
-                          <a className="dropdown-toggle" href="#" data-bs-toggle="dropdown" aria-expanded="false">
-                            <i className="material-icons">more_vert</i>
-                          </a>
-                          <ul className="dropdown-menu dropdown-menu-right">
-                            <li>
-                              <a className="dropdown-item" href="#">View Details</a>
-                            </li>
-                            <li>
-                              <a className="dropdown-item" href="#">Download</a>
-                            </li>
-                            <li>
-                              <a className="dropdown-item" href="#">Copy Link</a>
-                            </li>
-                          </ul>
-                        </ul>
-                        <div className="card-body file-info">
-                          <p>Printbaz Logo.ai</p>
-                          <span className="file-size">1009.2kb</span><br />
-                        </div>
-                      </div>
+                    <div className="card file">
+  {
+    orderDetail?.file?.map(fileUrl => {
+     // Extract the file ID from the URL
+     let fileId = "";
+     if (fileUrl.includes("/file/d/")) {
+       fileId = fileUrl.split("/file/d/")[1].split("/")[0];
+     } else if (fileUrl.includes("id=")) {
+       fileId = fileUrl.split("id=")[1];
+     }
+     // Construct the direct download link
+     const downloadUrl = `https://drive.google.com/uc?export=download&id=${fileId}`;
+
+      return (
+        <div key={fileUrl}>
+          <ul className="file-options dropdown">
+            <a className="dropdown-toggle" href="#" data-bs-toggle="dropdown" aria-expanded="false">
+              <i className="material-icons">more_vert</i>
+            </a>
+            <ul className="dropdown-menu dropdown-menu-right">
+              <li>
+                <a className="dropdown-item" href="#">View Details</a>
+              </li>
+              <li>
+                {/* Update the href to use the download link */}
+                <a className="dropdown-item" href={downloadUrl} download>Download</a>
+               
+              </li>
+              <li>
+                <a className="dropdown-item" href="#">Copy Link</a>
+              </li>
+            </ul>
+          </ul>
+          <div className="card-body file-info">
+            <p>{fileUrl.substring(fileUrl.lastIndexOf('/') + 1)}</p>
+            {/* <span className="file-size">1009.2kb</span><br /> */}
+          </div>
+        </div>
+      )
+    })
+  }
+</div>
+
                     </div>
                     <div className="col-lg-2">
-                      <div className="card file">
-                        <ul className="file-options dropdown">
-                          <a className="dropdown-toggle" href="#" data-bs-toggle="dropdown" aria-expanded="false">
-                            <i className="material-icons">more_vert</i>
-                          </a>
-                          <ul className="dropdown-menu dropdown-menu-right">
-                            <li>
-                              <a className="dropdown-item" href="#">View Details</a>
-                            </li>
-                            <li>
-                              <a className="dropdown-item" href="#">Download</a>
-                            </li>
-                            <li>
-                              <a className="dropdown-item" href="#">Copy Link</a>
-                            </li>
-                          </ul>
-                        </ul>
-                        <div className="card-body file-info">
-                          <p>Printbaz T-Shirt.jpg</p>
-                          <span className="file-size">200.0kb</span><br />
-                        </div>
-                      </div>
+                    <div className="card file">
+  {
+    orderDetail?.image?.map(imageUrl => {
+     // Extract the file ID from the URL
+     let fileId = "";
+     if (imageUrl.includes("/file/d/")) {
+       fileId = imageUrl.split("/file/d/")[1].split("/")[0];
+     } else if (imageUrl.includes("id=")) {
+       fileId = imageUrl.split("id=")[1];
+     }
+     // Construct the direct download link
+     const downloadUrl = `https://drive.google.com/uc?export=download&id=${fileId}`;
+
+      return (
+        <div key={imageUrl}>
+          <ul className="file-options dropdown">
+            <a className="dropdown-toggle" href="#" data-bs-toggle="dropdown" aria-expanded="false">
+              <i className="material-icons">more_vert</i>
+            </a>
+            <ul className="dropdown-menu dropdown-menu-right">
+              <li>
+                <a className="dropdown-item" href="#">View Details</a>
+              </li>
+              <li>
+                {/* Update the href to use the download link */}
+                <a className="dropdown-item" href={downloadUrl} download>Download</a>
+               
+              </li>
+              <li>
+                <a className="dropdown-item" href="#">Copy Link</a>
+              </li>
+            </ul>
+          </ul>
+          <div className="card-body file-info">
+            <p>{imageUrl.substring(imageUrl.lastIndexOf('/') + 1)}</p>
+            {/* <span className="file-size">1009.2kb</span><br /> */}
+          </div>
+        </div>
+      )
+    })
+  }
+</div>
                     </div>
                   </div>
                     </>)
