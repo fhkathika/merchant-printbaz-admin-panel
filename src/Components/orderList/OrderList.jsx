@@ -192,7 +192,7 @@ let matchingMerchant
                     </div>
                     <div className="col-lg-1 col-sm-12">
                       <p className="status-btn">{orders?.orderStatus}</p>
-                      <p style={{fontSize: '14px'}}>{orders?.createdAt}</p>
+                      <p style={{fontSize: '14px'}}>{orders?.createdAt?.slice(0,10)}</p>
                     </div>
                   </div>
                 </Link>
