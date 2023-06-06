@@ -46,7 +46,7 @@ const ViewClient = () => {
   };
   const getViewClientColor = (status) => {
     if (status === "request") {
-      return "Orange";
+      return "#ff6f00";
     }
     if (status === "approved") {
       return "green";

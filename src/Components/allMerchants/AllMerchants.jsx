@@ -31,7 +31,16 @@ let approvedUsers=allMerchant?.filter(users=>users?.approval==="approved");
 let bannedUsers=allMerchant?.filter(users=>users?.approval==="ban");
 let searchByEmail = allMerchant?.filter(userEmail => userEmail?.email.includes(filterEmail));
 
-console.log(searchByEmail);
+let SingleEmailOneTime = allMerchant.reduce((acc, current) => {
+  const x = acc.find(item => item.email === current.email);
+  if (!x) {
+      return acc.concat([current]);
+  } else {
+      return acc;
+  }
+}, []);
+console.log("SingleEmailOneTime",SingleEmailOneTime);
+
     return (
         <div>
         <meta charSet="UTF-8" />
@@ -294,7 +303,7 @@ console.log(searchByEmail);
             </>) 
           }
           {
-           filterUser==="all" && allMerchant?.map((merchants)=><>
+           filterUser==="all" && SingleEmailOneTime?.map((merchants)=><>
               
             <Link key={merchants?._id} to={`/viewClient/${merchants?._id}`} state={{merchants}}>
             <div className="row client-list">
@@ -315,7 +324,7 @@ console.log(searchByEmail);
               </div>
               <div className="col-lg-2 col-sm-12">
                 {
-                  merchants?.approval==="requiest" &&   <p className="status-btn" style={{backgroundColor:"red"}} >{merchants?.approval}</p>
+                  merchants?.approval==="request" &&   <p className="status-btn" style={{backgroundColor:"#ff6f00"}} >{merchants?.approval}</p>
                 }
                  {
                   merchants?.approval==="approved" &&   <p className="status-btn"  >{merchants?.approval}</p>

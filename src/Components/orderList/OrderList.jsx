@@ -17,7 +17,13 @@ const OrderList = () => {
 },[allMerchant])
 let matchingMerchant
 
- 
+let date = new Date(orderAll?.createdAt); // create a new Date object
+
+let options = { year: 'numeric', month: 'long', day: 'numeric' }; // options for toLocaleDateString
+
+let formattedDate = date.toLocaleDateString('en-US', options); // use toLocaleDateString to format the date
+
+console.log(formattedDate); 
 
     return (
         <div>
@@ -188,7 +194,7 @@ let matchingMerchant
                     </div>
                     <div className="col-lg-1 col-sm-12">
                       <p className="status-btn">{orders?.orderStatus}</p>
-                      <p style={{fontSize: '14px'}}>{orders?.createdAt?.slice(0,10)}</p>
+                      {/* <p style={{fontSize: '14px'}}>{formattedDate}</p> */}
                     </div>
                   </div>
                 </Link>

@@ -7,7 +7,14 @@ const ViewOrder = () => {
   const viewClient = location.state?.matchingMerchant;
   console.log(viewOrder);
   
+  let date = new Date(viewOrder?.createdAt); // create a new Date object
 
+  let options = { year: 'numeric', month: 'long', day: 'numeric' }; // options for toLocaleDateString
+  
+  let formattedDate = date.toLocaleDateString('en-US', options); // use toLocaleDateString to format the date
+  
+  console.log(formattedDate); 
+  
   const handleInputChange = async (e) => {
     const status = e.target.value; // the new status
   console.log("status",status);
@@ -166,8 +173,9 @@ const ViewOrder = () => {
             </div>
             <div className="row">
               <div className="col-12">
-                <div className="order-id bg-white p-4  shadow-sm">
-                  <h3 className="d-inline-block font-weight-bold">ORDER {viewOrder?._id} &nbsp;</h3>
+                <div className="order-id bg-white p-4  shadow-sm" >
+                <div style={{display:"flex",justifyContent:"space-between"}}>
+                <h3 className="d-inline-block font-weight-bold">ORDER ID: {viewOrder?._id} &nbsp; <h5 style={{marginTop:"10px"}}>{formattedDate}</h5></h3>
                   {/* <button className="status-btn d-inline-block py-2 px-3 font-weight-bold">{viewOrder?.orderStatus}</button> */}
                
                   <div
@@ -288,8 +296,15 @@ const ViewOrder = () => {
                             </>
                           )}
                         </select>
+                       
+                <p style={{textAlign:"center",marginTop:'10px'}}>Status changed at: {viewOrder?.statusDate}</p>
+
                       </div>
                 </div>
+              
+                     
+                </div>
+            
               </div>
             </div>
             <div className="row">
@@ -449,8 +464,8 @@ const ViewOrder = () => {
                     </div>
                   </div>
                   {
-                    viewOrder?.orderDetailArr?.map((orderDetail,index)=><>
-                      <div className="row order-tab" key={index}>
+                    viewOrder?.orderDetailArr?.map((orderDetail,orderIndex)=><>
+                      <div className="row order-tab" key={orderIndex}>
                     <div className="col-2">
                       <p>{orderDetail?.color}</p>
                     </div>
@@ -466,7 +481,7 @@ const ViewOrder = () => {
                     <div className="col-lg-2">
                     <div className="card file">
   {
-    orderDetail?.file?.map(fileUrl => {
+    orderDetail?.file?.map((fileUrl,fileIndex) => {
      // Extract the file ID from the URL
      let fileId = "";
      if (fileUrl.includes("/file/d/")) {
@@ -476,19 +491,22 @@ const ViewOrder = () => {
      }
      // Construct the direct download link
      const downloadUrl = `https://drive.google.com/uc?export=download&id=${fileId}`;
-
+     let dropdownId = `dropdown${orderIndex}-${fileIndex}`;
       return (
-        <div key={fileUrl}>
-          <ul className="file-options dropdown">
-            <a className="dropdown-toggle" href="#" data-bs-toggle="dropdown" aria-expanded="false">
+        <div key={fileIndex}>
+         
+          <div className="card-body file-info">
+            
+            <a className="dropdown-item" href={downloadUrl} download><p style={{cursor:"pointer"}} href={downloadUrl} download>{fileUrl.substring(fileUrl.lastIndexOf('/') + 1)}</p></a>
+            {/* <ul className="file-options dropdown" >
+            <a className="dropdown-toggle" href="#" id={dropdownId} data-bs-toggle="dropdown" aria-expanded="false">
               <i className="material-icons">more_vert</i>
             </a>
             <ul className="dropdown-menu dropdown-menu-right">
               <li>
-                <a className="dropdown-item" href="#">View Details</a>
+                <a className="dropdown-item"    href="#">View Details</a>
               </li>
               <li>
-                {/* Update the href to use the download link */}
                 <a className="dropdown-item" href={downloadUrl} download>Download</a>
                
               </li>
@@ -496,16 +514,18 @@ const ViewOrder = () => {
                 <a className="dropdown-item" href="#">Copy Link</a>
               </li>
             </ul>
-          </ul>
-          <div className="card-body file-info">
-            <p>{fileUrl.substring(fileUrl.lastIndexOf('/') + 1)}</p>
-            {/* <span className="file-size">1009.2kb</span><br /> */}
+          </ul> */}
           </div>
         </div>
       )
     })
   }
 </div>
+
+
+
+
+
 
                     </div>
                     <div className="col-lg-2">
@@ -524,7 +544,7 @@ const ViewOrder = () => {
 
       return (
         <div key={imageUrl}>
-          <ul className="file-options dropdown">
+          {/* <ul className="file-options dropdown">
             <a className="dropdown-toggle" href="#" data-bs-toggle="dropdown" aria-expanded="false">
               <i className="material-icons">more_vert</i>
             </a>
@@ -533,7 +553,6 @@ const ViewOrder = () => {
                 <a className="dropdown-item" href="#">View Details</a>
               </li>
               <li>
-                {/* Update the href to use the download link */}
                 <a className="dropdown-item" href={downloadUrl} download>Download</a>
                
               </li>
@@ -541,9 +560,10 @@ const ViewOrder = () => {
                 <a className="dropdown-item" href="#">Copy Link</a>
               </li>
             </ul>
-          </ul>
+          </ul> */}
           <div className="card-body file-info">
-            <p>{imageUrl.substring(imageUrl.lastIndexOf('/') + 1)}</p>
+           
+            <a className="dropdown-item" href={downloadUrl} download> <p>{imageUrl.substring(imageUrl.lastIndexOf('/') + 1)}</p></a>
             {/* <span className="file-size">1009.2kb</span><br /> */}
           </div>
         </div>
