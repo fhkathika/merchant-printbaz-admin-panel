@@ -6,6 +6,7 @@ const OrderList = () => {
   const { orderAll } = useGetMongoData();
   const [allMerchant,setAllMerchant]=useState([])
   console.log("orderAll", orderAll);
+  const [filterOrders,setFilterOrders]=useState('all')
   useEffect(()=>{
     const getOrders = async () => {
      await fetch('https://mserver.printbaz.com/alluser') //for main site
@@ -22,9 +23,49 @@ let date = new Date(orderAll?.createdAt); // create a new Date object
 let options = { year: 'numeric', month: 'long', day: 'numeric' }; // options for toLocaleDateString
 
 let formattedDate = date.toLocaleDateString('en-US', options); // use toLocaleDateString to format the date
+const handleInputChange = (event, index) => {
+  const { name, value } = event.target;
+  setFilterOrders(value)
+}
+let pendingOrders=orderAll?.filter(users=>users?.orderStatus==="Pending");
+let approvedOrders=orderAll?.filter(users=>users?.orderStatus==="Approved");
+let onHoldOrders=orderAll?.filter(users=>users?.orderStatus==="on-hold");
+let onHoldArtworkIssueOrders=orderAll?.filter(users=>users?.orderStatus==="on hold artwork issue");
+let onHoldBillingIssueOrders=orderAll?.filter(users=>users?.orderStatus==="on hold billing issue");
+let onHoldOutOfStockOrders=orderAll?.filter(users=>users?.orderStatus==="on hold out of stock");
+let inProductionOrders=orderAll?.filter(users=>users?.orderStatus==="in-production");
+let outForDeliveryOrders=orderAll?.filter(users=>users?.orderStatus==="out for delivery");
+let deliveredOrders=orderAll?.filter(users=>users?.orderStatus==="delivered");
+let cancelOrders=orderAll?.filter(users=>users?.orderStatus==="cancel");
 
-console.log(formattedDate); 
-
+const getViewClientColor = (status) => {
+  if (status === "Pending") {
+    return "Orange";
+  }
+  if (status === "Approved") {
+    return "green";
+  } 
+  if (status === "on-hold") {
+    return "yellow";
+  }
+    if (status === "in-production") {
+    return "blue";
+  }
+    if (status === "out for delivery") {
+    return "sea green";
+  }  
+  if (status === "delivered") {
+    return "sea green";
+  } 
+   if (status === "payment-released") {
+    return "sea green";
+  } 
+      if (status === "returned") {
+    return "red";
+  }
+  // you can add more conditions here or just return a default color
+  // return "defaultColor";
+};
     return (
         <div>
           <meta charSet="UTF-8" />
@@ -46,30 +87,14 @@ console.log(formattedDate);
                 <li className="nav-item">
                   <Link className="nav-link active" aria-current="page" to="/">Dashboard</Link>
 
+                </li> 
+                <li className="nav-item">
+                <Link className="nav-link active" aria-current="page" to="/allMerchants">Merchants</Link>
                 </li>
-                <li className="nav-item dropdown">
-                  <a className="nav-link dropdown-toggle" href="#" id="navbarDropdownMenuLink" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-                    Merchants
-                  </a>
-                  <ul className="dropdown-menu nav-dropdown-menu" aria-labelledby="navbarDropdownMenuLink">
-                    <li><Link className="dropdown-item nav-dropdown-item"to="/allMerchants">All Merchants</Link></li>
-                    <li><a className="dropdown-item nav-dropdown-item" href="client-list.html">Request Merchants</a></li>
-                    <li><a className="dropdown-item nav-dropdown-item" href="client-list.html">Aproved Merchants</a></li>
-                    <li><a className="dropdown-item nav-dropdown-item" href="client-list.html">Ban Merchants</a></li>
-                  </ul>
+                <li className="nav-item">
+                <Link className="nav-link active" aria-current="page" to="/orderList">Orders</Link>
                 </li>
-                <li className="nav-item dropdown">
-                  <a className="nav-link dropdown-toggle" href="#" id="navbarDropdownMenuLink" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-                    Orders
-                  </a>
-                  <ul className="dropdown-menu nav-dropdown-menu" aria-labelledby="navbarDropdownMenuLink">
-                    <li><Link className="dropdown-item nav-dropdown-item"to="/orderList">All Order</Link></li>
-                    <li><a className="dropdown-item nav-dropdown-item" href="order-list.html">Pending Order</a></li>
-                    <li><a className="dropdown-item nav-dropdown-item" href="order-list.html">On Hold Order</a></li>
-                    <li><a className="dropdown-item nav-dropdown-item" href="order-list.html">Aproved Order</a></li>
-                    <li><a className="dropdown-item nav-dropdown-item" href="order-list.html">Delivery Order</a></li>
-                  </ul>
-                </li>
+              
                 <li className="nav-item dropdown">
                   <a className="nav-link dropdown-toggle" href="#" id="navbarDropdownMenuLink" role="button" data-bs-toggle="dropdown" aria-expanded="false">
                     Analytics
@@ -132,16 +157,21 @@ console.log(formattedDate);
               </div>
               <div className="col-lg-2 col-sm-12">
                 <label htmlFor="status-filter">Status:</label>
-                <select id="status-filter" className="form-control">
-                  <option value>None</option>
+                <select id="status-filter" className="form-control" onChange={(e) =>  handleInputChange(e)}>
+                  <option value="all">all</option>
                   <option value="Pending">Pending</option>
                   <option value="on-hold">On Hold</option>
+                  <option value="on hold artwork issue">On hold -  Artwork issue</option>
+                  <option value="on hold billing issue">On hold - Billing Issue</option>
+                  <option value="on hold out of stock">On hold - Out of Stock</option>
                   <option value="Approved">Approved</option>
                   <option value="in-production">In Production</option>
                   <option value="out for delivery">Out for delivery</option>
                  <option value="delivered">Delivered</option>
                   <option value="payment-released">Payment Released</option>
                   <option value="returned">Returned</option>
+                  <option value="cancel">Cancel</option>
+                  
                 </select>
               </div>
             </div>
@@ -167,7 +197,7 @@ console.log(formattedDate);
                 </div>
               </div>
               {
-                orderAll.map((orders,index)=>{ 
+              filterOrders==="all" && orderAll.map((orders,index)=>{ 
                 matchingMerchant = allMerchant.find(merchant => merchant?.email === orders?.userMail)
                return (
                   <Link to={`/viewOrder/${orders?._id}`} state={{orders,matchingMerchant}} key={index}>
@@ -193,7 +223,410 @@ console.log(formattedDate);
                       <p>{orders?.recvMoney} TK</p>
                     </div>
                     <div className="col-lg-1 col-sm-12">
-                      <p className="status-btn">{orders?.orderStatus}</p>
+                      <p className="status-btn" style={{    backgroundColor: getViewClientColor(
+                            orders?.orderStatus
+                            ),}}>{orders?.orderStatus}</p>
+                      {/* <p style={{fontSize: '14px'}}>{formattedDate}</p> */}
+                    </div>
+                  </div>
+                </Link>
+               
+               )
+                }
+                  )
+               
+              }  
+              {
+              filterOrders==="Pending" && pendingOrders.map((orders,index)=>{ 
+                matchingMerchant = allMerchant.find(merchant => merchant?.email === orders?.userMail)
+               return (
+                  <Link to={`/viewOrder/${orders?._id}`} state={{orders,matchingMerchant}} key={index}>
+                  <div key={orders?._id} className="row client-list">
+                    <div className="col-lg-2 col-sm-12">
+                     {/* Display the corresponding allMerchant name */}
+                     <p>{matchingMerchant?.name}</p>
+          {/* {index < allMerchant.length && <p>{allMerchant[index]?.name}</p>} */}
+                   
+                    </div>
+                    <div className="col-lg-2 col-sm-12">
+                      <p>{orders?._id}</p>
+                    </div>
+                    <div className="col-lg-3 col-sm-12">
+                      <p>{orders?.name}</p>
+                      <p>{orders?.address}</p>
+                      <p>{orders?.phone}</p>
+                    </div>
+                    <div className="col-lg-2 col-sm-12">
+                      <p className="p-status-btn">{orders?.paymentStatus}</p>
+                    </div>
+                    <div className="col-lg-2 col-sm-12">
+                      <p>{orders?.recvMoney} TK</p>
+                    </div>
+                    <div className="col-lg-1 col-sm-12">
+                      <p className="status-btn" style={{    backgroundColor: getViewClientColor(
+                            orders?.orderStatus
+                            ),}}>{orders?.orderStatus}</p>
+                      {/* <p style={{fontSize: '14px'}}>{formattedDate}</p> */}
+                    </div>
+                  </div>
+                </Link>
+               
+               )
+                }
+                  )
+               
+              } 
+                {
+              filterOrders==="Approved" && approvedOrders.map((orders,index)=>{ 
+                matchingMerchant = allMerchant.find(merchant => merchant?.email === orders?.userMail)
+               return (
+                  <Link to={`/viewOrder/${orders?._id}`} state={{orders,matchingMerchant}} key={index}>
+                  <div key={orders?._id} className="row client-list">
+                    <div className="col-lg-2 col-sm-12">
+                     {/* Display the corresponding allMerchant name */}
+                     <p>{matchingMerchant?.name}</p>
+          {/* {index < allMerchant.length && <p>{allMerchant[index]?.name}</p>} */}
+                   
+                    </div>
+                    <div className="col-lg-2 col-sm-12">
+                      <p>{orders?._id}</p>
+                    </div>
+                    <div className="col-lg-3 col-sm-12">
+                      <p>{orders?.name}</p>
+                      <p>{orders?.address}</p>
+                      <p>{orders?.phone}</p>
+                    </div>
+                    <div className="col-lg-2 col-sm-12">
+                      <p className="p-status-btn">{orders?.paymentStatus}</p>
+                    </div>
+                    <div className="col-lg-2 col-sm-12">
+                      <p>{orders?.recvMoney} TK</p>
+                    </div>
+                    <div className="col-lg-1 col-sm-12">
+                      <p className="status-btn" style={{    backgroundColor: getViewClientColor(
+                            orders?.orderStatus
+                            ),}}>{orders?.orderStatus}</p>
+                      {/* <p style={{fontSize: '14px'}}>{formattedDate}</p> */}
+                    </div>
+                  </div>
+                </Link>
+               
+               )
+                }
+                  )
+               
+              }
+              
+                {
+              filterOrders==="on-hold" && onHoldOrders.map((orders,index)=>{ 
+                matchingMerchant = allMerchant.find(merchant => merchant?.email === orders?.userMail)
+               return (
+                  <Link to={`/viewOrder/${orders?._id}`} state={{orders,matchingMerchant}} key={index}>
+                  <div key={orders?._id} className="row client-list">
+                    <div className="col-lg-2 col-sm-12">
+                     {/* Display the corresponding allMerchant name */}
+                     <p>{matchingMerchant?.name}</p>
+          {/* {index < allMerchant.length && <p>{allMerchant[index]?.name}</p>} */}
+                   
+                    </div>
+                    <div className="col-lg-2 col-sm-12">
+                      <p>{orders?._id}</p>
+                    </div>
+                    <div className="col-lg-3 col-sm-12">
+                      <p>{orders?.name}</p>
+                      <p>{orders?.address}</p>
+                      <p>{orders?.phone}</p>
+                    </div>
+                    <div className="col-lg-2 col-sm-12">
+                      <p className="p-status-btn">{orders?.paymentStatus}</p>
+                    </div>
+                    <div className="col-lg-2 col-sm-12">
+                      <p>{orders?.recvMoney} TK</p>
+                    </div>
+                    <div className="col-lg-1 col-sm-12">
+                      <p className="status-btn" style={{    backgroundColor: getViewClientColor(
+                            orders?.orderStatus
+                            ),}}>{orders?.orderStatus}</p>
+                      {/* <p style={{fontSize: '14px'}}>{formattedDate}</p> */}
+                    </div>
+                  </div>
+                </Link>
+               
+               )
+                }
+                  )
+               
+              }  
+                {
+              filterOrders==="in-production" && inProductionOrders.map((orders,index)=>{ 
+                matchingMerchant = allMerchant.find(merchant => merchant?.email === orders?.userMail)
+               return (
+                  <Link to={`/viewOrder/${orders?._id}`} state={{orders,matchingMerchant}} key={index}>
+                  <div key={orders?._id} className="row client-list">
+                    <div className="col-lg-2 col-sm-12">
+                     {/* Display the corresponding allMerchant name */}
+                     <p>{matchingMerchant?.name}</p>
+          {/* {index < allMerchant.length && <p>{allMerchant[index]?.name}</p>} */}
+                   
+                    </div>
+                    <div className="col-lg-2 col-sm-12">
+                      <p>{orders?._id}</p>
+                    </div>
+                    <div className="col-lg-3 col-sm-12">
+                      <p>{orders?.name}</p>
+                      <p>{orders?.address}</p>
+                      <p>{orders?.phone}</p>
+                    </div>
+                    <div className="col-lg-2 col-sm-12">
+                      <p className="p-status-btn">{orders?.paymentStatus}</p>
+                    </div>
+                    <div className="col-lg-2 col-sm-12">
+                      <p>{orders?.recvMoney} TK</p>
+                    </div>
+                    <div className="col-lg-1 col-sm-12">
+                      <p className="status-btn" style={{    backgroundColor: getViewClientColor(
+                            orders?.orderStatus
+                            ),}}>{orders?.orderStatus}</p>
+                      {/* <p style={{fontSize: '14px'}}>{formattedDate}</p> */}
+                    </div>
+                  </div>
+                </Link>
+               
+               )
+                }
+                  )
+               
+              }
+              {
+              filterOrders==="out for delivery" && outForDeliveryOrders.map((orders,index)=>{ 
+                matchingMerchant = allMerchant.find(merchant => merchant?.email === orders?.userMail)
+               return (
+                  <Link to={`/viewOrder/${orders?._id}`} state={{orders,matchingMerchant}} key={index}>
+                  <div key={orders?._id} className="row client-list">
+                    <div className="col-lg-2 col-sm-12">
+                     {/* Display the corresponding allMerchant name */}
+                     <p>{matchingMerchant?.name}</p>
+          {/* {index < allMerchant.length && <p>{allMerchant[index]?.name}</p>} */}
+                   
+                    </div>
+                    <div className="col-lg-2 col-sm-12">
+                      <p>{orders?._id}</p>
+                    </div>
+                    <div className="col-lg-3 col-sm-12">
+                      <p>{orders?.name}</p>
+                      <p>{orders?.address}</p>
+                      <p>{orders?.phone}</p>
+                    </div>
+                    <div className="col-lg-2 col-sm-12">
+                      <p className="p-status-btn">{orders?.paymentStatus}</p>
+                    </div>
+                    <div className="col-lg-2 col-sm-12">
+                      <p>{orders?.recvMoney} TK</p>
+                    </div>
+                    <div className="col-lg-1 col-sm-12">
+                      <p className="status-btn" style={{    backgroundColor: getViewClientColor(
+                            orders?.orderStatus
+                            ),}}>{orders?.orderStatus}</p>
+                      {/* <p style={{fontSize: '14px'}}>{formattedDate}</p> */}
+                    </div>
+                  </div>
+                </Link>
+               
+               )
+                }
+                  )
+               
+              }  
+                {
+              filterOrders==="delivered" && deliveredOrders.map((orders,index)=>{ 
+                matchingMerchant = allMerchant.find(merchant => merchant?.email === orders?.userMail)
+               return (
+                  <Link to={`/viewOrder/${orders?._id}`} state={{orders,matchingMerchant}} key={index}>
+                  <div key={orders?._id} className="row client-list">
+                    <div className="col-lg-2 col-sm-12">
+                     {/* Display the corresponding allMerchant name */}
+                     <p>{matchingMerchant?.name}</p>
+          {/* {index < allMerchant.length && <p>{allMerchant[index]?.name}</p>} */}
+                   
+                    </div>
+                    <div className="col-lg-2 col-sm-12">
+                      <p>{orders?._id}</p>
+                    </div>
+                    <div className="col-lg-3 col-sm-12">
+                      <p>{orders?.name}</p>
+                      <p>{orders?.address}</p>
+                      <p>{orders?.phone}</p>
+                    </div>
+                    <div className="col-lg-2 col-sm-12">
+                      <p className="p-status-btn">{orders?.paymentStatus}</p>
+                    </div>
+                    <div className="col-lg-2 col-sm-12">
+                      <p>{orders?.recvMoney} TK</p>
+                    </div>
+                    <div className="col-lg-1 col-sm-12">
+                      <p className="status-btn" style={{    backgroundColor: getViewClientColor(
+                            orders?.orderStatus
+                            ),}}>{orders?.orderStatus}</p>
+                      {/* <p style={{fontSize: '14px'}}>{formattedDate}</p> */}
+                    </div>
+                  </div>
+                </Link>
+               
+               )
+                }
+                  )
+               
+              }
+              {
+              filterOrders==="on hold artwork issue" && onHoldArtworkIssueOrders.map((orders,index)=>{ 
+                matchingMerchant = allMerchant.find(merchant => merchant?.email === orders?.userMail)
+               return (
+                  <Link to={`/viewOrder/${orders?._id}`} state={{orders,matchingMerchant}} key={index}>
+                  <div key={orders?._id} className="row client-list">
+                    <div className="col-lg-2 col-sm-12">
+                     {/* Display the corresponding allMerchant name */}
+                     <p>{matchingMerchant?.name}</p>
+          {/* {index < allMerchant.length && <p>{allMerchant[index]?.name}</p>} */}
+                   
+                    </div>
+                    <div className="col-lg-2 col-sm-12">
+                      <p>{orders?._id}</p>
+                    </div>
+                    <div className="col-lg-3 col-sm-12">
+                      <p>{orders?.name}</p>
+                      <p>{orders?.address}</p>
+                      <p>{orders?.phone}</p>
+                    </div>
+                    <div className="col-lg-2 col-sm-12">
+                      <p className="p-status-btn">{orders?.paymentStatus}</p>
+                    </div>
+                    <div className="col-lg-2 col-sm-12">
+                      <p>{orders?.recvMoney} TK</p>
+                    </div>
+                    <div className="col-lg-1 col-sm-12">
+                      <p className="status-btn" style={{    backgroundColor: getViewClientColor(
+                            orders?.orderStatus
+                            ),}}>{orders?.orderStatus}</p>
+                      {/* <p style={{fontSize: '14px'}}>{formattedDate}</p> */}
+                    </div>
+                  </div>
+                </Link>
+               
+               )
+                }
+                  )
+               
+              }
+             {
+              filterOrders==="on hold billing issue" && onHoldBillingIssueOrders.map((orders,index)=>{ 
+                matchingMerchant = allMerchant.find(merchant => merchant?.email === orders?.userMail)
+               return (
+                  <Link to={`/viewOrder/${orders?._id}`} state={{orders,matchingMerchant}} key={index}>
+                  <div key={orders?._id} className="row client-list">
+                    <div className="col-lg-2 col-sm-12">
+                     {/* Display the corresponding allMerchant name */}
+                     <p>{matchingMerchant?.name}</p>
+          {/* {index < allMerchant.length && <p>{allMerchant[index]?.name}</p>} */}
+                   
+                    </div>
+                    <div className="col-lg-2 col-sm-12">
+                      <p>{orders?._id}</p>
+                    </div>
+                    <div className="col-lg-3 col-sm-12">
+                      <p>{orders?.name}</p>
+                      <p>{orders?.address}</p>
+                      <p>{orders?.phone}</p>
+                    </div>
+                    <div className="col-lg-2 col-sm-12">
+                      <p className="p-status-btn">{orders?.paymentStatus}</p>
+                    </div>
+                    <div className="col-lg-2 col-sm-12">
+                      <p>{orders?.recvMoney} TK</p>
+                    </div>
+                    <div className="col-lg-1 col-sm-12">
+                      <p className="status-btn" style={{    backgroundColor: getViewClientColor(
+                            orders?.orderStatus
+                            ),}}>{orders?.orderStatus}</p>
+                      {/* <p style={{fontSize: '14px'}}>{formattedDate}</p> */}
+                    </div>
+                  </div>
+                </Link>
+               
+               )
+                }
+                  )
+               
+              } 
+                {
+              filterOrders==="on hold out of stock" && onHoldOutOfStockOrders.map((orders,index)=>{ 
+                matchingMerchant = allMerchant.find(merchant => merchant?.email === orders?.userMail)
+               return (
+                  <Link to={`/viewOrder/${orders?._id}`} state={{orders,matchingMerchant}} key={index}>
+                  <div key={orders?._id} className="row client-list">
+                    <div className="col-lg-2 col-sm-12">
+                     {/* Display the corresponding allMerchant name */}
+                     <p>{matchingMerchant?.name}</p>
+          {/* {index < allMerchant.length && <p>{allMerchant[index]?.name}</p>} */}
+                   
+                    </div>
+                    <div className="col-lg-2 col-sm-12">
+                      <p>{orders?._id}</p>
+                    </div>
+                    <div className="col-lg-3 col-sm-12">
+                      <p>{orders?.name}</p>
+                      <p>{orders?.address}</p>
+                      <p>{orders?.phone}</p>
+                    </div>
+                    <div className="col-lg-2 col-sm-12">
+                      <p className="p-status-btn">{orders?.paymentStatus}</p>
+                    </div>
+                    <div className="col-lg-2 col-sm-12">
+                      <p>{orders?.recvMoney} TK</p>
+                    </div>
+                    <div className="col-lg-1 col-sm-12">
+                      <p className="status-btn" style={{    backgroundColor: getViewClientColor(
+                            orders?.orderStatus
+                            ),}}>{orders?.orderStatus}</p>
+                      {/* <p style={{fontSize: '14px'}}>{formattedDate}</p> */}
+                    </div>
+                  </div>
+                </Link>
+               
+               )
+                }
+                  )
+               
+              }  
+               {
+              filterOrders==="cancel" && cancelOrders.map((orders,index)=>{ 
+                matchingMerchant = allMerchant.find(merchant => merchant?.email === orders?.userMail)
+               return (
+                  <Link to={`/viewOrder/${orders?._id}`} state={{orders,matchingMerchant}} key={index}>
+                  <div key={orders?._id} className="row client-list">
+                    <div className="col-lg-2 col-sm-12">
+                     {/* Display the corresponding allMerchant name */}
+                     <p>{matchingMerchant?.name}</p>
+          {/* {index < allMerchant.length && <p>{allMerchant[index]?.name}</p>} */}
+                   
+                    </div>
+                    <div className="col-lg-2 col-sm-12">
+                      <p>{orders?._id}</p>
+                    </div>
+                    <div className="col-lg-3 col-sm-12">
+                      <p>{orders?.name}</p>
+                      <p>{orders?.address}</p>
+                      <p>{orders?.phone}</p>
+                    </div>
+                    <div className="col-lg-2 col-sm-12">
+                      <p className="p-status-btn">{orders?.paymentStatus}</p>
+                    </div>
+                    <div className="col-lg-2 col-sm-12">
+                      <p>{orders?.recvMoney} TK</p>
+                    </div>
+                    <div className="col-lg-1 col-sm-12">
+                      <p className="status-btn" style={{    backgroundColor: getViewClientColor(
+                            orders?.orderStatus
+                            ),}}>{orders?.orderStatus}</p>
                       {/* <p style={{fontSize: '14px'}}>{formattedDate}</p> */}
                     </div>
                   </div>

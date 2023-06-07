@@ -1,11 +1,13 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 
 const ViewOrder = () => {
   const location = useLocation();
   const viewOrder = location.state ? location?.state?.orders : null;
   const viewClient = location.state?.matchingMerchant;
-  console.log(viewOrder);
+  const [orderStatus, setOrderStatus] = useState(viewOrder?.orderStatus);
+  const [paymentStatus, setPaymentStatus] = useState(viewOrder?.paymentStatus);
+
   
   let date = new Date(viewOrder?.createdAt); // create a new Date object
 
@@ -36,7 +38,42 @@ const ViewOrder = () => {
   
       if (response.ok) {
         // Update the approval status in the viewClient object
-        viewOrder.orderStatus = status;
+        setOrderStatus(status);
+  
+        console.log("Success:", viewOrder);
+        // Update your state or perform any other necessary operations with the updated viewClient object
+      } else {
+        console.error("status Error:", response);
+        // Handle error here
+      }
+    } catch (error) {
+      console.error("Error:", error.message);
+      // Handle error here
+    }
+  }; 
+  
+  const handleInputPaymentChange = async (e) => {
+    const status = e.target.value; // the new status
+  console.log("status",status);
+
+    //   await fetch(`http://localhost:5000/update-approval/${viewClient?._id}`, { //for testing site
+    try {
+      const response = await fetch(
+        
+        `https://mserver.printbaz.com/updatePaymentStatus/${viewOrder?._id}`,
+      // `http://localhost:5000/updatePaymentStatus/${viewOrder?._id}`,
+        {
+          method: "PUT",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({ paymentStatus: status }),
+        }
+      );
+  
+      if (response.ok) {
+        // Update the approval status in the viewClient object
+        setPaymentStatus(status);
   
         console.log("Success:", viewOrder);
         // Update your state or perform any other necessary operations with the updated viewClient object
@@ -73,6 +110,20 @@ const ViewOrder = () => {
     } 
         if (status === "returned") {
       return "red";
+    }      if (status === "on hold artwork issue") {
+      return "#cafc03";
+    }      if (status === "on hold billing issue") {
+      return "#ca5fdf";
+    }      if (status === "on hold out of stock") {
+      return "#8ae1ed";
+    }  
+      if (status === "cancel") {
+      return "#ed8a8a";
+    }   
+     if (status === "paid") {
+      return "#b8ed8a";
+    }    if (status === "Unpaid") {
+      return "#360eea";
     }
     // you can add more conditions here or just return a default color
     // return "defaultColor";
@@ -116,9 +167,6 @@ const ViewOrder = () => {
                   </a>
                   <ul className="dropdown-menu nav-dropdown-menu" aria-labelledby="navbarDropdownMenuLink">
                     <li><Link className="dropdown-item nav-dropdown-item"to="/allMerchants">All Merchants</Link></li>
-                    <li><a className="dropdown-item nav-dropdown-item" href="client-list.html">Request Merchants</a></li>
-                    <li><a className="dropdown-item nav-dropdown-item" href="client-list.html">Aproved Merchants</a></li>
-                    <li><a className="dropdown-item nav-dropdown-item" href="client-list.html">Ban Merchants</a></li>
                   </ul>
                 </li>
                 <li className="nav-item dropdown">
@@ -127,10 +175,6 @@ const ViewOrder = () => {
                   </a>
                   <ul className="dropdown-menu nav-dropdown-menu" aria-labelledby="navbarDropdownMenuLink">
                     <li><Link className="dropdown-item nav-dropdown-item"to="/orderList">All Order</Link></li>
-                    <li><a className="dropdown-item nav-dropdown-item" href="order-list.html">Pending Order</a></li>
-                    <li><a className="dropdown-item nav-dropdown-item" href="order-list.html">On Hold Order</a></li>
-                    <li><a className="dropdown-item nav-dropdown-item" href="order-list.html">Aproved Order</a></li>
-                    <li><a className="dropdown-item nav-dropdown-item" href="order-list.html">Delivery Order</a></li>
                   </ul>
                 </li>
                 <li className="nav-item dropdown">
@@ -182,6 +226,49 @@ const ViewOrder = () => {
                         className=" d-inline-block  font-weight-bold"
                         style={{ marginBottom: "20px" }}
                       >
+                        <div style={{display:"flex"}}>
+                        <select
+                          id="status-filter"
+                          className="status-btn"
+                          style={{
+                            border: "none",
+                            padding: "8px",
+                            marginRight:'20px',
+                            backgroundColor: getViewClientColor(
+                              paymentStatus
+                            ),
+                          }}
+                          onChange={(e) => handleInputPaymentChange(e)}
+                        >
+                          <option value={orderStatus}>
+                            {paymentStatus=== "paid"&& "Paid" }
+                            {paymentStatus=== "Unpaid"&& "Unpaid" }
+                           
+                        
+                          </option>
+                      
+                      
+
+                       
+
+
+{paymentStatus === "paid" && (
+                            <>
+                              {/* <option value="paid">Paid</option> */}
+                              <option value="Unpaid">Unpaid</option>
+                           
+                            </>
+                          )}
+
+{paymentStatus === "Unpaid" && (
+                            <>
+                            <option value="paid">Paid</option>
+                            {/* <option value="Unpaid">Unpaid</option> */}
+                           
+                              
+                            </>
+                          )}
+                        </select>
                         <select
                           id="status-filter"
                           className="status-btn"
@@ -189,113 +276,216 @@ const ViewOrder = () => {
                             border: "none",
                             padding: "8px",
                             backgroundColor: getViewClientColor(
-                              viewOrder?.orderStatus
+                              orderStatus
                             ),
                           }}
                           onChange={(e) => handleInputChange(e)}
                         >
-                          <option value={viewOrder?.orderStatus}>
-                            {viewOrder?.orderStatus=== "Pending"&& "Pending" }
-                            {viewOrder?.orderStatus=== "on-hold"&& "On Hold" }
-                            {viewOrder?.orderStatus=== "Approved"&& "Approved" }
-                            {viewOrder?.orderStatus=== "in-production"&& "In Production" }
-                            {viewOrder?.orderStatus=== "out for delivery"&& "Out for delivery" }
-                            {viewOrder?.orderStatus=== "delivered"&& "Delivered" }
-                            {viewOrder?.orderStatus=== "payment-released"&& "Payment Released" }
-                            {viewOrder?.orderStatus=== "returned"&& "returned" }
+                          <option value={orderStatus}>
+                            {orderStatus=== "Pending"&& "Pending" }
+                            {orderStatus=== "on-hold"&& "On Hold" }
+                            {orderStatus=== "Approved"&& "Approved" }
+                            {orderStatus=== "in-production"&& "In Production" }
+                            {orderStatus=== "out for delivery"&& "Out for delivery" }
+                            {orderStatus=== "delivered"&& "Delivered" }
+                            {orderStatus=== "payment-released"&& "Payment Released" }
+                            {orderStatus=== "returned"&& "returned" }
+                            {orderStatus=== "on hold artwork issue"&& "On hold -Artwork issue" }
+                            {orderStatus=== "on hold billing issue"&& "On hold - Billing issue" }
+                            {orderStatus=== "on hold out of stock"&& "On hold - Out of stock" }
+                            {orderStatus=== "cancel"&& "Cancel" }
                         
                           </option>
-                          {viewOrder?.orderStatus === "Approved" && (
+                          {orderStatus === "Approved" && (
                             <>
                               <option value="Pending">Pending</option>
                               <option value="on-hold">On Hold</option>
+                              <option value="on hold artwork issue">On hold -  Artwork issue</option>
+                  <option value="on hold billing issue">On hold - Billing Issue</option>
+                  <option value="on hold out of stock">On hold - Out of Stock</option>
                               <option value="in-production">In Production</option>
                               <option value="out for delivery">Out for delivery</option>
                               <option value="delivered">Delivered</option>
                               <option value="payment-released">Payment Released</option>
                               <option value="returned">Returned</option>
+                              <option value="cancel">Cancel</option>
                             </>
                           )}
-                          {viewOrder?.orderStatus === "Pending" && (
+                          {orderStatus === "Pending" && (
                             <>
                              
                               <option value="on-hold">On Hold</option>
+                              <option value="on hold artwork issue">On hold -  Artwork issue</option>
+                  <option value="on hold billing issue">On hold - Billing Issue</option>
+                  <option value="on hold out of stock">On hold - Out of Stock</option>
                               <option value="Approved">Approved</option>
                               <option value="in-production">In Production</option>
                               <option value="out for delivery">Out for delivery</option>
                               <option value="delivered">Delivered</option>
                               <option value="payment-released">Payment Released</option>
                               <option value="returned">Returned</option>
+                              <option value="cancel">Cancel</option>
                             </>
                           )}
-                          {viewOrder?.orderStatus === "on-hold" && (
+                          {orderStatus === "on-hold" && (
                             <>
                              <option value="Pending">Pending</option>
+                             <option value="on hold artwork issue">On hold -  Artwork issue</option>
+                  <option value="on hold billing issue">On hold - Billing Issue</option>
+                  <option value="on hold out of stock">On hold - Out of Stock</option>
                              <option value="Approved">Approved</option>
                               <option value="in-production">In Production</option>
                               <option value="out for delivery">Out for delivery</option>
                               <option value="delivered">Delivered</option>
                               <option value="payment-released">Payment Released</option>
                               <option value="returned">Returned</option>
+                              <option value="cancel">Cancel</option>
                             </>
                           )}  
-                            {viewOrder?.orderStatus === "in-production" && (
+                            {orderStatus === "in-production" && (
                             <>
                                 <option value="on-hold">On Hold</option>
+                                <option value="on hold artwork issue">On hold -  Artwork issue</option>
+                  <option value="on hold billing issue">On hold - Billing Issue</option>
+                  <option value="on hold out of stock">On hold - Out of Stock</option>
                              <option value="Pending">Pending</option>
                              <option value="Approved">Approved</option>
                               <option value="out for delivery">Out for delivery</option>
                               <option value="delivered">Delivered</option>
                               <option value="payment-released">Payment Released</option>
                               <option value="returned">Returned</option>
+                              <option value="cancel">Cancel</option>
                             </>
                           )}  
-                              {viewOrder?.orderStatus === "out for delivery" && (
+                              {orderStatus === "out for delivery" && (
                             <>
                                 <option value="on-hold">On Hold</option>
+                                <option value="on hold artwork issue">On hold -  Artwork issue</option>
+                  <option value="on hold billing issue">On hold - Billing Issue</option>
+                  <option value="on hold out of stock">On hold - Out of Stock</option>
                              <option value="Pending">Pending</option>
                              <option value="Approved">Approved</option>
                              <option value="in-production">In Production</option>
                               <option value="delivered">Delivered</option>
                               <option value="payment-released">Payment Released</option>
                               <option value="returned">Returned</option>
+                              <option value="cancel">Cancel</option>
                             </>
                           )}
-                            {viewOrder?.orderStatus === "delivered" && (
+                            {orderStatus === "delivered" && (
                             <>
                                 <option value="on-hold">On Hold</option>
+                                <option value="on hold artwork issue">On hold -  Artwork issue</option>
+                  <option value="on hold billing issue">On hold - Billing Issue</option>
+                  <option value="on hold out of stock">On hold - Out of Stock</option>
                              <option value="Pending">Pending</option>
                              <option value="Approved">Approved</option>
                              <option value="in-production">In Production</option>
                              <option value="out for delivery">Out for delivery</option>
                               <option value="payment-released">Payment Released</option>
                               <option value="returned">Returned</option>
+                              <option value="cancel">Cancel</option>
                             </>
                           )} 
-                           {viewOrder?.orderStatus === "payment-released" && (
+                           {orderStatus === "payment-released" && (
                             <>
                                 <option value="on-hold">On Hold</option>
+                                <option value="on hold artwork issue">On hold -  Artwork issue</option>
+                  <option value="on hold billing issue">On hold - Billing Issue</option>
+                  <option value="on hold out of stock">On hold - Out of Stock</option>
                              <option value="Pending">Pending</option>
                              <option value="Approved">Approved</option>
                              <option value="in-production">In Production</option>
                              <option value="out for delivery">Out for delivery</option>
                              <option value="delivered">Delivered</option>
                               <option value="returned">Returned</option>
+                              <option value="cancel">Cancel</option>
                             </>
                           )}  
-                          {viewOrder?.orderStatus === "returned" && (
+                          {orderStatus === "returned" && (
                             <>
                                 <option value="on-hold">On Hold</option>
+                                <option value="on hold artwork issue">On hold -  Artwork issue</option>
+                  <option value="on hold billing issue">On hold - Billing Issue</option>
+                  <option value="on hold out of stock">On hold - Out of Stock</option>
                              <option value="Pending">Pending</option>
                              <option value="Approved">Approved</option>
                              <option value="in-production">In Production</option>
                              <option value="out for delivery">Out for delivery</option>
                              <option value="delivered">Delivered</option>
                              <option value="payment-released">Payment Released</option>
+                             <option value="cancel">Cancel</option>
                              
                             </>
                           )}
+
+                          {orderStatus === "on hold artwork issue" && (
+                            <>
+                              <option value="Pending">Pending</option>
+                              <option value="on-hold">On Hold</option>
+                              <option value="on hold billing issue">On hold - Billing Issue</option>
+                  <option value="on hold out of stock">On hold - Out of Stock</option>
+                              <option value="Approved">Approved</option>
+                              <option value="in-production">In Production</option>
+                              <option value="out for delivery">Out for delivery</option>
+                              <option value="delivered">Delivered</option>
+                              <option value="payment-released">Payment Released</option>
+                              <option value="returned">Returned</option>
+                              <option value="cancel">Cancel</option>
+                            </>
+                          )}
+
+{orderStatus === "on hold billing issue" && (
+                            <>
+                              <option value="Pending">Pending</option>
+                              <option value="on-hold">On Hold</option>
+                              <option value="on hold artwork issue">On hold - Artwork Issue</option>
+                  <option value="on hold out of stock">On hold - Out of Stock</option>
+                              <option value="Approved">Approved</option>
+                              <option value="in-production">In Production</option>
+                              <option value="out for delivery">Out for delivery</option>
+                              <option value="delivered">Delivered</option>
+                              <option value="payment-released">Payment Released</option>
+                              <option value="returned">Returned</option>
+                              <option value="cancel">Cancel</option>
+                            </>
+                          )}
+
+{orderStatus === "on hold out of stock" && (
+                            <>
+                              <option value="Pending">Pending</option>
+                              <option value="on-hold">On Hold</option>
+                              <option value="on hold artwork issue">On hold - Artwork Issue</option>
+                              <option value="on hold billing issue">On hold - Billing Issue</option>
+                              <option value="Approved">Approved</option>
+                              <option value="in-production">In Production</option>
+                              <option value="out for delivery">Out for delivery</option>
+                              <option value="delivered">Delivered</option>
+                              <option value="payment-released">Payment Released</option>
+                              <option value="returned">Returned</option>
+                              <option value="cancel">Cancel</option>
+                            </>
+                          )}
+
+{orderStatus === "cancel" && (
+                            <>
+                              <option value="Pending">Pending</option>
+                              <option value="on-hold">On Hold</option>
+                              <option value="on hold artwork issue">On hold - Artwork Issue</option>
+                              <option value="on hold billing issue">On hold - Billing Issue</option>
+                              <option value="on hold out of stock">On hold - Out Of Stock</option>
+                              <option value="Approved">Approved</option>
+                              <option value="in-production">In Production</option>
+                              <option value="out for delivery">Out for delivery</option>
+                              <option value="delivered">Delivered</option>
+                              <option value="payment-released">Payment Released</option>
+                              <option value="returned">Returned</option>
+                              
+                            </>
+                          )}
                         </select>
+                        </div>
+                        
                        
                 <p style={{textAlign:"center",marginTop:'10px'}}>Status changed at: {viewOrder?.statusDate}</p>
 
@@ -319,7 +509,7 @@ const ViewOrder = () => {
                     <div className="col-lg-3 col-md-6 col-sm-12 text-center mb-3">
                       <img src="https://media.discordapp.net/attachments/1069579536842379305/1102868453112680478/ic-confirmed-red.f41e73a9.png" alt="" />
                      {
-                      viewOrder?.orderStatus==="returned"|| viewOrder?.orderStatus==="Approved" || viewOrder?.orderStatus==="in-production" ||  viewOrder?.orderStatus==="out for delivery" ||  viewOrder?.orderStatus==="payment-released"||   viewOrder?.orderStatus==="delivered"    ?
+                      orderStatus==="returned"|| orderStatus==="Approved" || orderStatus==="in-production" ||  orderStatus==="out for delivery" ||  orderStatus==="payment-released"||   orderStatus==="delivered"    ?
                       <img src="https://media.discordapp.net/attachments/1069579536842379305/1102872711228821544/check_2.png" alt="" style={{width: '25px'}} />
                       :
                       <img src="https://media.discordapp.net/attachments/1069579536842379305/1102872711610515456/remove.png" alt="" style={{width: '25px'}} />
@@ -331,7 +521,7 @@ const ViewOrder = () => {
                     <div className="col-lg-3 col-md-6 col-sm-12 text-center mb-3">
                       <img src="https://media.discordapp.net/attachments/1069579536842379305/1102868452777140255/ic-picked-red.94cd32af.png" alt="" />
                       {
-                      viewOrder?.orderStatus==="returned"|| viewOrder?.orderStatus==="in-production" ||  viewOrder?.orderStatus==="out for delivery" ||  viewOrder?.orderStatus==="payment-released"||   viewOrder?.orderStatus==="delivered"    ?
+                                         orderStatus==="returned" || orderStatus==="in-production" ||  orderStatus==="out for delivery" ||  orderStatus==="payment-released"||   orderStatus==="delivered"   ?
                      
                        
                        <img src="https://media.discordapp.net/attachments/1069579536842379305/1102872711228821544/check_2.png" alt="" style={{width: '25px'}} />
@@ -344,7 +534,7 @@ const ViewOrder = () => {
                       <div className="col-lg-3 col-md-6 col-sm-12 text-center mb-3">
                       <img src="https://media.discordapp.net/attachments/1069579536842379305/1102868452777140255/ic-picked-red.94cd32af.png" alt="" />
                       {
-                       viewOrder?.orderStatus==="returned"|| viewOrder?.orderStatus==="out for delivery" ||  viewOrder?.orderStatus==="payment-released"||  viewOrder?.orderStatus==="delivered"   ?
+                       orderStatus==="returned"|| orderStatus==="out for delivery" || orderStatus==="payment-released"||  orderStatus==="delivered"   ?
                      
                        
                        <img src="https://media.discordapp.net/attachments/1069579536842379305/1102872711228821544/check_2.png" alt="" style={{width: '25px'}} />
@@ -357,7 +547,7 @@ const ViewOrder = () => {
                      <div className="col-lg-3 col-md-6 col-sm-12 text-center mb-3">
                       <img src="https://media.discordapp.net/attachments/1069579536842379305/1102868452777140255/ic-picked-red.94cd32af.png" alt="" />
                       {
-                   viewOrder?.orderStatus==="returned"|| viewOrder?.orderStatus==="in-production" ||   viewOrder?.orderStatus==="payment-released"|| viewOrder?.orderStatus==="delivered"  ?
+                   orderStatus==="returned"||   orderStatus==="payment-released"|| orderStatus==="delivered"  ?
                      
                        
                        <img src="https://media.discordapp.net/attachments/1069579536842379305/1102872711228821544/check_2.png" alt="" style={{width: '25px'}} />

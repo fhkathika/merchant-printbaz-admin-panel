@@ -39,7 +39,17 @@ let SingleEmailOneTime = allMerchant.reduce((acc, current) => {
       return acc;
   }
 }, []);
-console.log("SingleEmailOneTime",SingleEmailOneTime);
+let formattedDate;
+allMerchant?.map(merchant=>{
+  let date = new Date(merchant?.createdAt); 
+  let options = { year: 'numeric', month: 'long', day: 'numeric' }; 
+
+ formattedDate = date.toLocaleDateString('en-US', options); 
+  return(formattedDate)
+
+})
+console.log("formattedDate",formattedDate);
+
 
     return (
         <div>
@@ -62,30 +72,14 @@ console.log("SingleEmailOneTime",SingleEmailOneTime);
                 <li className="nav-item">
                   <Link className="nav-link active" aria-current="page" to="/">Dashboard</Link>
 
+                </li> 
+                <li className="nav-item">
+                <Link className="nav-link active" aria-current="page" to="/allMerchants">Merchants</Link>
                 </li>
-                <li className="nav-item dropdown">
-                  <a className="nav-link dropdown-toggle" href="#" id="navbarDropdownMenuLink" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-                    Merchants
-                  </a>
-                  <ul className="dropdown-menu nav-dropdown-menu" aria-labelledby="navbarDropdownMenuLink">
-                    <li><Link className="dropdown-item nav-dropdown-item"to="/allMerchants">All Merchants</Link></li>
-                    <li><a className="dropdown-item nav-dropdown-item" href="client-list.html">Request Merchants</a></li>
-                    <li><a className="dropdown-item nav-dropdown-item" href="client-list.html">Aproved Merchants</a></li>
-                    <li><a className="dropdown-item nav-dropdown-item" href="client-list.html">Ban Merchants</a></li>
-                  </ul>
+                <li className="nav-item">
+                <Link className="nav-link active" aria-current="page" to="/orderList">Orders</Link>
                 </li>
-                <li className="nav-item dropdown">
-                  <a className="nav-link dropdown-toggle" href="#" id="navbarDropdownMenuLink" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-                    Orders
-                  </a>
-                  <ul className="dropdown-menu nav-dropdown-menu" aria-labelledby="navbarDropdownMenuLink">
-                    <li><Link className="dropdown-item nav-dropdown-item"to="/orderList">All Order</Link></li>
-                    <li><a className="dropdown-item nav-dropdown-item" href="order-list.html">Pending Order</a></li>
-                    <li><a className="dropdown-item nav-dropdown-item" href="order-list.html">On Hold Order</a></li>
-                    <li><a className="dropdown-item nav-dropdown-item" href="order-list.html">Aproved Order</a></li>
-                    <li><a className="dropdown-item nav-dropdown-item" href="order-list.html">Delivery Order</a></li>
-                  </ul>
-                </li>
+              
                 <li className="nav-item dropdown">
                   <a className="nav-link dropdown-toggle" href="#" id="navbarDropdownMenuLink" role="button" data-bs-toggle="dropdown" aria-expanded="false">
                     Analytics
