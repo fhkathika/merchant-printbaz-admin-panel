@@ -90,39 +90,44 @@ const ViewOrder = () => {
     if (status === "Pending") {
       return "Orange";
     }
+    if (status === "on-hold") {
+      return "Orange";
+    }
+    if (status === "on hold artwork issue") {
+      return "Orange";
+    }  
+        if (status === "on hold billing issue") {
+      return "Orange";
+    } 
+    if (status === "on hold out of stock") {
+      return "Orange";
+    }  
     if (status === "Approved") {
       return "green";
     } 
-    if (status === "on-hold") {
-      return "yellow";
-    }
+  
       if (status === "in-production") {
-      return "blue";
+      return "green";
     }
       if (status === "out for delivery") {
-      return "sea green";
+      return "green";
     }  
     if (status === "delivered") {
-      return "sea green";
+      return "green";
     } 
      if (status === "payment-released") {
-      return "sea green";
+      return "green";
     } 
-        if (status === "returned") {
+    if (status === "returned") {
       return "red";
-    }      if (status === "on hold artwork issue") {
-      return "#cafc03";
-    }      if (status === "on hold billing issue") {
-      return "#ca5fdf";
-    }      if (status === "on hold out of stock") {
-      return "#8ae1ed";
-    }  
+    }    
       if (status === "cancel") {
-      return "#ed8a8a";
+      return "red";
     }   
      if (status === "paid") {
-      return "#b8ed8a";
-    }    if (status === "Unpaid") {
+      return "#1fea70";
+    }  
+    if (status === "Unpaid") {
       return "#360eea";
     }
     // you can add more conditions here or just return a default color
@@ -638,7 +643,7 @@ const ViewOrder = () => {
                       <h4>Color</h4>
                     </div>
                     <div className="col-2">
-                      <h4>Size</h4>
+                      <h4>T-shirt Size</h4>
                     </div>
                     <div className="col-2">
                       <h4>Quantity</h4>
