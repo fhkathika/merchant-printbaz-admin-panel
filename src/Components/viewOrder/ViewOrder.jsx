@@ -663,10 +663,17 @@ const ViewOrder = () => {
                       {orderDetail?.teshirtSize}
                     </div>
                     <div className="col-2">
-                      {orderDetail?.quantity}
+                    {orderDetail?.quantity}
                     </div>
                     <div className="col-2">
-                   {orderDetail?.teshirtSize}
+                    {/* {orderDetail?.printSide} */}
+                    <p>frontSide :{orderDetail?.printSize}</p>
+                    {
+                     (orderDetail?.printSide=== "backSide" ||  orderDetail?.printSide=== "bothSide") && 
+                     <p>backSide:{orderDetail?.printSizeBack}</p>
+                   }
+                  
+                     
                     </div>
                     <div className="col-lg-2">
                     <div className="card file">
