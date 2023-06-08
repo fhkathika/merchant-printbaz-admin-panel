@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { Link, useLocation } from 'react-router-dom';
+import TabForViewOrder from '../tabForViewOrder.jsx/TabForViewOrder';
 
 const ViewOrder = () => {
   const location = useLocation();
@@ -787,7 +788,8 @@ const ViewOrder = () => {
                 <div className="admin-dis section">
                   <div className="row admin-dis-tab">
                     <div className="col-12">
-                      <ul className="nav nav-tabs admin-dis">
+                      <TabForViewOrder orderId={viewOrder?._id}></TabForViewOrder>
+                      {/* <ul className="nav nav-tabs admin-dis">
                         <li className="nav-item admin-dis-li">
                           <a className="nav-link admin-dis-a active" aria-current="page" href="#">Discussion</a>
                         </li>
@@ -797,7 +799,7 @@ const ViewOrder = () => {
                         <li className="nav-item admin-dis-li">
                           <a className="nav-link admin-dis-a" href="#">File Manager</a>
                         </li>
-                      </ul>
+                      </ul> */}
                     </div>
                   </div>
                   <div className="admin-dis-chat">
