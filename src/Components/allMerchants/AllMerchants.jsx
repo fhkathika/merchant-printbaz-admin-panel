@@ -49,8 +49,14 @@ allMerchant?.map(merchant=>{
 
 })
 console.log("formattedDate",formattedDate);
+console.log("SingleEmailOneTime",SingleEmailOneTime);
 
-
+const handleContactChange=(e)=>{
+  const value = e.target.value;
+  console.log(value);
+  setFilterUsers(value);
+}
+let searchByPhoneNumber= allMerchant?.filter(Phone => Phone?.phone?.includes(filterUser));
     return (
         <div>
         <meta charSet="UTF-8" />
@@ -117,8 +123,8 @@ console.log("formattedDate",formattedDate);
           </div>
           <div className="row client-filter">
             <div className="col-lg-2 col-sm-12">
-              <label htmlFor="id-filter">Id:</label>
-              <input type="number" id="id-filter" className="form-control" />
+              <label htmlFor="id-filter">Contact number:</label>
+              <input type="number" id="id-filter" className="form-control"  onChange={(e) =>  handleContactChange(e)} />
             </div>
             <div className="col-lg-2 col-sm-12">
               <label htmlFor="name-filter">Name:</label>
@@ -148,7 +154,7 @@ console.log("formattedDate",formattedDate);
           </div>
           <div className="row client-list-title">
             <div className="col-lg-2 col-sm-12">
-              <h4>ID</h4>
+              <h4>Conatct Number</h4>
             </div>
             <div className="col-lg-2 col-sm-12">
               <h4>Name</h4>
@@ -167,11 +173,46 @@ console.log("formattedDate",formattedDate);
             </div>
           </div>
           {
+          filterUser &&  searchByPhoneNumber?.map((merchants)=><>
+             <Link key={merchants?._id} to={`/viewClient/${merchants?._id}`} state={{merchants}}>
+            <div className="row client-list">
+              <div className="col-lg-2 col-sm-12">
+                <p>{merchants?.phone}</p>
+              </div>
+              <div className="col-lg-2 col-sm-12">
+                <p>{merchants?.name}</p>
+              </div>
+              <div className="col-lg-2 col-sm-12">
+                <p>{merchants?.brandName}</p>
+              </div>
+              <div className="col-lg-2 col-sm-12">
+                <p>{merchants?.email}</p>
+              </div>
+              <div className="col-lg-2 col-sm-12">
+                <p>{merchants?.createdAt?.slice(0,10)}</p>
+              </div>
+              <div className="col-lg-2 col-sm-12">
+                {
+                  merchants?.approval==="requiest" &&   <p className="status-btn" style={{backgroundColor:"red"}} >{merchants?.approval}</p>
+                }
+                 {
+                  merchants?.approval==="approved" &&   <p className="status-btn"  >{merchants?.approval}</p>
+                } 
+                 {
+                  merchants?.approval==="ban" &&   <p className="status-btn" style={{backgroundColor:"blue"}}  >{merchants?.approval}</p>
+                }
+              
+              </div>
+            </div>
+          </Link>
+            </>)
+          }
+          {
           filterEmail &&  searchByEmail?.map((merchants)=><>
              <Link key={merchants?._id} to={`/viewClient/${merchants?._id}`} state={{merchants}}>
             <div className="row client-list">
               <div className="col-lg-2 col-sm-12">
-                <p>{merchants?._id}</p>
+                <p>{merchants?.phone}</p>
               </div>
               <div className="col-lg-2 col-sm-12">
                 <p>{merchants?.name}</p>
@@ -207,7 +248,7 @@ console.log("formattedDate",formattedDate);
                <Link key={merchants?._id} to={`/viewClient/${merchants?._id}`} state={{merchants}}>
             <div className="row client-list">
               <div className="col-lg-2 col-sm-12">
-                <p>{merchants?._id}</p>
+                <p>{merchants?.phone}</p>
               </div>
               <div className="col-lg-2 col-sm-12">
                 <p>{merchants?.name}</p>
@@ -238,7 +279,7 @@ console.log("formattedDate",formattedDate);
                <Link key={merchants?._id} to={`/viewClient/${merchants?._id}`} state={{merchants}}>
             <div className="row client-list">
               <div className="col-lg-2 col-sm-12">
-                <p>{merchants?._id}</p>
+                <p>{merchants?.phone}</p>
               </div>
               <div className="col-lg-2 col-sm-12">
                 <p>{merchants?.name}</p>
@@ -270,7 +311,7 @@ console.log("formattedDate",formattedDate);
                <Link key={merchants?._id} to={`/viewClient/${merchants?._id}`} state={{merchants}}>
             <div className="row client-list">
               <div className="col-lg-2 col-sm-12">
-                <p>{merchants?._id}</p>
+                <p>{merchants?.phone}</p>
               </div>
               <div className="col-lg-2 col-sm-12">
                 <p>{merchants?.name}</p>
@@ -302,7 +343,7 @@ console.log("formattedDate",formattedDate);
             <Link key={merchants?._id} to={`/viewClient/${merchants?._id}`} state={{merchants}}>
             <div className="row client-list">
               <div className="col-lg-2 col-sm-12">
-                <p>{merchants?._id}</p>
+                <p>{merchants?.phone}</p>
               </div>
               <div className="col-lg-2 col-sm-12">
                 <p>{merchants?.name}</p>
