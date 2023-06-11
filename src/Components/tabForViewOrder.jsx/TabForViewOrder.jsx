@@ -3,6 +3,7 @@
 import { Button } from 'bootstrap';
 import React, { useState } from 'react';
 import SupportTicketPopUp from '../suppoprtTicketPopUp/SupportTicketPopUp';
+import SupportTicketChatbox from '../supportTicketChatbox/SupportTicketChatbox';
 
 function TabForViewOrder({orderId}) {
   const [activeTab, setActiveTab] = useState('tab1');
@@ -44,6 +45,7 @@ function TabForViewOrder({orderId}) {
 
       <div id="tab1" className={`tab-content ${activeTab === 'tab1' ? 'active' : ''}`}>
         <h2>Discussion Content</h2>
+        <SupportTicketChatbox/>
       </div>
 
       <div id="tab2" className={`tab-content ${activeTab === 'tab2' ? 'active' : ''}`}>

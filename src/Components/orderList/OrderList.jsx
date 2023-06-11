@@ -44,7 +44,13 @@ let cancelOrders=orderAll?.filter(users=>users?.orderStatus==="cancel");
 // payment staus
 let paidOrders=orderAll?.filter(users=>users?.paymentStatus==="paid");
 let unPaidOrders=orderAll?.filter(users=>users?.paymentStatus==="Unpaid");
+let searchByOrderId= orderAll?.filter(OrederId => OrederId?._id?.includes(filterOrders));
 
+const handleOrderIdChange = (e) => {
+  const value = e.target.value;
+  console.log(value);
+  setFilterOrders(value);
+}
 const getViewClientColor = (status) => {
   if (status === "Pending") {
     return "Orange";
@@ -163,7 +169,7 @@ const getViewClientColor = (status) => {
               </div>
               <div className="col-lg-2 col-sm-12">
                 <label htmlFor="id-filter">Order Id:</label>
-                <input type="number" id="id-filter" className="form-control" />
+                <input type="text" id="id-filter" className="form-control" onChange={(e) =>  handleOrderIdChange(e)} />
               </div>
               <div className="col-lg-2 col-sm-12">
                 <label htmlFor="brand-filter">Recipient Info:</label>
@@ -223,6 +229,43 @@ const getViewClientColor = (status) => {
                 </div>
               </div>
               {
+                   filterOrders && searchByOrderId?.map((orders,index)=>{ 
+                    matchingMerchant = allMerchant.find(merchant => merchant?.email === orders?.userMail)
+                   return (
+                      <Link to={`/viewOrder/${orders?._id}`} state={{orders,matchingMerchant}} key={index}>
+                      <div key={orders?._id} className="row client-list">
+                        <div className="col-lg-2 col-sm-12">
+                         {/* Display the corresponding allMerchant name */}
+                         <p>{matchingMerchant?.name}</p>
+              {/* {index < allMerchant.length && <p>{allMerchant[index]?.name}</p>} */}
+                       
+                        </div>
+                        <div className="col-lg-2 col-sm-12">
+                          <p>{orders?._id}</p>
+                        </div>
+                        <div className="col-lg-3 col-sm-12">
+                          <p>{orders?.name}</p>
+                          <p>{orders?.address}</p>
+                          <p>{orders?.phone}</p>
+                        </div>
+                        <div className="col-lg-2 col-sm-12">
+                          <p className="p-status-btn">{orders?.paymentStatus}</p>
+                        </div>
+                        <div className="col-lg-2 col-sm-12">
+                          <p>{orders?.recvMoney} TK</p>
+                        </div>
+                        <div className="col-lg-1 col-sm-12">
+                          <p className="" style={{backgroundColor:getViewClientColor(orders?.orderStatus)}}>{orders?.orderStatus}</p>
+                          {/* <p style={{fontSize: '14px'}}>{formattedDate}</p> */}
+                        </div>
+                      </div>
+                    </Link>
+                   
+                   )
+                    }
+                      )
+              } 
+                 {
                    filterOrders==="paid" && paidOrders.map((orders,index)=>{ 
                     matchingMerchant = allMerchant.find(merchant => merchant?.email === orders?.userMail)
                    return (

@@ -631,6 +631,27 @@ const ViewOrder = () => {
                   </div>
                 </div>
               </div>
+              {/* //instruction box  */}
+              <div className="col-lg-12 col-md-12 mb-3">
+                <div className="rec-info bg-white p-4 shadow-sm">
+                  <div className="row">
+                    <div className="col-12">
+                      <h3 className="all-title">Instruction</h3>
+                    </div>
+                  </div>
+               
+                  <div className="row order-list-title">
+                    <div className="col-12">
+                      <h4>{viewOrder?.instruction}</h4>
+                    </div>
+              
+                  </div>
+               
+                
+                 
+                </div>
+              </div>
+
               <div className="col-lg-12 col-md-12 mb-3">
                 <div className="rec-info bg-white p-4 shadow-sm">
                   <div className="row">
@@ -782,6 +803,7 @@ const ViewOrder = () => {
                  
                 </div>
               </div>
+
             </div>
             <div className="row">
               <div className="col-12">

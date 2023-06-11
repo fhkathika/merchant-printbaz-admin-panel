@@ -1,6 +1,45 @@
+import axios from 'axios';
 import PropTypes from 'prop-types';
+import { useEffect, useState } from 'react';
 
 const SupportTicketPopUp = ({ message,ticketId,userOrderId, onClose }) => {
+  
+  const [chatLog, setChatLog] = useState([]);
+  const [newMsg, setNewMsg] = useState('');
+  useEffect(() => {
+    // Fetch the chat log from the server when the component mounts
+    fetchChatLog();
+  }, []);
+
+  const fetchChatLog = async () => {
+      try {
+        const response = await axios.get('http://localhost:5000/getmessages');
+        setChatLog(response.data);
+      } catch (err) {
+        console.error(err);
+      }
+    };
+    const handleNewMessageChange = (e) => {
+      console.log(e.target.value);
+      setNewMsg(e.target.value);
+  };
+ console.log("newMessage",newMsg); 
+  const handleSendMessage = async (e) => {
+      e.preventDefault();
+      try {
+        const newMessage = { ticketId: ticketId, sender: 'user', message: chatLog };
+        const response = await axios.post('http://localhost:5000/sendmessages', newMessage);
+        // Update the chat log with the message received from the server
+        setChatLog([...chatLog, response.data]);
+        console.log("chatLog",chatLog);
+        console.log("response.data",response.data);
+      } catch (err) {
+        console.error(err);
+      }
+      // setNewMsg('');
+    };
+    
+
   return (
     <>
       <meta charSet="UTF-8" />
@@ -41,136 +80,39 @@ const SupportTicketPopUp = ({ message,ticketId,userOrderId, onClose }) => {
                     </div>
                   </div>
                   <div className="position-relative">
-                    <div className="chat-messages p-4">
-                      <div className="chat-message-right pb-4">
-                        <div>
-                          <img src="https://bootdey.com/img/Content/avatar/avatar1.png" className="rounded-circle mr-1" alt="Chris Wood" width={40} height={40} />
-                          <div className="text-muted small text-nowrap mt-2">2:33 am</div>
-                        </div>
-                        <div className="flex-shrink-1 bg-light rounded py-2 px-3 mr-3">
-                          <div className="font-weight-bold mb-1">You</div>
-                          Lorem ipsum dolor sit amet, vis erat denique in, dicunt prodesset te vix.
-                        </div>
-                      </div>
-                      <div className="chat-message-left pb-4">
-                        <div>
-                          <img src="https://bootdey.com/img/Content/avatar/avatar3.png" className="rounded-circle mr-1" alt={1684051962640} width={40} height={40} />
-                          <div className="text-muted small text-nowrap mt-2">2:34 am</div>
-                        </div>
-                        <div className="flex-shrink-1 bg-light rounded py-2 px-3 ml-3">
-                          <div className="font-weight-bold mb-1">1684051962640</div>
-                          Sit meis deleniti eu, pri vidit meliore docendi ut, an eum erat animal commodo.
-                        </div>
-                      </div>
-                      <div className="chat-message-right mb-4">
-                        <div>
-                          <img src="https://bootdey.com/img/Content/avatar/avatar1.png" className="rounded-circle mr-1" alt="Chris Wood" width={40} height={40} />
-                          <div className="text-muted small text-nowrap mt-2">2:35 am</div>
-                        </div>
-                        <div className="flex-shrink-1 bg-light rounded py-2 px-3 mr-3">
-                          <div className="font-weight-bold mb-1">You</div>
-                          Cum ea graeci tractatos.
-                        </div>
-                      </div>
-                      <div className="chat-message-left pb-4">
-                        <div>
-                          <img src="https://bootdey.com/img/Content/avatar/avatar3.png" className="rounded-circle mr-1" alt={1684051962640} width={40} height={40} />
-                          <div className="text-muted small text-nowrap mt-2">2:36 am</div>
-                        </div>
-                        <div className="flex-shrink-1 bg-light rounded py-2 px-3 ml-3">
-                          <div className="font-weight-bold mb-1">1684051962640</div>
-                          Sed pulvinar, massa vitae interdum pulvinar, risus lectus porttitor magna, vitae commodo lectus mauris et velit.
-                          Proin ultricies placerat imperdiet. Morbi varius quam ac venenatis tempus.
-                        </div>
-                      </div>
-                      <div className="chat-message-left pb-4">
-                        <div>
-                          <img src="https://bootdey.com/img/Content/avatar/avatar3.png" className="rounded-circle mr-1" alt={1684051962640} width={40} height={40} />
-                          <div className="text-muted small text-nowrap mt-2">2:37 am</div>
-                        </div>
-                        <div className="flex-shrink-1 bg-light rounded py-2 px-3 ml-3">
-                          <div className="font-weight-bold mb-1">1684051962640</div>
-                          Cras pulvinar, sapien id vehicula aliquet, diam velit elementum orci.
-                        </div>
-                      </div>
-                      <div className="chat-message-right mb-4">
-                        <div>
-                          <img src="https://bootdey.com/img/Content/avatar/avatar1.png" className="rounded-circle mr-1" alt="Chris Wood" width={40} height={40} />
-                          <div className="text-muted small text-nowrap mt-2">2:38 am</div>
-                        </div>
-                        <div className="flex-shrink-1 bg-light rounded py-2 px-3 mr-3">
-                          <div className="font-weight-bold mb-1">You</div>
-                          Lorem ipsum dolor sit amet, vis erat denique in, dicunt prodesset te vix.
-                        </div>
-                      </div>
-                      <div className="chat-message-left pb-4">
-                        <div>
-                          <img src="https://bootdey.com/img/Content/avatar/avatar3.png" className="rounded-circle mr-1" alt={1684051962640} width={40} height={40} />
-                          <div className="text-muted small text-nowrap mt-2">2:39 am</div>
-                        </div>
-                        <div className="flex-shrink-1 bg-light rounded py-2 px-3 ml-3">
-                          <div className="font-weight-bold mb-1">1684051962640</div>
-                          Sit meis deleniti eu, pri vidit meliore docendi ut, an eum erat animal commodo.
-                        </div>
-                      </div>
-                      <div className="chat-message-right mb-4">
-                        <div>
-                          <img src="https://bootdey.com/img/Content/avatar/avatar1.png" className="rounded-circle mr-1" alt="Chris Wood" width={40} height={40} />
-                          <div className="text-muted small text-nowrap mt-2">2:40 am</div>
-                        </div>
-                        <div className="flex-shrink-1 bg-light rounded py-2 px-3 mr-3">
-                          <div className="font-weight-bold mb-1">You</div>
-                          Cum ea graeci tractatos.
-                        </div>
-                      </div>
-                      <div className="chat-message-right mb-4">
-                        <div>
-                          <img src="https://bootdey.com/img/Content/avatar/avatar1.png" className="rounded-circle mr-1" alt="Chris Wood" width={40} height={40} />
-                          <div className="text-muted small text-nowrap mt-2">2:41 am</div>
-                        </div>
-                        <div className="flex-shrink-1 bg-light rounded py-2 px-3 mr-3">
-                          <div className="font-weight-bold mb-1">You</div>
-                          Morbi finibus, lorem id placerat ullamcorper, nunc enim ultrices massa, id dignissim metus urna eget purus.
-                        </div>
-                      </div>
-                      <div className="chat-message-left pb-4">
-                        <div>
-                          <img src="https://bootdey.com/img/Content/avatar/avatar3.png" className="rounded-circle mr-1" alt={1684051962640} width={40} height={40} />
-                          <div className="text-muted small text-nowrap mt-2">2:42 am</div>
-                        </div>
-                        <div className="flex-shrink-1 bg-light rounded py-2 px-3 ml-3">
-                          <div className="font-weight-bold mb-1">1684051962640</div>
-                          Sed pulvinar, massa vitae interdum pulvinar, risus lectus porttitor magna, vitae commodo lectus mauris et velit.
-                          Proin ultricies placerat imperdiet. Morbi varius quam ac venenatis tempus.
-                        </div>
-                      </div>
-                      <div className="chat-message-right mb-4">
-                        <div>
-                          <img src="https://bootdey.com/img/Content/avatar/avatar1.png" className="rounded-circle mr-1" alt="Chris Wood" width={40} height={40} />
-                          <div className="text-muted small text-nowrap mt-2">2:43 am</div>
-                        </div>
-                        <div className="flex-shrink-1 bg-light rounded py-2 px-3 mr-3">
-                          <div className="font-weight-bold mb-1">You</div>
-                          Lorem ipsum dolor sit amet, vis erat denique in, dicunt prodesset te vix.
-                        </div>
-                      </div>
-                      <div className="chat-message-left pb-4">
-                        <div>
-                          <img src="https://bootdey.com/img/Content/avatar/avatar3.png" className="rounded-circle mr-1" alt={1684051962640} width={40} height={40} />
-                          <div className="text-muted small text-nowrap mt-2">2:44 am</div>
-                        </div>
-                        <div className="flex-shrink-1 bg-light rounded py-2 px-3 ml-3">
-                          <div className="font-weight-bold mb-1">1684051962640</div>
-                          Sit meis deleniti eu, pri vidit meliore docendi ut, an eum erat animal commodo.
-                        </div>
-                      </div>
-                    </div>
+                  <div className="chat-messages p-4">
+      {chatLog.map(msg => (
+        <div className={msg.sender === 'user' ? 'chat-message-right pb-4' : 'chat-message-left pb-4'}>
+          <div>
+            <img src="https://bootdey.com/img/Content/avatar/avatar3.png" className="rounded-circle mr-1" alt={msg.sender} width={40} height={40} />
+            <div className="text-muted small text-nowrap mt-2">{new Date(msg.id).toLocaleTimeString()}</div>
+          </div>
+          <div className="flex-shrink-1 bg-light rounded py-2 px-3 ml-3">
+            <div className="font-weight-bold mb-1">{msg.sender}</div>
+            {msg.message}
+          </div>
+        </div>
+      ))}
+    </div>
                   </div>
                   <div className="flex-grow-0 py-3 px-4 border-top">
-                    <div className="input-group">
-                      <input type="text" className="form-control" placeholder="Type your message" />
+                    <div >
+                    <form className="input-group" onSubmit={handleSendMessage}>
+        <input 
+          type="text"
+          value={newMsg}
+          onChange={handleNewMessageChange}
+          placeholder="Type your message here..."
+        />
+         <button className="btn"><i className="fa fa-paperclip" aria-hidden="true" /></button>
+        <button className="btn btn-primary" type="submit">Send</button>
+     
+        {/* <input type="text" className="form-control"   value={newMessage}
+          onChange={handleNewMessageChange} placeholder="Type your message" />
                       <button className="btn"><i className="fa fa-paperclip" aria-hidden="true" /></button>
-                      <button className="btn btn-primary">Reply</button>
+                      <button className="btn btn-primary">Reply</button> */}
+      </form>
+                     
                     </div>
                   </div>
                 </div>
