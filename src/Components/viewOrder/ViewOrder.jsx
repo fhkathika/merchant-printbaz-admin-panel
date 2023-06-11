@@ -140,7 +140,11 @@ const ViewOrder = () => {
     link.download = true;
     link.click();
   }
-  
+  const copyOrderId = () => {
+    navigator.clipboard.writeText(viewOrder?._id);
+    console.log("viewOrder?._id",viewOrder?._id);
+    // Show a notification or perform any other action after copying the ID
+  };
     return (
         <div>
           <meta charSet="UTF-8" />
@@ -225,7 +229,7 @@ const ViewOrder = () => {
               <div className="col-12">
                 <div className="order-id bg-white p-4  shadow-sm" >
                 <div style={{display:"flex",justifyContent:"space-between"}}>
-                <h3 className="d-inline-block font-weight-bold">ORDER ID: {viewOrder?._id} &nbsp; <h5 style={{marginTop:"10px"}}>{formattedDate}</h5></h3>
+                <h3 className="d-inline-block font-weight-bold" onClick={copyOrderId}>ORDER ID: {viewOrder?._id} &nbsp;<span style={{cursor:"pointer",border:"1px solid gray",padding:"5px",borderRadius:"5px",fontSize:"16px"}} onClick={copyOrderId}>copy</span> <h5 style={{marginTop:"10px"}}>{formattedDate}</h5></h3>
                   {/* <button className="status-btn d-inline-block py-2 px-3 font-weight-bold">{viewOrder?.orderStatus}</button> */}
                
                   <div
