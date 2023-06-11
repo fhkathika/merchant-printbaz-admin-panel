@@ -124,7 +124,7 @@ let searchByPhoneNumber= allMerchant?.filter(Phone => Phone?.phone?.includes(fil
           <div className="row client-filter">
             <div className="col-lg-2 col-sm-12">
               <label htmlFor="id-filter">Contact number:</label>
-              <input type="number" id="id-filter" className="form-control"  onChange={(e) =>  handleContactChange(e)} />
+              <input type="text" id="id-filter" className="form-control"  onChange={(e) =>  handleContactChange(e)} />
             </div>
             <div className="col-lg-2 col-sm-12">
               <label htmlFor="name-filter">Name:</label>
