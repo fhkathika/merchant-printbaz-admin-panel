@@ -1,7 +1,8 @@
-import React, { useState } from 'react';
+import React, { useState,useRef } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import TabForViewOrder from '../tabForViewOrder.jsx/TabForViewOrder';
-
+import Overlay from 'react-bootstrap/Overlay';
+import Tooltip from 'react-bootstrap/Tooltip';
 const ViewOrder = () => {
   const location = useLocation();
   const viewOrder = location.state ? location?.state?.orders : null;
@@ -9,7 +10,8 @@ const ViewOrder = () => {
   const [orderStatus, setOrderStatus] = useState(viewOrder?.orderStatus);
   const [paymentStatus, setPaymentStatus] = useState(viewOrder?.paymentStatus);
 
-  
+  const [show, setShow] = useState(false);
+  const target = useRef(null);
   let date = new Date(viewOrder?.createdAt); // create a new Date object
 
   let options = { year: 'numeric', month: 'long', day: 'numeric' }; // options for toLocaleDateString
@@ -142,7 +144,13 @@ const ViewOrder = () => {
   }
   const copyOrderId = () => {
     navigator.clipboard.writeText(viewOrder?._id);
+    
+    setShow(true)
     console.log("viewOrder?._id",viewOrder?._id);
+    setTimeout(() => {
+      setShow(false);
+    }, 1000);
+    
     // Show a notification or perform any other action after copying the ID
   };
     return (
@@ -220,9 +228,15 @@ const ViewOrder = () => {
               <div className="col-12">
                 <div className="order-id bg-white p-4  shadow-sm" >
                 <div style={{display:"flex",justifyContent:"space-between"}}>
-                <h3 className="d-inline-block font-weight-bold" onClick={copyOrderId}>ORDER ID: {viewOrder?._id} &nbsp;<span style={{cursor:"pointer",border:"1px solid gray",padding:"5px",borderRadius:"5px",fontSize:"16px"}} onClick={copyOrderId}>copy</span> <h5 style={{marginTop:"10px"}}>{formattedDate}</h5></h3>
+                <h3 className="d-inline-block font-weight-bold" onClick={copyOrderId}>ORDER ID: {viewOrder?._id} &nbsp;<span style={{cursor:"pointer",padding:"5px",fontSize:"16px"}} ref={target}  onClick={copyOrderId}><i class="fa fa-copy ml-2 mt-1 text-green cursor-pointer text-sm"></i></span> <h5 style={{marginTop:"10px"}}>{formattedDate}</h5></h3>
                   {/* <button className="status-btn d-inline-block py-2 px-3 font-weight-bold">{viewOrder?.orderStatus}</button> */}
-               
+                  <Overlay target={target.current} show={show} placement="right">
+        {(props) => (
+          <Tooltip id="overlay-example" {...props}>
+           copied!
+          </Tooltip>
+        )}
+      </Overlay>
                   <div
                         className=" d-inline-block  font-weight-bold"
                         style={{ marginBottom: "20px" }}
@@ -579,9 +593,13 @@ const ViewOrder = () => {
                       <h5>Brand Name</h5>
                       <p>{viewClient?.brandName}</p>
                     </div>
-                    <div className="col-12">
+                    <div className="col-md-6 col-sm-12">
                       <h5>Email</h5>
                       <p>{viewClient?.email}</p>
+                    </div>
+                    <div className="col-md-6 col-sm-12">
+                      <h5>Contact Number</h5>
+                      <p>{viewClient?.phone}</p>
                     </div>
                   </div>
                 </div>

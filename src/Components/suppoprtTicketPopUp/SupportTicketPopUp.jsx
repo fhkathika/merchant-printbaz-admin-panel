@@ -9,11 +9,12 @@ const SupportTicketPopUp = ({ message,ticketId,userOrderId, onClose }) => {
   useEffect(() => {
     // Fetch the chat log from the server when the component mounts
     fetchChatLog();
+    
   }, []);
 
   const fetchChatLog = async () => {
       try {
-        const response = await axios.get('http://localhost:5000/getmessages');
+        const response = await axios.get(`http://localhost:5000/getmessages/${ticketId}`);
         setChatLog(response.data);
       } catch (err) {
         console.error(err);
@@ -24,20 +25,37 @@ const SupportTicketPopUp = ({ message,ticketId,userOrderId, onClose }) => {
       setNewMsg(e.target.value);
   };
  console.log("newMessage",newMsg); 
-  const handleSendMessage = async (e) => {
-      e.preventDefault();
-      try {
-        const newMessage = { ticketId: ticketId, sender: 'user', message: chatLog };
-        const response = await axios.post('http://localhost:5000/sendmessages', newMessage);
-        // Update the chat log with the message received from the server
-        setChatLog([...chatLog, response.data]);
-        console.log("chatLog",chatLog);
-        console.log("response.data",response.data);
-      } catch (err) {
-        console.error(err);
-      }
-      // setNewMsg('');
-    };
+
+ const handleSendMessage = async (e) => {
+  e.preventDefault();
+  try {
+    console.log("ticketId",ticketId);
+    const newMessage = { ticketId: ticketId, user: 'user', content: newMsg };
+
+    
+    // Check if the message was sent successfully
+    // if (response?.data?.success) {
+      // Append the newMessage to chatLog
+      const chatMessage = {
+        ticketId: newMessage.ticketId,  // added this line
+        content: newMessage.content,
+        user: newMessage.user,
+        // orderId:newMessage.userOrderId,
+        timestamp: new Date().toISOString(), // this won't be the exact timestamp saved in the DB
+      };
+      setChatLog([...chatLog, chatMessage]);
+      const response = await axios.post('http://localhost:5000/sendmessages',chatMessage);
+      console.log("chatLog",chatLog);
+      setNewMsg('');
+    // } else {
+    //   // Handle error if the message was not sent successfully
+    //   console.error('Failed to send message');
+    // }
+  } catch (err) {
+    console.error(err);
+  }
+};
+
     
 
   return (
@@ -88,8 +106,8 @@ const SupportTicketPopUp = ({ message,ticketId,userOrderId, onClose }) => {
             <div className="text-muted small text-nowrap mt-2">{new Date(msg.id).toLocaleTimeString()}</div>
           </div>
           <div className="flex-shrink-1 bg-light rounded py-2 px-3 ml-3">
-            <div className="font-weight-bold mb-1">{msg.sender}</div>
-            {msg.message}
+            <div className="font-weight-bold mb-1">{msg?.user}</div>
+            {msg.content}
           </div>
         </div>
       ))}

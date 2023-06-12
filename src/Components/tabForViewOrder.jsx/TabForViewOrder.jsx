@@ -45,7 +45,6 @@ function TabForViewOrder({orderId}) {
 
       <div id="tab1" className={`tab-content ${activeTab === 'tab1' ? 'active' : ''}`}>
         <h2>Discussion Content</h2>
-        <SupportTicketChatbox/>
       </div>
 
       <div id="tab2" className={`tab-content ${activeTab === 'tab2' ? 'active' : ''}`}>
