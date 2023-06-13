@@ -2,11 +2,13 @@ import axios from 'axios';
 import PropTypes from 'prop-types';
 import { useEffect, useState } from 'react';
 import "../../css/style.css"
+import CreateTicketAlertbox from '../createTickwtAlert/CreateTicketAlertbox';
 const SupportTicketPopUp = ({ message,ticketId,userOrderId, onClose }) => {
   
   const [chatLog, setChatLog] = useState([]);
   const [newMsg, setNewMsg] = useState('');
   const [ticketIssue, setTicketIssue] = useState('');
+  const [createTicketnotify, setCreateTicketnotify] = useState(false);
   useEffect(() => {
     // Fetch the chat log from the server when the component mounts
     fetchChatLog();
@@ -65,7 +67,7 @@ setTicketIssue(e.target.value)
   e.preventDefault();
   try {
     console.log("ticketId",ticketId);
-    const newMessage = { ticketId: ticketId,userOrderId:userOrderId,ticketIssue:ticketIssue, user: 'user', content: newMsg };
+    const newMessage = { ticketId: ticketId,userOrderId:userOrderId,ticketIssue:ticketIssue,ticketStatus:"open", user: 'user', content: newMsg };
 
     
     // Check if the message was sent successfully
@@ -75,15 +77,20 @@ setTicketIssue(e.target.value)
         ticketId: newMessage.ticketId,  // added this line
         content: newMessage.content,
         ticketIssue: newMessage.ticketIssue,
+        ticketStatus: newMessage.ticketStatus,
         admin: newMessage.user,
         orderId:newMessage.userOrderId,
         timestamp: new Date().toISOString(), // this won't be the exact timestamp saved in the DB
       };
       setChatLog([...chatLog, chatMessage]);
-      // const response = await axios.post('http://localhost:5000/sendmessages',chatMessage);
-      const response = await axios.post('https://mserver.printbaz.com/sendmessages',chatMessage);
+      const response = await axios.post('http://localhost:5000/sendmessages',chatMessage);
+      // const response = await axios.post('https://mserver.printbaz.com/sendmessages',chatMessage);
       console.log("chatLog",chatLog);
       setNewMsg('');
+     
+      setCreateTicketnotify(true)
+   
+    //  window.location.reload();
     // } else {
     //   // Handle error if the message was not sent successfully
     //   console.error('Failed to send message');
@@ -105,8 +112,8 @@ setTicketIssue(e.target.value)
           <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" integrity="sha512-iecdLmaskl7CVkqkXNQ/ZH/XLlvWZOJyj7Yy7tcenmpD1ypASozpmT/E0iPtmFIB46ZmdtAc9eNBvH0H/ZpiBw==" crossOrigin="anonymous" referrerPolicy="no-referrer" />
           <title>Admin Dashboard</title>
           <style dangerouslySetInnerHTML={{__html: "\n* {\n    box-sizing: border-box;\n    margin: 0;\n    padding: 0;\n}\n\nul,\nli,\na {\n    text-decoration: none;\n}\n\nbody {\n    font-family: Arial, sans-serif;\n    line-height: 1.6;\n    background-color: #f4f4f4;\n}\n\n/* Nav Bar CSS Start */\n\n.navbar {\nbackground: #001846 !important;\npadding: 0 20px 0 20px;\n}\n\n.navbar-brand img {\nwidth: 120px;\n}\n\n.nav-link {\ncolor: #ffffff !important;\nfont-size: 18px;\nfont-weight: 500;\ntext-align: center;\ntext-transform: uppercase;\npadding: 20px 20px 20px 20px;\nmargin: 0 10px 0 10px;\n}\n\n.nav-link:hover {\nbackground-color: #ffffff;\ncolor: #001846 !important;\ntransition: linear 0.2s;\n}\n\n.nav-dropdown-menu {\nbackground-color: #001846;\n}\n\n.nav-dropdown-item {\ncolor: #ffffff;\ntext-transform: uppercase;\n}\n\n.navbar-toggler {\nbackground-color: #ffffff !important;\n}\n\n/* Nav Bar CSS End */\n\n/* Media Queries */\n@media screen and (max-width: 1024px) {}\n\n@media screen and (max-width: 768px) {\n    .chat-user-list {\n    display: flex;\n    flex-direction: column;\n    max-height: 220px !important;\n    overflow-y: scroll;\n}\n\n.chat-messages {\n    display: flex;\n    flex-direction: column;\n    max-height: 220px !important;\n    overflow-y: scroll;\n}\n    .nav-link {\n        text-align: left;\n    }\n\n    .nav-link:hover {\n        width: 100%;\n\n    }\n.chat-page {\n    margin: 20px !important;\n}\n\n}\n.chat-page {\n   width:45%;\n}\n\n.chat-list-tab2 {\n    color: #001846 !important;\n    padding: 10px 25px 10px 25px;\n    margin: 0;\n}\n\n.chat-online {\n    color: #34ce57\n}\n\n.chat-offline {\n    color: #e4606d\n}\n\n.chat-user-list {\n    display: flex;\n    flex-direction: column;\n    max-height: 620px;\n    overflow-y: scroll;\n}\n\n.chat-messages {\n    display: flex;\n    flex-direction: column;\n    max-height: 620px;\n    overflow-y: scroll;\n}\n\n.chat-message-left,\n.chat-message-right {\n    display: flex;\n    flex-shrink: 0\n}\n\n.chat-message-left {\n    margin-right: auto\n}\n\n.chat-message-right {\n    flex-direction: row-reverse;\n    margin-left: auto\n}\n.py-3 {\n    padding-top: 1rem!important;\n    padding-bottom: 1rem!important;\n}\n.px-4 {\n    padding-right: 1.5rem!important;\n    padding-left: 1.5rem!important;\n}\n.flex-grow-0 {\n    flex-grow: 0!important;\n}\n.border-top {\n    border-top: 1px solid #dee2e6!important;\n}\n\n    " }} />
-      <div className="alert-overlay" onClick={onClose} />
-      <div className="alert-box chat-page">
+      <div className="" onClick={onClose} />
+      <div className=" " >
         {/* <h2>{message}</h2> */}
         <p style={{color:"black",cursor:"pointer",textAlign:"right"}} onClick={onClose}>Cancel</p>
        
@@ -118,13 +125,11 @@ setTicketIssue(e.target.value)
                   <div className="flex align-items-center py-1" >
                         <div className='d-flex align-items-center'>
 
-                        <div className="position-relative">
-                        <img src="https://bootdey.com/img/Content/avatar/avatar3.png" className="rounded-circle mr-1" alt={1684051962640} width={40} height={40} />
-                      </div>
+                       
                       <div className="flex-grow-1 pl-3" style={{ marginLeft:"10px",textAlign:"left"}}>
                         <p>Order Id: <span style={{color:"blue"}}>{userOrderId}</span></p>
                         <p>Ticket id: <span style={{color:"orange"}}>{ticketId}</span> </p>
-                        <div className="text-muted small"><em>Typing...</em></div>
+                       
                       </div>
                         </div>
                     
@@ -132,7 +137,7 @@ setTicketIssue(e.target.value)
                       <select
                           id="status-filter"
                           className="status-btn"
-                          required
+                          
                           style={{
                             border: "none",
                             padding: "8px",
@@ -143,6 +148,7 @@ setTicketIssue(e.target.value)
                           }}
                           name="ticketIssue"
                           value={ticketIssue}
+                          required
                           onChange={ (e)=>handleInputTicketIssueChange(e)}
                         >
                      
@@ -158,15 +164,12 @@ setTicketIssue(e.target.value)
                        
                         </select>
                       </div> 
-                       <div>
-                        <button className="btn btn-info btn-lg mr-1 px-3 d-none d-md-inline-block" style={{backgroundColor: '#E70000', border: 'none'}}><svg width={24} height={24} viewBox="0 0 1024 1024" xmlns="http://www.w3.org/2000/svg"><path fill="#000000" d="M195.2 195.2a64 64 0 0 1 90.496 0L512 421.504 738.304 195.2a64 64 0 0 1 90.496 90.496L602.496 512 828.8 738.304a64 64 0 0 1-90.496 90.496L512 602.496 285.696 828.8a64 64 0 0 1-90.496-90.496L421.504 512 195.2 285.696a64 64 0 0 1 0-90.496z" /></svg></button>
-                        <button className="btn btn-light border btn-lg px-3"><svg xmlns="http://www.w3.org/2000/svg" width={24} height={24} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round" className="feather feather-more-horizontal feather-lg"><circle cx={12} cy={12} r={1} /><circle cx={19} cy={12} r={1} /><circle cx={5} cy={12} r={1} /></svg></button>
-                      </div>
+                       
                      
                     </div>
                   </div>
                   <div className="position-relative">
-                  <div className="chat-messages p-4">
+                  {/* <div className="chat-messages p-4">
       { chatLog?.map(msg => (
         <div className={msg.admin === 'user' ? 'chat-message-right pb-4' : 'chat-message-left pb-4'}>
           <div>
@@ -181,30 +184,43 @@ setTicketIssue(e.target.value)
       ))}
      
      
-    </div>
+    </div> */}
                   </div>
                   <div className="flex-grow-0 py-3 px-4 border-top">
                     <div >
-                    <form className="input-group" onSubmit={handleSendMessage}>
-        <input 
+                    <form className="input-group chat-messages p-4" onSubmit={handleSendMessage}>
+        <textarea 
           type="text"
+          rows="15" cols="33"
           value={newMsg}
           onChange={handleNewMessageChange}
           placeholder="Type your message here..."
+          required
         />
-         <button className="btn"><i className="fa fa-paperclip" aria-hidden="true" /></button>
-        <button className="btn btn-primary" type="submit">Send</button>
+       
+         <button style={{textAlign:"right"}} className="btn"><i className="fa fa-paperclip" aria-hidden="true" /></button>
+        <button className="btn btn-primary" type="submit">Create Ticket</button>
      
         {/* <input type="text" className="form-control"   value={newMessage}
           onChange={handleNewMessageChange} placeholder="Type your message" />
                       <button className="btn"><i className="fa fa-paperclip" aria-hidden="true" /></button>
                       <button className="btn btn-primary">Reply</button> */}
       </form>
+      {
+        createTicketnotify &&
+        <CreateTicketAlertbox
+        closeCreateTicketPopup={onClose}
+        onClose={() => setCreateTicketnotify(false)}
+        message="Your Ticket Createed Successfully"
+        />
+      }
                      
                     </div>
                   </div>
                 </div>
               </div>
+
+              
             </div>
         
       </div>

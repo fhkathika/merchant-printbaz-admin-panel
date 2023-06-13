@@ -3,7 +3,7 @@ import React, { useEffect, useState } from 'react';
 import SupportTicketPopUp from '../suppoprtTicketPopUp/SupportTicketPopUp';
 import axios from 'axios';
 import UsersStoredSupportTickets from '../userStoredSupportTicket/UsersStoredSupportTickets';
-
+import Accordion from 'react-bootstrap/Accordion';
 function TabForViewOrder({orderId}) {
   const [activeTab, setActiveTab] = useState('tab1');
   const [showTicketPopUp, setShowTicketPopUp] = useState(false);
@@ -11,22 +11,22 @@ function TabForViewOrder({orderId}) {
   const [popupId, setPopupId] = useState('');
   const [usersTickets, setUsersTickets] = useState([]);
   const [shownPopupTicketId, setShownPopupTicketId] = useState(null);
-
+  useEffect(() => {
+    // Fetch the chat log from the server when the component mounts
+    fetchChatLog();
+    
+  }, []);
   const fetchChatLog = async () => {
     try {
-      // const response = await axios.get(`http://localhost:5000/getOrderIdmessages/${orderId}`);
-      const response = await axios.get(`https://mserver.printbaz.com/getOrderIdmessages/${orderId}`);
+      const response = await axios.get(`http://localhost:5000/getOrderIdmessages/${orderId}`);
+      // const response = await axios.get(`https://mserver.printbaz.com/getOrderIdmessages/${orderId}`);
       setUsersTickets(response.data.messages);
       console.log("response.data.messages",response.data.messages);
     } catch (err) {
       console.error(err);
     }
   };
-  useEffect(() => {
-    // Fetch the chat log from the server when the component mounts
-    fetchChatLog();
-    
-  }, []);
+
 
   const handleTabClick = (tabName) => {
     setActiveTab(tabName);
@@ -85,24 +85,42 @@ function TabForViewOrder({orderId}) {
      <h4 style={{marginTop:"20px"}}>All Support Tickets</h4>
      {
    usersTickets?.map(tickets =>
-       <ul>
-         <li  className='status-btn' onClick={() => setShownPopupTicketId(tickets?.ticketId)}>
-          
-             {tickets?.ticketId}
-         </li>
-         {
-           shownPopupTicketId === tickets?.ticketId && (
-               <UsersStoredSupportTickets
+    <>
+       <Accordion defaultActiveKey="0">
+     
+      <Accordion.Item eventKey="1">
+        <Accordion.Header>{ tickets?.ticketId} 
+        
+        {
+          tickets?.messages?.map(ticketState=> <span style={{marginLeft:"10px",color:'orange'}}>{ticketState?.ticketStatus}</span>)
+        }
+         </Accordion.Header>
+        <Accordion.Body>
+        <UsersStoredSupportTickets
                    userOrderId={orderId}
                    onClose={() => setShownPopupTicketId(null)}
                    ticketId={tickets?.ticketId}
+                   ticketIssue={tickets?.ticketIssue}
                />
+        </Accordion.Body>
+      </Accordion.Item>
+    </Accordion>
+   
+      {/* {
+           shownPopupTicketId === tickets?.ticketId && (
+             
            )
-         }
-       </ul>)
+         }  
+        */}
+      
+    </>
+      
+       
+       
+       )
 }
 
-       
+
      
       </div>
 

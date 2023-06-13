@@ -61,6 +61,7 @@
         height: 100%;
         width: 100%;
         background-color: rgba(0, 0, 0, 0.5);
+        /* background-color: rgba(244, 238, 238, 0.5); */
         z-index: 999;
       }
       
@@ -68,8 +69,10 @@
         position: fixed;
         top: 50%;
         left: 50%;
+       
         transform: translate(-50%, -50%);
-        background-color: #f5f5f5;
+        /* background-color: #f5f5f5; */
+        background-color: rgb(154, 154, 225);
         padding: 2rem;
         border-radius: 0.5rem;
         box-shadow: 0 0.5rem 1rem rgba(116, 112, 112, 0.3);
@@ -79,6 +82,28 @@
       }
 
       .alert-box h2 {
+        color: white;
+        margin-top: 1rem;
+        font-size: 1.5rem;
+        line-height: 2.5rem;
+      }
+
+
+      .ticket-alert-box {
+        position: fixed;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        background-color:rgb(11, 8, 98);
+        padding: 2rem;
+        border-radius: 0.5rem;
+        box-shadow: 0 0.5rem 1rem rgba(116, 112, 112, 0.3);
+        z-index: 1000;
+        text-align: center;
+       
+      }
+
+      .ticket-alert-box h2 {
         color: white;
         margin-top: 1rem;
         font-size: 1.5rem;
