@@ -42,7 +42,7 @@ console.log("status",status);
   e.preventDefault();
   try {
     console.log("ticketId",ticketId);
-    const newMessage = { ticketId: ticketId,userOrderId:userOrderId, user: 'user', content: newMsg };
+    const newMessage = { ticketId: ticketId,ticketStatus:"replied",userOrderId:userOrderId, user: 'user', content: newMsg };
 
     
     // Check if the message was sent successfully
@@ -51,6 +51,7 @@ console.log("status",status);
       const chatMessage = {
         ticketId: newMessage.ticketId,  // added this line
         content: newMessage.content,
+        ticketStatus: newMessage.ticketStatus,
         admin: newMessage.user,
         orderId:newMessage.userOrderId,
         timestamp: new Date().toISOString(), // this won't be the exact timestamp saved in the DB

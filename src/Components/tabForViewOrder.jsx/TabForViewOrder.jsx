@@ -89,11 +89,10 @@ function TabForViewOrder({orderId}) {
        <Accordion defaultActiveKey="0">
      
       <Accordion.Item eventKey="1">
-        <Accordion.Header>{ tickets?.ticketId} 
-        
-        {
-          tickets?.messages?.map(ticketState=> <span style={{marginLeft:"10px",color:'orange'}}>{ticketState?.ticketStatus}</span>)
-        }
+        <Accordion.Header>
+          { tickets?.ticketId} 
+         <span style={{marginLeft:"10px",color:"orange"}}>{ tickets?.ticketStatus} </span> 
+      
          </Accordion.Header>
         <Accordion.Body>
         <UsersStoredSupportTickets
