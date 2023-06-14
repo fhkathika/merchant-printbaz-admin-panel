@@ -3,7 +3,7 @@ import PropTypes from 'prop-types';
 import { useEffect, useState } from 'react';
 import "../../css/style.css"
 import CreateTicketAlertbox from '../createTickwtAlert/CreateTicketAlertbox';
-const SupportTicketPopUp = ({ message,ticketId,userOrderId, onClose }) => {
+const SupportTicketPopUp = ({ message,ticketId,userOrderId,onClose,fetchTickets }) => {
   
   const [chatLog, setChatLog] = useState([]);
   const [newMsg, setNewMsg] = useState('');
@@ -67,7 +67,7 @@ setTicketIssue(e.target.value)
   e.preventDefault();
   try {
     console.log("ticketId",ticketId);
-    const newMessage = { ticketId: ticketId,userOrderId:userOrderId,ticketIssue:ticketIssue,ticketStatus:"open", user: 'user', content: newMsg };
+    const newMessage = { ticketId: ticketId,userOrderId:userOrderId,ticketIssue:ticketIssue,ticketStatus:"open", user: 'Admin', content: newMsg };
 
     
     // Check if the message was sent successfully
@@ -89,7 +89,7 @@ setTicketIssue(e.target.value)
       setNewMsg('');
      
       setCreateTicketnotify(true)
-   
+      fetchTickets()
     //  window.location.reload();
     // } else {
     //   // Handle error if the message was not sent successfully
@@ -154,11 +154,11 @@ setTicketIssue(e.target.value)
                      
                      <option value="">select issue</option>
                       <option value="onHold artwork issue">On hold- Artwork issue</option>
-                   
-                     <option value="onHold billing issue">On hold- Billing Issue</option>
+                      <option value="onHold billing issue">On hold- Billing Issue</option>
                      <option value="onHold out of stock">On hold- Out of stock</option>
                      <option value="returned">Returned</option>
                      <option value="cancellation">Cancellation</option>
+                     <option value="general query">General Query</option>
                            
                               
                        

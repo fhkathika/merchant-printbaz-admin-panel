@@ -10,6 +10,7 @@ import Mailbox from './Components/mailBox/Mailbox';
 import Ticket from './Components/ticket/Ticket';
 import ViewClient from './Components/viewClient/ViewClient';
 import ViewOrder from './Components/viewOrder/ViewOrder';
+import ViewTicket from './Components/viewTicket/ViewTicket';
 
 function App() {
   return (
@@ -24,6 +25,7 @@ function App() {
        <Route path="/ticket" element={<Ticket />} />
        <Route path="/viewClient/:id" element={<ViewClient />} />
        <Route path="/viewOrder/:id" element={<ViewOrder />} />
+       <Route path="/viewTicket/:id" element={<ViewTicket/>} />
        </Routes>
     </div>
   );

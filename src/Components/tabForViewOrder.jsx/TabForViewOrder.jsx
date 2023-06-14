@@ -77,6 +77,7 @@ function TabForViewOrder({orderId}) {
             userOrderId={orderId}
             onClose={closePopup}
             ticketId={popupId}
+            fetchTickets={fetchChatLog}
             
             />
             )
@@ -90,9 +91,23 @@ function TabForViewOrder({orderId}) {
      
       <Accordion.Item eventKey="1">
         <Accordion.Header>
-          { tickets?.ticketId} 
-         <span style={{marginLeft:"10px",color:"orange"}}>{ tickets?.ticketStatus} </span> 
-      
+         Ticket Id:  <span style={{color:"blue",fontWeight:"bold",marginLeft:"10px"}}>{ tickets?.ticketId}</span> 
+         
+      {
+         tickets?.ticketStatus==="open" &&
+         <span style={{marginLeft:"10px",color:"purple",fontStyle:"italic"}}>{ tickets?.ticketStatus} </span> 
+      }  
+       {
+         tickets?.ticketStatus==="replied" &&
+         <span style={{marginLeft:"10px",color:"green",fontStyle:"italic"}}>{ tickets?.ticketStatus} </span> 
+      } 
+       {
+         tickets?.ticketStatus==="pending" &&
+         <span style={{marginLeft:"10px",color:"orange",fontStyle:"italic"}}>{ tickets?.ticketStatus} </span> 
+      }  {
+         tickets?.ticketStatus==="closed" &&
+         <span style={{marginLeft:"10px",color:"red",fontStyle:"italic"}}>{ tickets?.ticketStatus} </span> 
+      }
          </Accordion.Header>
         <Accordion.Body>
         <UsersStoredSupportTickets

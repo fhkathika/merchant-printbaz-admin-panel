@@ -8,26 +8,31 @@ const UsersStoredSupportTickets = ({ message,ticketId,userOrderId,ticketIssue, o
   const [chatLog, setChatLog] = useState([]);
   const [newMsg, setNewMsg] = useState('');
   const [usersStoredTickets, setUsersStoredTickets] = useState([]);
+  const [openTextBox, setOpenTextBox] = useState(false);
+  const [fetchFlterData, setFetchFlterData] = useState([]);
   // const [ticketIssue, setTicketIssue] = useState('');
   useEffect(() => {
     // Fetch the chat log from the server when the component mounts
    
     fetchOrderIddata();
-    
   }, []);
   const fetchOrderIddata = async () => {
     try {
-      const response = await axios.get(`http://localhost:5000/getOrderIdmessages/${userOrderId}`);
-      // const response = await axios.get(`https://mserver.printbaz.com/getOrderIdmessages/${userOrderId}`);
+      // const response = await axios.get(`http://localhost:5000/getOrderIdmessages/${userOrderId}`);
+      const response = await axios.get(`https://mserver.printbaz.com/getOrderIdmessages/${userOrderId}`);
       setUsersStoredTickets(response.data.messages);
    
     } catch (err) {
       console.error(err);
     }
   };
+  
+  let filterByTicketId=usersStoredTickets?.find(ticket=>ticket.ticketId===ticketId)
 console.log("usersStoredTickets",usersStoredTickets);
 
 
+
+console.log("fetchFlterData",fetchFlterData);
     const handleNewMessageChange = (e) => {
       console.log(e.target.value);
       setNewMsg(e.target.value);
@@ -42,195 +47,229 @@ console.log("status",status);
   e.preventDefault();
   try {
     console.log("ticketId",ticketId);
-    const newMessage = { ticketId: ticketId,ticketStatus:"replied",userOrderId:userOrderId, user: 'user', content: newMsg };
+    const newMessage = { ticketId: ticketId,ticketStatus:"replied",userOrderId:userOrderId, user: 'Admin', content: newMsg };
 
+    const chatMessage = {
+      ticketId: newMessage.ticketId,  // added this line
+      content: newMessage.content,
+      ticketStatus: newMessage.ticketStatus,
+      admin: newMessage.user,
+      orderId:newMessage.userOrderId,
+      timestamp: new Date().toISOString(), // this won't be the exact timestamp saved in the DB
+    };
+
+    // Add the new message to the local state immediately
+    setChatLog([...chatLog, chatMessage]);
     
-    // Check if the message was sent successfully
-    // if (response?.data?.success) {
-      // Append the newMessage to chatLog
-      const chatMessage = {
-        ticketId: newMessage.ticketId,  // added this line
-        content: newMessage.content,
-        ticketStatus: newMessage.ticketStatus,
-        admin: newMessage.user,
-        orderId:newMessage.userOrderId,
-        timestamp: new Date().toISOString(), // this won't be the exact timestamp saved in the DB
-      };
-     
-      const response = await axios.post('http://localhost:5000/sendmessages',chatMessage);
-    // If the message is sent successfully, update the state
-    if (response?.data?.success) {
-      // Add the new message to the chatLog
-      setChatLog([...chatLog, chatMessage]);
 
-      // Add the new message to the usersStoredTickets state
-      setUsersStoredTickets([...usersStoredTickets, {
-        ...chatMessage,
-        messages: [chatMessage]
-      }]);
+    const response = await axios.post('http://localhost:5000/sendmessages',chatMessage);
 
-      // Clear the new message input field
-      setNewMsg('');
-    } else {
-      // Handle error if the message was not sent successfully
+    if (!response?.data?.success) {
+      // If the message was not sent successfully, revert the local state
+      setChatLog(oldChatLog => oldChatLog.filter(msg => msg !== chatMessage));
+      setUsersStoredTickets(oldTickets => oldTickets.filter(ticket => ticket !== chatMessage));
       console.error('Failed to send message');
     }
-
+    setUsersStoredTickets(oldTickets => [...oldTickets, {
+      ...chatMessage,
+      messages: [chatMessage]
+    }]);
+    setNewMsg('');
+    fetchOrderIddata()
     console.log("chatLog",chatLog);
   } catch (err) {
     console.error(err);
   }
-};
-let filterByTicketId=usersStoredTickets.find(ticket=>ticket.ticketId===ticketId)
+};  
 
- console.log("filterByTicketId",filterByTicketId);
- const getViewClientColor = (status) => {
-  if (status === "Pending") {
-    return "Orange";
-  }
-  if (status === "on-hold") {
-    return "Orange";
-  }
-  if (status === "on hold artwork issue") {
-    return "Orange";
-  }  
-      if (status === "on hold billing issue") {
-    return "Orange";
-  } 
-  if (status === "on hold out of stock") {
-    return "Orange";
-  }  
-  if (status === "Approved") {
-    return "green";
-  } 
 
-    if (status === "in-production") {
-    return "green";
+
+
+function timeSince(date) {
+
+  var seconds = Math.floor((new Date() - date) / 1000);
+
+  var interval = seconds / 31536000;
+
+  if (interval > 1) {
+    return Math.floor(interval) + " years ago";
   }
-    if (status === "out for delivery") {
-    return "green";
-  }  
-  if (status === "delivered") {
-    return "green";
-  } 
-   if (status === "payment-released") {
-    return "green";
-  } 
-  if (status === "returned") {
-    return "red";
-  }    
-    if (status === "cancel") {
-    return "red";
-  }   
-   if (status === "paid") {
-    return "#1fea70";
-  }  
-  if (status === "Unpaid") {
-    return "#360eea";
+  interval = seconds / 2592000;
+  if (interval > 1) {
+    return Math.floor(interval) + " months ago";
   }
-  // you can add more conditions here or just return a default color
-  // return "defaultColor";
-};
+  interval = seconds / 86400;
+  if (interval > 1) {
+    return Math.floor(interval) + " days ago";
+  }
+  interval = seconds / 3600;
+  if (interval > 1) {
+    return Math.floor(interval) + " hours ago";
+  }
+  interval = seconds / 60;
+  if (interval > 1) {
+    return Math.floor(interval) + " minutes ago";
+  }
+  return Math.floor(seconds) + " seconds ago";
+}
+
+
   return (
     <>
-      <meta charSet="UTF-8" />
-          <meta httpEquiv="X-UA-Compatible" content="IE=edge" />
-          <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-          <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossOrigin="anonymous" />
-          <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/PhononJs/1.5.1/css/components/icons.min.css" />
-          <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" integrity="sha512-iecdLmaskl7CVkqkXNQ/ZH/XLlvWZOJyj7Yy7tcenmpD1ypASozpmT/E0iPtmFIB46ZmdtAc9eNBvH0H/ZpiBw==" crossOrigin="anonymous" referrerPolicy="no-referrer" />
+     <meta charSet="UTF-8" />
+    <meta httpEquiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossOrigin="anonymous" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/PhononJs/1.5.1/css/components/icons.min.css" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" integrity="sha512-iecdLmaskl7CVkqkXNQ/ZH/XLlvWZOJyj7Yy7tcenmpD1ypASozpmT/E0iPtmFIB46ZmdtAc9eNBvH0H/ZpiBw==" crossOrigin="anonymous" referrerPolicy="no-referrer" />
+    <link rel="stylesheet" href="styles.css" />
           <title>Admin Dashboard</title>
-          <style dangerouslySetInnerHTML={{__html: "\n* {\n    box-sizing: border-box;\n    margin: 0;\n    padding: 0;\n}\n\nul,\nli,\na {\n    text-decoration: none;\n}\n\nbody {\n    font-family: Arial, sans-serif;\n    line-height: 1.6;\n    background-color: #f4f4f4;\n}\n\n/* Nav Bar CSS Start */\n\n.navbar {\nbackground: #001846 !important;\npadding: 0 20px 0 20px;\n}\n\n.navbar-brand img {\nwidth: 120px;\n}\n\n.nav-link {\ncolor: #ffffff !important;\nfont-size: 18px;\nfont-weight: 500;\ntext-align: center;\ntext-transform: uppercase;\npadding: 20px 20px 20px 20px;\nmargin: 0 10px 0 10px;\n}\n\n.nav-link:hover {\nbackground-color: #ffffff;\ncolor: #001846 !important;\ntransition: linear 0.2s;\n}\n\n.nav-dropdown-menu {\nbackground-color: #001846;\n}\n\n.nav-dropdown-item {\ncolor: #ffffff;\ntext-transform: uppercase;\n}\n\n.navbar-toggler {\nbackground-color: #ffffff !important;\n}\n\n/* Nav Bar CSS End */\n\n/* Media Queries */\n@media screen and (max-width: 1024px) {}\n\n@media screen and (max-width: 768px) {\n    .chat-user-list {\n    display: flex;\n    flex-direction: column;\n    max-height: 220px !important;\n    overflow-y: scroll;\n}\n\n.chat-messages {\n    display: flex;\n    flex-direction: column;\n    max-height: 220px !important;\n    overflow-y: scroll;\n}\n    .nav-link {\n        text-align: left;\n    }\n\n    .nav-link:hover {\n        width: 100%;\n\n    }\n.chat-page {\n    margin: 20px !important;\n}\n\n}\n.chat-page {\n    width: 45%  ;\n}\n\n.chat-list-tab2 {\n    color: #001846 !important;\n    padding: 10px 25px 10px 25px;\n    margin: 0;\n}\n\n.chat-online {\n    color: #34ce57\n}\n\n.chat-offline {\n    color: #e4606d\n}\n\n.chat-user-list {\n    display: flex;\n    flex-direction: column;\n    max-height: 620px;\n    overflow-y: scroll;\n}\n\n.chat-messages {\n    display: flex;\n    flex-direction: column;\n    max-height: 620px;\n    overflow-y: scroll;\n}\n\n.chat-message-left,\n.chat-message-right {\n    display: flex;\n    flex-shrink: 0\n}\n\n.chat-message-left {\n    margin-right: auto\n}\n\n.chat-message-right {\n    flex-direction: row-reverse;\n    margin-left: auto\n}\n.py-3 {\n    padding-top: 1rem!important;\n    padding-bottom: 1rem!important;\n}\n.px-4 {\n    padding-right: 1.5rem!important;\n    padding-left: 1.5rem!important;\n}\n.flex-grow-0 {\n    flex-grow: 0!important;\n}\n.border-top {\n    border-top: 1px solid #dee2e6!important;\n}\n\n    " }} />
+          <style dangerouslySetInnerHTML={{__html: "\n        * {\n            box-sizing: border-box;\n            margin: 0;\n            padding: 0;\n        }\n\n        ul,\n        li,\n        a {\n            text-decoration: none;\n        }\n\n        body {\n            font-family: Arial, sans-serif;\n            line-height: 1.6;\n            background-color: #f4f4f4;\n        }\n\n        /* Nav Bar CSS Start */\n\n        .navbar {\n            background: #001846 !important;\n            padding: 0 20px 0 20px;\n        }\n\n        .navbar-brand img {\n            width: 120px;\n        }\n\n        .nav-link {\n            color: #ffffff !important;\n            font-size: 18px;\n            font-weight: 500;\n            text-align: center;\n            text-transform: uppercase;\n            padding: 20px 20px 20px 20px;\n            margin: 0 10px 0 10px;\n        }\n\n        .nav-link:hover {\n            background-color: #ffffff;\n            color: #001846 !important;\n            transition: linear 0.2s;\n        }\n\n        .nav-dropdown-menu {\n            background-color: #001846;\n        }\n\n        .nav-dropdown-item {\n            color: #ffffff;\n            text-transform: uppercase;\n        }\n\n        .navbar-toggler {\n            background-color: #ffffff !important;\n        }\n\n        /* Nav Bar CSS End */\n\n        /* Ticket System CSS Start */\n\n        .ticket-system {\n            margin: 50px;\n        }\n\n        .ticket-header {}\n\n        .ticket-header h1 {\n            background: #ffffff;\n            padding: 20px;\n            font-size: 30px;\n            font-weight: 700;\n            margin: 0;\n        }\n\n        .ticket-top-menu {\n            background: #F5F7F9;\n            padding: 20px;\n            margin: 0;\n            box-shadow: 0 2px 4px 0 rgba(24, 50, 71, .08);\n        }\n\n        .ttm-button {\n            margin-right: 10px;\n            padding: 5px 10px 5px 10px;\n            border-radius: 5px;\n            border: 1px #cfd7df solid;\n            background: #ffffff;\n        }\n\n        .ttm-button:hover {\n            border: 1px solid #cfd7df;\n            color: #12344d;\n            background: #EBEDF0;\n            transition: .1s ease-in;\n        }\n\n        .ticket-top-menu .sort-by {\n            display: inline-block;\n            float: right;\n        }\n\n        /* Ticket Display */\n\n        .ticket-info {\n            background: #ffffff;\n            padding: 25px 20px 20px 20px;\n            margin-top: 3px;\n            margin-bottom: 3px;\n\n        }\n\n        .ticket-info img {\n            display: inline-block;\n            width: 25px;\n            margin-bottom: 0.5rem;\n            margin-right: 5px;\n\n        }\n\n        .ticket-info h2 {\n            display: inline-block;\n            font-size: 25px;\n            font-weight: 700;\n        }\n\n        .ticket-info p {\n            font-size: 14px;\n            font-weight: 600;\n            margin-left: 35px;\n            margin-bottom: 0;\n        }\n\n        .mer-info {\n            background: #ffffff;\n            padding: 25px 20px 20px 20px;\n            background-color: #fff;\n            box-shadow: 0 1px 0 0 #cfd7df;\n            display: table;\n            width: 100%;\n            box-sizing: border-box;\n\n        }\n\n        .mer-info img {\n            display: inline-block;\n            width: 25px;\n            margin-bottom: 0.5rem;\n            margin-right: 5px;\n            border-radius: 5px;\n\n        }\n\n        .mer-info h2 {\n            display: inline-block;\n            font-size: 20px;\n            font-weight: 700;\n            color: rgb(0, 157, 255);\n        }\n\n        .mer-info button {\n            float: right;\n            margin-right: 10px;\n            padding: 5px 10px 5px 10px;\n            border-radius: 5px;\n            border: 1px #cfd7df solid;\n            background: #ffffff;\n\n        }\n\n        .mer-info button:hover {\n            border: 1px solid #cfd7df;\n            color: #ca0909;\n            background: #EBEDF0;\n            transition: .1s ease-in;\n\n        }\n\n        .mer-info h3 {\n            font-size: 14px;\n            font-weight: 400;\n            margin-left: 35px;\n            margin-bottom: 0;\n            font-style: italic;\n        }\n\n        .mer-info p {\n            font-size: 16px;\n            font-weight: 400;\n            margin-left: 35px;\n            margin-bottom: 0;\n        }\n\n        .ticket-replay {\n            background: #ffffff;\n            padding: 20px 20px 20px 20px;\n\n        }\n\n        .ticket-replay img {\n            display: inline-block;\n            width: 25px;\n            margin-bottom: 0.5rem;\n            margin-right: 5px;\n            border-radius: 5px;\n\n        }\n\n\n        /* finter Section */\n\n        .filter-section {\n            margin-top: 3px;\n            padding: 25px 20px 20px 20px;\n            background-color: #fff;\n            box-shadow: 0 1px 0 0 #cfd7df;\n            display: table;\n            width: 100%;\n            box-sizing: border-box;\n            height: 100%;\n        }\n\n        .filter-text h2 {\n            font-size: 18px;\n            font-weight: 600;\n        }\n\n        .filter-text h3 {\n            font-size: 14px;\n            font-weight: 400;\n            font-style: italic;\n            margin-bottom: 25px;\n        }\n\n        .filter-dropdown {\n            margin-bottom: 30px;\n        }\n\n        .filter-dropdown .dropdown-menu {\n            width: 100%;\n        }\n\n        .dropdown-toggle::after {\n            float: right;\n            margin-top: 10px;\n        }\n\n        .filter-update-button button {\n            width: 100%;\n            margin-right: 10px;\n            padding: 5px 10px 5px 10px;\n            border-radius: 5px;\n            border: 1px #cfd7df solid;\n            background: #ffffff;\n            font-weight: 700;\n\n        }\n\n        .filter-update-button button:hover {\n            border: 1px solid #cfd7df;\n            color: #ffffff;\n            background: rgb(0, 194, 0);\n            transition: .1s ease-in;\n\n        }\n\n        .profile-section {\n            margin-top: 3px;\n            padding: 25px 20px 20px 20px;\n            background-color: #fff;\n            box-shadow: 0 1px 0 0 #cfd7df;\n            display: table;\n            width: 100%;\n            box-sizing: border-box;\n            height: 100%;\n        }\n\n        .profile-section img {\n            width: 80px;\n            display: inline-block;\n            border-radius: 5px;\n            margin-left: 30%;\n        }\n\n        .profile-section h2 {\n            margin-top: 20px;\n            font-size: 18px;\n            font-weight: 700;\n            display: inline-block;\n        }\n\n        .profile-section h3 {\n            font-size: 14px;\n            font-weight: 400;\n            font-style: italic;\n            display: inline-block;\n        }\n\n        .profile-section p {\n            margin-top: 15px;\n            font-size: 16px;\n            font-weight: 600;\n            display: inline-block;\n        }\n\n    " }} />
       <div className="" onClick={onClose} />
       <div className=" ">
         {/* <h2>{message}</h2> */}
-        <p style={{color:"black",cursor:"pointer",textAlign:"right"}} onClick={onClose}>Cancel</p>
+        {/* <p style={{color:"black",cursor:"pointer",textAlign:"right"}} onClick={onClose}>Cancel</p> */}
        
             <div className="card">
               <div className="row g-0">
                
-                <div className="col-12 col-lg-12 col-xl-12">
-                  <div className="py-2 px-4 border-bottom d-none d-lg-block  ">
-                    <div className="flex align-items-center py-1" >
-                        <div className='d-flex align-items-center'>
-
-                        <div className="position-relative">
-                        <img src="https://bootdey.com/img/Content/avatar/avatar3.png" className="rounded-circle mr-1" alt={1684051962640} width={40} height={40} />
-                      </div>
-                      <div className="flex-grow-1 pl-3" style={{ marginLeft:"10px",textAlign:"left"}}>
-                        <p>Order Id: <span style={{color:"blue"}}>{userOrderId}</span></p>
-                        <p>Ticket id: <span style={{color:"orange"}}>{ticketId}</span> </p>
-                        <div className="text-muted small"><em>Typing...</em></div>
-                      </div>
-                        </div>
-                    
-                      <div>
-               
-   <p className='status-btn'>{ticketIssue}</p>
-  
-                      
-  
-                      </div> 
-                       <div>
-                        <button className="btn btn-info btn-lg mr-1 px-3 d-none d-md-inline-block" style={{backgroundColor: '#E70000', border: 'none'}}><svg width={24} height={24} viewBox="0 0 1024 1024" xmlns="http://www.w3.org/2000/svg"><path fill="#000000" d="M195.2 195.2a64 64 0 0 1 90.496 0L512 421.504 738.304 195.2a64 64 0 0 1 90.496 90.496L602.496 512 828.8 738.304a64 64 0 0 1-90.496 90.496L512 602.496 285.696 828.8a64 64 0 0 1-90.496-90.496L421.504 512 195.2 285.696a64 64 0 0 1 0-90.496z" /></svg></button>
-                        <button className="btn btn-light border btn-lg px-3"><svg xmlns="http://www.w3.org/2000/svg" width={24} height={24} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round" className="feather feather-more-horizontal feather-lg"><circle cx={12} cy={12} r={1} /><circle cx={19} cy={12} r={1} /><circle cx={5} cy={12} r={1} /></svg></button>
-                      </div>
-                     
-                    </div>
-                  </div>
-                  <div className="position-relative">
-                  <div className="chat-messages p-4">
-    
-         {
-   filterByTicketId?.messages?.map(allText=>
+              <div className="col-12 col-lg-12 col-xl-12">
+          <div className="row">
+            <div className="col-12">
+              <div className="ticket-info">
+                <img src="https://media.discordapp.net/attachments/1069579536842379305/1117395441697443860/pngegg_15.png" alt="" />
+                <h2>{ticketIssue==="onHold out of stock" &&
+               " On hold- Out of stock"
                 
-    <div className={allText.admin === 'user' ? 'chat-message-right pb-4' : 'chat-message-left pb-4'}>
-    <div>
-      <img src="https://bootdey.com/img/Content/avatar/avatar3.png" className="rounded-circle mr-1" alt={allText.admin} width={40} height={40} />
-      <div className="text-muted small text-nowrap mt-2">{new Date(allText._id).toLocaleTimeString()}</div>
-    </div>
-    <div className="flex-shrink-1 bg-light rounded py-2 px-3 ml-3">
-      <div className="font-weight-bold mb-1">{allText?.admin}</div>
-      {allText.content}
-    </div>
-  </div>
-    
-    )
-         } 
-       
-          
-         
-          
-    
-     
-     
-    </div>
-                  </div>
-                  <div className="flex-grow-0 py-3 px-4 border-top">
-                    <div >
-                    <form className="input-group chat-messages p-4" onSubmit={handleSendMessage}>
-    
-
-<textarea 
-          type="text"
-          rows="11" cols="33"
-          value={newMsg}
-          onChange={handleNewMessageChange}
-          placeholder="Type your message here..."
-          required
-        />
-         <button style={{textAlign:"right"}} className="btn"><i className="fa fa-paperclip" aria-hidden="true" /></button>
-        <button className="btn btn-primary" type="submit">Send</button>
-     
-        {/* <input type="text" className="form-control"   value={newMessage}
-          onChange={handleNewMessageChange} placeholder="Type your message" />
-                      <button className="btn"><i className="fa fa-paperclip" aria-hidden="true" /></button>
-                      <button className="btn btn-primary">Reply</button> */}
-      </form>
-                     
-                    </div>
-                  </div>
+                }</h2>  
+                <h2>{ticketIssue==="onHold artwork issue" &&
+               "On hold- Artwork issue"
+                
+                }</h2>  
+                <h2>{ticketIssue==="onHold billing issue" &&
+               "On hold- Billing Issue"
+                
+                }</h2>
+                  <h2>{ticketIssue==="returned" &&
+               "Returned"
+                
+                }</h2> 
+                <h2>{ticketIssue==="cancellation" &&
+               "Cancellation"
+                
+                }</h2>
+                <h2>{ticketIssue==="general query" &&
+               "General Query"
+                
+                }</h2>
+                <p>Order ID: {userOrderId}</p>
+                <p>Ticket ID: {ticketId}</p>
+              </div>
+            </div>
+          </div>
+          <div className="" style={{maxHeight:"30rem",overflowY:"scroll"}}>
+            {
+               filterByTicketId?.messages?.map(allText=>
+                <>
+                {
+                   allText.user &&
+                   <div className="col-12">
+                   <div className="mer-info">
+                     <img src="https://media.discordapp.net/attachments/1069579536842379305/1107191553501450260/Logo-01.jpg?width=616&height=616" alt="" />
+                     <h2>Md. Raihan Ahamad Rabbi</h2>
+                     <h3>2 days ago (Fri, 9 Jun 2023 at 3:46 AM)</h3> <br />
+                     <p>Hi,
+                       <br /><br />
+                       The television I ordered from your site was delivered with a cracked screen. I need some help with a refund or a replacement.
+                       <br />
+                       Here is the order number FD07062010
+                       <br /><br />
+                       Thanks,<br />
+                       Raihan
+                     </p>
+                   </div>
+                 </div>
+                }
+                 
+              {
+                allText.admin && 
+                <div className="col-12">
+                <div className="mer-info">
+                  <img src="https://media.discordapp.net/attachments/1069579536842379305/1107191553501450260/Logo-01.jpg?width=616&height=616" alt="" />
+                  <h2 style={{color: 'red'}}>{allText.admin}</h2>
+                  <h3>{timeSince(new Date(allText?.timestamp))} ({new Date(allText?.timestamp).toLocaleString("en-US", { month: 'long', day: 'numeric', year: 'numeric', hour: 'numeric', minute: 'numeric' })})</h3>
+                  <p>   {allText.content}
+                  </p>
                 </div>
+              </div>
+              }
+             
+                </>
+              
+                )
+            }
+           
+          </div>
+          <div className="row">
+            <div className="col-12">
+              {
+                !openTextBox && 
+                <div className="ticket-replay">
+              
+                <button className="ttm-button" onClick={()=>setOpenTextBox(true)}><i className="fa fa-reply" aria-hidden="true" style={{marginRight: '5px'}} />Reply</button>
+                <button className="ttm-button"><i className="fa fa-sticky-note" aria-hidden="true" style={{marginRight: '5px'}} />Add Note</button>
+                <button className="ttm-button"><i className="fa fa-paper-plane" aria-hidden="true" style={{marginRight: '5px'}} />Send Copy</button>
+              </div>
+              }
+            
+            </div>
+          </div> 
+            <div className="row">
+              <div className='col-12'>
+              {
+             openTextBox && 
+             <form className="input-group chat-messages p-4 " onSubmit={handleSendMessage}>
+    <textarea  className='col-12'
+                       type="text"
+                       rows="11" cols="33"
+                       value={newMsg}
+                       onChange={handleNewMessageChange}
+                       placeholder="Type your message here..."
+                       required
+                     />
+                     
+                     <div className=' col-12' style={{marginTop:"20px"}} >
+                     <button  className="btn"><i className="fa fa-paperclip" aria-hidden="true" /></button>
+                   
+      
+                     </div>  
+                     <div className='flex col-12' style={{marginTop:"20px"}} >
+                     <button  className="btn"><i className="fa fa-paperclip" aria-hidden="true" /></button>
+                     <div>
+                     <button className="ttm-button" onClick={()=>setOpenTextBox(false)}> <i className="fa fa-trash" aria-hidden="true" style={{ marginRight: '5px' }} /></button>
+                     <button className="ttm-button" type="submit"><i className="fa fa-reply" aria-hidden="true" style={{marginRight: '5px'}} />Reply</button>
+                     </div>
+                    
+                   
+                     </div>
+
+                  
+                     
+                    
+                  
+                     {/* <input type="text" className="form-control"   value={newMessage}
+                       onChange={handleNewMessageChange} placeholder="Type your message" />
+                                   <button className="btn"><i className="fa fa-paperclip" aria-hidden="true" /></button>
+                                   <button className="btn btn-primary">Reply</button> */}
+                   </form>
+           }
+              </div>
+        
+           
+                     
+           
+          </div>
+        </div>
               </div>
 
               
