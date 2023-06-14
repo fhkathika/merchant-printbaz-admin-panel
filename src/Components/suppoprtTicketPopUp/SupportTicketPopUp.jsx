@@ -19,7 +19,8 @@ const SupportTicketPopUp = ({ message,ticketId,userOrderId,onClose,fetchTickets 
 
   const fetchChatLog = async () => {
       try {
-        const response = await axios.get(`http://localhost:5000/getmessages/${ticketId}`);
+        // const response = await axios.get(`http://localhost:5000/getmessages/${ticketId}`);
+        const response = await axios.get(`https://mserver.printbaz.com/getmessages/${ticketId}`);
         setChatLog(response.data);
       } catch (err) {
         console.error(err);
@@ -83,8 +84,8 @@ setTicketIssue(e.target.value)
         timestamp: new Date().toISOString(), // this won't be the exact timestamp saved in the DB
       };
       setChatLog([...chatLog, chatMessage]);
-      const response = await axios.post('http://localhost:5000/sendmessages',chatMessage);
-      // const response = await axios.post('https://mserver.printbaz.com/sendmessages',chatMessage);
+      // const response = await axios.post('http://localhost:5000/sendmessages',chatMessage);
+      const response = await axios.post('https://mserver.printbaz.com/sendmessages',chatMessage);
       console.log("chatLog",chatLog);
       setNewMsg('');
      

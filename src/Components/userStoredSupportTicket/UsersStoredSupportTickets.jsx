@@ -62,7 +62,8 @@ console.log("status",status);
     setChatLog([...chatLog, chatMessage]);
     
 
-    const response = await axios.post('http://localhost:5000/sendmessages',chatMessage);
+    // const response = await axios.post('http://localhost:5000/sendmessages',chatMessage);
+    const response = await axios.post('https://mserver.printbaz.com/sendmessages',chatMessage);
 
     if (!response?.data?.success) {
       // If the message was not sent successfully, revert the local state
