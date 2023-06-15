@@ -9,7 +9,6 @@ const UsersStoredSupportTickets = ({ message,ticketId,userOrderId,ticketIssue, o
   const [newMsg, setNewMsg] = useState('');
   const [usersStoredTickets, setUsersStoredTickets] = useState([]);
   const [openTextBox, setOpenTextBox] = useState(false);
-  const [fetchFlterData, setFetchFlterData] = useState([]);
   // const [ticketIssue, setTicketIssue] = useState('');
   useEffect(() => {
     // Fetch the chat log from the server when the component mounts
@@ -18,8 +17,8 @@ const UsersStoredSupportTickets = ({ message,ticketId,userOrderId,ticketIssue, o
   }, []);
   const fetchOrderIddata = async () => {
     try {
-      // const response = await axios.get(`http://localhost:5000/getOrderIdmessages/${userOrderId}`);
-      const response = await axios.get(`https://mserver.printbaz.com/getOrderIdmessages/${userOrderId}`);
+      const response = await axios.get(`http://localhost:5000/getOrderIdmessages/${userOrderId}`);
+      // const response = await axios.get(`https://mserver.printbaz.com/getOrderIdmessages/${userOrderId}`);
       setUsersStoredTickets(response.data.messages);
    
     } catch (err) {
@@ -32,7 +31,6 @@ console.log("usersStoredTickets",usersStoredTickets);
 
 
 
-console.log("fetchFlterData",fetchFlterData);
     const handleNewMessageChange = (e) => {
       console.log(e.target.value);
       setNewMsg(e.target.value);
@@ -62,8 +60,8 @@ console.log("status",status);
     setChatLog([...chatLog, chatMessage]);
     
 
-    // const response = await axios.post('http://localhost:5000/sendmessages',chatMessage);
-    const response = await axios.post('https://mserver.printbaz.com/sendmessages',chatMessage);
+    const response = await axios.post('http://localhost:5000/sendmessages',chatMessage);
+    // const response = await axios.post('https://mserver.printbaz.com/sendmessages',chatMessage);
 
     if (!response?.data?.success) {
       // If the message was not sent successfully, revert the local state
