@@ -12,6 +12,8 @@ const ViewTicket = () => {
     const [newMsg, setNewMsg] = useState('');
     const viewTicketDetail = location.state ? location?.state?.allTicket : null;
     const [usersStoredTickets, setUsersStoredTickets] = useState([]);
+    const [selectedFiles, setSelectedFiles] = useState([]);
+
     console.log("viewTicketDetail",viewTicketDetail);
     useEffect(() => {
         // Fetch the chat log from the server when the component mounts
@@ -30,31 +32,57 @@ const ViewTicket = () => {
         }
       };
       let filterByTicketId=usersStoredTickets?.find(ticket=>ticket.ticketId===viewTicketDetail?.ticketId)
-    const handleNewMessageChange = (e) => {
+   
+   console.log("filterByTicketId",filterByTicketId);  
+    ///input text
+      const handleNewMessageChange = (e) => {
         console.log(e.target.value);
         setNewMsg(e.target.value);
     };
+    //upload files
+    const handleFileChange = (e) => {
+      setSelectedFiles(e.target.files);
+    };
+    
+ 
     const handleSendMessage = async (e) => {
         e.preventDefault();
         try {
-          const newMessage = { ticketId: viewTicketDetail?.ticketId,ticketStatus:"replied",userOrderId:viewTicketDetail?.orderId, user: 'admin', content: newMsg };
+          const formData=new FormData();
+          Array.from(selectedFiles).forEach((file)=>{
+            formData.append('files',file)
+          })
+          const newMessage = {
+             ticketId: viewTicketDetail?.ticketId,
+             ticketIssue: viewTicketDetail?.ticketIssue,
+             ticketStatus:"replied",
+             userOrderId:viewTicketDetail?.orderId,
+              user: 'Admin',
+               content: newMsg };
       
           const chatMessage = {
             ticketId: newMessage.ticketId,  // added this line
             content: newMessage.content,
             ticketStatus: newMessage.ticketStatus,
+            ticketIssue: newMessage.ticketIssue,
             admin: newMessage.user,
             orderId:newMessage.userOrderId,
             timestamp: new Date().toISOString(), // this won't be the exact timestamp saved in the DB
           };
+          Object.entries(chatMessage).forEach(([key,value])=>{
+            formData.append(key,value)
+          })
       
           // Add the new message to the local state immediately
           setChatLog([...chatLog, chatMessage]);
           
       
-          const response = await axios.post('http://localhost:5000/sendmessages',chatMessage);
-          // const response = await axios.post('https://mserver.printbaz.com/sendmessages',chatMessage);
-      
+          const response = await axios.post('http://localhost:5000/sendmessages', formData, {
+          // const response = await axios.post('https://mserver.printbaz.com/sendmessages', formData, {
+      headers: {
+        'Content-Type': 'multipart/form-data',
+      },
+    });
           if (!response?.data?.success) {
             // If the message was not sent successfully, revert the local state
             setChatLog(oldChatLog => oldChatLog.filter(msg => msg !== chatMessage));
@@ -211,9 +239,10 @@ const ViewTicket = () => {
               </div>
             </div>
           </div>
-          <div className="row" style={{overflow:"scroll",height:"30rem"}}>
+          <div className="" style={{overflow:"scroll",maxHeight:"30rem"}}>
               {
                   filterByTicketId?.messages?.map(viewTick=>
+                  
                     <div className="col-12">
                 {
                    viewTick.user &&
@@ -233,6 +262,7 @@ const ViewTicket = () => {
                      </p>
                    </div>
                  </div>
+                 
                 }
                  
               {
@@ -242,11 +272,25 @@ const ViewTicket = () => {
                   <img src="https://media.discordapp.net/attachments/1069579536842379305/1107191553501450260/Logo-01.jpg?width=616&height=616" alt="" />
                   <h2 style={{color: 'red'}}>{viewTick.admin}</h2>
                   <h3>{timeSince(new Date(viewTick?.timestamp))} ({new Date(viewTick?.timestamp).toLocaleString("en-US", { month: 'long', day: 'numeric', year: 'numeric', hour: 'numeric', minute: 'numeric' })})</h3>
-                  <p>   {viewTick.content}
-                  </p>
+                  <p>   {viewTick.content}</p>
+
+                  
+                  {/* <img src="https://drive.google.com/file/d/1QjDnrA7MpKUNW9eH94Kxi1finaaDoxAU/view" alt='msg'/>  */}
+             {/* {
+    viewTick?.files &&
+    viewTick?.files?.map(file =>
+     
+    
+
+    )
+} */}
+
+                
                 </div>
               </div>
               }
+
+             
                   </div>
                     )
               }
@@ -286,10 +330,21 @@ const ViewTicket = () => {
       
                      </div>  
                      <div className='flex col-12' style={{marginTop:"20px"}} >
-                     <button  className="btn"><i className="fa fa-paperclip" aria-hidden="true" /></button>
+           
+                     <button  className="btn"
+                     
+                     ><i className="fa fa-paperclip" aria-hidden="true" />          <input
+                     className="btn"
+                     type="file"
+                     name="file"
+                     multiple
+                     
+                     onChange={handleFileChange}
+                   /></button>
                      <div>
                      <button className="ttm-button" onClick={()=>setOpenTextBox(false)}> <i className="fa fa-trash" aria-hidden="true" style={{ marginRight: '5px' }} /></button>
                      <button className="ttm-button" type="submit"><i className="fa fa-reply" aria-hidden="true" style={{marginRight: '5px'}} />Reply</button>
+                  
                      </div>
                     
                    

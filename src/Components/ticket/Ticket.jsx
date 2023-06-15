@@ -164,7 +164,15 @@ const Ticket = () => {
                         <img src="https://media.discordapp.net/attachments/1069579536842379305/1107191553501450260/Logo-01.jpg?width=616&height=616" alt="" />
                       </div>
                       <div className="box1-right">
-                        <h6>{allTicket?.ticketIssue}</h6>
+                        
+                        <h6>{allTicket?.ticketIssue==="onHold out of stock" &&"On hold- Out of stock"}
+               {allTicket?.ticketIssue==="onHold artwork issue" &&"On hold- Artwork issue"}
+                {allTicket?.ticketIssue==="onHold billing issue" &&"On hold- Billing Issue"}
+                {allTicket?.ticketIssue==="returned" &&"Returned"}
+                {allTicket?.ticketIssue==="cancellation" &&"Cancellation"}
+                {allTicket?.ticketIssue==="general query" &&"General Query"}
+               </h6>  
+               
                         <h3>user</h3>
                         <h4>Order ID: {allTicket?.orderId}</h4>
                         <h5>Ticket ID: {allTicket?.ticketId}</h5>
