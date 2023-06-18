@@ -3,12 +3,14 @@ import PropTypes from 'prop-types';
 import { useEffect, useState } from 'react';
 import "../../css/style.css"
 import CreateTicketAlertbox from '../createTickwtAlert/CreateTicketAlertbox';
-const SupportTicketPopUp = ({ message,ticketId,userOrderId,onClose,fetchTickets }) => {
+const SupportTicketPopUp = ({ message,ticketId,userOrderId,onClose,fetchTickets,userEmail }) => {
   
   const [chatLog, setChatLog] = useState([]);
   const [newMsg, setNewMsg] = useState('');
   const [ticketIssue, setTicketIssue] = useState('');
   const [createTicketnotify, setCreateTicketnotify] = useState(false);
+  const [usersStoredTickets, setUsersStoredTickets] = useState([]);
+    const [selectedFiles, setSelectedFiles] = useState([]);
   useEffect(() => {
     // Fetch the chat log from the server when the component mounts
     fetchChatLog();
@@ -19,8 +21,8 @@ const SupportTicketPopUp = ({ message,ticketId,userOrderId,onClose,fetchTickets 
 
   const fetchChatLog = async () => {
       try {
-        const response = await axios.get(`http://localhost:5000/getmessages/${ticketId}`);
-        // const response = await axios.get(`https://mserver.printbaz.com/getmessages/${ticketId}`);
+        // const response = await axios.get(`http://localhost:5000/getmessages/${ticketId}`);
+        const response = await axios.get(`https://mserver.printbaz.com/getmessages/${ticketId}`);
         setChatLog(response.data);
       } catch (err) {
         console.error(err);
@@ -64,42 +66,59 @@ setTicketIssue(e.target.value)
  }
 
  console.log("status",ticketIssue);
+    
  const handleSendMessage = async (e) => {
   e.preventDefault();
   try {
-    console.log("ticketId",ticketId);
-    const newMessage = { ticketId: ticketId,userOrderId:userOrderId,ticketIssue:ticketIssue,ticketStatus:"open", user: 'Admin', content: newMsg };
+    const formData=new FormData();
+    Array.from(selectedFiles).forEach((file)=>{
+      formData.append('files',file)
+    })
+    const newMessage = { ticketId: ticketId,userOrderId:userOrderId,ticketIssue:ticketIssue,ticketStatus:"open", user: 'Admin', content: newMsg,userEmail:userEmail };
 
+    const chatMessage = {
+      ticketId: newMessage.ticketId,  // added this line
+      content: newMessage.content,
+      ticketStatus: newMessage.ticketStatus,
+      ticketIssue: newMessage.ticketIssue,
+      userEmail: newMessage.userEmail,
+      admin: newMessage.user,
+      orderId:newMessage.userOrderId,
+      timestamp: new Date().toISOString(), // this won't be the exact timestamp saved in the DB
+    };
+    Object.entries(chatMessage).forEach(([key,value])=>{
+      formData.append(key,value)
+    })
+
+    // Add the new message to the local state immediately
+    setChatLog([...chatLog, chatMessage]);
     
-    // Check if the message was sent successfully
-    // if (response?.data?.success) {
-      // Append the newMessage to chatLog
-      const chatMessage = {
-        ticketId: newMessage.ticketId,  // added this line
-        content: newMessage.content,
-        ticketIssue: newMessage.ticketIssue,
-        ticketStatus: newMessage.ticketStatus,
-        admin: newMessage.user,
-        orderId:newMessage.userOrderId,
-        timestamp: new Date().toISOString(), // this won't be the exact timestamp saved in the DB
-      };
-      setChatLog([...chatLog, chatMessage]);
-      const response = await axios.post('http://localhost:5000/sendmessages',chatMessage);
-      // const response = await axios.post('https://mserver.printbaz.com/sendmessages',chatMessage);
-      console.log("chatLog",chatLog);
-      setNewMsg('');
-     
-      setCreateTicketnotify(true)
+
+    // const response = await axios.post('http://localhost:5000/sendmessages', formData, {
+    const response = await axios.post('https://mserver.printbaz.com/sendmessages', formData, {
+headers: {
+  'Content-Type': 'multipart/form-data',
+},
+});
+    if (!response?.data?.success) {
+      // If the message was not sent successfully, revert the local state
+      setChatLog(oldChatLog => oldChatLog.filter(msg => msg !== chatMessage));
+      setUsersStoredTickets(oldTickets => oldTickets.filter(ticket => ticket !== chatMessage));
+      console.error('Failed to send message');
+    }
+    setUsersStoredTickets(oldTickets => [...oldTickets, {
+      ...chatMessage,
+      messages: [chatMessage]
+    }]);
+    setNewMsg('');
+    fetchChatLog();
+     setCreateTicketnotify(true)
       fetchTickets()
-    //  window.location.reload();
-    // } else {
-    //   // Handle error if the message was not sent successfully
-    //   console.error('Failed to send message');
-    // }
+    console.log("chatLog",chatLog);
   } catch (err) {
     console.error(err);
   }
-};
+}; 
 
     
 

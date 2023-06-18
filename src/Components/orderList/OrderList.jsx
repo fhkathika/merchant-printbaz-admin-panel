@@ -20,9 +20,37 @@ let matchingMerchant
 
 let date = new Date(orderAll?.createdAt); // create a new Date object
 
-let options = { year: 'numeric', month: 'long', day: 'numeric' }; // options for toLocaleDateString
+let options = { month: 'long', day: 'numeric', year: 'numeric', hour: 'numeric', minute: 'numeric' }; // options for toLocaleDateString
 
 let formattedDate = date.toLocaleDateString('en-US', options); // use toLocaleDateString to format the date
+function timeSince(date) {
+
+  var seconds = Math.floor((new Date() - date) / 1000);
+
+  var interval = seconds / 31536000;
+
+  if (interval > 1) {
+    return Math.floor(interval) + " years ago";
+  }
+  interval = seconds / 2592000;
+  if (interval > 1) {
+    return Math.floor(interval) + " months ago";
+  }
+  interval = seconds / 86400;
+  if (interval > 1) {
+    return Math.floor(interval) + " days ago";
+  }
+  interval = seconds / 3600;
+  if (interval > 1) {
+    return Math.floor(interval) + " hours ago";
+  }
+  interval = seconds / 60;
+  if (interval > 1) {
+    return Math.floor(interval) + " minutes ago";
+  }
+  return Math.floor(seconds) + " seconds ago";
+}
+console.log("formattedDate",formattedDate);
 const handleInputChange = (event, index) => {
   const { name, value } = event.target;
   setFilterOrders(value)
@@ -231,7 +259,8 @@ const getViewClientColor = (status) => {
               {
                    filterOrders && searchByOrderId?.map((orders,index)=>{ 
                     matchingMerchant = allMerchant.find(merchant => merchant?.email === orders?.userMail)
-                   return (
+                   let  totalPrintBazCostWithDeliveryFee=Number(orders?.printbazcost) + Number(orders?.deliveryFee)
+                    return (
                       <Link to={`/viewOrder/${orders?._id}`} state={{orders,matchingMerchant}} key={index}>
                       <div key={orders?._id} className="row client-list">
                         <div className="col-lg-2 col-sm-12">
@@ -252,11 +281,11 @@ const getViewClientColor = (status) => {
                           <p className="p-status-btn">{orders?.paymentStatus}</p>
                         </div>
                         <div className="col-lg-2 col-sm-12">
-                          <p>{orders?.recvMoney} TK</p>
+                          <p>{totalPrintBazCostWithDeliveryFee} TK</p>
                         </div>
                         <div className="col-lg-1 col-sm-12">
                           <p className="" style={{backgroundColor:getViewClientColor(orders?.orderStatus)}}>{orders?.orderStatus}</p>
-                          {/* <p style={{fontSize: '14px'}}>{formattedDate}</p> */}
+                          <p style={{fontSize: '14px'}}>{formattedDate}</p>
                         </div>
                       </div>
                     </Link>
@@ -268,7 +297,8 @@ const getViewClientColor = (status) => {
                  {
                    filterOrders==="paid" && paidOrders.map((orders,index)=>{ 
                     matchingMerchant = allMerchant.find(merchant => merchant?.email === orders?.userMail)
-                   return (
+                   let  totalPrintBazCostWithDeliveryFee=Number(orders?.printbazcost) + Number(orders?.deliveryFee)
+                    return (
                       <Link to={`/viewOrder/${orders?._id}`} state={{orders,matchingMerchant}} key={index}>
                       <div key={orders?._id} className="row client-list">
                         <div className="col-lg-2 col-sm-12">
@@ -289,11 +319,16 @@ const getViewClientColor = (status) => {
                           <p className="p-status-btn">{orders?.paymentStatus}</p>
                         </div>
                         <div className="col-lg-2 col-sm-12">
-                          <p>{orders?.recvMoney} TK</p>
+                          <p>{totalPrintBazCostWithDeliveryFee} TK</p>
                         </div>
                         <div className="col-lg-1 col-sm-12">
                           <p className="" style={{backgroundColor:getViewClientColor(orders?.orderStatus)}}>{orders?.orderStatus}</p>
                           {/* <p style={{fontSize: '14px'}}>{formattedDate}</p> */}
+                          <p style={{fontSize: '14px'}}> created at: {new Date(orders?.createdAt).toLocaleDateString('en-US', options)}</p>
+                      {
+                        orders?.statusDate  && 
+                        <p style={{fontSize: '14px'}}> uppdated at: {new Date(orders?.statusDate).toLocaleDateString('en-US', options)}</p>
+                      }
                         </div>
                       </div>
                     </Link>
@@ -305,7 +340,8 @@ const getViewClientColor = (status) => {
                 {
                    filterOrders==="Unpaid" && unPaidOrders.map((orders,index)=>{ 
                     matchingMerchant = allMerchant.find(merchant => merchant?.email === orders?.userMail)
-                   return (
+                   let  totalPrintBazCostWithDeliveryFee=Number(orders?.printbazcost) + Number(orders?.deliveryFee)
+                    return (
                       <Link to={`/viewOrder/${orders?._id}`} state={{orders,matchingMerchant}} key={index}>
                       <div key={orders?._id} className="row client-list">
                         <div className="col-lg-2 col-sm-12">
@@ -326,12 +362,17 @@ const getViewClientColor = (status) => {
                           <p className="p-status-btn">{orders?.paymentStatus}</p>
                         </div>
                         <div className="col-lg-2 col-sm-12">
-                          <p>{orders?.recvMoney} TK</p>
+                          <p>{totalPrintBazCostWithDeliveryFee} TK</p>
                         </div>
                         <div className="col-lg-1 col-sm-12">
                           <p className="status-btn" style={{    backgroundColor: getViewClientColor(
                                 orders?.orderStatus
                                 )}}>{orders?.orderStatus}</p>
+                                  <p style={{fontSize: '14px'}}> created at: {new Date(orders?.createdAt).toLocaleDateString('en-US', options)}</p>
+                      {
+                        orders?.statusDate  && 
+                        <p style={{fontSize: '14px'}}> uppdated at: {new Date(orders?.statusDate).toLocaleDateString('en-US', options)}</p>
+                      }
                           {/* <p style={{fontSize: '14px'}}>{formattedDate}</p> */}
                         </div>
                       </div>
@@ -344,7 +385,8 @@ const getViewClientColor = (status) => {
               {
               filterOrders==="all" && orderAll.map((orders,index)=>{ 
                 matchingMerchant = allMerchant.find(merchant => merchant?.email === orders?.userMail)
-               return (
+            let  totalPrintBazCostWithDeliveryFee=Number(orders?.printbazcost) + Number(orders?.deliveryFee)
+                 return (
                   <Link to={`/viewOrder/${orders?._id}`} state={{orders,matchingMerchant}} key={index}>
                   <div key={orders?._id} className="row client-list">
                     <div className="col-lg-2 col-sm-12">
@@ -365,11 +407,17 @@ const getViewClientColor = (status) => {
                       <p className="p-status-btn">{orders?.paymentStatus}</p>
                     </div>
                     <div className="col-lg-2 col-sm-12">
-                      <p>{orders?.recvMoney} TK</p>
+                      <p> {totalPrintBazCostWithDeliveryFee} TK</p>
                     </div>
                     <div className="col-lg-1 col-sm-12">
                       <p className="status-btn" style={{backgroundColor:getViewClientColor(orders?.orderStatus)}}>{orders?.orderStatus}</p>
                       {/* <p style={{fontSize: '14px'}}>{formattedDate}</p> */}
+                      <p style={{fontSize: '14px'}}> created at: {new Date(orders?.createdAt).toLocaleDateString('en-US', options)}</p>
+                      {
+                        orders?.statusDate  && 
+                        <p style={{fontSize: '14px'}}> uppdated at: {new Date(orders?.statusDate).toLocaleDateString('en-US', options)}</p>
+                      }
+                     
                     </div>
                   </div>
                 </Link>
@@ -382,7 +430,8 @@ const getViewClientColor = (status) => {
               {
               filterOrders==="Pending" && pendingOrders.map((orders,index)=>{ 
                 matchingMerchant = allMerchant.find(merchant => merchant?.email === orders?.userMail)
-               return (
+               let  totalPrintBazCostWithDeliveryFee=Number(orders?.printbazcost) + Number(orders?.deliveryFee)
+                return (
                   <Link to={`/viewOrder/${orders?._id}`} state={{orders,matchingMerchant}} key={index}>
                   <div key={orders?._id} className="row client-list">
                     <div className="col-lg-2 col-sm-12">
@@ -403,12 +452,17 @@ const getViewClientColor = (status) => {
                       <p className="p-status-btn">{orders?.paymentStatus}</p>
                     </div>
                     <div className="col-lg-2 col-sm-12">
-                      <p>{orders?.recvMoney} TK</p>
+                      <p>{totalPrintBazCostWithDeliveryFee} TK</p>
                     </div>
                     <div className="col-lg-1 col-sm-12">
                       <p className="status-btn" style={{    backgroundColor: getViewClientColor(
                             orders?.orderStatus
                             ),}}>{orders?.orderStatus}</p>
+                               <p style={{fontSize: '14px'}}> created at: {new Date(orders?.createdAt).toLocaleDateString('en-US', options)}</p>
+                      {
+                        orders?.statusDate  && 
+                        <p style={{fontSize: '14px'}}> uppdated at: {new Date(orders?.statusDate).toLocaleDateString('en-US', options)}</p>
+                      }
                       {/* <p style={{fontSize: '14px'}}>{formattedDate}</p> */}
                     </div>
                   </div>
@@ -422,7 +476,8 @@ const getViewClientColor = (status) => {
                 {
               filterOrders==="Approved" && approvedOrders.map((orders,index)=>{ 
                 matchingMerchant = allMerchant.find(merchant => merchant?.email === orders?.userMail)
-               return (
+               let  totalPrintBazCostWithDeliveryFee=Number(orders?.printbazcost) + Number(orders?.deliveryFee)
+                return (
                   <Link to={`/viewOrder/${orders?._id}`} state={{orders,matchingMerchant}} key={index}>
                   <div key={orders?._id} className="row client-list">
                     <div className="col-lg-2 col-sm-12">
@@ -443,12 +498,17 @@ const getViewClientColor = (status) => {
                       <p className="p-status-btn">{orders?.paymentStatus}</p>
                     </div>
                     <div className="col-lg-2 col-sm-12">
-                      <p>{orders?.recvMoney} TK</p>
+                      <p>{totalPrintBazCostWithDeliveryFee} TK</p>
                     </div>
                     <div className="col-lg-1 col-sm-12">
                       <p className="status-btn" style={{    backgroundColor: getViewClientColor(
                             orders?.orderStatus
                             ),}}>{orders?.orderStatus}</p>
+                             <p style={{fontSize: '14px'}}> created at: {new Date(orders?.createdAt).toLocaleDateString('en-US', options)}</p>
+                      {
+                        orders?.statusDate  && 
+                        <p style={{fontSize: '14px'}}> uppdated at: {new Date(orders?.statusDate).toLocaleDateString('en-US', options)}</p>
+                      }
                       {/* <p style={{fontSize: '14px'}}>{formattedDate}</p> */}
                     </div>
                   </div>
@@ -463,7 +523,8 @@ const getViewClientColor = (status) => {
                 {
               filterOrders==="on-hold" && onHoldOrders.map((orders,index)=>{ 
                 matchingMerchant = allMerchant.find(merchant => merchant?.email === orders?.userMail)
-               return (
+               let  totalPrintBazCostWithDeliveryFee=Number(orders?.printbazcost) + Number(orders?.deliveryFee)
+                return (
                   <Link to={`/viewOrder/${orders?._id}`} state={{orders,matchingMerchant}} key={index}>
                   <div key={orders?._id} className="row client-list">
                     <div className="col-lg-2 col-sm-12">
@@ -484,12 +545,17 @@ const getViewClientColor = (status) => {
                       <p className="p-status-btn">{orders?.paymentStatus}</p>
                     </div>
                     <div className="col-lg-2 col-sm-12">
-                      <p>{orders?.recvMoney} TK</p>
+                      <p>{totalPrintBazCostWithDeliveryFee} TK</p>
                     </div>
                     <div className="col-lg-1 col-sm-12">
                       <p className="status-btn" style={{    backgroundColor: getViewClientColor(
                             orders?.orderStatus
                             ),}}>{orders?.orderStatus}</p>
+                               <p style={{fontSize: '14px'}}> created at: {new Date(orders?.createdAt).toLocaleDateString('en-US', options)}</p>
+                      {
+                        orders?.statusDate  && 
+                        <p style={{fontSize: '14px'}}> uppdated at: {new Date(orders?.statusDate).toLocaleDateString('en-US', options)}</p>
+                      }
                       {/* <p style={{fontSize: '14px'}}>{formattedDate}</p> */}
                     </div>
                   </div>
@@ -503,7 +569,8 @@ const getViewClientColor = (status) => {
                 {
               filterOrders==="in-production" && inProductionOrders.map((orders,index)=>{ 
                 matchingMerchant = allMerchant.find(merchant => merchant?.email === orders?.userMail)
-               return (
+               let  totalPrintBazCostWithDeliveryFee=Number(orders?.printbazcost) + Number(orders?.deliveryFee)
+                return (
                   <Link to={`/viewOrder/${orders?._id}`} state={{orders,matchingMerchant}} key={index}>
                   <div key={orders?._id} className="row client-list">
                     <div className="col-lg-2 col-sm-12">
@@ -524,12 +591,17 @@ const getViewClientColor = (status) => {
                       <p className="p-status-btn">{orders?.paymentStatus}</p>
                     </div>
                     <div className="col-lg-2 col-sm-12">
-                      <p>{orders?.recvMoney} TK</p>
+                      <p>{totalPrintBazCostWithDeliveryFee} TK</p>
                     </div>
                     <div className="col-lg-1 col-sm-12">
                       <p className="status-btn" style={{    backgroundColor: getViewClientColor(
                             orders?.orderStatus
                             ),}}>{orders?.orderStatus}</p>
+                               <p style={{fontSize: '14px'}}> created at: {new Date(orders?.createdAt).toLocaleDateString('en-US', options)}</p>
+                      {
+                        orders?.statusDate  && 
+                        <p style={{fontSize: '14px'}}> uppdated at: {new Date(orders?.statusDate).toLocaleDateString('en-US', options)}</p>
+                      }
                       {/* <p style={{fontSize: '14px'}}>{formattedDate}</p> */}
                     </div>
                   </div>
@@ -543,7 +615,8 @@ const getViewClientColor = (status) => {
               {
               filterOrders==="out for delivery" && outForDeliveryOrders.map((orders,index)=>{ 
                 matchingMerchant = allMerchant.find(merchant => merchant?.email === orders?.userMail)
-               return (
+               let  totalPrintBazCostWithDeliveryFee=Number(orders?.printbazcost) + Number(orders?.deliveryFee)
+                return (
                   <Link to={`/viewOrder/${orders?._id}`} state={{orders,matchingMerchant}} key={index}>
                   <div key={orders?._id} className="row client-list">
                     <div className="col-lg-2 col-sm-12">
@@ -564,12 +637,17 @@ const getViewClientColor = (status) => {
                       <p className="p-status-btn">{orders?.paymentStatus}</p>
                     </div>
                     <div className="col-lg-2 col-sm-12">
-                      <p>{orders?.recvMoney} TK</p>
+                      <p>{totalPrintBazCostWithDeliveryFee} TK</p>
                     </div>
                     <div className="col-lg-1 col-sm-12">
                       <p className="status-btn" style={{    backgroundColor: getViewClientColor(
                             orders?.orderStatus
                             ),}}>{orders?.orderStatus}</p>
+                               <p style={{fontSize: '14px'}}> created at: {new Date(orders?.createdAt).toLocaleDateString('en-US', options)}</p>
+                      {
+                        orders?.statusDate  && 
+                        <p style={{fontSize: '14px'}}> uppdated at: {new Date(orders?.statusDate).toLocaleDateString('en-US', options)}</p>
+                      }
                       {/* <p style={{fontSize: '14px'}}>{formattedDate}</p> */}
                     </div>
                   </div>
@@ -583,7 +661,8 @@ const getViewClientColor = (status) => {
                 {
               filterOrders==="delivered" && deliveredOrders.map((orders,index)=>{ 
                 matchingMerchant = allMerchant.find(merchant => merchant?.email === orders?.userMail)
-               return (
+               let  totalPrintBazCostWithDeliveryFee=Number(orders?.printbazcost) + Number(orders?.deliveryFee)
+                return (
                   <Link to={`/viewOrder/${orders?._id}`} state={{orders,matchingMerchant}} key={index}>
                   <div key={orders?._id} className="row client-list">
                     <div className="col-lg-2 col-sm-12">
@@ -604,12 +683,17 @@ const getViewClientColor = (status) => {
                       <p className="p-status-btn">{orders?.paymentStatus}</p>
                     </div>
                     <div className="col-lg-2 col-sm-12">
-                      <p>{orders?.recvMoney} TK</p>
+                      <p>{totalPrintBazCostWithDeliveryFee} TK</p>
                     </div>
                     <div className="col-lg-1 col-sm-12">
                       <p className="status-btn" style={{    backgroundColor: getViewClientColor(
                             orders?.orderStatus
                             ),}}>{orders?.orderStatus}</p>
+                               <p style={{fontSize: '14px'}}> created at: {new Date(orders?.createdAt).toLocaleDateString('en-US', options)}</p>
+                      {
+                        orders?.statusDate  && 
+                        <p style={{fontSize: '14px'}}> uppdated at: {new Date(orders?.statusDate).toLocaleDateString('en-US', options)}</p>
+                      }
                       {/* <p style={{fontSize: '14px'}}>{formattedDate}</p> */}
                     </div>
                   </div>
@@ -623,7 +707,8 @@ const getViewClientColor = (status) => {
               {
               filterOrders==="on hold artwork issue" && onHoldArtworkIssueOrders.map((orders,index)=>{ 
                 matchingMerchant = allMerchant.find(merchant => merchant?.email === orders?.userMail)
-               return (
+               let  totalPrintBazCostWithDeliveryFee=Number(orders?.printbazcost) + Number(orders?.deliveryFee)
+                return (
                   <Link to={`/viewOrder/${orders?._id}`} state={{orders,matchingMerchant}} key={index}>
                   <div key={orders?._id} className="row client-list">
                     <div className="col-lg-2 col-sm-12">
@@ -644,12 +729,18 @@ const getViewClientColor = (status) => {
                       <p className="p-status-btn">{orders?.paymentStatus}</p>
                     </div>
                     <div className="col-lg-2 col-sm-12">
-                      <p>{orders?.recvMoney} TK</p>
+                      <p>{totalPrintBazCostWithDeliveryFee} TK</p>
                     </div>
                     <div className="col-lg-1 col-sm-12">
                       <p className="status-btn" style={{    backgroundColor: getViewClientColor(
                             orders?.orderStatus
                             )}}>{orders?.orderStatus}</p>
+                              <p style={{fontSize: '14px'}}> created at: {new Date(orders?.createdAt).toLocaleDateString('en-US', options)}</p>
+                      {
+                        orders?.statusDate  && 
+                        <p style={{fontSize: '14px'}}> uppdated at: {new Date(orders?.statusDate).toLocaleDateString('en-US', options)}</p>
+                      }
+
                       {/* <p style={{fontSize: '14px'}}>{formattedDate}</p> */}
                     </div>
                   </div>
@@ -663,7 +754,8 @@ const getViewClientColor = (status) => {
              {
               filterOrders==="on hold billing issue" && onHoldBillingIssueOrders.map((orders,index)=>{ 
                 matchingMerchant = allMerchant.find(merchant => merchant?.email === orders?.userMail)
-               return (
+               let  totalPrintBazCostWithDeliveryFee=Number(orders?.printbazcost) + Number(orders?.deliveryFee)
+                return (
                   <Link to={`/viewOrder/${orders?._id}`} state={{orders,matchingMerchant}} key={index}>
                   <div key={orders?._id} className="row client-list">
                     <div className="col-lg-2 col-sm-12">
@@ -684,12 +776,17 @@ const getViewClientColor = (status) => {
                       <p className="p-status-btn">{orders?.paymentStatus}</p>
                     </div>
                     <div className="col-lg-2 col-sm-12">
-                      <p>{orders?.recvMoney} TK</p>
+                      <p>{totalPrintBazCostWithDeliveryFee} TK</p>
                     </div>
                     <div className="col-lg-1 col-sm-12">
                       <p className="status-btn" style={{    backgroundColor: getViewClientColor(
                             orders?.orderStatus
                             )}}>{orders?.orderStatus}</p>
+                              <p style={{fontSize: '14px'}}> created at: {new Date(orders?.createdAt).toLocaleDateString('en-US', options)}</p>
+                      {
+                        orders?.statusDate  && 
+                        <p style={{fontSize: '14px'}}> uppdated at: {new Date(orders?.statusDate).toLocaleDateString('en-US', options)}</p>
+                      }
                       {/* <p style={{fontSize: '14px'}}>{formattedDate}</p> */}
                     </div>
                   </div>
@@ -703,7 +800,8 @@ const getViewClientColor = (status) => {
                 {
               filterOrders==="on hold out of stock" && onHoldOutOfStockOrders.map((orders,index)=>{ 
                 matchingMerchant = allMerchant.find(merchant => merchant?.email === orders?.userMail)
-               return (
+               let  totalPrintBazCostWithDeliveryFee=Number(orders?.printbazcost) + Number(orders?.deliveryFee)
+                return (
                   <Link to={`/viewOrder/${orders?._id}`} state={{orders,matchingMerchant}} key={index}>
                   <div key={orders?._id} className="row client-list">
                     <div className="col-lg-2 col-sm-12">
@@ -724,12 +822,17 @@ const getViewClientColor = (status) => {
                       <p className="p-status-btn">{orders?.paymentStatus}</p>
                     </div>
                     <div className="col-lg-2 col-sm-12">
-                      <p>{orders?.recvMoney} TK</p>
+                      <p>{totalPrintBazCostWithDeliveryFee} TK</p>
                     </div>
                     <div className="col-lg-1 col-sm-12">
                       <p className="status-btn" style={{    backgroundColor: getViewClientColor(
                             orders?.orderStatus
                             ),}}>{orders?.orderStatus}</p>
+                              <p style={{fontSize: '14px'}}> created at: {new Date(orders?.createdAt).toLocaleDateString('en-US', options)}</p>
+                      {
+                        orders?.statusDate  && 
+                        <p style={{fontSize: '14px'}}> uppdated at: {new Date(orders?.statusDate).toLocaleDateString('en-US', options)}</p>
+                      }
                       {/* <p style={{fontSize: '14px'}}>{formattedDate}</p> */}
                     </div>
                   </div>
@@ -743,7 +846,8 @@ const getViewClientColor = (status) => {
                {
               filterOrders==="cancel" && cancelOrders.map((orders,index)=>{ 
                 matchingMerchant = allMerchant.find(merchant => merchant?.email === orders?.userMail)
-               return (
+                let  totalPrintBazCostWithDeliveryFee=Number(orders?.printbazcost) + Number(orders?.deliveryFee)
+                return (
                   <Link to={`/viewOrder/${orders?._id}`} state={{orders,matchingMerchant}} key={index}>
                   <div key={orders?._id} className="row client-list">
                     <div className="col-lg-2 col-sm-12">
@@ -764,12 +868,17 @@ const getViewClientColor = (status) => {
                       <p className="p-status-btn">{orders?.paymentStatus}</p>
                     </div>
                     <div className="col-lg-2 col-sm-12">
-                      <p>{orders?.recvMoney} TK</p>
+                      <p>{totalPrintBazCostWithDeliveryFee} TK</p>
                     </div>
                     <div className="col-lg-1 col-sm-12">
                       <p className="status-btn" style={{    backgroundColor: getViewClientColor(
                             orders?.orderStatus
                             ),}}>{orders?.orderStatus}</p>
+                              <p style={{fontSize: '14px'}}> created at: {new Date(orders?.createdAt).toLocaleDateString('en-US', options)}</p>
+                      {
+                        orders?.statusDate  && 
+                        <p style={{fontSize: '14px'}}> uppdated at: {new Date(orders?.statusDate).toLocaleDateString('en-US', options)}</p>
+                      }
                       {/* <p style={{fontSize: '14px'}}>{formattedDate}</p> */}
                     </div>
                   </div>

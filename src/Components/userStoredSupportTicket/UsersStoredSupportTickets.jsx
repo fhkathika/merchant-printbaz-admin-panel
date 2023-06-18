@@ -3,12 +3,13 @@ import axios from 'axios';
 import PropTypes from 'prop-types';
 import { useEffect, useState } from 'react';
 
-const UsersStoredSupportTickets = ({ message,ticketId,userOrderId,ticketIssue, onClose }) => {
+const UsersStoredSupportTickets = ({ message,ticketId,userOrderId,ticketIssue, onClose,userEmail }) => {
   
   const [chatLog, setChatLog] = useState([]);
   const [newMsg, setNewMsg] = useState('');
   const [usersStoredTickets, setUsersStoredTickets] = useState([]);
   const [openTextBox, setOpenTextBox] = useState(false);
+  const [selectedFiles, setSelectedFiles] = useState([]);
   // const [ticketIssue, setTicketIssue] = useState('');
   useEffect(() => {
     // Fetch the chat log from the server when the component mounts
@@ -17,8 +18,8 @@ const UsersStoredSupportTickets = ({ message,ticketId,userOrderId,ticketIssue, o
   }, []);
   const fetchOrderIddata = async () => {
     try {
-      const response = await axios.get(`http://localhost:5000/getOrderIdmessages/${userOrderId}`);
-      // const response = await axios.get(`https://mserver.printbaz.com/getOrderIdmessages/${userOrderId}`);
+      // const response = await axios.get(`http://localhost:5000/getOrderIdmessages/${userOrderId}`);
+      const response = await axios.get(`https://mserver.printbaz.com/getOrderIdmessages/${userOrderId}`);
       setUsersStoredTickets(response.data.messages);
    
     } catch (err) {
@@ -27,42 +28,60 @@ const UsersStoredSupportTickets = ({ message,ticketId,userOrderId,ticketIssue, o
   };
   
   let filterByTicketId=usersStoredTickets?.find(ticket=>ticket.ticketId===ticketId)
-console.log("usersStoredTickets",usersStoredTickets);
+console.log("usersStoredTickets",usersStoredTickets?.files);
 
-
-
-    const handleNewMessageChange = (e) => {
+const handleNewMessageChange = (e) => {
       console.log(e.target.value);
       setNewMsg(e.target.value);
   };
+      //upload files
+      const handleFileChange = (e) => {
+        setSelectedFiles(e.target.files);
+      };
+      
  console.log("newMessage",newMsg); 
  const handleInputTicketIssueChange = async (e) => {
   const status = e.target.value; // the new status
 console.log("status",status);
  }
 
+    
  const handleSendMessage = async (e) => {
   e.preventDefault();
   try {
-    console.log("ticketId",ticketId);
-    const newMessage = { ticketId: ticketId,ticketStatus:"replied",userOrderId:userOrderId, user: 'Admin', content: newMsg };
+    if (!newMsg.trim() && !selectedFiles.length) {
+      alert("Please input a message or upload a file.");
+      return;
+  }
+    const formData=new FormData();
+    Array.from(selectedFiles).forEach((file)=>{
+      formData.append('files',file)
+    })
+    const newMessage = { ticketId: ticketId,userOrderId:userOrderId,ticketIssue:ticketIssue,ticketStatus:"replied", user: 'Admin', content: newMsg,userEmail:userEmail };
 
     const chatMessage = {
       ticketId: newMessage.ticketId,  // added this line
       content: newMessage.content,
       ticketStatus: newMessage.ticketStatus,
+      ticketIssue: newMessage.ticketIssue,
       admin: newMessage.user,
       orderId:newMessage.userOrderId,
       timestamp: new Date().toISOString(), // this won't be the exact timestamp saved in the DB
     };
+    Object.entries(chatMessage).forEach(([key,value])=>{
+      formData.append(key,value)
+    })
 
     // Add the new message to the local state immediately
     setChatLog([...chatLog, chatMessage]);
     
 
-    const response = await axios.post('http://localhost:5000/sendmessages',chatMessage);
-    // const response = await axios.post('https://mserver.printbaz.com/sendmessages',chatMessage);
-
+    // const response = await axios.post('http://localhost:5000/sendmessages', formData, {
+    const response = await axios.post('https://mserver.printbaz.com/sendmessages', formData, {
+headers: {
+  'Content-Type': 'multipart/form-data',
+},
+});
     if (!response?.data?.success) {
       // If the message was not sent successfully, revert the local state
       setChatLog(oldChatLog => oldChatLog.filter(msg => msg !== chatMessage));
@@ -74,13 +93,13 @@ console.log("status",status);
       messages: [chatMessage]
     }]);
     setNewMsg('');
-    fetchOrderIddata()
+    setSelectedFiles('');
+   fetchOrderIddata();
     console.log("chatLog",chatLog);
   } catch (err) {
     console.error(err);
   }
-};  
-
+}; 
 
 
 
@@ -199,6 +218,13 @@ function timeSince(date) {
                   <h3>{timeSince(new Date(allText?.timestamp))} ({new Date(allText?.timestamp).toLocaleString("en-US", { month: 'long', day: 'numeric', year: 'numeric', hour: 'numeric', minute: 'numeric' })})</h3>
                   <p>   {allText.content}
                   </p>
+                  {
+  allText?.files?.map(adminFile => {
+    const fileId = adminFile.split('/d/')[1].split('/view')[0];
+    const directURL = `https://drive.google.com/uc?export=view&id=${fileId}`;
+    return <p><a href={directURL} target="_blank" rel="noopener noreferrer">View File</a></p>
+  })
+}
                 </div>
               </div>
               }
@@ -234,16 +260,24 @@ function timeSince(date) {
                        value={newMsg}
                        onChange={handleNewMessageChange}
                        placeholder="Type your message here..."
-                       required
+                       
                      />
-                     
-                     <div className=' col-12' style={{marginTop:"20px"}} >
-                     <button  className="btn"><i className="fa fa-paperclip" aria-hidden="true" /></button>
-                   
-      
-                     </div>  
+           
                      <div className='flex col-12' style={{marginTop:"20px"}} >
-                     <button  className="btn"><i className="fa fa-paperclip" aria-hidden="true" /></button>
+                   
+                     <button  className="btn"
+                     
+                     ><i className="fa fa-paperclip" aria-hidden="true" />      
+                         <input
+                     className="btn"
+                     type="file"
+                     name="file"
+                   
+                     multiple
+                     
+                     onChange={handleFileChange}
+                   />
+                   </button>
                      <div>
                      <button className="ttm-button" onClick={()=>setOpenTextBox(false)}> <i className="fa fa-trash" aria-hidden="true" style={{ marginRight: '5px' }} /></button>
                      <button className="ttm-button" type="submit"><i className="fa fa-reply" aria-hidden="true" style={{marginRight: '5px'}} />Reply</button>

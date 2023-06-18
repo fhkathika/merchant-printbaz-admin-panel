@@ -22,8 +22,8 @@ const ViewTicket = () => {
       }, []);
       const fetchOrderIddata = async () => {
         try {
-          const response = await axios.get(`http://localhost:5000/getOrderIdmessages/${viewTicketDetail?.orderId}`);
-          // const response = await axios.get(`https://mserver.printbaz.com/getOrderIdmessages/${viewTicketDetail?.orderId}`);
+          // const response = await axios.get(`http://localhost:5000/getOrderIdmessages/${viewTicketDetail?.orderId}`);
+          const response = await axios.get(`https://mserver.printbaz.com/getOrderIdmessages/${viewTicketDetail?.orderId}`);
  
           setUsersStoredTickets(response.data.messages);
        
@@ -32,8 +32,8 @@ const ViewTicket = () => {
         }
       };
       let filterByTicketId=usersStoredTickets?.find(ticket=>ticket.ticketId===viewTicketDetail?.ticketId)
+   let test=filterByTicketId?.messages?.map(file=>file?.files?.map(allFile=>console.log(allFile)))
    
-   console.log("filterByTicketId",filterByTicketId);  
     ///input text
       const handleNewMessageChange = (e) => {
         console.log(e.target.value);
@@ -196,8 +196,9 @@ const ViewTicket = () => {
             <h1>Ticket View</h1>
           </div>
           <div className="ticket-top-menu">
-            <button className="ttm-button"><i className="fa fa-reply" aria-hidden="true" style={{marginRight: '5px'}} />Replay</button>
-            <button className="ttm-button"><i className="fa fa-check-circle" aria-hidden="true" style={{marginRight: '5px'}} />Close</button>
+           
+                <button className="ttm-button" onClick={()=>setOpenTextBox(true)}><i className="fa fa-reply" aria-hidden="true" style={{marginRight: '5px'}} />Reply</button>
+             <button className="ttm-button"><i className="fa fa-check-circle" aria-hidden="true" style={{marginRight: '5px'}} />Close</button>
             <button className="ttm-button"><i className="fa fa-trash" aria-hidden="true" style={{marginRight: '5px'}} />Delete</button>
             <button className="ttm-button"><i className="fa fa-paper-plane" aria-hidden="true" style={{marginRight: '5px'}} />Send Copy</button>
           </div>
@@ -274,16 +275,29 @@ const ViewTicket = () => {
                   <h3>{timeSince(new Date(viewTick?.timestamp))} ({new Date(viewTick?.timestamp).toLocaleString("en-US", { month: 'long', day: 'numeric', year: 'numeric', hour: 'numeric', minute: 'numeric' })})</h3>
                   <p>   {viewTick.content}</p>
 
-                  
-                  {/* <img src="https://drive.google.com/file/d/1QjDnrA7MpKUNW9eH94Kxi1finaaDoxAU/view" alt='msg'/>  */}
-             {/* {
-    viewTick?.files &&
-    viewTick?.files?.map(file =>
-     
-    
-
-    )
+                  {/* {
+  viewTick?.files?.map(adminFile => {
+    const fileId = adminFile.split('/d/')[1].split('/view')[0];
+    const directURL = `https://drive.google.com/uc?export=view&id=${fileId}`;
+    // Check if the URL ends with .png, .jpg, or .svg
+    if (directURL.endsWith('.png') || directURL.endsWith('.jpg') || directURL.endsWith('.svg')) {
+      return <img src={directURL} alt="chat img"/>
+    } else {
+      return <p>{directURL}</p>
+    }
+  })
 } */}
+
+{
+  viewTick?.files?.map(adminFile => {
+    const fileId = adminFile.split('/d/')[1].split('/view')[0];
+    const directURL = `https://drive.google.com/uc?export=view&id=${fileId}`;
+    return <p><a href={directURL} target="_blank" rel="noopener noreferrer">View File</a></p>
+  })
+}
+
+
+
 
                 
                 </div>

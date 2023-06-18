@@ -4,7 +4,7 @@ import SupportTicketPopUp from '../suppoprtTicketPopUp/SupportTicketPopUp';
 import axios from 'axios';
 import UsersStoredSupportTickets from '../userStoredSupportTicket/UsersStoredSupportTickets';
 import Accordion from 'react-bootstrap/Accordion';
-function TabForViewOrder({orderId}) {
+function TabForViewOrder({orderId,email}) {
   const [activeTab, setActiveTab] = useState('tab1');
   const [showTicketPopUp, setShowTicketPopUp] = useState(false);
   const [showStoredTicketPopUp, setShowStoredTicketPopUp] = useState(false);
@@ -18,8 +18,8 @@ function TabForViewOrder({orderId}) {
   }, []);
   const fetchChatLog = async () => {
     try {
-      const response = await axios.get(`http://localhost:5000/getOrderIdmessages/${orderId}`);
-      // const response = await axios.get(`https://mserver.printbaz.com/getOrderIdmessages/${orderId}`);
+      // const response = await axios.get(`http://localhost:5000/getOrderIdmessages/${orderId}`);
+      const response = await axios.get(`https://mserver.printbaz.com/getOrderIdmessages/${orderId}`);
       setUsersTickets(response.data.messages);
       console.log("response.data.messages",response.data.messages);
     } catch (err) {
@@ -78,6 +78,7 @@ function TabForViewOrder({orderId}) {
             onClose={closePopup}
             ticketId={popupId}
             fetchTickets={fetchChatLog}
+            userEmail={email}
             
             />
             )
@@ -115,6 +116,7 @@ function TabForViewOrder({orderId}) {
                    onClose={() => setShownPopupTicketId(null)}
                    ticketId={tickets?.ticketId}
                    ticketIssue={tickets?.ticketIssue}
+                   userEmail={email}
                />
         </Accordion.Body>
       </Accordion.Item>

@@ -3,6 +3,7 @@ import { Link, useLocation } from 'react-router-dom';
 import TabForViewOrder from '../tabForViewOrder.jsx/TabForViewOrder';
 import Overlay from 'react-bootstrap/Overlay';
 import Tooltip from 'react-bootstrap/Tooltip';
+import Ticket from '../ticket/Ticket';
 const ViewOrder = () => {
   const location = useLocation();
   const viewOrder = location.state ? location?.state?.orders : null;
@@ -14,7 +15,7 @@ const ViewOrder = () => {
   const target = useRef(null);
   let date = new Date(viewOrder?.createdAt); // create a new Date object
 
-  let options = { year: 'numeric', month: 'long', day: 'numeric' }; // options for toLocaleDateString
+  let options = {month: 'long', day: 'numeric', year: 'numeric', hour: 'numeric', minute: 'numeric'  }; // options for toLocaleDateString
   
   let formattedDate = date.toLocaleDateString('en-US', options); // use toLocaleDateString to format the date
   
@@ -692,6 +693,9 @@ const ViewOrder = () => {
                     <div className="col-2">
                       <h4>Picture</h4>
                     </div>
+                    {/* <div className="col-2">
+                      <h4>Picture</h4>
+                    </div> */}
                   </div>
                   {
                     viewOrder?.orderDetailArr?.map((orderDetail,orderIndex)=><>
@@ -823,7 +827,8 @@ const ViewOrder = () => {
                 <div className="admin-dis section">
                   <div className="row admin-dis-tab">
                     <div className="col-12">
-                      <TabForViewOrder orderId={viewOrder?._id}></TabForViewOrder>
+                      <TabForViewOrder orderId={viewOrder?._id} email={viewClient?.email}></TabForViewOrder>
+                      {/* <Ticket style={{visibility:"none"}}  email={viewClient?.email}/> */}
                       {/* <ul className="nav nav-tabs admin-dis">
                         <li className="nav-item admin-dis-li">
                           <a className="nav-link admin-dis-a active" aria-current="page" href="#">Discussion</a>
