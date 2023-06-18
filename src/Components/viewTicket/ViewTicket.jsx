@@ -13,6 +13,7 @@ const ViewTicket = () => {
     const viewTicketDetail = location.state ? location?.state?.allTicket : null;
     const [usersStoredTickets, setUsersStoredTickets] = useState([]);
     const [selectedFiles, setSelectedFiles] = useState([]);
+    const [ticketClose, setTicketClose] = useState(false);
 
     console.log("viewTicketDetail",viewTicketDetail);
     useEffect(() => {
@@ -42,6 +43,9 @@ const ViewTicket = () => {
     //upload files
     const handleFileChange = (e) => {
       setSelectedFiles(e.target.files);
+    };
+        const closeTicket = (e) => {
+      setTicketClose(true);
     };
     
  
@@ -198,7 +202,7 @@ const ViewTicket = () => {
           <div className="ticket-top-menu">
            
                 <button className="ttm-button" onClick={()=>setOpenTextBox(true)}><i className="fa fa-reply" aria-hidden="true" style={{marginRight: '5px'}} />Reply</button>
-             <button className="ttm-button"><i className="fa fa-check-circle" aria-hidden="true" style={{marginRight: '5px'}} />Close</button>
+             <button className="ttm-button" onClick={closeTicket}><i className="fa fa-check-circle" aria-hidden="true" style={{marginRight: '5px'}} />Close</button>
             <button className="ttm-button"><i className="fa fa-trash" aria-hidden="true" style={{marginRight: '5px'}} />Delete</button>
             <button className="ttm-button"><i className="fa fa-paper-plane" aria-hidden="true" style={{marginRight: '5px'}} />Send Copy</button>
           </div>
@@ -314,12 +318,17 @@ const ViewTicket = () => {
           <div className="row">
             <div className="col-12">
               {
-                !openTextBox && 
+                (!openTextBox && !ticketClose) && 
                 <div className="ticket-replay">
                 <img src="https://media.discordapp.net/attachments/1069579536842379305/1107191553501450260/Logo-01.jpg?width=616&height=616" alt="" />
                 <button className="ttm-button" onClick={()=>setOpenTextBox(true)}><i className="fa fa-reply" aria-hidden="true" style={{marginRight: '5px'}} />Reply</button>
                 <button className="ttm-button"><i className="fa fa-sticky-note" aria-hidden="true" style={{marginRight: '5px'}} />Add Note</button>
               </div>
+              }
+
+              {
+                ticketClose && 
+                <h3 style={{textAlign:"center"}}>support ticket closed!</h3>
               }
             
             </div>
