@@ -250,7 +250,7 @@ const ViewTicket = () => {
            }
                
              <button className="ttm-button" onClick={closeTicket}><i className="fa fa-check-circle" aria-hidden="true" style={{marginRight: '5px'}} />Close</button>
-            <button className="ttm-button"><i className="fa fa-trash" aria-hidden="true" style={{marginRight: '5px'}} />Delete</button>
+            {/* <button className="ttm-button"><i className="fa fa-trash" aria-hidden="true" style={{marginRight: '5px'}} />Delete</button> */}
             <button className="ttm-button"><i className="fa fa-paper-plane" aria-hidden="true" style={{marginRight: '5px'}} />Send Copy</button>
           </div>
         </div>
@@ -488,44 +488,13 @@ const ViewTicket = () => {
                 <li><a className="dropdown-item" href="#">Cancellation</a></li>
               </ul>
             </div>
-            <div className="dropdown filter-dropdown">
-              <button style={{width: '100%', textAlign: 'left'}} className="btn dropdown-toggle ttm-button" type="button" id="dropdownMenuButton1" data-bs-toggle="dropdown" aria-expanded="false">
-                Agents
-              </button>
-              <ul className="dropdown-menu" aria-labelledby="dropdownMenuButton1">
-                <li><a className="dropdown-item" href="#">Me</a></li>
-                <li><a className="dropdown-item" href="#">Shuvro Haque</a></li>
-                <li><a className="dropdown-item" href="#">Tashfin Rahaman</a></li>
-                <li><a className="dropdown-item" href="#">Abir Ali Khan</a></li>
-                <li><a className="dropdown-item" href="#">Fariha Hasan</a></li>
-              </ul>
-            </div>
-            <div className="dropdown filter-dropdown">
-              <button style={{width: '100%', textAlign: 'left'}} className="btn dropdown-toggle ttm-button" type="button" id="dropdownMenuButton1" data-bs-toggle="dropdown" aria-expanded="false">
-                Status
-              </button>
-              <ul className="dropdown-menu" aria-labelledby="dropdownMenuButton1">
-                <li><a className="dropdown-item" href="#">Pending</a></li>
-                <li><a className="dropdown-item" href="#">Open</a></li>
-                <li><a className="dropdown-item" href="#">Close</a></li>
-              </ul>
-            </div>
-            <div className="dropdown filter-dropdown">
-              <button style={{width: '100%', textAlign: 'left'}} className="btn dropdown-toggle ttm-button" type="button" id="dropdownMenuButton1" data-bs-toggle="dropdown" aria-expanded="false">
-                Priority
-              </button>
-              <ul className="dropdown-menu" aria-labelledby="dropdownMenuButton1">
-                <li><a className="dropdown-item" href="#">Low</a></li>
-                <li><a className="dropdown-item" href="#">Medium</a></li>
-                <li><a className="dropdown-item" href="#">Hign</a></li>
-              </ul>
-            </div>
-            <div className="filter-update-button">
+            
+            {/* <div className="filter-update-button">
               <button>Update</button>
-            </div>
+            </div> */}
           </div>
         </div>
-        <div className="col-2">
+        {/* <div className="col-2">
           <div className="profile-section">
             <img src="https://media.discordapp.net/attachments/1069579536842379305/1107191553501450260/Logo-01.jpg?width=616&height=616" alt="" />
             <h2 style={{display: 'inline-block'}}>Md. Raihan Ahamad Rabbi</h2>
@@ -557,7 +526,7 @@ const ViewTicket = () => {
               </div>
             </div>
           </div>
-        </div>
+        </div> */}
       </div>
     </section>
   </div>
