@@ -9,7 +9,7 @@ const CreateTicketAlertbox = ({ message, onClose,closeCreateTicketPopup }) => {
     const timeoutId = setTimeout(() => {
       onClose();
       closeCreateTicketPopup()
-    }, 2000); // Hide the alert box after 3 seconds
+    }, 1000); // Hide the alert box after 1 seconds
 
     return () => clearTimeout(timeoutId);
   }, [onClose]);

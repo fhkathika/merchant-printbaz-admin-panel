@@ -4,6 +4,7 @@
 import axios from 'axios';
 import React, { useEffect, useState } from 'react';
 import { Link, useLocation } from 'react-router-dom';
+import AlertMessage from '../alert/AlertMessage';
 
 const ViewTicket = () => {
     const location = useLocation();
@@ -14,8 +15,12 @@ const ViewTicket = () => {
     const [usersStoredTickets, setUsersStoredTickets] = useState([]);
     const [selectedFiles, setSelectedFiles] = useState([]);
     const [ticketClose, setTicketClose] = useState(false);
+    const [ticketStatus, setTicketStatus] = useState(viewTicketDetail?.ticketStatus);
+    const [showAlert, setShowAlert] = useState(false);
 
     console.log("viewTicketDetail",viewTicketDetail);
+    console.log("openTextBox",openTextBox);
+    console.log("ticketStatus",ticketStatus);
     useEffect(() => {
         // Fetch the chat log from the server when the component mounts
        
@@ -42,16 +47,54 @@ const ViewTicket = () => {
     };
     //upload files
     const handleFileChange = (e) => {
-      setSelectedFiles(e.target.files);
+      const filesArray = Array.from(e.target.files);
+      setSelectedFiles(filesArray);
     };
-        const closeTicket = (e) => {
-      setTicketClose(true);
+
+    //close ticket
+        const closeTicket = async (e) => {
+         let status="close"
+         try {
+          const response = await fetch(
+            
+            `https://mserver.printbaz.com/TicketCloseStatus/${viewTicketDetail?.ticketId}`,
+          // `http://localhost:5000/TicketCloseStatus/${viewTicketDetail?.ticketId}`,
+            {
+              method: "PUT",
+              headers: {
+                "Content-Type": "application/json",
+              },
+              body: JSON.stringify({ ticketStatus: status }),
+            }
+          );
+      
+          if (response.ok) {
+            // Update the approval status in the viewClient object
+            setTicketStatus(status);
+            setTicketClose(true);
+      
+            // console.log("Success:", viewOrder);
+            // Update your state or perform any other necessary operations with the updated viewClient object
+          } else {
+            console.error("status Error:", response);
+            // Handle error here
+          }
+        } catch (error) {
+          console.error("Error:", error.message);
+          // Handle error here
+        }
+   
     };
     
  
     const handleSendMessage = async (e) => {
         e.preventDefault();
         try {
+          if (!newMsg.trim() && !selectedFiles.length) {
+            setShowAlert(true)
+            return;
+        }
+
           const formData=new FormData();
           Array.from(selectedFiles).forEach((file)=>{
             formData.append('files',file)
@@ -81,8 +124,8 @@ const ViewTicket = () => {
           setChatLog([...chatLog, chatMessage]);
           
       
-          const response = await axios.post('http://localhost:5000/sendmessages', formData, {
-          // const response = await axios.post('https://mserver.printbaz.com/sendmessages', formData, {
+          // const response = await axios.post('http://localhost:5000/sendmessages', formData, {
+          const response = await axios.post('https://mserver.printbaz.com/sendmessages', formData, {
       headers: {
         'Content-Type': 'multipart/form-data',
       },
@@ -201,7 +244,11 @@ const ViewTicket = () => {
           </div>
           <div className="ticket-top-menu">
            
-                <button className="ttm-button" onClick={()=>setOpenTextBox(true)}><i className="fa fa-reply" aria-hidden="true" style={{marginRight: '5px'}} />Reply</button>
+           {
+             (openTextBox!==true  && ticketStatus!=="close") && 
+             <button className="ttm-button" onClick={()=>setOpenTextBox(true)}><i className="fa fa-reply" aria-hidden="true" style={{marginRight: '5px'}} />Reply</button>
+           }
+               
              <button className="ttm-button" onClick={closeTicket}><i className="fa fa-check-circle" aria-hidden="true" style={{marginRight: '5px'}} />Close</button>
             <button className="ttm-button"><i className="fa fa-trash" aria-hidden="true" style={{marginRight: '5px'}} />Delete</button>
             <button className="ttm-button"><i className="fa fa-paper-plane" aria-hidden="true" style={{marginRight: '5px'}} />Send Copy</button>
@@ -295,8 +342,13 @@ const ViewTicket = () => {
 {
   viewTick?.files?.map(adminFile => {
     const fileId = adminFile.split('/d/')[1].split('/view')[0];
-    const directURL = `https://drive.google.com/uc?export=view&id=${fileId}`;
-    return <p><a href={directURL} target="_blank" rel="noopener noreferrer">View File</a></p>
+    const previewURL = `https://drive.google.com/file/d/${fileId}/preview`;
+    return (
+      <>
+        
+          <iframe src={previewURL}  style={{width: "auto", height: "auto",alignItems:"center"}}></iframe>
+      </>
+    )
   })
 }
 
@@ -318,7 +370,7 @@ const ViewTicket = () => {
           <div className="row">
             <div className="col-12">
               {
-                (!openTextBox && !ticketClose) && 
+                (openTextBox!==true  && ticketStatus!=="close" )  && 
                 <div className="ticket-replay">
                 <img src="https://media.discordapp.net/attachments/1069579536842379305/1107191553501450260/Logo-01.jpg?width=616&height=616" alt="" />
                 <button className="ttm-button" onClick={()=>setOpenTextBox(true)}><i className="fa fa-reply" aria-hidden="true" style={{marginRight: '5px'}} />Reply</button>
@@ -326,8 +378,9 @@ const ViewTicket = () => {
               </div>
               }
 
-              {
-                ticketClose && 
+               
+               {
+                (ticketClose || ticketStatus==="close") && 
                 <h3 style={{textAlign:"center"}}>support ticket closed!</h3>
               }
             
@@ -344,7 +397,7 @@ const ViewTicket = () => {
                        value={newMsg}
                        onChange={handleNewMessageChange}
                        placeholder="Type your message here..."
-                       required
+                      
                      />
                      
                      <div className=' col-12' style={{marginTop:"20px"}} >
@@ -354,16 +407,32 @@ const ViewTicket = () => {
                      </div>  
                      <div className='flex col-12' style={{marginTop:"20px"}} >
            
-                     <button  className="btn"
+                     {/* <div style={{position: 'relative'}}>
+        <input
+          className="btn"
+          type="file"
+          name="file"
+          style={{opacity: 0, position: 'absolute', top: 0, left: 0, width: '100%', height: '100%'}}
+          multiple
+          onChange={handleFileChange}
+        />
+        <i className="fa fa-paperclip" aria-hidden="true" />
+      </div> */}
+
+<button  className="btn"
                      
-                     ><i className="fa fa-paperclip" aria-hidden="true" />          <input
+                     ><i className="fa fa-paperclip" aria-hidden="true" />      
+                         <input
                      className="btn"
                      type="file"
                      name="file"
+                   
                      multiple
                      
-                     onChange={handleFileChange}
-                   /></button>
+                    //  onChange={handleFileChange}
+                   />
+                   </button>
+
                      <div>
                      <button className="ttm-button" onClick={()=>setOpenTextBox(false)}> <i className="fa fa-trash" aria-hidden="true" style={{ marginRight: '5px' }} /></button>
                      <button className="ttm-button" type="submit"><i className="fa fa-reply" aria-hidden="true" style={{marginRight: '5px'}} />Reply</button>
@@ -382,6 +451,16 @@ const ViewTicket = () => {
                                    <button className="btn"><i className="fa fa-paperclip" aria-hidden="true" /></button>
                                    <button className="btn btn-primary">Reply</button> */}
                    </form>
+           }
+
+{
+             showAlert &&
+             <AlertMessage 
+             message="input field required"
+             showAlert={showAlert}
+             setShowAlert={setShowAlert}
+             
+             />
            }
               </div>
         

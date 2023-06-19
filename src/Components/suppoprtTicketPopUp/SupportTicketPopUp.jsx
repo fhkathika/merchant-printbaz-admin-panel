@@ -2,6 +2,7 @@ import axios from 'axios';
 import PropTypes from 'prop-types';
 import { useEffect, useState } from 'react';
 import "../../css/style.css"
+import AlertMessage from '../alert/AlertMessage';
 import CreateTicketAlertbox from '../createTickwtAlert/CreateTicketAlertbox';
 const SupportTicketPopUp = ({ message,ticketId,userOrderId,onClose,fetchTickets,userEmail }) => {
   
@@ -11,7 +12,11 @@ const SupportTicketPopUp = ({ message,ticketId,userOrderId,onClose,fetchTickets,
   const [createTicketnotify, setCreateTicketnotify] = useState(false);
   const [usersStoredTickets, setUsersStoredTickets] = useState([]);
     const [selectedFiles, setSelectedFiles] = useState([]);
-  useEffect(() => {
+    const [preview, setPreview] = useState(null);
+    const [showAlert, setShowAlert] = useState(false);
+    const [selectIssue,setSelectIssue] = useState(false);
+    console.log("selectIssue",selectIssue);
+    useEffect(() => {
     // Fetch the chat log from the server when the component mounts
     fetchChatLog();
   
@@ -64,12 +69,23 @@ const handleInputTicketIssueChange = async (e) => {
 setTicketIssue(e.target.value)
  
  }
+     //upload files
+     const handleFileChange = (e) => {
+      setSelectedFiles(e.target.files);
+  
+    };
 
- console.log("status",ticketIssue);
-    
  const handleSendMessage = async (e) => {
   e.preventDefault();
   try {
+    if (!newMsg.trim() && !selectedFiles.length) {
+      setShowAlert(true)
+      return;
+  }  
+   if (!ticketIssue.trim()) {
+    setSelectIssue(true)
+      return;
+  }
     const formData=new FormData();
     Array.from(selectedFiles).forEach((file)=>{
       formData.append('files',file)
@@ -179,12 +195,13 @@ headers: {
                      <option value="returned">Returned</option>
                      <option value="cancellation">Cancellation</option>
                      <option value="general query">General Query</option>
-                           
-                              
-                       
                         </select>
+                        {
+ selectIssue=== true &&
+ <p style={{textAlign:"center",color:"red"}}>select Issue required!</p>
+                      } 
                       </div> 
-                       
+                  
                      
                     </div>
                   </div>
@@ -215,10 +232,23 @@ headers: {
           value={newMsg}
           onChange={handleNewMessageChange}
           placeholder="Type your message here..."
-          required
+          
         />
-       
-         <button style={{textAlign:"right"}} className="btn"><i className="fa fa-paperclip" aria-hidden="true" /></button>
+             <div style={{ position:"relative"}}>
+                      
+                      <input
+                  className="btn"
+                  type="file"
+                  name="file"
+                style={{opacity:"0",position:"absolute",top:0,left:"0",height:"100%",weight:"100%"}}
+                  multiple
+                  
+                  onChange={handleFileChange}
+                />
+                  <i className="fa fa-paperclip"  aria-hidden="true" /> 
+
+                </div>
+         {/* <button style={{textAlign:"right"}} className="btn"><i className="fa fa-paperclip" aria-hidden="true" /></button> */}
         <button className="btn btn-primary" type="submit">Create Ticket</button>
      
         {/* <input type="text" className="form-control"   value={newMessage}
@@ -234,6 +264,17 @@ headers: {
         message="Your Ticket Createed Successfully"
         />
       }
+         {
+             showAlert  &&
+             <AlertMessage 
+             message="input field required"
+             showAlert={showAlert}
+             setShowAlert={setShowAlert}
+             
+             />
+           
+           } 
+             
                      
                     </div>
                   </div>

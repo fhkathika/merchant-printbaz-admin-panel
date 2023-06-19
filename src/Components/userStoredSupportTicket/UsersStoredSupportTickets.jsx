@@ -2,6 +2,7 @@
 import axios from 'axios';
 import PropTypes from 'prop-types';
 import { useEffect, useState } from 'react';
+import AlertMessage from '../alert/AlertMessage';
 
 const UsersStoredSupportTickets = ({ message,ticketId,userOrderId,ticketIssue, onClose,userEmail }) => {
   
@@ -10,6 +11,7 @@ const UsersStoredSupportTickets = ({ message,ticketId,userOrderId,ticketIssue, o
   const [usersStoredTickets, setUsersStoredTickets] = useState([]);
   const [openTextBox, setOpenTextBox] = useState(false);
   const [selectedFiles, setSelectedFiles] = useState([]);
+  const [showAlert, setShowAlert] = useState(false);
   // const [ticketIssue, setTicketIssue] = useState('');
   useEffect(() => {
     // Fetch the chat log from the server when the component mounts
@@ -36,7 +38,8 @@ const handleNewMessageChange = (e) => {
   };
       //upload files
       const handleFileChange = (e) => {
-        setSelectedFiles(e.target.files);
+        const filesArray = Array.from(e.target.files);
+      setSelectedFiles(filesArray);
       };
       
  console.log("newMessage",newMsg); 
@@ -50,7 +53,7 @@ console.log("status",status);
   e.preventDefault();
   try {
     if (!newMsg.trim() && !selectedFiles.length) {
-      alert("Please input a message or upload a file.");
+      setShowAlert(true)
       return;
   }
     const formData=new FormData();
@@ -221,11 +224,15 @@ function timeSince(date) {
                   {
   allText?.files?.map(adminFile => {
     const fileId = adminFile.split('/d/')[1].split('/view')[0];
-    const directURL = `https://drive.google.com/uc?export=view&id=${fileId}`;
-    return <p><a href={directURL} target="_blank" rel="noopener noreferrer">View File</a></p>
+    const previewURL = `https://drive.google.com/file/d/${fileId}/preview`;
+    return (
+      <>
+        
+          <iframe src={previewURL}  style={{width: "auto", height: "auto",alignItems:"center"}}></iframe>
+      </>
+    )
   })
-}
-                </div>
+}             </div>
               </div>
               }
              
@@ -272,10 +279,9 @@ function timeSince(date) {
                      className="btn"
                      type="file"
                      name="file"
-                   
-                     multiple
-                     
+                    
                      onChange={handleFileChange}
+                     multiple
                    />
                    </button>
                      <div>
@@ -294,7 +300,17 @@ function timeSince(date) {
                        onChange={handleNewMessageChange} placeholder="Type your message" />
                                    <button className="btn"><i className="fa fa-paperclip" aria-hidden="true" /></button>
                                    <button className="btn btn-primary">Reply</button> */}
+                  
                    </form>
+           }
+           {
+             showAlert &&
+             <AlertMessage 
+             message="input field required"
+             showAlert={showAlert}
+             setShowAlert={setShowAlert}
+             
+             />
            }
               </div>
         
