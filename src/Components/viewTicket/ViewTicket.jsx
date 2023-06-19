@@ -429,7 +429,7 @@ const ViewTicket = () => {
                    
                      multiple
                      
-                    //  onChange={handleFileChange}
+                   onChange={handleFileChange}
                    />
                    </button>
 
