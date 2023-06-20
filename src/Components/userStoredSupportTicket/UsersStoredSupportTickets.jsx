@@ -205,15 +205,15 @@ function timeSince(date) {
               <div className="ticket-info">
                 <img src="https://media.discordapp.net/attachments/1069579536842379305/1117395441697443860/pngegg_15.png" alt="" />
                 <h2>{ticketIssue==="onHold out of stock" &&
-               " On hold- Out of stock"
+               "Out of Stock"
                 
                 }</h2>  
                 <h2>{ticketIssue==="onHold artwork issue" &&
-               "On hold- Artwork issue"
+               "Artwork Issue"
                 
                 }</h2>  
                 <h2>{ticketIssue==="onHold billing issue" &&
-               "On hold- Billing Issue"
+               "Billing Issue"
                 
                 }</h2>
                   <h2>{ticketIssue==="returned" &&

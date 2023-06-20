@@ -179,9 +179,9 @@ console.log("artWorkIssue",artWorkIssue);
                       </div>
                       <div className="box1-right">
                         
-                        <h6>{allTicket?.ticketIssue==="onHold out of stock" &&"On hold- Out of stock"}
-               {allTicket?.ticketIssue==="onHold artwork issue" &&"On hold- Artwork issue"}
-                {allTicket?.ticketIssue==="onHold billing issue" &&"On hold- Billing Issue"}
+                        <h6>{allTicket?.ticketIssue==="onHold out of stock" &&" Out of Stock"}
+               {allTicket?.ticketIssue==="onHold artwork issue" &&" Artwork Issue"}
+                {allTicket?.ticketIssue==="onHold billing issue" &&"Billing Issue"}
                 {allTicket?.ticketIssue==="returned" &&"Returned"}
                 {allTicket?.ticketIssue==="cancellation" &&"Cancellation"}
                 {allTicket?.ticketIssue==="general query" &&"General Query"}
@@ -788,9 +788,9 @@ console.log("artWorkIssue",artWorkIssue);
                         >
                      
                      <option value="all">all</option>
-                      <option value="onHold artwork issue">On hold- Artwork issue</option>
-                      <option value="onHold billing issue">On hold- Billing Issue</option>
-                     <option value="onHold out of stock">On hold- Out of stock</option>
+                      <option value="onHold artwork issue">Artwork issue</option>
+                      <option value="onHold billing issue"> Billing Issue</option>
+                     <option value="onHold out of stock">Out of stock</option>
                      <option value="returned">Returned</option>
                      <option value="cancellation">Cancellation</option>
                      <option value="general query">General Query</option>
