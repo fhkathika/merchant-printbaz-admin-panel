@@ -3,10 +3,17 @@
 
 import axios from 'axios';
 import React, { useEffect, useState } from 'react';
+import ReactMarkdown from 'react-markdown';
 import { Link, useLocation } from 'react-router-dom';
 import AlertMessage from '../alert/AlertMessage';
+import { useQuill } from 'react-quilljs';
+import BlotFormatter from 'quill-blot-formatter';
+import 'quill/dist/quill.snow.css';
 
 const ViewTicket = () => {
+  const { quill, quillRef, Quill } = useQuill({
+    modules: { blotFormatter: {} }
+  });
     const location = useLocation();
     const [openTextBox, setOpenTextBox] = useState(false);
     const [chatLog, setChatLog] = useState([]);
@@ -17,10 +24,49 @@ const ViewTicket = () => {
     const [ticketClose, setTicketClose] = useState(false);
     const [ticketStatus, setTicketStatus] = useState(viewTicketDetail?.ticketStatus);
     const [showAlert, setShowAlert] = useState(false);
-
+    const [isBold, setIsBold] = useState(false);
+    const [isItalic, setIsItalic] = useState(false);
+    const [isUnderlined, setIsUnderlined] = useState(false);
+    const [formatType, setFormatType] = useState({});
     console.log("viewTicketDetail",viewTicketDetail);
     console.log("openTextBox",openTextBox);
     console.log("ticketStatus",ticketStatus);
+    if (Quill && !quill) {
+      // const BlotFormatter = require('quill-blot-formatter');
+      Quill.register('modules/blotFormatter', BlotFormatter);
+    }
+  
+    useEffect(() => {
+      if (quill) {
+        quill.on('text-change', (delta, oldContents) => {
+          // const text =  quillRef.current.getEditor().getText();
+          // setNewMsg(text)
+          console.log("delta,delta",delta);
+          delta.ops.forEach((op) => {
+            if (typeof op.insert === 'string') {
+              console.log('Inserted text:', op.insert);
+              console.log('Applied formats:', op.attributes);
+            } else if (op.insert && typeof op.insert === 'object') {
+              // handle embeds like images, video etc.
+              Object.keys(op.insert).forEach((key) => {
+                console.log('Inserted object of type:', key);
+                console.log('Object value:', op.insert[key]);
+                console.log('Applied formats:', op.attributes);
+              });
+            }
+          });
+          const currentContents = quill.getContents();
+          console.log(currentContents.diff(oldContents));
+  
+          const text = quill.getText();
+          const format=quill.getFormat();
+          console.log('Typed text:', format);
+          // setNewMsg(text)
+          setNewMsg(quill.root.innerHTML);
+        });
+      }
+    }, [quill, Quill]);
+    console.log("formatType",formatType);
     useEffect(() => {
         // Fetch the chat log from the server when the component mounts
        
@@ -85,11 +131,22 @@ const ViewTicket = () => {
         }
    
     };
-    
+    const { bold, italic } = formatType;
+    const formatMessage = (newMsg, bold, italic) => {
+      let formattedMessage = newMsg;
+      
+      if (bold) formattedMessage = `**${formattedMessage}**`;
+      if (italic) formattedMessage = `*${formattedMessage}*`;
+      if (isUnderlined) formattedMessage =`<u>${formattedMessage}</u>`;
+  
+      return formattedMessage;
+  }
+  
  
     const handleSendMessage = async (e) => {
         e.preventDefault();
         try {
+          let formattedMessage = formatMessage(newMsg, bold, italic);
           if (!newMsg.trim() && !selectedFiles.length) {
             setShowAlert(true)
             return;
@@ -174,7 +231,20 @@ const ViewTicket = () => {
         }
         return Math.floor(seconds) + " seconds ago";
       }
-      
+      const getStyle = () => {
+        const { bold, italic } = formatType;
+        const style = {};
+    
+        if (bold) {
+          style.fontWeight = 'bold';
+        }
+    
+        if (italic) {
+          style.fontStyle = 'italic';
+        }
+    
+        return style;
+      };
     return (
     <div>
     <meta charSet="UTF-8" />
@@ -324,8 +394,9 @@ const ViewTicket = () => {
                   <img src="https://media.discordapp.net/attachments/1069579536842379305/1107191553501450260/Logo-01.jpg?width=616&height=616" alt="" />
                   <h2 style={{color: 'red'}}>{viewTick.admin}</h2>
                   <h3>{timeSince(new Date(viewTick?.timestamp))} ({new Date(viewTick?.timestamp).toLocaleString("en-US", { month: 'long', day: 'numeric', year: 'numeric', hour: 'numeric', minute: 'numeric' })})</h3>
-                  <p>   {viewTick.content}</p>
-
+                  {/* <p style={{}}>{viewTick?.content}</p> */}
+                  <div dangerouslySetInnerHTML={{ __html: viewTick.content }} />
+                  {/* <ReactMarkdown >{viewTick.content}</ReactMarkdown> */}
                   {/* {
   viewTick?.files?.map(adminFile => {
     const fileId = adminFile.split('/d/')[1].split('/view')[0];
@@ -390,67 +461,39 @@ const ViewTicket = () => {
               <div className='col-12'>
               {
              openTextBox && 
-             <form className="input-group chat-messages p-4 " onSubmit={handleSendMessage}>
-    <textarea  className='col-12'
-                       type="text"
-                       rows="11" cols="33"
-                       value={newMsg}
-                       onChange={handleNewMessageChange}
-                       placeholder="Type your message here..."
-                      
-                     />
-                     
-                     <div className=' col-12' style={{marginTop:"20px"}} >
-                     {/* <button  className="btn"><i className="fa fa-paperclip" aria-hidden="true" /></button> */}
-                   
+             <form className="input-group chat-messages p-4" onSubmit={handleSendMessage}>
       
-                     </div>  
-                     <div className='flex col-12' style={{marginTop:"20px"}} >
-           
-                     {/* <div style={{position: 'relative'}}>
-        <input
-          className="btn"
-          type="file"
-          name="file"
-          style={{opacity: 0, position: 'absolute', top: 0, left: 0, width: '100%', height: '100%'}}
-          multiple
-          onChange={handleFileChange}
-        />
-        <i className="fa fa-paperclip" aria-hidden="true" />
-      </div> */}
+      <div   ref={quillRef}  />
+      {/* <textArea
+        className='col-12'
+        type="text"
+        rows="11" cols="33"
+        value={newMsg}
+        onChange={handleNewMessageChange}
+        placeholder="Type your message here..."
+     
+      /> */}
+      <div className=' col-12' style={{marginTop:"5px"}}>
+     
 
-<button  className="btn"
-                     
-                     ><i className="fa fa-paperclip" aria-hidden="true" />      
-                         <input
-                     className="btn"
-                     type="file"
-                     name="file"
-                   
-                     multiple
-                     
-                   onChange={handleFileChange}
-                   />
-                   </button>
-
-                     <div>
-                     <button className="ttm-button" onClick={()=>setOpenTextBox(false)}> <i className="fa fa-trash" aria-hidden="true" style={{ marginRight: '5px' }} /></button>
-                     <button className="ttm-button" type="submit"><i className="fa fa-reply" aria-hidden="true" style={{marginRight: '5px'}} />Reply</button>
-                  
-                     </div>
-                    
-                   
-                     </div>
-
-                  
-                     
-                    
-                  
-                     {/* <input type="text" className="form-control"   value={newMessage}
-                       onChange={handleNewMessageChange} placeholder="Type your message" />
-                                   <button className="btn"><i className="fa fa-paperclip" aria-hidden="true" /></button>
-                                   <button className="btn btn-primary">Reply</button> */}
-                   </form>
+        </div>  
+      <div className='flex col-12' style={{}}>
+        
+        <button className="btn"><i className="fa fa-paperclip" aria-hidden="true" />      
+          <input
+            className="btn"
+            type="file"
+            name="file"
+            multiple
+            onChange={handleFileChange}
+          />
+        </button>
+        <div>
+          <button className="ttm-button" onClick={()=>setOpenTextBox(false)}> <i className="fa fa-trash" aria-hidden="true" style={{ marginRight: '5px' }} /></button>
+          <button className="ttm-button" type="submit"><i className="fa fa-reply" aria-hidden="true" style={{marginRight: '5px'}} />Reply</button>
+        </div>
+      </div>
+    </form>
            }
 
 {
