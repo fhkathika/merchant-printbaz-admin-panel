@@ -3,7 +3,9 @@ import axios from 'axios';
 import PropTypes from 'prop-types';
 import { useEffect, useState } from 'react';
 import AlertMessage from '../alert/AlertMessage';
-
+import { useQuill } from 'react-quilljs';
+import BlotFormatter from 'quill-blot-formatter';
+import 'quill/dist/quill.snow.css';
 const UsersStoredSupportTickets = ({ message,ticketId,userOrderId,ticketIssue, onClose,userEmail }) => {
   
   const [chatLog, setChatLog] = useState([]);
@@ -13,6 +15,48 @@ const UsersStoredSupportTickets = ({ message,ticketId,userOrderId,ticketIssue, o
   const [selectedFiles, setSelectedFiles] = useState([]);
   const [showAlert, setShowAlert] = useState(false);
   // const [ticketIssue, setTicketIssue] = useState('');
+ 
+  const { quill, quillRef, Quill } = useQuill({
+    modules: { blotFormatter: {} }
+  });
+  if (Quill && !quill) {
+    // const BlotFormatter = require('quill-blot-formatter');
+    Quill.register('modules/blotFormatter', BlotFormatter);
+  }
+
+  useEffect(() => {
+    if (quill) {
+      quill.on('text-change', (delta, oldContents) => {
+        // const text =  quillRef.current.getEditor().getText();
+        // setNewMsg(text)
+        console.log("delta,delta",delta);
+        delta.ops.forEach((op) => {
+          if (typeof op.insert === 'string') {
+            console.log('Inserted text:', op.insert);
+            console.log('Applied formats:', op.attributes);
+          } else if (op.insert && typeof op.insert === 'object') {
+            // handle embeds like images, video etc.
+            Object.keys(op.insert).forEach((key) => {
+              console.log('Inserted object of type:', key);
+              console.log('Object value:', op.insert[key]);
+              console.log('Applied formats:', op.attributes);
+            });
+          }
+        });
+        const currentContents = quill.getContents();
+        console.log(currentContents.diff(oldContents));
+
+        const text = quill.getText();
+        const format=quill.getFormat();
+        console.log('Typed text:', format);
+        // setNewMsg(text)
+        setNewMsg(quill.root.innerHTML);
+      });
+    }
+  }, [quill, Quill]);
+
+  
+ 
   useEffect(() => {
     // Fetch the chat log from the server when the component mounts
    
@@ -219,8 +263,8 @@ function timeSince(date) {
                   <img src="https://media.discordapp.net/attachments/1069579536842379305/1107191553501450260/Logo-01.jpg?width=616&height=616" alt="" />
                   <h2 style={{color: 'red'}}>{allText.admin}</h2>
                   <h3>{timeSince(new Date(allText?.timestamp))} ({new Date(allText?.timestamp).toLocaleString("en-US", { month: 'long', day: 'numeric', year: 'numeric', hour: 'numeric', minute: 'numeric' })})</h3>
-                  <p>   {allText.content}
-                  </p>
+                  {/* <p>   {allText.content}</p> */}
+                  <div dangerouslySetInnerHTML={{ __html: allText.content }} />
                   {
   allText?.files?.map(adminFile => {
     const fileId = adminFile.split('/d/')[1].split('/view')[0];
@@ -261,14 +305,15 @@ function timeSince(date) {
               {
              openTextBox && 
              <form className="input-group chat-messages p-4 " onSubmit={handleSendMessage}>
-    <textarea  className='col-12'
+     <div   ref={quillRef}  />
+    {/* <textarea  className='col-12'
                        type="text"
                        rows="11" cols="33"
                        value={newMsg}
                        onChange={handleNewMessageChange}
                        placeholder="Type your message here..."
                        
-                     />
+                     /> */}
            
                      <div className='flex col-12' style={{marginTop:"20px"}} >
                    

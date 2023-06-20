@@ -4,6 +4,10 @@ import { useEffect, useState } from 'react';
 import "../../css/style.css"
 import AlertMessage from '../alert/AlertMessage';
 import CreateTicketAlertbox from '../createTickwtAlert/CreateTicketAlertbox';
+import { useQuill } from 'react-quilljs';
+import BlotFormatter from 'quill-blot-formatter';
+import 'quill/dist/quill.snow.css';
+
 const SupportTicketPopUp = ({ message,ticketId,userOrderId,onClose,fetchTickets,userEmail }) => {
   
   const [chatLog, setChatLog] = useState([]);
@@ -16,6 +20,44 @@ const SupportTicketPopUp = ({ message,ticketId,userOrderId,onClose,fetchTickets,
     const [showAlert, setShowAlert] = useState(false);
     const [selectIssue,setSelectIssue] = useState(false);
     console.log("selectIssue",selectIssue);
+    const { quill, quillRef, Quill } = useQuill({
+      modules: { blotFormatter: {} }
+    });
+    if (Quill && !quill) {
+      // const BlotFormatter = require('quill-blot-formatter');
+      Quill.register('modules/blotFormatter', BlotFormatter);
+    }
+  
+    useEffect(() => {
+      if (quill) {
+        quill.on('text-change', (delta, oldContents) => {
+          // const text =  quillRef.current.getEditor().getText();
+          // setNewMsg(text)
+          console.log("delta,delta",delta);
+          delta.ops.forEach((op) => {
+            if (typeof op.insert === 'string') {
+              console.log('Inserted text:', op.insert);
+              console.log('Applied formats:', op.attributes);
+            } else if (op.insert && typeof op.insert === 'object') {
+              // handle embeds like images, video etc.
+              Object.keys(op.insert).forEach((key) => {
+                console.log('Inserted object of type:', key);
+                console.log('Object value:', op.insert[key]);
+                console.log('Applied formats:', op.attributes);
+              });
+            }
+          });
+          const currentContents = quill.getContents();
+          console.log(currentContents.diff(oldContents));
+  
+          const text = quill.getText();
+          const format=quill.getFormat();
+          console.log('Typed text:', format);
+          // setNewMsg(text)
+          setNewMsg(quill.root.innerHTML);
+        });
+      }
+    }, [quill, Quill]);
     useEffect(() => {
     // Fetch the chat log from the server when the component mounts
     fetchChatLog();
@@ -226,30 +268,23 @@ headers: {
                   <div className="flex-grow-0 py-3 px-4 border-top">
                     <div >
                     <form className="input-group chat-messages p-4" onSubmit={handleSendMessage}>
-        <textarea 
-          type="text"
-          rows="15" cols="33"
-          value={newMsg}
-          onChange={handleNewMessageChange}
-          placeholder="Type your message here..."
-          
-        />
+                    <div   ref={quillRef}  />
              <div style={{ position:"relative"}}>
-                      
+             <i className="fa fa-paperclip"  aria-hidden="true" /> 
+  
                       <input
                   className="btn"
                   type="file"
                   name="file"
-                style={{opacity:"0",position:"absolute",top:0,left:"0",height:"100%",weight:"100%"}}
+                style={{height:"100%",weight:"100%"}}
                   multiple
                   
                   onChange={handleFileChange}
                 />
-                  <i className="fa fa-paperclip"  aria-hidden="true" /> 
-
+                 
                 </div>
          {/* <button style={{textAlign:"right"}} className="btn"><i className="fa fa-paperclip" aria-hidden="true" /></button> */}
-        <button className="btn btn-primary" type="submit">Create Ticket</button>
+      <button className="btn btn-primary" style={{}} type="submit">Create Ticket</button>
      
         {/* <input type="text" className="form-control"   value={newMessage}
           onChange={handleNewMessageChange} placeholder="Type your message" />

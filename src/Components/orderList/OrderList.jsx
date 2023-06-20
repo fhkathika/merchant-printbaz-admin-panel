@@ -383,7 +383,7 @@ const getViewClientColor = (status) => {
                       )
               }
               {
-              filterOrders==="all" && orderAll.map((orders,index)=>{ 
+              filterOrders==="all" && orderAll.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt)).map((orders,index)=>{ 
                 matchingMerchant = allMerchant.find(merchant => merchant?.email === orders?.userMail)
             let  totalPrintBazCostWithDeliveryFee=Number(orders?.printbazcost) + Number(orders?.deliveryFee)
                  return (

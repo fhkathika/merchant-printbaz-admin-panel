@@ -5,6 +5,10 @@ const AllMerchants = () => {
   const [allMerchant,setAllMerchant]=useState([])
   const [filterUser,setFilterUsers]=useState('all')
   const [filterEmail,setFilterEmail]=useState('')
+  const [currentPage, setCurrentPage] = useState(1);
+  const [itemsPerPage, setItemsPerPage] = useState(30); 
+  const indexOfLastItem = currentPage * itemsPerPage;
+const indexOfFirstItem = indexOfLastItem - itemsPerPage;
 
   useEffect(()=>{
     const getOrders = async () => {
@@ -39,6 +43,7 @@ let SingleEmailOneTime = allMerchant.reduce((acc, current) => {
       return acc;
   }
 }, []);
+const actualIndexOfLastItem = indexOfLastItem > SingleEmailOneTime.length ? SingleEmailOneTime.length : indexOfLastItem;
 let formattedDate;
 allMerchant?.map(merchant=>{
   let date = new Date(merchant?.createdAt); 
@@ -152,6 +157,12 @@ let searchByPhoneNumber= allMerchant?.filter(Phone => Phone?.phone?.includes(fil
               </select>
             </div>
           </div>
+          <div style={{textAlign:"right"}}>
+          <span style={{marginRight:"20px"}}>{indexOfFirstItem + 1} - {actualIndexOfLastItem} of {SingleEmailOneTime.length}</span>
+    <button style={{marginRight:"20px",border:"none"}} onClick={() => setCurrentPage(currentPage - 1)} disabled={currentPage === 1} ><img style={{height:"10px",width:"15px"}} src='images/left-arrow.png' alt="left arrow"/></button>
+    <button style={{height:"40px",border:"none"}} onClick={() => setCurrentPage(currentPage + 1)} disabled={currentPage === Math.ceil(SingleEmailOneTime.length / itemsPerPage)}><img style={{height:"10px",width:"15px"}} src='images/right-arrow.png' alt="right arrow"/></button>
+   
+          </div>
           <div className="row client-list-title">
             <div className="col-lg-2 col-sm-12">
               <h4>Conatct Number</h4>
@@ -172,6 +183,9 @@ let searchByPhoneNumber= allMerchant?.filter(Phone => Phone?.phone?.includes(fil
               <h4>Status</h4>
             </div>
           </div>
+         
+         
+
           {
           filterUser &&  searchByPhoneNumber?.map((merchants)=><>
              <Link key={merchants?._id} to={`/viewClient/${merchants?._id}`} state={{merchants}}>
@@ -244,7 +258,7 @@ let searchByPhoneNumber= allMerchant?.filter(Phone => Phone?.phone?.includes(fil
           }
         
           {
-            filterUser==="pending" &&  pendingUsers.map(merchants=><>
+            filterUser==="pending" &&  pendingUsers.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt)).map(merchants=><>
                <Link key={merchants?._id} to={`/viewClient/${merchants?._id}`} state={{merchants}}>
             <div className="row client-list">
               <div className="col-lg-2 col-sm-12">
@@ -338,7 +352,7 @@ let searchByPhoneNumber= allMerchant?.filter(Phone => Phone?.phone?.includes(fil
             </>) 
           }
           {
-           filterUser==="all" && SingleEmailOneTime?.map((merchants)=><>
+           filterUser==="all" && SingleEmailOneTime?.slice(indexOfFirstItem, indexOfLastItem).sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt)).map((merchants)=><>
               
             <Link key={merchants?._id} to={`/viewClient/${merchants?._id}`} state={{merchants}}>
             <div className="row client-list">

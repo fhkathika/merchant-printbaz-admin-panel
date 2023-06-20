@@ -11,9 +11,7 @@ import BlotFormatter from 'quill-blot-formatter';
 import 'quill/dist/quill.snow.css';
 
 const ViewTicket = () => {
-  const { quill, quillRef, Quill } = useQuill({
-    modules: { blotFormatter: {} }
-  });
+
     const location = useLocation();
     const [openTextBox, setOpenTextBox] = useState(false);
     const [chatLog, setChatLog] = useState([]);
@@ -31,6 +29,10 @@ const ViewTicket = () => {
     console.log("viewTicketDetail",viewTicketDetail);
     console.log("openTextBox",openTextBox);
     console.log("ticketStatus",ticketStatus);
+
+    const { quill, quillRef, Quill } = useQuill({
+      modules: { blotFormatter: {} }
+    });
     if (Quill && !quill) {
       // const BlotFormatter = require('quill-blot-formatter');
       Quill.register('modules/blotFormatter', BlotFormatter);
@@ -67,6 +69,8 @@ const ViewTicket = () => {
       }
     }, [quill, Quill]);
     console.log("formatType",formatType);
+
+    
     useEffect(() => {
         // Fetch the chat log from the server when the component mounts
        
@@ -131,22 +135,12 @@ const ViewTicket = () => {
         }
    
     };
-    const { bold, italic } = formatType;
-    const formatMessage = (newMsg, bold, italic) => {
-      let formattedMessage = newMsg;
-      
-      if (bold) formattedMessage = `**${formattedMessage}**`;
-      if (italic) formattedMessage = `*${formattedMessage}*`;
-      if (isUnderlined) formattedMessage =`<u>${formattedMessage}</u>`;
-  
-      return formattedMessage;
-  }
+
   
  
     const handleSendMessage = async (e) => {
         e.preventDefault();
         try {
-          let formattedMessage = formatMessage(newMsg, bold, italic);
           if (!newMsg.trim() && !selectedFiles.length) {
             setShowAlert(true)
             return;
@@ -231,20 +225,7 @@ const ViewTicket = () => {
         }
         return Math.floor(seconds) + " seconds ago";
       }
-      const getStyle = () => {
-        const { bold, italic } = formatType;
-        const style = {};
-    
-        if (bold) {
-          style.fontWeight = 'bold';
-        }
-    
-        if (italic) {
-          style.fontStyle = 'italic';
-        }
-    
-        return style;
-      };
+     
     return (
     <div>
     <meta charSet="UTF-8" />
