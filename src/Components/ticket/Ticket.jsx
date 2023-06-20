@@ -787,10 +787,10 @@ console.log("artWorkIssue",artWorkIssue);
                           onChange={ (e)=>handleInputTicketIssueChange(e)}
                         >
                      
-                     <option value="all">all</option>
-                      <option value="onHold artwork issue">Artwork issue</option>
+                     <option value="all">All</option>
+                      <option value="onHold artwork issue">Artwork Issue</option>
                       <option value="onHold billing issue"> Billing Issue</option>
-                     <option value="onHold out of stock">Out of stock</option>
+                     <option value="onHold out of stock">Out of Stock</option>
                      <option value="returned">Returned</option>
                      <option value="cancellation">Cancellation</option>
                      <option value="general query">General Query</option>
