@@ -22,9 +22,7 @@ const ViewTicket = () => {
     const [ticketClose, setTicketClose] = useState(false);
     const [ticketStatus, setTicketStatus] = useState(viewTicketDetail?.ticketStatus);
     const [showAlert, setShowAlert] = useState(false);
-    const [isBold, setIsBold] = useState(false);
-    const [isItalic, setIsItalic] = useState(false);
-    const [isUnderlined, setIsUnderlined] = useState(false);
+   
     const [formatType, setFormatType] = useState({});
     console.log("viewTicketDetail",viewTicketDetail);
     console.log("openTextBox",openTextBox);
@@ -70,7 +68,7 @@ const ViewTicket = () => {
     }, [quill, Quill]);
     console.log("formatType",formatType);
 
-    
+
     useEffect(() => {
         // Fetch the chat log from the server when the component mounts
        
@@ -154,6 +152,7 @@ const ViewTicket = () => {
              ticketId: viewTicketDetail?.ticketId,
              ticketIssue: viewTicketDetail?.ticketIssue,
              ticketStatus:"replied",
+             userEmail:viewTicketDetail?.userEmail,
              userOrderId:viewTicketDetail?.orderId,
               user: 'Admin',
                content: newMsg };
@@ -163,6 +162,7 @@ const ViewTicket = () => {
             content: newMessage.content,
             ticketStatus: newMessage.ticketStatus,
             ticketIssue: newMessage.ticketIssue,
+            userEmail: newMessage.userEmail,
             admin: newMessage.user,
             orderId:newMessage.userOrderId,
             timestamp: new Date().toISOString(), // this won't be the exact timestamp saved in the DB

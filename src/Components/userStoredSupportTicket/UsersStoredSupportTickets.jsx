@@ -111,6 +111,7 @@ console.log("status",status);
       content: newMessage.content,
       ticketStatus: newMessage.ticketStatus,
       ticketIssue: newMessage.ticketIssue,
+      userEmail: newMessage.userEmail,
       admin: newMessage.user,
       orderId:newMessage.userOrderId,
       timestamp: new Date().toISOString(), // this won't be the exact timestamp saved in the DB
