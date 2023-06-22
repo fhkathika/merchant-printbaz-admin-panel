@@ -187,7 +187,7 @@ console.log("artWorkIssue",artWorkIssue);
                 {allTicket?.ticketIssue==="general query" &&"General Query"}
                </h6>  
                
-                        <h3>user</h3>
+                        <h3>{allTicket?.userName}</h3>
                         <h4>Order ID: {allTicket?.orderId}</h4>
                         <h5>Ticket ID: {allTicket?.ticketId}</h5>
                        
