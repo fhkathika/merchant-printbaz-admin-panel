@@ -4,7 +4,8 @@ import SupportTicketPopUp from '../suppoprtTicketPopUp/SupportTicketPopUp';
 import axios from 'axios';
 import UsersStoredSupportTickets from '../userStoredSupportTicket/UsersStoredSupportTickets';
 import Accordion from 'react-bootstrap/Accordion';
-function TabForViewOrder({orderId,email}) {
+function TabForViewOrder({orderId,email,viewClient}) {
+  const {name}=viewClient;
   const [activeTab, setActiveTab] = useState('tab1');
   const [showTicketPopUp, setShowTicketPopUp] = useState(false);
   const [showStoredTicketPopUp, setShowStoredTicketPopUp] = useState(false);
@@ -79,6 +80,7 @@ function TabForViewOrder({orderId,email}) {
             ticketId={popupId}
             fetchTickets={fetchChatLog}
             userEmail={email}
+            userName={name}
             
             />
             )
@@ -117,6 +119,7 @@ function TabForViewOrder({orderId,email}) {
                    ticketId={tickets?.ticketId}
                    ticketIssue={tickets?.ticketIssue}
                    userEmail={email}
+                   userName={name}
                />
         </Accordion.Body>
       </Accordion.Item>

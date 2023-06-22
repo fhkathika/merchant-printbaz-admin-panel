@@ -6,7 +6,7 @@ import AlertMessage from '../alert/AlertMessage';
 import { useQuill } from 'react-quilljs';
 import BlotFormatter from 'quill-blot-formatter';
 import 'quill/dist/quill.snow.css';
-const UsersStoredSupportTickets = ({ message,ticketId,userOrderId,ticketIssue, onClose,userEmail }) => {
+const UsersStoredSupportTickets = ({ message,ticketId,userOrderId,ticketIssue, onClose,userEmail,userName }) => {
   
   const [chatLog, setChatLog] = useState([]);
   const [newMsg, setNewMsg] = useState('');
@@ -104,14 +104,16 @@ console.log("status",status);
     Array.from(selectedFiles).forEach((file)=>{
       formData.append('files',file)
     })
-    const newMessage = { ticketId: ticketId,userOrderId:userOrderId,ticketIssue:ticketIssue,ticketStatus:"replied", user: 'Admin', content: newMsg,userEmail:userEmail };
+    const newMessage = { ticketId: ticketId,userOrderId:userOrderId,ticketIssue:ticketIssue,ticketStatus:"replied", user: 'Printbaz', content: newMsg,userEmail:userEmail,userName:userName,unread:true };
 
     const chatMessage = {
       ticketId: newMessage.ticketId,  // added this line
       content: newMessage.content,
       ticketStatus: newMessage.ticketStatus,
       ticketIssue: newMessage.ticketIssue,
+      unread: newMessage.unread,
       userEmail: newMessage.userEmail,
+      userName: newMessage.userName,
       admin: newMessage.user,
       orderId:newMessage.userOrderId,
       timestamp: new Date().toISOString(), // this won't be the exact timestamp saved in the DB
@@ -140,6 +142,9 @@ headers: {
       ...chatMessage,
       messages: [chatMessage]
     }]);
+    if (quill) {
+      quill.setContents([]);
+    }
     setNewMsg('');
     setSelectedFiles('');
    fetchOrderIddata();
@@ -237,34 +242,47 @@ function timeSince(date) {
             {
                filterByTicketId?.messages?.map(allText=>
                 <>
-                {
-                   allText.user &&
-                   <div className="col-12">
-                   <div className="mer-info">
-                     <img src="https://media.discordapp.net/attachments/1069579536842379305/1107191553501450260/Logo-01.jpg?width=616&height=616" alt="" />
-                     <h2>Md. Raihan Ahamad Rabbi</h2>
-                     <h3>2 days ago (Fri, 9 Jun 2023 at 3:46 AM)</h3> <br />
-                     <p>Hi,
-                       <br /><br />
-                       The television I ordered from your site was delivered with a cracked screen. I need some help with a refund or a replacement.
-                       <br />
-                       Here is the order number FD07062010
-                       <br /><br />
-                       Thanks,<br />
-                       Raihan
-                     </p>
-                   </div>
-                 </div>
-                }
-                 
+                {/* clent messages  */}
+               {
+                allText.admin===userName && 
+           
+                <div className="col-12">
+                <div className="mer-info">
+                  <img src="https://media.discordapp.net/attachments/1069579536842379305/1107191553501450260/Logo-01.jpg?width=616&height=616" alt="" />
+                  <h2 style={{color:"#012652"}}>{userName}</h2>
+                  <h3 >{timeSince(new Date(allText?.timestamp))} ({new Date(allText?.timestamp).toLocaleString("en-US", { month: 'long', day: 'numeric', year: 'numeric', hour: 'numeric', minute: 'numeric' })})</h3>
+                  <hr className='hr_lineStyle'/>
+              
+                  {/* <p>   {viewTick.content}</p> */}
+                  <div dangerouslySetInnerHTML={{ __html: allText.content }} />
+                
+                  {/* // upload image  */}
+                  {
+  allText?.files?.map(adminFile => {
+    const fileId = adminFile.split('/d/')[1].split('/view')[0];
+    const previewURL = `https://drive.google.com/file/d/${fileId}/preview`;
+    return (
+      <>
+        
+          <iframe src={previewURL}  style={{width: "auto", height: "auto",alignItems:"center"}}></iframe>
+      </>
+    )
+  })
+} 
+
+                
+                </div>
+              </div>
+              }
+                 {/* admin messages  */}
               {
-                allText.admin && 
+                allText.admin==="Printbaz" && 
                 <div className="col-12">
                 <div className="mer-info">
                   <img src="https://media.discordapp.net/attachments/1069579536842379305/1107191553501450260/Logo-01.jpg?width=616&height=616" alt="" />
                   <h2 style={{color: 'red'}}>{allText.admin}</h2>
                   <h3>{timeSince(new Date(allText?.timestamp))} ({new Date(allText?.timestamp).toLocaleString("en-US", { month: 'long', day: 'numeric', year: 'numeric', hour: 'numeric', minute: 'numeric' })})</h3>
-                  {/* <p>   {allText.content}</p> */}
+                  <hr className='hr_lineStyle'/>
                   <div dangerouslySetInnerHTML={{ __html: allText.content }} />
                   {
   allText?.files?.map(adminFile => {

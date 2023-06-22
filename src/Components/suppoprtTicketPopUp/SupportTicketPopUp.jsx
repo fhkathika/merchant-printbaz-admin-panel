@@ -8,7 +8,7 @@ import { useQuill } from 'react-quilljs';
 import BlotFormatter from 'quill-blot-formatter';
 import 'quill/dist/quill.snow.css';
 
-const SupportTicketPopUp = ({ message,ticketId,userOrderId,onClose,fetchTickets,userEmail }) => {
+const SupportTicketPopUp = ({ message,ticketId,userOrderId,onClose,fetchTickets,userEmail,userName }) => {
   
   const [chatLog, setChatLog] = useState([]);
   const [newMsg, setNewMsg] = useState('');
@@ -132,7 +132,7 @@ setTicketIssue(e.target.value)
     Array.from(selectedFiles).forEach((file)=>{
       formData.append('files',file)
     })
-    const newMessage = { ticketId: ticketId,userOrderId:userOrderId,ticketIssue:ticketIssue,ticketStatus:"open", user: 'Admin', content: newMsg,userEmail:userEmail };
+    const newMessage = { ticketId: ticketId,userOrderId:userOrderId,ticketIssue:ticketIssue,ticketStatus:"open", user: 'Printbaz',unread:true, content: newMsg,userEmail:userEmail,userName:userName };
 
     const chatMessage = {
       ticketId: newMessage.ticketId,  // added this line
@@ -140,6 +140,8 @@ setTicketIssue(e.target.value)
       ticketStatus: newMessage.ticketStatus,
       ticketIssue: newMessage.ticketIssue,
       userEmail: newMessage.userEmail,
+      userName: newMessage.userName,
+      unread: newMessage.unread,
       admin: newMessage.user,
       orderId:newMessage.userOrderId,
       timestamp: new Date().toISOString(), // this won't be the exact timestamp saved in the DB

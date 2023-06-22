@@ -11,7 +11,7 @@ import BlotFormatter from 'quill-blot-formatter';
 import 'quill/dist/quill.snow.css';
 
 const ViewTicket = () => {
-
+  const messagesEndRef = React.useRef(null);
     const location = useLocation();
     const [openTextBox, setOpenTextBox] = useState(false);
     const [chatLog, setChatLog] = useState([]);
@@ -73,7 +73,12 @@ const ViewTicket = () => {
         // Fetch the chat log from the server when the component mounts
        
         fetchOrderIddata();
-      }, []);
+            // Fetch the chat log every 10 seconds
+      const intervalId = setInterval(fetchOrderIddata, 10000);
+
+      // Clean up the interval on unmount
+      return () => clearInterval(intervalId);
+      }, [messagesEndRef.current?.scrollIntoView({ behavior: "smooth" })]);
       const fetchOrderIddata = async () => {
         try {
           // const response = await axios.get(`http://localhost:5000/getOrderIdmessages/${viewTicketDetail?.orderId}`);
@@ -86,8 +91,17 @@ const ViewTicket = () => {
         }
       };
       let filterByTicketId=usersStoredTickets?.find(ticket=>ticket.ticketId===viewTicketDetail?.ticketId)
-   let test=filterByTicketId?.messages?.map(file=>file?.files?.map(allFile=>console.log(allFile)))
-   
+      const SendTicketCopy = (ticketCopy) => {
+        console.log("SendTicketCopy clicked");
+        axios.post('http://localhost:5000/sendTicketCopy', ticketCopy)
+          .then((response) => {
+            console.log("send ticket mail", response);
+          })
+          .catch((error) => {
+            console.error(error);
+          });
+      };
+   console.log("filterByTicketId",filterByTicketId);
     ///input text
       const handleNewMessageChange = (e) => {
         console.log(e.target.value);
@@ -152,9 +166,11 @@ const ViewTicket = () => {
              ticketId: viewTicketDetail?.ticketId,
              ticketIssue: viewTicketDetail?.ticketIssue,
              ticketStatus:"replied",
+             unread:true,
              userEmail:viewTicketDetail?.userEmail,
+             userName:viewTicketDetail?.userName,
              userOrderId:viewTicketDetail?.orderId,
-              user: 'Admin',
+              user: 'Printbaz',
                content: newMsg };
       
           const chatMessage = {
@@ -162,7 +178,9 @@ const ViewTicket = () => {
             content: newMessage.content,
             ticketStatus: newMessage.ticketStatus,
             ticketIssue: newMessage.ticketIssue,
+            unread: newMessage.unread,
             userEmail: newMessage.userEmail,
+            userName: newMessage.userName,
             admin: newMessage.user,
             orderId:newMessage.userOrderId,
             timestamp: new Date().toISOString(), // this won't be the exact timestamp saved in the DB
@@ -191,6 +209,9 @@ const ViewTicket = () => {
             ...chatMessage,
             messages: [chatMessage]
           }]);
+          if (quill) {
+            quill.setContents([]);
+          }
           setNewMsg('');
           fetchOrderIddata()
           console.log("chatLog",chatLog);
@@ -302,7 +323,17 @@ const ViewTicket = () => {
                
              <button className="ttm-button" onClick={closeTicket}><i className="fa fa-check-circle" aria-hidden="true" style={{marginRight: '5px'}} />Close</button>
             {/* <button className="ttm-button"><i className="fa fa-trash" aria-hidden="true" style={{marginRight: '5px'}} />Delete</button> */}
-            <button className="ttm-button"><i className="fa fa-paper-plane" aria-hidden="true" style={{marginRight: '5px'}} />Send Copy</button>
+            <button className="ttm-button"
+            // onClick={() => SendTicketCopy({ userMail: filterByTicketId?.userEmail, ticketId: filterByTicketId?.ticketId, ticketIssue: filterByTicketId?.ticketIssue,messages:filterByTicketId?.messages })}
+            >
+  <i
+    className="fa fa-paper-plane"
+    aria-hidden="true"
+    style={{ marginRight: '5px' }}
+   
+  />
+  Send Mail
+</button>
           </div>
         </div>
       </div>
@@ -347,29 +378,41 @@ const ViewTicket = () => {
                   filterByTicketId?.messages?.map(viewTick=>
                   
                     <div className="col-12">
+                {/* clent messages  */}
                 {
-                   viewTick.user &&
-                   <div className="col-12">
-                   <div className="mer-info">
-                     <img src="https://media.discordapp.net/attachments/1069579536842379305/1107191553501450260/Logo-01.jpg?width=616&height=616" alt="" />
-                     <h2>Md. Raihan Ahamad Rabbi</h2>
-                     <h3>2 days ago (Fri, 9 Jun 2023 at 3:46 AM)</h3> <br />
-                     <p>Hi,
-                       <br /><br />
-                       The television I ordered from your site was delivered with a cracked screen. I need some help with a refund or a replacement.
-                       <br />
-                       Here is the order number FD07062010
-                       <br /><br />
-                       Thanks,<br />
-                       Raihan
-                     </p>
-                   </div>
-                 </div>
-                 
-                }
+                viewTick.admin===viewTicketDetail?.userName && 
+           
+                <div className="col-12">
+                <div className="mer-info">
+                  <img src="https://media.discordapp.net/attachments/1069579536842379305/1107191553501450260/Logo-01.jpg?width=616&height=616" alt="" />
+                  <h2 >{viewTicketDetail?.userName}</h2>
+                  <h3 >{timeSince(new Date(viewTick?.timestamp))} ({new Date(viewTick?.timestamp).toLocaleString("en-US", { month: 'long', day: 'numeric', year: 'numeric', hour: 'numeric', minute: 'numeric' })})</h3>
+                  <hr className='hr_lineStyle'/>
+              
+                  {/* <p>   {viewTick.content}</p> */}
+                  <div dangerouslySetInnerHTML={{ __html: viewTick.content }} />
+                
+                  {/* // upload image  */}
+                  {
+  viewTick?.files?.map(adminFile => {
+    const fileId = adminFile.split('/d/')[1].split('/view')[0];
+    const previewURL = `https://drive.google.com/file/d/${fileId}/preview`;
+    return (
+      <>
+        
+          <iframe src={previewURL}  style={{width: "auto", height: "auto",alignItems:"center"}}></iframe>
+      </>
+    )
+  })
+} 
+
+                
+                </div>
+              </div>
+              }
                  
               {
-                viewTick.admin && 
+                viewTick.admin==="Printbaz" && 
                 <div className="col-12">
                 <div className="mer-info">
                   <img src="https://media.discordapp.net/attachments/1069579536842379305/1107191553501450260/Logo-01.jpg?width=616&height=616" alt="" />
@@ -416,6 +459,7 @@ const ViewTicket = () => {
                   </div>
                     )
               }
+               <div ref={messagesEndRef} />
            
 
           </div>

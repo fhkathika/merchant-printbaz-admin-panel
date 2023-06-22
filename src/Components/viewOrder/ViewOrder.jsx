@@ -827,7 +827,7 @@ const ViewOrder = () => {
                 <div className="admin-dis section">
                   <div className="row admin-dis-tab">
                     <div className="col-12">
-                      <TabForViewOrder orderId={viewOrder?._id} email={viewClient?.email}></TabForViewOrder>
+                      <TabForViewOrder orderId={viewOrder?._id} email={viewClient?.email} viewClient={viewClient}></TabForViewOrder>
                       {/* <Ticket style={{visibility:"none"}}  email={viewClient?.email}/> */}
                       {/* <ul className="nav nav-tabs admin-dis">
                         <li className="nav-item admin-dis-li">
