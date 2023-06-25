@@ -5,6 +5,7 @@ import { Link } from 'react-router-dom';
 const Ticket = () => {
   const[fetchAllTicket,setFetchAllTicket]=useState([])
   const [ticketIssue, setTicketIssue] = useState("all");
+  // const [ticketStatus, setTicketStatus] = useState("");
   useEffect(() => {
     // Fetch the chat log from the server when the component mounts
    
@@ -27,6 +28,11 @@ const Ticket = () => {
     e.preventDefault()
   
   setTicketIssue(e.target.value)
+   
+   }  
+   const handleInputTicketStatusChange = async (e) => {
+    e.preventDefault()
+    setTicketIssue(e.target.value)
    
    }
   function timeSince(date) {
@@ -64,7 +70,11 @@ let outOfStock=fetchAllTicket?.filter(users=>users?.ticketIssue==="onHold out of
 let returned=fetchAllTicket?.filter(users=>users?.ticketIssue==="returned");
 let cancellation=fetchAllTicket?.filter(users=>users?.ticketIssue==="cancellation");
 let generalQuery=fetchAllTicket?.filter(users=>users?.ticketIssue==="general query");
-console.log("artWorkIssue",artWorkIssue);
+let closeQuery=fetchAllTicket?.filter(users=>users?.ticketStatus==="close");
+let repliedQuery=fetchAllTicket?.filter(users=>users?.ticketStatus==="replied");
+let openQuery=fetchAllTicket?.filter(users=>users?.ticketStatus==="open");
+let pendingQuery=fetchAllTicket?.filter(users=>users?.ticketStatus==="pending");
+console.log("closeQuery",closeQuery);
   return (
     <div>
     <meta charSet="UTF-8" />
@@ -156,7 +166,12 @@ console.log("artWorkIssue",artWorkIssue);
       <div className="row">
         <div className="col-10">
           {
-          ticketIssue==="all" &&  fetchAllTicket?.map((allTicket,index)=>{ 
+          ticketIssue==="all" && fetchAllTicket?.sort((a, b) => {
+            // Sort by lastTimestamp in descending order
+            const timestampA = new Date(a.messages[a.messages.length - 1].timestamp);
+            const timestampB = new Date(b.messages[b.messages.length - 1].timestamp);
+            return timestampB - timestampA;
+          })?.map((allTicket,index)=>{ 
               let lastTimestamp = null;
               let exactTime=null
               let lastUser=null
@@ -242,7 +257,12 @@ console.log("artWorkIssue",artWorkIssue);
                          } )
           }
     {
-            ticketIssue==="onHold artwork issue" &&  artWorkIssue?.map((allTicket,index)=>{ 
+            ticketIssue==="onHold artwork issue" &&  artWorkIssue?.sort((a, b) => {
+              // Sort by lastTimestamp in descending order
+              const timestampA = new Date(a.messages[a.messages.length - 1].timestamp);
+              const timestampB = new Date(b.messages[b.messages.length - 1].timestamp);
+              return timestampB - timestampA;
+            })?.map((allTicket,index)=>{ 
               let lastTimestamp = null;
               let exactTime=null
               let lastUser=null
@@ -265,15 +285,15 @@ console.log("artWorkIssue",artWorkIssue);
                       </div>
                       <div className="box1-right">
                         
-                        <h6>{allTicket?.ticketIssue==="onHold out of stock" &&"On hold- Out of stock"}
-               {allTicket?.ticketIssue==="onHold artwork issue" &&"On hold- Artwork issue"}
-                {allTicket?.ticketIssue==="onHold billing issue" &&"On hold- Billing Issue"}
+                        <h6>{allTicket?.ticketIssue==="onHold out of stock" &&"Out of stock"}
+               {allTicket?.ticketIssue==="onHold artwork issue" &&"Artwork issue"}
+                {allTicket?.ticketIssue==="onHold billing issue" &&"Billing Issue"}
                 {allTicket?.ticketIssue==="returned" &&"Returned"}
                 {allTicket?.ticketIssue==="cancellation" &&"Cancellation"}
                 {allTicket?.ticketIssue==="general query" &&"General Query"}
                </h6>  
                
-                        <h3>user</h3>
+                        <h3>{allTicket?.userName}</h3>
                         <h4>Order ID: {allTicket?.orderId}</h4>
                         <h5>Ticket ID: {allTicket?.ticketId}</h5>
                        
@@ -328,7 +348,12 @@ console.log("artWorkIssue",artWorkIssue);
                          } )
           } 
            {
-            ticketIssue==="onHold billing issue" &&  billingIssue?.map((allTicket,index)=>{ 
+            ticketIssue==="onHold billing issue" &&  billingIssue?.sort((a, b) => {
+              // Sort by lastTimestamp in descending order
+              const timestampA = new Date(a.messages[a.messages.length - 1].timestamp);
+              const timestampB = new Date(b.messages[b.messages.length - 1].timestamp);
+              return timestampB - timestampA;
+            })?.map((allTicket,index)=>{ 
               let lastTimestamp = null;
               let exactTime=null
               let lastUser=null
@@ -351,15 +376,15 @@ console.log("artWorkIssue",artWorkIssue);
                       </div>
                       <div className="box1-right">
                         
-                        <h6>{allTicket?.ticketIssue==="onHold out of stock" &&"On hold- Out of stock"}
-               {allTicket?.ticketIssue==="onHold artwork issue" &&"On hold- Artwork issue"}
-                {allTicket?.ticketIssue==="onHold billing issue" &&"On hold- Billing Issue"}
+                        <h6>{allTicket?.ticketIssue==="onHold out of stock" &&"Out of stock"}
+               {allTicket?.ticketIssue==="onHold artwork issue" &&"Artwork issue"}
+                {allTicket?.ticketIssue==="onHold billing issue" &&"Billing Issue"}
                 {allTicket?.ticketIssue==="returned" &&"Returned"}
                 {allTicket?.ticketIssue==="cancellation" &&"Cancellation"}
                 {allTicket?.ticketIssue==="general query" &&"General Query"}
                </h6>  
                
-                        <h3>user</h3>
+                        <h3>{allTicket?.userName}</h3>
                         <h4>Order ID: {allTicket?.orderId}</h4>
                         <h5>Ticket ID: {allTicket?.ticketId}</h5>
                        
@@ -414,7 +439,12 @@ console.log("artWorkIssue",artWorkIssue);
                          } )
           }  
           {
-            ticketIssue==="onHold out of stock" &&  outOfStock?.map((allTicket,index)=>{ 
+            ticketIssue==="onHold out of stock" &&  outOfStock?.sort((a, b) => {
+              // Sort by lastTimestamp in descending order
+              const timestampA = new Date(a.messages[a.messages.length - 1].timestamp);
+              const timestampB = new Date(b.messages[b.messages.length - 1].timestamp);
+              return timestampB - timestampA;
+            })?.map((allTicket,index)=>{ 
               let lastTimestamp = null;
               let exactTime=null
               let lastUser=null
@@ -437,15 +467,15 @@ console.log("artWorkIssue",artWorkIssue);
                       </div>
                       <div className="box1-right">
                         
-                        <h6>{allTicket?.ticketIssue==="onHold out of stock" &&"On hold- Out of stock"}
-               {allTicket?.ticketIssue==="onHold artwork issue" &&"On hold- Artwork issue"}
-                {allTicket?.ticketIssue==="onHold billing issue" &&"On hold- Billing Issue"}
+                        <h6>{allTicket?.ticketIssue==="onHold out of stock" &&"Out of stock"}
+               {allTicket?.ticketIssue==="onHold artwork issue" &&"Artwork issue"}
+                {allTicket?.ticketIssue==="onHold billing issue" &&"Billing Issue"}
                 {allTicket?.ticketIssue==="returned" &&"Returned"}
                 {allTicket?.ticketIssue==="cancellation" &&"Cancellation"}
                 {allTicket?.ticketIssue==="general query" &&"General Query"}
                </h6>  
                
-                        <h3>user</h3>
+                        <h3>{allTicket?.userName}</h3>
                         <h4>Order ID: {allTicket?.orderId}</h4>
                         <h5>Ticket ID: {allTicket?.ticketId}</h5>
                        
@@ -500,7 +530,12 @@ console.log("artWorkIssue",artWorkIssue);
                          } )
           }
           {
-            ticketIssue==="returned" &&  returned?.map((allTicket,index)=>{ 
+            ticketIssue==="returned" &&  returned?.sort((a, b) => {
+              // Sort by lastTimestamp in descending order
+              const timestampA = new Date(a.messages[a.messages.length - 1].timestamp);
+              const timestampB = new Date(b.messages[b.messages.length - 1].timestamp);
+              return timestampB - timestampA;
+            })?.map((allTicket,index)=>{ 
               let lastTimestamp = null;
               let exactTime=null
               let lastUser=null
@@ -523,15 +558,15 @@ console.log("artWorkIssue",artWorkIssue);
                       </div>
                       <div className="box1-right">
                         
-                        <h6>{allTicket?.ticketIssue==="onHold out of stock" &&"On hold- Out of stock"}
-               {allTicket?.ticketIssue==="onHold artwork issue" &&"On hold- Artwork issue"}
-                {allTicket?.ticketIssue==="onHold billing issue" &&"On hold- Billing Issue"}
+                        <h6>{allTicket?.ticketIssue==="onHold out of stock" &&" Out of stock"}
+               {allTicket?.ticketIssue==="onHold artwork issue" &&"Artwork issue"}
+                {allTicket?.ticketIssue==="onHold billing issue" &&"Billing Issue"}
                 {allTicket?.ticketIssue==="returned" &&"Returned"}
                 {allTicket?.ticketIssue==="cancellation" &&"Cancellation"}
                 {allTicket?.ticketIssue==="general query" &&"General Query"}
                </h6>  
                
-                        <h3>user</h3>
+                        <h3>{allTicket?.userName}</h3>
                         <h4>Order ID: {allTicket?.orderId}</h4>
                         <h5>Ticket ID: {allTicket?.ticketId}</h5>
                        
@@ -586,7 +621,12 @@ console.log("artWorkIssue",artWorkIssue);
                          } )
           } 
            {
-            ticketIssue==="cancellation" &&  cancellation?.map((allTicket,index)=>{ 
+            ticketIssue==="cancellation" &&  cancellation?.sort((a, b) => {
+              // Sort by lastTimestamp in descending order
+              const timestampA = new Date(a.messages[a.messages.length - 1].timestamp);
+              const timestampB = new Date(b.messages[b.messages.length - 1].timestamp);
+              return timestampB - timestampA;
+            })?.map((allTicket,index)=>{ 
               let lastTimestamp = null;
               let exactTime=null
               let lastUser=null
@@ -609,15 +649,15 @@ console.log("artWorkIssue",artWorkIssue);
                       </div>
                       <div className="box1-right">
                         
-                        <h6>{allTicket?.ticketIssue==="onHold out of stock" &&"On hold- Out of stock"}
-               {allTicket?.ticketIssue==="onHold artwork issue" &&"On hold- Artwork issue"}
-                {allTicket?.ticketIssue==="onHold billing issue" &&"On hold- Billing Issue"}
+                        <h6>{allTicket?.ticketIssue==="onHold out of stock" &&"Out of stock"}
+               {allTicket?.ticketIssue==="onHold artwork issue" &&"Artwork issue"}
+                {allTicket?.ticketIssue==="onHold billing issue" &&"Billing Issue"}
                 {allTicket?.ticketIssue==="returned" &&"Returned"}
                 {allTicket?.ticketIssue==="cancellation" &&"Cancellation"}
                 {allTicket?.ticketIssue==="general query" &&"General Query"}
                </h6>  
                
-                        <h3>user</h3>
+                        <h3>{allTicket?.userName}</h3>
                         <h4>Order ID: {allTicket?.orderId}</h4>
                         <h5>Ticket ID: {allTicket?.ticketId}</h5>
                        
@@ -672,7 +712,12 @@ console.log("artWorkIssue",artWorkIssue);
                          } )
           } 
            {
-            ticketIssue==="general query" &&  generalQuery?.map((allTicket,index)=>{ 
+            ticketIssue==="general query" &&  generalQuery?.sort((a, b) => {
+              // Sort by lastTimestamp in descending order
+              const timestampA = new Date(a.messages[a.messages.length - 1].timestamp);
+              const timestampB = new Date(b.messages[b.messages.length - 1].timestamp);
+              return timestampB - timestampA;
+            })?.map((allTicket,index)=>{ 
               let lastTimestamp = null;
               let exactTime=null
               let lastUser=null
@@ -695,15 +740,15 @@ console.log("artWorkIssue",artWorkIssue);
                       </div>
                       <div className="box1-right">
                         
-                        <h6>{allTicket?.ticketIssue==="onHold out of stock" &&"On hold- Out of stock"}
-               {allTicket?.ticketIssue==="onHold artwork issue" &&"On hold- Artwork issue"}
-                {allTicket?.ticketIssue==="onHold billing issue" &&"On hold- Billing Issue"}
+                        <h6>{allTicket?.ticketIssue==="onHold out of stock" &&"Out of stock"}
+               {allTicket?.ticketIssue==="onHold artwork issue" &&"Artwork issue"}
+                {allTicket?.ticketIssue==="onHold billing issue" &&"Billing Issue"}
                 {allTicket?.ticketIssue==="returned" &&"Returned"}
                 {allTicket?.ticketIssue==="cancellation" &&"Cancellation"}
                 {allTicket?.ticketIssue==="general query" &&"General Query"}
                </h6>  
                
-                        <h3>user</h3>
+                        <h3>{allTicket?.userName}</h3>
                         <h4>Order ID: {allTicket?.orderId}</h4>
                         <h5>Ticket ID: {allTicket?.ticketId}</h5>
                        
@@ -759,7 +804,369 @@ console.log("artWorkIssue",artWorkIssue);
           }
 
 
-        
+{
+            ticketIssue==="close" &&  closeQuery?.sort((a, b) => {
+              // Sort by lastTimestamp in descending order
+              const timestampA = new Date(a.messages[a.messages.length - 1].timestamp);
+              const timestampB = new Date(b.messages[b.messages.length - 1].timestamp);
+              return timestampB - timestampA;
+            })?.map((allTicket,index)=>{ 
+              let lastTimestamp = null;
+              let exactTime=null
+              let lastUser=null
+              if (allTicket?.messages?.length > 0) {
+                const lastMessage = allTicket.messages[allTicket.messages.length - 1];
+                lastTimestamp = new Date(lastMessage.timestamp).toLocaleString("en-US", { month: 'long', day: 'numeric', year: 'numeric', hour: 'numeric', minute: 'numeric' });
+                exactTime=timeSince((new Date(lastTimestamp)))
+                lastUser = lastMessage.admin;
+              }
+              return(
+                <Link to={`/viewTicket/${allTicket?._id}`} state={{allTicket}} key={index}>
+
+<div className="ticket-display">
+                <div className="row">
+                  <div className="col-8">
+                    <div className="td-box1">
+                      <div className="box1-left">
+                        <input className="check-box" type="checkbox" />
+                        <img src="https://media.discordapp.net/attachments/1069579536842379305/1107191553501450260/Logo-01.jpg?width=616&height=616" alt="" />
+                      </div>
+                      <div className="box1-right">
+                        
+                        <h6>{allTicket?.ticketIssue==="onHold out of stock" &&"Out of stock"}
+               {allTicket?.ticketIssue==="onHold artwork issue" &&"Artwork issue"}
+                {allTicket?.ticketIssue==="onHold billing issue" &&"Billing Issue"}
+                {allTicket?.ticketIssue==="returned" &&"Returned"}
+                {allTicket?.ticketIssue==="cancellation" &&"Cancellation"}
+                {allTicket?.ticketIssue==="general query" &&"General Query"}
+               </h6>  
+               
+                        <h3>{allTicket?.userName}</h3>
+                        <h4>Order ID: {allTicket?.orderId}</h4>
+                        <h5>Ticket ID: {allTicket?.ticketId}</h5>
+                       
+                        <span>
+                             {lastTimestamp && <p>{exactTime} {lastTimestamp}</p>}
+  
+                        </span>
+                         
+                        
+                      </div>
+                    </div>
+                  </div>
+                  <div className="col-4">
+                    <div className="td-box2">
+                      <div className="box-text">
+                        {
+                          allTicket?.ticketIssue==="onHold billing issue" &&
+                          <p><i className="fa fa-square" aria-hidden="true" style={{color: 'red'}} />High</p>
+                        }
+                          {
+                          allTicket?.ticketIssue==="returned" &&
+                          <p><i className="fa fa-square" aria-hidden="true" style={{color: 'blue'}} />Medium</p>
+                        } 
+                          {
+                          allTicket?.ticketIssue==="onHold artwork issue" &&
+                          <p><i className="fa fa-square" aria-hidden="true" style={{color: 'blue'}} />Medium</p>
+                        }
+                         {
+                          allTicket?.ticketIssue==="cancellation" &&
+                          <p><i className="fa fa-square" aria-hidden="true" style={{color: 'blue'}} />Medium</p>
+                        } 
+                         {
+                          allTicket?.ticketIssue==="onHold out of stock" &&
+                          <p><i className="fa fa-square" aria-hidden="true" style={{color: 'yellow'}} />Low</p>
+                        } 
+                        {
+                          allTicket?.ticketIssue==="general query" &&
+                          <p><i className="fa fa-square" aria-hidden="true" style={{color: 'yellow'}} />Low</p>
+                        }
+                       
+                        <p><i className="fa fa-user" aria-hidden="true" style={{color: 'rgb(0, 174, 255)'}} />{lastUser}</p>
+                        <p><i className="fa fa-envelope-open" aria-hidden="true" style={{color: 'rgb(0, 172, 0)'}} />{allTicket?.ticketStatus}</p>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+                </Link>
+              
+              )
+             
+                         } )
+          } 
+          {
+            ticketIssue==="replied" &&  repliedQuery?.sort((a, b) => {
+              // Sort by lastTimestamp in descending order
+              const timestampA = new Date(a.messages[a.messages.length - 1].timestamp);
+              const timestampB = new Date(b.messages[b.messages.length - 1].timestamp);
+              return timestampB - timestampA;
+            })?.map((allTicket,index)=>{ 
+              let lastTimestamp = null;
+              let exactTime=null
+              let lastUser=null
+              if (allTicket?.messages?.length > 0) {
+                const lastMessage = allTicket.messages[allTicket.messages.length - 1];
+                lastTimestamp = new Date(lastMessage.timestamp).toLocaleString("en-US", { month: 'long', day: 'numeric', year: 'numeric', hour: 'numeric', minute: 'numeric' });
+                exactTime=timeSince((new Date(lastTimestamp)))
+                lastUser = lastMessage.admin;
+              }
+              return(
+                <Link to={`/viewTicket/${allTicket?._id}`} state={{allTicket}} key={index}>
+
+<div className="ticket-display">
+                <div className="row">
+                  <div className="col-8">
+                    <div className="td-box1">
+                      <div className="box1-left">
+                        <input className="check-box" type="checkbox" />
+                        <img src="https://media.discordapp.net/attachments/1069579536842379305/1107191553501450260/Logo-01.jpg?width=616&height=616" alt="" />
+                      </div>
+                      <div className="box1-right">
+                        
+                        <h6>{allTicket?.ticketIssue==="onHold out of stock" &&"Out of stock"}
+               {allTicket?.ticketIssue==="onHold artwork issue" &&"Artwork issue"}
+                {allTicket?.ticketIssue==="onHold billing issue" &&"Billing Issue"}
+                {allTicket?.ticketIssue==="returned" &&"Returned"}
+                {allTicket?.ticketIssue==="cancellation" &&"Cancellation"}
+                {allTicket?.ticketIssue==="general query" &&"General Query"}
+               </h6>  
+               
+                        <h3>{allTicket?.userName}</h3>
+                        <h4>Order ID: {allTicket?.orderId}</h4>
+                        <h5>Ticket ID: {allTicket?.ticketId}</h5>
+                       
+                        <span>
+                             {lastTimestamp && <p>{exactTime} {lastTimestamp}</p>}
+  
+                        </span>
+                         
+                        
+                      </div>
+                    </div>
+                  </div>
+                  <div className="col-4">
+                    <div className="td-box2">
+                      <div className="box-text">
+                        {
+                          allTicket?.ticketIssue==="onHold billing issue" &&
+                          <p><i className="fa fa-square" aria-hidden="true" style={{color: 'red'}} />High</p>
+                        }
+                          {
+                          allTicket?.ticketIssue==="returned" &&
+                          <p><i className="fa fa-square" aria-hidden="true" style={{color: 'blue'}} />Medium</p>
+                        } 
+                          {
+                          allTicket?.ticketIssue==="onHold artwork issue" &&
+                          <p><i className="fa fa-square" aria-hidden="true" style={{color: 'blue'}} />Medium</p>
+                        }
+                         {
+                          allTicket?.ticketIssue==="cancellation" &&
+                          <p><i className="fa fa-square" aria-hidden="true" style={{color: 'blue'}} />Medium</p>
+                        } 
+                         {
+                          allTicket?.ticketIssue==="onHold out of stock" &&
+                          <p><i className="fa fa-square" aria-hidden="true" style={{color: 'yellow'}} />Low</p>
+                        } 
+                        {
+                          allTicket?.ticketIssue==="general query" &&
+                          <p><i className="fa fa-square" aria-hidden="true" style={{color: 'yellow'}} />Low</p>
+                        }
+                       
+                        <p><i className="fa fa-user" aria-hidden="true" style={{color: 'rgb(0, 174, 255)'}} />{lastUser}</p>
+                        <p><i className="fa fa-envelope-open" aria-hidden="true" style={{color: 'rgb(0, 172, 0)'}} />{allTicket?.ticketStatus}</p>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+                </Link>
+              
+              )
+             
+                         } )
+          }    
+           {
+            ticketIssue==="pending" &&  pendingQuery?.sort((a, b) => {
+              // Sort by lastTimestamp in descending order
+              const timestampA = new Date(a.messages[a.messages.length - 1].timestamp);
+              const timestampB = new Date(b.messages[b.messages.length - 1].timestamp);
+              return timestampB - timestampA;
+            })?.map((allTicket,index)=>{ 
+              let lastTimestamp = null;
+              let exactTime=null
+              let lastUser=null
+              if (allTicket?.messages?.length > 0) {
+                const lastMessage = allTicket.messages[allTicket.messages.length - 1];
+                lastTimestamp = new Date(lastMessage.timestamp).toLocaleString("en-US", { month: 'long', day: 'numeric', year: 'numeric', hour: 'numeric', minute: 'numeric' });
+                exactTime=timeSince((new Date(lastTimestamp)))
+                lastUser = lastMessage.admin;
+              }
+              return(
+                <Link to={`/viewTicket/${allTicket?._id}`} state={{allTicket}} key={index}>
+
+<div className="ticket-display">
+                <div className="row">
+                  <div className="col-8">
+                    <div className="td-box1">
+                      <div className="box1-left">
+                        <input className="check-box" type="checkbox" />
+                        <img src="https://media.discordapp.net/attachments/1069579536842379305/1107191553501450260/Logo-01.jpg?width=616&height=616" alt="" />
+                      </div>
+                      <div className="box1-right">
+                        
+                        <h6>{allTicket?.ticketIssue==="onHold out of stock" &&"Out of stock"}
+               {allTicket?.ticketIssue==="onHold artwork issue" &&"Artwork issue"}
+                {allTicket?.ticketIssue==="onHold billing issue" &&"Billing Issue"}
+                {allTicket?.ticketIssue==="returned" &&"Returned"}
+                {allTicket?.ticketIssue==="cancellation" &&"Cancellation"}
+                {allTicket?.ticketIssue==="general query" &&"General Query"}
+               </h6>  
+               
+                        <h3>{allTicket?.userName}</h3>
+                        <h4>Order ID: {allTicket?.orderId}</h4>
+                        <h5>Ticket ID: {allTicket?.ticketId}</h5>
+                       
+                        <span>
+                             {lastTimestamp && <p>{exactTime} {lastTimestamp}</p>}
+  
+                        </span>
+                         
+                        
+                      </div>
+                    </div>
+                  </div>
+                  <div className="col-4">
+                    <div className="td-box2">
+                      <div className="box-text">
+                        {
+                          allTicket?.ticketIssue==="onHold billing issue" &&
+                          <p><i className="fa fa-square" aria-hidden="true" style={{color: 'red'}} />High</p>
+                        }
+                          {
+                          allTicket?.ticketIssue==="returned" &&
+                          <p><i className="fa fa-square" aria-hidden="true" style={{color: 'blue'}} />Medium</p>
+                        } 
+                          {
+                          allTicket?.ticketIssue==="onHold artwork issue" &&
+                          <p><i className="fa fa-square" aria-hidden="true" style={{color: 'blue'}} />Medium</p>
+                        }
+                         {
+                          allTicket?.ticketIssue==="cancellation" &&
+                          <p><i className="fa fa-square" aria-hidden="true" style={{color: 'blue'}} />Medium</p>
+                        } 
+                         {
+                          allTicket?.ticketIssue==="onHold out of stock" &&
+                          <p><i className="fa fa-square" aria-hidden="true" style={{color: 'yellow'}} />Low</p>
+                        } 
+                        {
+                          allTicket?.ticketIssue==="general query" &&
+                          <p><i className="fa fa-square" aria-hidden="true" style={{color: 'yellow'}} />Low</p>
+                        }
+                       
+                        <p><i className="fa fa-user" aria-hidden="true" style={{color: 'rgb(0, 174, 255)'}} />{lastUser}</p>
+                        <p><i className="fa fa-envelope-open" aria-hidden="true" style={{color: 'rgb(0, 172, 0)'}} />{allTicket?.ticketStatus}</p>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+                </Link>
+              
+              )
+             
+                         } )
+          }   {
+            ticketIssue==="open" &&  openQuery?.sort((a, b) => {
+              // Sort by lastTimestamp in descending order
+              const timestampA = new Date(a.messages[a.messages.length - 1].timestamp);
+              const timestampB = new Date(b.messages[b.messages.length - 1].timestamp);
+              return timestampB - timestampA;
+            })?.map((allTicket,index)=>{ 
+              let lastTimestamp = null;
+              let exactTime=null
+              let lastUser=null
+              if (allTicket?.messages?.length > 0) {
+                const lastMessage = allTicket.messages[allTicket.messages.length - 1];
+                lastTimestamp = new Date(lastMessage.timestamp).toLocaleString("en-US", { month: 'long', day: 'numeric', year: 'numeric', hour: 'numeric', minute: 'numeric' });
+                exactTime=timeSince((new Date(lastTimestamp)))
+                lastUser = lastMessage.admin;
+              }
+              return(
+                <Link to={`/viewTicket/${allTicket?._id}`} state={{allTicket}} key={index}>
+
+<div className="ticket-display">
+                <div className="row">
+                  <div className="col-8">
+                    <div className="td-box1">
+                      <div className="box1-left">
+                        <input className="check-box" type="checkbox" />
+                        <img src="https://media.discordapp.net/attachments/1069579536842379305/1107191553501450260/Logo-01.jpg?width=616&height=616" alt="" />
+                      </div>
+                      <div className="box1-right">
+                        
+                        <h6>{allTicket?.ticketIssue==="onHold out of stock" &&"Out of stock"}
+               {allTicket?.ticketIssue==="onHold artwork issue" &&"Artwork issue"}
+                {allTicket?.ticketIssue==="onHold billing issue" &&"Billing Issue"}
+                {allTicket?.ticketIssue==="returned" &&"Returned"}
+                {allTicket?.ticketIssue==="cancellation" &&"Cancellation"}
+                {allTicket?.ticketIssue==="general query" &&"General Query"}
+               </h6>  
+               
+                        <h3>{allTicket?.userName}</h3>
+                        <h4>Order ID: {allTicket?.orderId}</h4>
+                        <h5>Ticket ID: {allTicket?.ticketId}</h5>
+                       
+                        <span>
+                             {lastTimestamp && <p>{exactTime} {lastTimestamp}</p>}
+  
+                        </span>
+                         
+                        
+                      </div>
+                    </div>
+                  </div>
+                  <div className="col-4">
+                    <div className="td-box2">
+                      <div className="box-text">
+                        {
+                          allTicket?.ticketIssue==="onHold billing issue" &&
+                          <p><i className="fa fa-square" aria-hidden="true" style={{color: 'red'}} />High</p>
+                        }
+                          {
+                          allTicket?.ticketIssue==="returned" &&
+                          <p><i className="fa fa-square" aria-hidden="true" style={{color: 'blue'}} />Medium</p>
+                        } 
+                          {
+                          allTicket?.ticketIssue==="onHold artwork issue" &&
+                          <p><i className="fa fa-square" aria-hidden="true" style={{color: 'blue'}} />Medium</p>
+                        }
+                         {
+                          allTicket?.ticketIssue==="cancellation" &&
+                          <p><i className="fa fa-square" aria-hidden="true" style={{color: 'blue'}} />Medium</p>
+                        } 
+                         {
+                          allTicket?.ticketIssue==="onHold out of stock" &&
+                          <p><i className="fa fa-square" aria-hidden="true" style={{color: 'yellow'}} />Low</p>
+                        } 
+                        {
+                          allTicket?.ticketIssue==="general query" &&
+                          <p><i className="fa fa-square" aria-hidden="true" style={{color: 'yellow'}} />Low</p>
+                        }
+                       
+                        <p><i className="fa fa-user" aria-hidden="true" style={{color: 'rgb(0, 174, 255)'}} />{lastUser}</p>
+                        <p><i className="fa fa-envelope-open" aria-hidden="true" style={{color: 'rgb(0, 172, 0)'}} />{allTicket?.ticketStatus}</p>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+                </Link>
+              
+              )
+             
+                         } )
+          } 
         
         </div>
         <div className="col-2">
@@ -794,6 +1201,38 @@ console.log("artWorkIssue",artWorkIssue);
                      <option value="returned">Returned</option>
                      <option value="cancellation">Cancellation</option>
                      <option value="general query">General Query</option>
+                        </select>
+                    
+                      
+            </div>
+            
+            <div className="dropdown filter-dropdown">
+             
+            
+                      <select
+                          id="status-filter"
+                          className="status-btn"
+
+                          
+                          style={{
+                            border: "1px solid #d1d1d1",
+                            padding: "8px",
+                            marginRight:'20px',
+                            width:"100%",
+                            background:"none"
+                            
+                          }}
+                          name="ticketIssue"
+                          value={ticketIssue}
+                          required
+                          onChange={ (e)=>handleInputTicketStatusChange(e)}
+                        >
+                     
+                     <option value="">select status</option>
+                      <option value="close">Close</option>
+                     <option value="replied">Replied </option>
+                     <option value="pending">Pending </option>
+                     <option value="open">Open</option>
                         </select>
                     
                       

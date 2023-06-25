@@ -2,13 +2,14 @@
 
 
 import axios from 'axios';
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import ReactMarkdown from 'react-markdown';
 import { Link, useLocation } from 'react-router-dom';
 import AlertMessage from '../alert/AlertMessage';
 import { useQuill } from 'react-quilljs';
 import BlotFormatter from 'quill-blot-formatter';
 import 'quill/dist/quill.snow.css';
+import { Overlay, Tooltip } from 'react-bootstrap';
 
 const ViewTicket = () => {
   const messagesEndRef = React.useRef(null);
@@ -22,7 +23,8 @@ const ViewTicket = () => {
     const [ticketClose, setTicketClose] = useState(false);
     const [ticketStatus, setTicketStatus] = useState(viewTicketDetail?.ticketStatus);
     const [showAlert, setShowAlert] = useState(false);
-   
+    const [showMailTooltip, setShowMailTooltip] = useState(false);
+  const target = useRef(null);
     const [formatType, setFormatType] = useState({});
     console.log("viewTicketDetail",viewTicketDetail);
     console.log("openTextBox",openTextBox);
@@ -93,9 +95,14 @@ const ViewTicket = () => {
       let filterByTicketId=usersStoredTickets?.find(ticket=>ticket.ticketId===viewTicketDetail?.ticketId)
       const SendTicketCopy = (ticketCopy) => {
         console.log("SendTicketCopy clicked");
-        axios.post('http://localhost:5000/sendTicketCopy', ticketCopy)
+        // axios.post('http://localhost:5000/sendTicketCopy', ticketCopy)
+        axios.post('https://mserver.printbaz.com/sendTicketCopy', ticketCopy)
           .then((response) => {
             console.log("send ticket mail", response);
+            setShowMailTooltip(true)
+            setTimeout(() => {
+              setShowMailTooltip(false);
+            }, 1000);
           })
           .catch((error) => {
             console.error(error);
@@ -323,8 +330,8 @@ const ViewTicket = () => {
                
              <button className="ttm-button" onClick={closeTicket}><i className="fa fa-check-circle" aria-hidden="true" style={{marginRight: '5px'}} />Close</button>
             {/* <button className="ttm-button"><i className="fa fa-trash" aria-hidden="true" style={{marginRight: '5px'}} />Delete</button> */}
-            <button className="ttm-button"
-            // onClick={() => SendTicketCopy({ userMail: filterByTicketId?.userEmail, ticketId: filterByTicketId?.ticketId, ticketIssue: filterByTicketId?.ticketIssue,messages:filterByTicketId?.messages })}
+            <button className="ttm-button" ref={target}
+            onClick={() => SendTicketCopy({ userMail: filterByTicketId?.userEmail, ticketId: filterByTicketId?.ticketId, ticketIssue: filterByTicketId?.ticketIssue,messages:filterByTicketId?.messages })}
             >
   <i
     className="fa fa-paper-plane"
@@ -334,6 +341,14 @@ const ViewTicket = () => {
   />
   Send Mail
 </button>
+<Overlay target={target.current} show={showMailTooltip} placement="top">
+        {(props) => (
+          <Tooltip id="overlay-example" {...props}>
+           send mail!
+          </Tooltip>
+        )}
+      </Overlay>
+   
           </div>
         </div>
       </div>

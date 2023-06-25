@@ -6,7 +6,11 @@ const OrderList = () => {
   const { orderAll } = useGetMongoData();
   const [allMerchant,setAllMerchant]=useState([])
   console.log("orderAll", orderAll);
-  const [filterOrders,setFilterOrders]=useState('all')
+  const [filterOrders,setFilterOrders]=useState('all');
+  const [currentPage, setCurrentPage] = useState(1);
+  const [itemsPerPage, setItemsPerPage] = useState(20); 
+  const indexOfLastItem = currentPage * itemsPerPage;
+  const indexOfFirstItem = indexOfLastItem - itemsPerPage;
   useEffect(()=>{
     const getOrders = async () => {
      await fetch('https://mserver.printbaz.com/alluser') //for main site
@@ -126,6 +130,7 @@ const getViewClientColor = (status) => {
   // you can add more conditions here or just return a default color
   // return "defaultColor";
 };
+const actualIndexOfLastItem = indexOfLastItem > orderAll.length ? orderAll.length : indexOfLastItem;
     return (
         <div>
           <meta charSet="UTF-8" />
@@ -234,6 +239,16 @@ const getViewClientColor = (status) => {
                   
                 </select>
               </div>
+              {
+                 filterOrders==="all"  && 
+                 <div style={{textAlign:"right"}}>
+                 <span style={{marginRight:"20px"}}>{indexOfFirstItem + 1} - {actualIndexOfLastItem} of {orderAll.length}</span>
+           <button style={{marginRight:"20px",border:"none"}} onClick={() => setCurrentPage(currentPage - 1)} disabled={currentPage === 1} ><img style={{height:"10px",width:"15px"}} src='images/left-arrow.png' alt="left arrow"/></button>
+           <button style={{height:"40px",border:"none"}} onClick={() => setCurrentPage(currentPage + 1)} disabled={currentPage === Math.ceil(orderAll.length / itemsPerPage)}><img style={{height:"10px",width:"15px"}} src='images/right-arrow.png' alt="right arrow"/></button>
+          
+                 </div>
+              }
+           
             </div>
             <div className="client-order-list">
               <div className="row" style={{marginBottom: '30px'}}>
@@ -383,7 +398,7 @@ const getViewClientColor = (status) => {
                       )
               }
               {
-              filterOrders==="all" && orderAll.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt)).map((orders,index)=>{ 
+              filterOrders==="all" && orderAll?.slice(indexOfFirstItem, indexOfLastItem).sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt)).sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt)).map((orders,index)=>{ 
                 matchingMerchant = allMerchant.find(merchant => merchant?.email === orders?.userMail)
             let  totalPrintBazCostWithDeliveryFee=Number(orders?.printbazcost) + Number(orders?.deliveryFee)
                  return (

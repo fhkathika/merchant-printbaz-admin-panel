@@ -4,6 +4,7 @@ import TabForViewOrder from '../tabForViewOrder.jsx/TabForViewOrder';
 import Overlay from 'react-bootstrap/Overlay';
 import Tooltip from 'react-bootstrap/Tooltip';
 import Ticket from '../ticket/Ticket';
+import SendOrderStatusMail from '../sendOrderStatusMail/SendOrderStatusMail';
 const ViewOrder = () => {
   const location = useLocation();
   const viewOrder = location.state ? location?.state?.orders : null;
@@ -43,7 +44,7 @@ const ViewOrder = () => {
       if (response.ok) {
         // Update the approval status in the viewClient object
         setOrderStatus(status);
-  
+        SendOrderStatusMail({status:status,_id:viewOrder?._id,userMail:viewOrder?.userMail })
         console.log("Success:", viewOrder);
         // Update your state or perform any other necessary operations with the updated viewClient object
       } else {
@@ -305,7 +306,7 @@ const ViewOrder = () => {
                             {orderStatus=== "out for delivery"&& "Out for delivery" }
                             {orderStatus=== "delivered"&& "Delivered" }
                             {orderStatus=== "payment-released"&& "Payment Released" }
-                            {orderStatus=== "returned"&& "returned" }
+                            {orderStatus=== "returned"&& "Returned" }
                             {orderStatus=== "on hold artwork issue"&& "On hold -Artwork issue" }
                             {orderStatus=== "on hold billing issue"&& "On hold - Billing issue" }
                             {orderStatus=== "on hold out of stock"&& "On hold - Out of stock" }
