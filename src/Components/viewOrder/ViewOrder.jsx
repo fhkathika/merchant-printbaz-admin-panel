@@ -5,12 +5,15 @@ import Overlay from 'react-bootstrap/Overlay';
 import Tooltip from 'react-bootstrap/Tooltip';
 import Ticket from '../ticket/Ticket';
 import SendOrderStatusMail from '../sendOrderStatusMail/SendOrderStatusMail';
+import { Button } from 'react-bootstrap';
+import UpdateOrder from '../updateOrder/UpdateOrder';
 const ViewOrder = () => {
   const location = useLocation();
   const viewOrder = location.state ? location?.state?.orders : null;
   const viewClient = location.state?.matchingMerchant;
   const [orderStatus, setOrderStatus] = useState(viewOrder?.orderStatus);
   const [paymentStatus, setPaymentStatus] = useState(viewOrder?.paymentStatus);
+  const [updateOrder, setUpdateOrder] = useState(false);
 
   const [show, setShow] = useState(false);
   const target = useRef(null);
@@ -20,7 +23,7 @@ const ViewOrder = () => {
   
   let formattedDate = date.toLocaleDateString('en-US', options); // use toLocaleDateString to format the date
   
-  console.log(formattedDate); 
+  console.log("viewOrder",viewOrder); 
   
   const handleInputChange = async (e) => {
     const status = e.target.value; // the new status
@@ -30,8 +33,8 @@ const ViewOrder = () => {
     try {
       const response = await fetch(
         
-        `https://mserver.printbaz.com/updateOrderStatus/${viewOrder?._id}`,
-      // `http://localhost:5000/updateOrderStatus/${viewOrder?._id}`,
+        // `https://mserver.printbaz.com/updateOrderStatus/${viewOrder?._id}`,
+      `http://localhost:5000/updateOrderStatus/${viewOrder?._id}`,
         {
           method: "PUT",
           headers: {
@@ -91,6 +94,12 @@ const ViewOrder = () => {
       // Handle error here
     }
   };
+  const handleUpdatePopUp=(e)=>{
+    e.preventDefault()
+ 
+    setUpdateOrder(true)
+    console.log("setUpdateOrder",updateOrder);
+  }
   const getViewClientColor = (status) => {
     if (status === "Pending") {
       return "Orange";
@@ -219,10 +228,13 @@ const ViewOrder = () => {
         </nav>
           <div className="all-content">
             <div className="row">
-              <div className="col-lg-12 col-sm-12">
+              <div className="col-lg-12 col-sm-12 flex">
                 <div className="view-client-title my-3">
                   <Link to="/orderList"><span style={{fontSize: '30px'}}>
                       &lt; </span> View Order Details</Link>
+                </div> 
+                 <div className="view-client-title my-3">
+                <Button variant="success" onClick={handleUpdatePopUp}>Edit Order</Button>
                 </div>
               </div>
             </div>
@@ -676,7 +688,7 @@ const ViewOrder = () => {
                   </div>
                
                   <div className="row order-list-title">
-                    <div className="col-2">
+                    <div className="col-1">
                       <h4>Color</h4>
                     </div>
                     <div className="col-2">
@@ -694,6 +706,9 @@ const ViewOrder = () => {
                     <div className="col-2">
                       <h4>Picture</h4>
                     </div>
+                      <div className="col-1">
+                      <h4>BrandLogo</h4>
+                    </div>
                     {/* <div className="col-2">
                       <h4>Picture</h4>
                     </div> */}
@@ -701,7 +716,7 @@ const ViewOrder = () => {
                   {
                     viewOrder?.orderDetailArr?.map((orderDetail,orderIndex)=><>
                       <div className="row order-tab" key={orderIndex}>
-                    <div className="col-2">
+                    <div className="col-1">
                       <p>{orderDetail?.color}</p>
                     </div>
                     <div className="col-2">
@@ -764,12 +779,7 @@ const ViewOrder = () => {
   }
 </div>
 
-
-
-
-
-
-                    </div>
+</div>
                     <div className="col-lg-2">
                     <div className="card file">
   {
@@ -786,23 +796,7 @@ const ViewOrder = () => {
 
       return (
         <div key={imageUrl}>
-          {/* <ul className="file-options dropdown">
-            <a className="dropdown-toggle" href="#" data-bs-toggle="dropdown" aria-expanded="false">
-              <i className="material-icons">more_vert</i>
-            </a>
-            <ul className="dropdown-menu dropdown-menu-right">
-              <li>
-                <a className="dropdown-item" href="#">View Details</a>
-              </li>
-              <li>
-                <a className="dropdown-item" href={downloadUrl} download>Download</a>
-               
-              </li>
-              <li>
-                <a className="dropdown-item" href="#">Copy Link</a>
-              </li>
-            </ul>
-          </ul> */}
+        
           <div className="card-body file-info">
            
             <a className="dropdown-item" href={downloadUrl} download> <p>{imageUrl.substring(imageUrl.lastIndexOf('/') + 1)}</p></a>
@@ -812,6 +806,41 @@ const ViewOrder = () => {
       )
     })
   }
+</div>
+                    </div>
+                     <div className="col-lg-1">
+                    <div className="card file">
+                    {
+    (() => {
+     // Extract the file ID from the URL
+     let fileId = "";
+     if (orderDetail?.brandLogo.includes("/file/d/")) {
+       fileId = orderDetail?.brandLogo.split("/file/d/")[1].split("/")[0];
+     } else if (orderDetail?.brandLogo.includes("id=")) {
+       fileId = orderDetail?.brandLogo.split("id=")[1];
+     }
+     // Construct the direct download link
+     const downloadUrl = `https://drive.google.com/uc?export=download&id=${fileId}`;
+
+      return (
+        <div >
+        
+          <div className="card-body file-info">
+           {
+             orderDetail?.brandLogo ?
+             <a className="dropdown-item" href={downloadUrl} download> <p>{orderDetail?.brandLogo.substring(orderDetail?.brandLogo.lastIndexOf('/') + 1)}</p></a>
+             :
+             ""
+           }
+           
+          
+            {/* <span className="file-size">1009.2kb</span><br /> */}
+          </div>
+        </div>
+      )
+    })()
+  }
+
 </div>
                     </div>
                   </div>
@@ -887,6 +916,12 @@ const ViewOrder = () => {
               </div>
             </div>
           </div>
+          {
+            updateOrder===true &&
+            <UpdateOrder onClose={() => setUpdateOrder(false)}
+            viewOrder={viewOrder}
+            viewClient={viewClient}/>
+          }
         </div>
     );
 };
