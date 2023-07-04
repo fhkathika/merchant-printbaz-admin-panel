@@ -7,16 +7,17 @@ import { Button, Form, OverlayTrigger, ProgressBar, Spinner, Tooltip } from 'rea
 import { useLocation, useNavigate } from 'react-router-dom';
 import { useGetData } from '../../hooks/useGetData';
 import teeShirtFormula from '../../Formulas/teeShirtFormula';
+import AlertMessage from '../alert/AlertMessage';
+import OrderUpdateAlert from '../alert/OrderUpdateAlert';
 
 const UpdateOrder = ({ onClose,viewOrder,viewClient }) => {
-    console.log("viewOrder",viewOrder?._id);
+    console.log("viewOrder",viewOrder);
 
    const ordersArray = viewOrder?.orderDetailArr?.map(order => {
-    console.log("order", order);
+   
     return order;
 });
 
-console.log(ordersArray);
 let  individualOrder
 if(ordersArray){
     for(let i=0;i<ordersArray.length;i++){
@@ -24,16 +25,27 @@ if(ordersArray){
     }
 }
 const filesArr=individualOrder?.file?.map(singleFile=>{
-    console.log("singleFile",singleFile);
+  
     return singleFile
 })
-console.log("filesArr",filesArr);
+const ImagesArr=individualOrder?.image?.map(singleImage=>{
+  
+    return singleImage
+})
 let individualFile;
 if(filesArr){
     for(let i=0;i<filesArr.length;i++){
         individualFile=filesArr[i]
     }
 }
+let individualImage;
+if(ImagesArr){
+    for(let i=0;i<ImagesArr.length;i++){
+      individualImage=ImagesArr[i]
+    }
+}
+console.log("individualFile",individualFile);
+console.log("individualImage",individualImage);
    const [formData, setFormData] = useState({
         name: viewOrder?.name,
         phone: viewOrder?.phone,
@@ -49,8 +61,9 @@ if(filesArr){
             printSide:individualOrder?.printSide,
             printSize: individualOrder?.printSize,
             printSizeBack:individualOrder?.printSizeBack,
-            file: null,
-            image: null,
+            
+            file: individualOrder?.file?.length > 0 ? individualOrder.file : [],
+            image: individualOrder?.image?.length > 0 ? individualOrder.image : [],
             brandLogo: individualOrder?.brandLogo,
           },
         ],
@@ -62,7 +75,6 @@ if(filesArr){
        const [fileprogress, setFileProgress] = useState(0);
        const [imageprogress, setImageProgress] = useState(0);
        const [showAlert, setShowAlert] = useState(false);
-       const [loading, setLoading] = useState(false);
        const [dbData, setDbData] = useState({});
        const [printSide, setPrintSide] = useState('');
        const [addbrandLogo, setAddBrandLogo] = useState('');
@@ -78,7 +90,7 @@ if(filesArr){
       const [recvAmount,setRecvAmount]=useState()
       const [formValid, setFormValid] = useState(false);
     
-    
+    console.log("individualOrder?.image",individualOrder?.image);
       const d = new Date();
         const options = { month: "long", day: "numeric", year: "numeric" };
         const formattedDate = d.toLocaleDateString("en-US", options);
@@ -138,19 +150,46 @@ if(filesArr){
           }
         } 
        
+      // const handleFileChange = (event, index) => {
+      //   const { name, files } = event.target;
+      //   if (name==="file" || name==="image") {
+      //     // const fieldName = name.split('.')[1];
+      //     const newOrderDetailArr = [...formData.orderDetailArr];
+      //      // Change from a single file to an array of files
+      //     newOrderDetailArr[index][[event.target.name]] =Array.from(files);
+      //     setFormData({ ...formData, orderDetailArr: newOrderDetailArr });
+      //     console.log('Updated Order State:', formData);
+      //     setFile(files)
+      //     console.log('File:', files); // Log the file object
+      //   }
+      // };
       const handleFileChange = (event, index) => {
         const { name, files } = event.target;
-        if (name==="file" || name==="image") {
-          // const fieldName = name.split('.')[1];
+        if ((name === "file" || name === "image") && files.length > 0) {
           const newOrderDetailArr = [...formData.orderDetailArr];
-           // Change from a single file to an array of files
-          newOrderDetailArr[index][[event.target.name]] =Array.from(files);
+          // Concatenate new files or images with the existing ones
+          newOrderDetailArr[index][name] = [...newOrderDetailArr[index][name], ...Array.from(files)];
           setFormData({ ...formData, orderDetailArr: newOrderDetailArr });
-          console.log('Updated Order State:', formData);
-          setFile(files)
-          console.log('File:', files); // Log the file object
         }
       };
+    
+      
+      console.log("setFormData",formData);
+
+      // const handleFileChange = (file, index) => {
+      //   const name = "file"; // Assuming the name is always "file" in this case
+      //   const files = Array.isArray(file) ? file : [file]; // Convert singleFile to an array if necessary
+        
+      //   const newOrderDetailArr = [...formData.orderDetailArr];
+      //   newOrderDetailArr[index][name] = files;
+        
+      //   setFormData({ ...formData, orderDetailArr: newOrderDetailArr });
+      //   console.log('Updated Order State:', formData);
+        
+      //   setFile(files);
+      //   console.log('File:', files); // Log the file array
+      // };
+      
 
     let updatedPrintbazcost=0
       let printbazcost=0;
@@ -270,7 +309,7 @@ if(filesArr){
         for  (var j = 0; j < formData?.orderDetailArr?.length; j++) {
           QuantityBase=Number( formData?.orderDetailArr[j]?.quantity)
           totalQuantity =Number(QuantityBase+totalQuantity)
-         console.log("testQuantity",totalQuantity);
+        
        
         if (formData?.orderDetailArr[j]?.quantity > 0) {
           // Calculate the number of groups of 5 items in the order
@@ -344,30 +383,37 @@ if(filesArr){
        
         const handleUpdate = async (e) => {
             e.preventDefault()
+            setIsLoading(true)
+            // Validate the form here
+            if (validateForm()) {
+              setIsLoading(false) // Set loading status to false if form is invalid
+              return; // Exit the function if form is invalid
+            }
             try {
               const formData2 = new FormData();
               const orderDetailArr = formData.orderDetailArr || [];
               const filesAndImagesArr = [];
-          
+          console.log("formData.orderDetailArr",formData.orderDetailArr);
               orderDetailArr?.forEach((item, index) => {
                 const fileAndImageData = {};
-          
-                if (item.file) {
+               // Only append 'file' and 'image' fields if they have been updated:
+                if (item.file && item.file.length > 0) {
+                  console.log("item.file.length",item.file.length);
                   item.file.forEach((file, fileIndex) => {
                     formData2.append(`file${index}_${fileIndex}`, file); // Append each file
                   });
                 }
           
-                if (item.image) {
+                if (item.image && item.image.length > 0) {
                   item.image.forEach((image, imageIndex) => {
                     formData2.append(`image${index}_${imageIndex}`, image); // Append each image
                   });
                 }
           
                 // Append brandLogo
-                if (item.brandLogo) {
+                if (item.brandLogo && item.brandLogo.length > 0) {
                   formData2.append(`brandLogo${index}`, item.brandLogo);
-                }
+              }
           
                 if (Object.keys(fileAndImageData).length) {
                   filesAndImagesArr.push(fileAndImageData);
@@ -381,11 +427,14 @@ if(filesArr){
           
                 return item;
               });
-          
+           // Only append 'orderDetailArr' if it has been updated:
+    if (orderDetailArr.length > 0) {
+      formData2.append('orderDetailArr', JSON.stringify(orderDetailArr));
+    }
               formData2.append('filesAndImages', JSON.stringify(filesAndImagesArr)); // Append the filesAndImagesArr as a JSON string
           
               // Append the remaining form data
-              formData2.append('orderDetailArr', JSON.stringify(orderDetailArr));
+              // formData2.append('orderDetailArr', JSON.stringify(orderDetailArr));
               formData2.append('name', formData.name);
               formData2.append('phone', formData.phone);
               formData2.append('address', formData.address);
@@ -396,8 +445,8 @@ if(filesArr){
               formData2.append('deliveryFee', deliveryFee);
               formData2.append('recvMoney', recvMoney);
               formData2.append('userMail', viewClient?.email);
-          
-            //   const response = await fetch(`https://mserver.printbaz.com/updateorder/${viewOrder?._id}`, {
+         
+              // const response = await fetch(`https://mserver.printbaz.com/updateorder/${viewOrder?._id}`, {
               const response = await fetch(`http://localhost:5000/updateorder/${viewOrder?._id}`, {
                 method: "PUT",
                 body: formData2,
@@ -406,6 +455,8 @@ if(filesArr){
               if (response.ok) {
                 const result = await response.json();
                 console.log("Success:", result);
+                console.log('API response:', response);
+             
                 setShowAlert(true);
               } else {
                 throw new Error('API error: ' + response.status);
@@ -413,7 +464,11 @@ if(filesArr){
             } catch (error) {
               console.error('API error:', error.message);
             }
+            finally {
+              setIsLoading(false); // Set loading status to false
+            }
           };
+         
           
   return (
     <>
@@ -703,41 +758,50 @@ if(filesArr){
                      
                     }
                    
-                    <Form.Group controlId="formFile" className="mb-3">
-                      <Form.Label>Upload Main File</Form.Label>
-                      {
-                         individualOrder?.file?.map(singleFile=>{
-                            const fileId = singleFile.split('/d/')[1].split('/view')[0];
-                            const previewURL = `https://drive.google.com/file/d/${fileId}/preview`;
-                            return (
-                                <div style={{position:"relative"}}>
-                                {/* <iframe src={file}    style={{
-                        position: "absolute",
-                       top: 0,
-                        left: 0,
-                        width: "100%",
-                        height: "auto",
-                        pointerEvents: "none",
-                        border: "none",
-                      }} title="uni"></iframe> */}
-<Form.Control
-                        type="file"
-                        name="file"
-                       style={{height:"150px",width:"100%"}}
-                        onChange={(e) => handleFileChange(e, index)} 
-                        required
-                        accept=".ai,.eps,.psd,.pdf,.svg,.png"
-                        multiple
-                      />
-                                </div>
-                            )
-                          }
-                          ) }
-                      
-                  
-                      
-                      <span style={{color:"gray"}}>upload .ai,.eps,.psd,.pdf,.svg,.png file</span>
-                    </Form.Group>
+          {/* ///upload file section  */}
+          <Form.Group controlId="formFile" className="mb-3">
+  <Form.Label>Upload Main File</Form.Label>
+  {
+    individualOrder?.file?.map((singleFile, fileIndex) => {
+      const fileId = singleFile.split('/d/')[1].split('/view')[0];
+      const previewURL = `https://drive.google.com/file/d/${fileId}/preview`;
+      return (
+        <div style={{ position: "relative" }} key={fileIndex}>
+          <iframe
+            src={previewURL}
+            style={{
+              position: "absolute",
+              top: 0,
+              left: 0,
+              width: "100%",
+              height: "auto",
+              pointerEvents: "none",
+              border: "none",
+            }}
+            title="uni"
+          ></iframe>
+          <Form.Control
+            type="file"
+            name="file"
+            style={{ height: "150px", width: "100%" }}
+            onChange={(e) => {
+              if (e.target.files.length > 0) {
+                handleFileChange(e, fileIndex)
+              }
+            }}
+            accept=".ai,.eps,.psd,.pdf,.svg,.png"
+            multiple
+          />
+        </div>
+      );
+    })
+  }
+  
+  <span style={{ color: "gray" }}>upload .ai, .eps,.psd,.pdf,.svg, .png file</span>
+</Form.Group>
+
+
+
                     {fileprogress === 0 ? null : (
          <ProgressBar now={fileprogress} label={`${fileprogress}%`} />
           )}
@@ -764,7 +828,7 @@ if(filesArr){
                         type="file"
                         name="image"
                         style={{opacity:0,height:"150px",width:"100%"}}
-                        required
+                       
                         accept="image/*"
                         onChange={(e) => handleFileChange(e, index)}
                         multiple
@@ -820,7 +884,6 @@ if(filesArr){
  
   
 </Form.Group>
-
          
                      </>
                      ))}
@@ -908,7 +971,7 @@ if(filesArr){
                       <div className="row mt-5">
                   <div className="col-12">
                     <Button type="submit" style={{ backgroundColor: "#124" }}>
-                      Submit
+                      Update
                     </Button>
       
                     <Button
@@ -940,6 +1003,21 @@ if(filesArr){
       
               
               </Form>
+              {showAlert===true && (
+          
+          <OrderUpdateAlert
+          message="Your order has been updated successfully."
+          onClose={() => setShowAlert(false)}
+       
+          
+          
+          />
+          
+          
+          )
+          
+          
+          }
       </div>
   
     </>
