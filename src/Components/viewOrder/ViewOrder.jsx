@@ -741,10 +741,10 @@ const ViewOrder = () => {
     orderDetail?.file?.map((fileUrl,fileIndex) => {
      // Extract the file ID from the URL
      let fileId = "";
-     if (fileUrl.includes("/file/d/")) {
-       fileId = fileUrl.split("/file/d/")[1].split("/")[0];
-     } else if (fileUrl.includes("id=")) {
-       fileId = fileUrl.split("id=")[1];
+     if (fileUrl?.includes("/file/d/")) {
+       fileId = fileUrl?.split("/file/d/")[1]?.split("/")[0];
+     } else if (fileUrl?.includes("id=")) {
+       fileId = fileUrl?.split("id=")[1];
      }
      // Construct the direct download link
      const downloadUrl = `https://drive.google.com/uc?export=download&id=${fileId}`;
@@ -814,10 +814,10 @@ const ViewOrder = () => {
     (() => {
      // Extract the file ID from the URL
      let fileId = "";
-     if (orderDetail?.brandLogo.includes("/file/d/")) {
-       fileId = orderDetail?.brandLogo.split("/file/d/")[1].split("/")[0];
-     } else if (orderDetail?.brandLogo.includes("id=")) {
-       fileId = orderDetail?.brandLogo.split("id=")[1];
+     if (orderDetail?.brandLogo?.includes("/file/d/")) {
+       fileId = orderDetail?.brandLogo?.split("/file/d/")[1].split("/")[0];
+     } else if (orderDetail?.brandLogo?.includes("id=")) {
+       fileId = orderDetail?.brandLogo?.split("id=")[1];
      }
      // Construct the direct download link
      const downloadUrl = `https://drive.google.com/uc?export=download&id=${fileId}`;
