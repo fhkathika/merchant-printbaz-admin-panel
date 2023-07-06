@@ -155,18 +155,33 @@ console.log("individualImage",individualImage);
           }
         } 
         const handleFileChange = (event, orderIndex, fileIndex) => {
+          console.log("orderIndex", orderIndex);
+          console.log("fileIndex", fileIndex);
           const { name, files } = event.target;
-          if ((name === "file" || name === "image") && files.length > 0) {
-            const newOrderDetailArr = [...formData?.orderDetailArr];
-            console.log("newOrderDetailArr",newOrderDetailArr);
-            if (!newOrderDetailArr[orderIndex]) {
-              newOrderDetailArr[orderIndex] = {};
-            }
-            // Replace the file at the specific index with the new file
-            newOrderDetailArr[orderIndex].file[fileIndex] = files[0];
-            setFormData({ ...formData, orderDetailArr: newOrderDetailArr });
+      
+          if (files.length > 0) {
+              setFormData(prevState => {
+                  const newOrderDetailArr = prevState.orderDetailArr.map((item, index) => {
+                      if (index === orderIndex) {
+                          let updatedFilesOrImages;
+                          if (name === "file") {
+                              updatedFilesOrImages = [...item.file]; // Create a copy of the file array
+                              updatedFilesOrImages[fileIndex] = files[0]; // Update the file at the specified index
+                              return { ...item, file: updatedFilesOrImages }; // Update the file array in the item
+                          } else if (name === "image") {
+                              updatedFilesOrImages = [...item.image]; // Create a copy of the image array
+                              updatedFilesOrImages[fileIndex] = files[0]; // Update the image at the specified index
+                              return { ...item, image: updatedFilesOrImages }; // Update the image array in the item
+                          }
+                      }
+                      return item;
+                  });
+                  return { ...prevState, orderDetailArr: newOrderDetailArr }; // Update the orderDetailArr in the formData state
+              });
           }
-        };
+      };
+      
+        
         
         
         
@@ -414,12 +429,16 @@ console.log("individualImage",individualImage);
               orderDetailArr?.forEach((item, index) => {
                 const fileAndImageData = {};
                // Only append 'file' and 'image' fields if they have been updated:
-                if (item.file && item.file.length > 0) {
-                  console.log("item.file.length",item.file.length);
-                  item.file.forEach((file, fileIndex) => {
+               if (item.file && item.file.length > 0) {
+                console.log("item.file.length",item.file.length);
+                item.file.forEach((file, fileIndex) => {
+                  if (file instanceof File) {
                     formData2.append(`file${index}_${fileIndex}`, file); // Append each file
-                  });
-                }
+                  } else {
+                    console.error(`item.file[${fileIndex}] is not a File object:`, file);
+                  }
+                });
+              }
           
                 if (item.image && item.image.length > 0) {
                   item.image.forEach((image, imageIndex) => {
@@ -428,7 +447,8 @@ console.log("individualImage",individualImage);
                 }
           
                 // Append brandLogo
-                if (item.brandLogo && item.brandLogo.length > 0) {
+                if (item.brandLogo ) {
+                  console.log("item.brandLogo",item.brandLogo);
                   formData2.append(`brandLogo${index}`, item.brandLogo);
               }
           
@@ -618,11 +638,7 @@ console.log("individualImage",individualImage);
                     {formData.orderDetailArr.map((item, index) => (
                       <>
                       
-                  
-                     
-                     
-                     
-                    <Form.Group
+                  <Form.Group
                       className="mb-3 Print Side w-100 m-auto"
                       controlId="wccalcPrintSide"
                     >
@@ -778,36 +794,68 @@ console.log("individualImage",individualImage);
           {/* ///upload file section  */}
           <Form.Group controlId="formFile" className="mb-3">
   <Form.Label>Upload Main File</Form.Label>
-  {formData.orderDetailArr[0]?.file?.map((singleFile, fileIndex) => {
+  {item?.file?.map((singleFile, fileIndex) => {
     let fileId, filePreviewURL;
     if (typeof singleFile === 'string') { // singleFile is a URL string
       fileId = singleFile?.split('/d/')[1].split('/view')[0];
       filePreviewURL =`https://drive.google.com/file/d/${fileId}/preview`;
     } else if (singleFile instanceof File) { // singleFile is a file object
       filePreviewURL = URL.createObjectURL(singleFile);
+      
     }
 
     return (
-      <div style={{ position: "relative", marginBottom: "5px" }} >
-        <iframe
+      <div style={{ position: "relative", marginBottom: "5px", height: "150px", width: "100%"  }} key={fileIndex} >
+      
+      
+          <iframe
           src={filePreviewURL}
           style={{
             position: "absolute",
-            top: "50%",
-            left: "50%",
-            transform: "translate(-50%, -50%)",
+            top: 0,
+            left: 0,
             width: "100%",
-            height: "auto",
-            pointerEvents: "none",
+            height: "100%",
+            // pointerEvents: "none",
             border: "none",
           }}
           title={`file-${fileIndex}`}
         ></iframe>
+      
+    
+         <label 
+    htmlFor={`fileInput-${fileIndex}`} 
+    style={{ 
+      position: "absolute", 
+      top: "50%", 
+      left: "50%", 
+      transform: "translate(-50%, -50%)",  
+      cursor: "pointer", 
+      width: "50%", 
+      height: "40px", 
+      display: "flex", 
+      justifyContent: "center", 
+      alignItems: "center", 
+      color: "black",
+      textAlign: "center",
+      transition: "background-color 0.2s"
+    }}
+    onMouseOver={(e) => {
+      e.target.innerHTML = "Choose file"
+      e.target.style.backgroundColor = "rgba(255,255,255,0.8)"
+    }}
+    onMouseOut={(e) => {
+      e.target.innerHTML = ""
+      e.target.style.backgroundColor = "transparent"
+    }}
+  >
+  </label>
         <Form.Control
           type="file"
           name="file"
-          style={{ height: "150px", width: "100%" }}
-          onChange={(e) => handleFileChange(e,0,fileIndex)} // Pass the correct index
+          id={`fileInput-${fileIndex}`}
+          style={{ display: "none" }}
+          onChange={(e) => handleFileChange(e, index, fileIndex)}// Pass the correct index
           accept=".ai,.eps,.psd,.pdf,.svg,.png"
           multiple
         />
@@ -830,13 +878,19 @@ console.log("individualImage",individualImage);
                     <Form.Group controlId="formFile" className="mb-3">
                       <Form.Label>Upload Mockup/T-Shirt Demo Picture</Form.Label>
                       {
-                            individualOrder?.image?.map((singleImage,imageIndex)=>{
-                                const fileId = singleImage.split('/d/')[1].split('/view')[0];
-                                const previewURL = `https://drive.google.com/file/d/${fileId}/preview`;
+                           item?.image?.map((singleImage,imageIndex)=>{
+                            let fileId, imagePreviewURL;
+                            if (typeof singleImage === 'string') { // singleFile is a URL string
+                              fileId = singleImage?.split('/d/')[1].split('/view')[0];
+                              imagePreviewURL =`https://drive.google.com/file/d/${fileId}/preview`;
+                            } else if (singleImage instanceof File) { // singleFile is a file object
+                             imagePreviewURL = URL.createObjectURL(singleImage);
+                            }
+                              
                             return(
-                                <div style={{ position: "relative", marginBottom: "5px", height: "150px", width: "100%" }} >
+                                <div style={{ position: "relative", marginBottom: "5px", height: "150px", width: "100%" }} key={imageIndex}>
      <iframe
-    src={previewURL}
+    src={imagePreviewURL}
     style={{
       position: "absolute",
       top: 0,
@@ -879,11 +933,7 @@ console.log("individualImage",individualImage);
                         id={`fileInput-${imageIndex}`}
                         name="image"
                         style={{ display: "none" }}
-                        onChange={(e) => {
-                          if (e.target.files.length > 0) {
-                            handleFileChange(e)
-                          }
-                        }}
+                        onChange={(e) => handleFileChange(e, index, imageIndex)}
                        
                         accept="image/*"
                         multiple
@@ -902,12 +952,19 @@ console.log("individualImage",individualImage);
 <Form.Group controlId="formBrandLogo" className="mb-3">
   <Form.Label>Upload Your Brand Logo (optional)</Form.Label>
   {  (() => {
-      const fileId = individualOrder?.brandLogo?.split('/d/')[1].split('/view')[0];
-      const previewURL = `https://drive.google.com/file/d/${fileId}/preview`;
+        let fileId, brandLogoPreviewURL;
+     if (typeof item?.brandLogo === 'string') { // singleFile is a URL string
+      fileId = item?.brandLogo?.split('/d/')[1].split('/view')[0];
+      brandLogoPreviewURL =`https://drive.google.com/file/d/${fileId}/preview`;
+    } else  { // singleFile is a file object
+      brandLogoPreviewURL = URL.createObjectURL(item?.brandLogo);
+    }
+      // const fileId = item?.brandLogo?.split('/d/')[1].split('/view')[0];
+      // const previewURL = `https://drive.google.com/file/d/${fileId}/preview`;
         
       return (
         <div style={{ position: "relative"}}>
-            <iframe src={previewURL}    style={{
+            <iframe src={brandLogoPreviewURL}    style={{
               position: "absolute",
              top: 0,
               left: 0,
