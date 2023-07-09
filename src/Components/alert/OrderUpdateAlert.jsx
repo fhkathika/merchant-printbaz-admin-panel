@@ -7,16 +7,16 @@ const OrderUpdateAlert = ({ message, onClose }) => {
   useEffect(() => {
     const timeoutId = setTimeout(() => {
       onClose();
-    }, 4000); // Hide the alert box after 3 seconds
+    }, 2000); // Hide the alert box after 1 seconds
 
     return () => clearTimeout(timeoutId);
-  }, [onClose]);
+  }, []);
 
   return (
     <>
       <div className="" onClick={onClose} />
       <div className="alert-box">
-        <img src='/images/checked.png' alt='alert message'/>
+        <img style={{height:"30px",width:'30px'}} src='/images/checked.png' alt='alert message'/>
         <h2>{message}</h2>
       </div>
     </>

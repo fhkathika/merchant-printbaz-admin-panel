@@ -10,16 +10,29 @@ import teeShirtFormula from '../../Formulas/teeShirtFormula';
 import AlertMessage from '../alert/AlertMessage';
 import OrderUpdateAlert from '../alert/OrderUpdateAlert';
 
-const UpdateOrder = ({ onClose,viewOrder,viewClient }) => {
+const UpdateOrder = ({ onClose,viewOrder,viewClient,getSpecificOrderById }) => {
     console.log("viewOrder",viewOrder);
     const [selectedFile, setSelectedFile] = useState(null);
     const [previewUrl, setPreviewUrl] = useState('');
-   const ordersArray = viewOrder?.orderDetailArr?.map(order => {
+    console.log("getSpecificOrderById",getSpecificOrderById);
+   const ordersArray = getSpecificOrderById?.orderDetailArr?.map(order => {
    
     return order;
 });
+// useEffect(()=>{
+//   const getOrderById=async()=>{
+//     // Fetch the updated order details
+// await fetch(`https://mserver.printbaz.com/getorder/${viewOrder?._id}`)
+// // await fetch(`http://localhost:5000/getorder/${viewOrder?._id}`)
+// .then(res=>res.json())
+// .then(data => setGetSpecificOrderById(data))
 
 
+// }
+// getOrderById()
+// },[getSpecificOrderById])
+ 
+   
 let  individualOrder
 if(ordersArray){
     for(let i=0;i<ordersArray.length;i++){
@@ -49,12 +62,12 @@ if(ImagesArr){
 console.log("individualFile",individualFile);
 console.log("individualImage",individualImage);
    const [formData, setFormData] = useState({
-        name: viewOrder?.name,
-        phone: viewOrder?.phone,
-        address: viewOrder?.address,
-        instruction: viewOrder?.instruction,
-        collectAmount: viewOrder?.collectAmount,
-        area: viewOrder?.area,
+        name: getSpecificOrderById?.name,
+        phone: getSpecificOrderById?.phone,
+        address: getSpecificOrderById?.address,
+        instruction: getSpecificOrderById?.instruction,
+        collectAmount: getSpecificOrderById?.collectAmount,
+        area: getSpecificOrderById?.area,
         orderDetailArr: [
           {
             color: individualOrder?.color,
@@ -158,7 +171,7 @@ console.log("individualImage",individualImage);
           console.log("orderIndex", orderIndex);
           console.log("fileIndex", fileIndex);
           const { name, files } = event.target;
-      
+          console.log("name",name);
           if (files.length > 0) {
               setFormData(prevState => {
                   const newOrderDetailArr = prevState.orderDetailArr.map((item, index) => {
@@ -182,28 +195,7 @@ console.log("individualImage",individualImage);
       };
       
         
-        
-        
-        
-      console.log("selectedfile",selectedFile);
-      // const handleFileChange = (event, index) => {
-      //   const { name, files } = event.target;
-      //   if (name === "file" || name === "image") {
-      //     setFormData((prevState) => {
-      //       const newOrderDetailArr = [...prevState.orderDetailArr];
-      //       if (!newOrderDetailArr[index]) {
-      //         newOrderDetailArr[index] = {};
-      //       }
-      //       newOrderDetailArr[index][event.target.name] = Array.from(files);
-      //       return { ...prevState, orderDetailArr: newOrderDetailArr };
-      //     });
-      //     console.log('File:', files); // Log the file object
-      //   }
-      // };
-      
-      
-      
-      
+   
     
   
       console.log("setFormData",formData);
@@ -483,8 +475,8 @@ console.log("individualImage",individualImage);
               formData2.append('recvMoney', recvMoney);
               formData2.append('userMail', viewClient?.email);
          
-              // const response = await fetch(`https://mserver.printbaz.com/updateorder/${viewOrder?._id}`, {
-              const response = await fetch(`http://localhost:5000/updateorder/${viewOrder?._id}`, {
+              const response = await fetch(`https://mserver.printbaz.com/updateorder/${viewOrder?._id}`, {
+              // const response = await fetch(`http://localhost:5000/updateorder/${viewOrder?._id}`, {
                 method: "PUT",
                 body: formData2,
               });
@@ -493,7 +485,17 @@ console.log("individualImage",individualImage);
                 const result = await response.json();
                 console.log("Success:", result);
                 console.log('API response:', response);
-             
+            
+             // Fetch the updated order details
+  const orderResponse = await fetch(`https://mserver.printbaz.com/getorder/${viewOrder?._id}`);
+  // const orderResponse = await fetch(`http://localhost:5000/getorder/${viewOrder?._id}`);
+  if (orderResponse.ok) {
+    const updatedOrder = await orderResponse.json();
+    console.log('Updated order:', updatedOrder);
+  } else {
+    throw new Error('Order fetch error: ' + orderResponse.status);
+  }
+
                 setShowAlert(true);
               } else {
                 throw new Error('API error: ' + response.status);
@@ -792,38 +794,40 @@ console.log("individualImage",individualImage);
                     }
                    
           {/* ///upload file section  */}
-          <Form.Group controlId="formFile" className="mb-3">
+          <Form.Group controlId="formFile" className="">
   <Form.Label>Upload Main File</Form.Label>
   {item?.file?.map((singleFile, fileIndex) => {
-    let fileId, filePreviewURL;
+    let fileId, filePreviewURLDrive,filePreviewURL;
     if (typeof singleFile === 'string') { // singleFile is a URL string
       fileId = singleFile?.split('/d/')[1].split('/view')[0];
       filePreviewURL =`https://drive.google.com/file/d/${fileId}/preview`;
     } else if (singleFile instanceof File) { // singleFile is a file object
       filePreviewURL = URL.createObjectURL(singleFile);
-      
+    
     }
 
     return (
-      <div style={{ position: "relative", marginBottom: "5px", height: "150px", width: "100%"  }} key={fileIndex} >
+      <div style={{ marginBottom:"55px", height: "150px", width: "100%"  }} key={fileIndex} >
       
-      
-          <iframe
-          src={filePreviewURL}
-          style={{
-            position: "absolute",
-            top: 0,
-            left: 0,
-            width: "100%",
-            height: "100%",
-            // pointerEvents: "none",
-            border: "none",
-          }}
-          title={`file-${fileIndex}`}
-        ></iframe>
-      
+     
+        <iframe
+        src={filePreviewURL}
+        style={{
+        
+          width: "100%",
+          height: "100%",
+          overflow:"auto",
+          // marginBottom:'10px',
+        //  pointerEvents: "none",
+          border: "none",
+        }}
+        title={`file-${fileIndex}`}
+      ></iframe>
+     
     
-         <label 
+     
+  
+        {/* <label 
     htmlFor={`fileInput-${fileIndex}`} 
     style={{ 
       position: "absolute", 
@@ -849,12 +853,14 @@ console.log("individualImage",individualImage);
       e.target.style.backgroundColor = "transparent"
     }}
   >
-  </label>
+  </label> */}
+
         <Form.Control
           type="file"
           name="file"
           id={`fileInput-${fileIndex}`}
-          style={{ display: "none" }}
+         
+          style={{position:"absolute",height:"45px",display:"" }}
           onChange={(e) => handleFileChange(e, index, fileIndex)}// Pass the correct index
           accept=".ai,.eps,.psd,.pdf,.svg,.png"
           multiple
@@ -873,9 +879,9 @@ console.log("individualImage",individualImage);
                     {fileprogress === 0 ? null : (
          <ProgressBar now={fileprogress} label={`${fileprogress}%`} />
           )}
-         
+         {/* image upload  */}
                     
-                    <Form.Group controlId="formFile" className="mb-3">
+                    <Form.Group controlId="formFileImage" className="mb-3">
                       <Form.Label>Upload Mockup/T-Shirt Demo Picture</Form.Label>
                       {
                            item?.image?.map((singleImage,imageIndex)=>{
@@ -899,10 +905,10 @@ console.log("individualImage",individualImage);
       height: "100%",
       border: "none",
     }}
-    title="uni"
+    title={`image-${imageIndex}`}
   ></iframe>
     <label 
-    htmlFor={`fileInput-${imageIndex}`} 
+    htmlFor={`imageInput-${imageIndex}`} 
     style={{ 
       position: "absolute", 
       top: "50%", 
@@ -930,7 +936,7 @@ console.log("individualImage",individualImage);
   </label>
                            <Form.Control
                         type="file"
-                        id={`fileInput-${imageIndex}`}
+                        id={`imageInput-${imageIndex}`}
                         name="image"
                         style={{ display: "none" }}
                         onChange={(e) => handleFileChange(e, index, imageIndex)}
@@ -963,21 +969,48 @@ console.log("individualImage",individualImage);
       // const previewURL = `https://drive.google.com/file/d/${fileId}/preview`;
         
       return (
-        <div style={{ position: "relative"}}>
+        <div style={{ position: "relative", marginBottom: "5px", height: "150px", width: "100%" }}>
             <iframe src={brandLogoPreviewURL}    style={{
               position: "absolute",
-             top: 0,
+              top: 0,
               left: 0,
               width: "100%",
-              height: "100px",
-              pointerEvents: "none",
+              height: "100%",
               border: "none",
           
-            }} title="uni"></iframe>
+            }} title="update brandlogo"></iframe>
+            <label 
+    htmlFor={`brandlogo-${item?.brandLogo}`} 
+    style={{ 
+      position: "absolute", 
+      top: "50%", 
+      left: "50%", 
+      transform: "translate(-50%, -50%)",  
+      cursor: "pointer", 
+      width: "50%", 
+      height: "40px", 
+      display: "flex", 
+      justifyContent: "center", 
+      alignItems: "center", 
+      color: "black",
+      textAlign: "center",
+      transition: "background-color 0.2s"
+    }}
+    onMouseOver={(e) => {
+      e.target.innerHTML = "Choose file"
+      e.target.style.backgroundColor = "rgba(255,255,255,0.8)"
+    }}
+    onMouseOut={(e) => {
+      e.target.innerHTML = ""
+      e.target.style.backgroundColor = "transparent"
+    }}
+  >
+  </label>
             <Form.Control
-            style={{opacity:0,width:"100%",height:"100px"}}
     type="file"
+    id={`brandlogo-${item?.brandLogo}`}
     name="brandLogo"
+    style={{ display: "none" }}
     accept="image/jpeg, image/png"
     onChange={(e) => {
       const orderDetailArrCopy = [...formData.orderDetailArr];

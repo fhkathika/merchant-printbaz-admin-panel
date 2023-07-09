@@ -1,4 +1,4 @@
-import React, { useState,useRef } from 'react';
+import React, { useState,useRef, useEffect } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import TabForViewOrder from '../tabForViewOrder.jsx/TabForViewOrder';
 import Overlay from 'react-bootstrap/Overlay';
@@ -14,6 +14,7 @@ const ViewOrder = () => {
   const [orderStatus, setOrderStatus] = useState(viewOrder?.orderStatus);
   const [paymentStatus, setPaymentStatus] = useState(viewOrder?.paymentStatus);
   const [updateOrder, setUpdateOrder] = useState(false);
+  const [getSpecificOrderById, setGetSpecificOrderById] = useState();
 
   const [show, setShow] = useState(false);
   const target = useRef(null);
@@ -24,7 +25,19 @@ const ViewOrder = () => {
   let formattedDate = date.toLocaleDateString('en-US', options); // use toLocaleDateString to format the date
   
   console.log("viewOrder",viewOrder); 
-  
+  useEffect(()=>{
+    const getOrderById=async()=>{
+             // Fetch the updated order details
+    await fetch(`https://mserver.printbaz.com/getorder/${viewOrder?._id}`)
+    // await fetch(`http://localhost:5000/getorder/${viewOrder?._id}`)
+    .then(res=>res.json())
+    .then(data => setGetSpecificOrderById(data))
+      
+    
+         }
+         getOrderById()
+        },[getSpecificOrderById])
+    
   const handleInputChange = async (e) => {
     const status = e.target.value; // the new status
   console.log("status",status);
@@ -33,8 +46,8 @@ const ViewOrder = () => {
     try {
       const response = await fetch(
         
-        // `https://mserver.printbaz.com/updateOrderStatus/${viewOrder?._id}`,
-      `http://localhost:5000/updateOrderStatus/${viewOrder?._id}`,
+        `https://mserver.printbaz.com/updateOrderStatus/${viewOrder?._id}`,
+      // `http://localhost:5000/updateOrderStatus/${viewOrder?._id}`,
         {
           method: "PUT",
           headers: {
@@ -96,7 +109,7 @@ const ViewOrder = () => {
   };
   const handleUpdatePopUp=(e)=>{
     e.preventDefault()
- 
+
     setUpdateOrder(true)
     console.log("setUpdateOrder",updateOrder);
   }
@@ -626,15 +639,15 @@ const ViewOrder = () => {
                     </div>
                     <div className="col-md-6 col-sm-12">
                       <h5>Name</h5>
-                      <p>{viewOrder?.name}</p>
+                      <p>{getSpecificOrderById?.name}</p>
                     </div>
                     <div className="col-md-6 col-sm-12">
                       <h5>Phone</h5>
-                      <p>{viewOrder?.phone}</p>
+                      <p>{getSpecificOrderById?.phone}</p>
                     </div>
                     <div className="col-12">
                       <h5>Address</h5>
-                      <p>{viewOrder?.address}</p>
+                      <p>{getSpecificOrderById?.address}</p>
                     </div>
                   </div>
                 </div>
@@ -645,15 +658,15 @@ const ViewOrder = () => {
                     <div className="col-12">
                       <h3 className="all-title">Cost of Order</h3>
                       <h6>Printbaz Cost</h6>
-                      <p>{viewOrder?.printbazcost} BDT</p>
+                      <p>{getSpecificOrderById?.printbazcost} BDT</p>
                       <h6>Delivery Fee</h6>
-                      <p>{viewOrder?.deliveryFee} BDT</p>
+                      <p>{getSpecificOrderById?.deliveryFee} BDT</p>
                       <h6>Collect Amount</h6>
-                      <p>{viewOrder?.collectAmount} BDT</p>
+                      <p>{getSpecificOrderById?.collectAmount} BDT</p>
                       <h6>Cash Handling Fee</h6>
                       <p>2% BDT</p>
                       <h6>Receivable Amount</h6>
-                      <p>{viewOrder?.recvMoney} BDT</p>
+                      <p>{getSpecificOrderById?.recvMoney} BDT</p>
                     </div>
                   </div>
                 </div>
@@ -669,7 +682,7 @@ const ViewOrder = () => {
                
                   <div className="row order-list-title">
                     <div className="col-12">
-                      <h4>{viewOrder?.instruction}</h4>
+                      <h4>{getSpecificOrderById?.instruction}</h4>
                     </div>
               
                   </div>
@@ -714,7 +727,7 @@ const ViewOrder = () => {
                     </div> */}
                   </div>
                   {
-                    viewOrder?.orderDetailArr?.map((orderDetail,orderIndex)=><>
+                    getSpecificOrderById?.orderDetailArr?.map((orderDetail,orderIndex)=><>
                       <div className="row order-tab" key={orderIndex}>
                     <div className="col-1">
                       <p>{orderDetail?.color}</p>
@@ -920,6 +933,7 @@ const ViewOrder = () => {
             updateOrder===true &&
             <UpdateOrder onClose={() => setUpdateOrder(false)}
             viewOrder={viewOrder}
+            getSpecificOrderById={getSpecificOrderById}
             viewClient={viewClient}/>
           }
         </div>
