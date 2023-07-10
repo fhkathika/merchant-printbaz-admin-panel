@@ -1,14 +1,18 @@
 import React, { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import useGetMongoData from '../../hooks/useGetMongoData';
-
+import DatePicker from 'react-datepicker';
+import 'react-datepicker/dist/react-datepicker.css';
 const OrderList = () => {
   const { orderAll } = useGetMongoData();
   const [allMerchant,setAllMerchant]=useState([])
   console.log("orderAll", orderAll);
+  const [show, setShow] = useState({});
   const [filterOrders,setFilterOrders]=useState('all');
   const [currentPage, setCurrentPage] = useState(1);
   const [itemsPerPage, setItemsPerPage] = useState(20); 
+  const [startDate,setStartDate]=useState(null);
+  const [endDate,setEndDate]=useState(null);
   const indexOfLastItem = currentPage * itemsPerPage;
   const indexOfFirstItem = indexOfLastItem - itemsPerPage;
   useEffect(()=>{
@@ -21,7 +25,7 @@ const OrderList = () => {
     getOrders()
 },[allMerchant])
 let matchingMerchant
-
+ console.log("allMerchant",allMerchant);
 let date = new Date(orderAll?.createdAt); // create a new Date object
 
 let options = { month: 'long', day: 'numeric', year: 'numeric', hour: 'numeric', minute: 'numeric' }; // options for toLocaleDateString
@@ -75,9 +79,13 @@ let deliveredOrders=orderAll?.filter(users=>users?.orderStatus==="delivered");
 let cancelOrders=orderAll?.filter(users=>users?.orderStatus==="cancel");
 // payment staus
 let paidOrders=orderAll?.filter(users=>users?.paymentStatus==="paid");
+
 let unPaidOrders=orderAll?.filter(users=>users?.paymentStatus==="Unpaid");
 let searchByOrderId= orderAll?.filter(OrederId => OrederId?._id?.includes(filterOrders));
-
+let filterByClientPhone=allMerchant?.filter(users=>users?.phone===filterOrders);
+let filterByBrandName=allMerchant?.filter(users=>users?.brandName===filterOrders);
+console.log("filterByBrandName",filterByBrandName);
+console.log("filterByClientPhone",filterByClientPhone);
 const handleOrderIdChange = (e) => {
   const value = e.target.value;
   console.log(value);
@@ -130,6 +138,19 @@ const getViewClientColor = (status) => {
   // you can add more conditions here or just return a default color
   // return "defaultColor";
 };
+// start date Handler 
+const handleChangeStartDate=(date)=>{
+  setStartDate(date)
+  setFilterOrders('')
+}
+const handleChangeEndDate=(date)=>{
+  setEndDate(date)
+  setFilterOrders('')
+}
+const filerByOrderDate=orderAll.filter(order=>{
+  const orderDate=new Date(order?.createdAt)
+  return orderDate>=new Date(startDate) && orderDate<=new Date(endDate)
+})
 const actualIndexOfLastItem = indexOfLastItem > orderAll.length ? orderAll.length : indexOfLastItem;
     return (
         <div>
@@ -197,33 +218,42 @@ const actualIndexOfLastItem = indexOfLastItem > orderAll.length ? orderAll.lengt
             </div>
             <div className="row order-filter">
               <div className="col-lg-2 col-sm-12">
-                <label htmlFor="name-filter">Name:</label>
-                <input type="text" id="name-filter" className="form-control" />
+                <label htmlFor="name-filter" style={{marginBottom:"8px"}}>Client Number</label>
+                <input type="text" id="name-filter" className="form-control"onChange={handleInputChange}  />
               </div>
               <div className="col-lg-2 col-sm-12">
-                <label htmlFor="id-filter">Order Id:</label>
+                <label htmlFor="id-filter" style={{marginBottom:"8px"}}>Order Id:</label>
                 <input type="text" id="id-filter" className="form-control" onChange={(e) =>  handleOrderIdChange(e)} />
               </div>
               <div className="col-lg-2 col-sm-12">
-                <label htmlFor="brand-filter">Recipient Info:</label>
-                <input type="text" id="brand-filter" className="form-control" />
+                <label htmlFor="brand-filter" style={{marginBottom:"8px"}}>Brand Name</label>
+                <input type="text" id="brand-filter" onChange={ handleInputChange} className="form-control" />
               </div>
               <div className="col-lg-2 col-sm-12">
-                <label htmlFor="status-filter">Payment:</label>
+                <label htmlFor="status-filter" style={{marginBottom:"8px"}}>Payment:</label>
                 <select id="status-filter" className="form-control" onChange={(e)=>handlePaymentStausInputChange(e)}>
                   <option value>None</option>
                   <option value="Unpaid">Unpaid</option>
                   <option value="paid">Paid</option>
                 </select>
               </div>
+             
+              <div className="col-lg-1 col-sm-12">
+                  <label htmlFor="startDate" className="form-label">Start Date</label>
+                  <DatePicker className='form-control' selected={startDate} onChange={handleChangeStartDate} selectsStart startDate={startDate} endDate={endDate} />
+                 
+                
+                  </div>   
+                   <div className="col-lg-1 col-sm-12">
+               
+                 
+                  <label style={{textAlign:"start"}} htmlFor="endDate" className="form-label">End Date</label>
+                  <DatePicker className='form-control' selected={endDate} onChange={handleChangeEndDate} selectsEnd startDate={startDate} endDate={endDate} minDate={startDate} />
+                  </div>
               <div className="col-lg-2 col-sm-12">
-                <label htmlFor="date-filter">Date:</label>
-                <input type="date" id="date-filter" className="form-control" />
-              </div>
-              <div className="col-lg-2 col-sm-12">
-                <label htmlFor="status-filter">Status:</label>
-                <select id="status-filter" className="form-control" onChange={(e) =>  handleInputChange(e)}>
-                  <option value="all">all</option>
+                <label htmlFor="status-filter" style={{marginBottom:"8px"}}>Status:</label>
+                <select id="status-filter"  className="form-control" onChange={(e) =>  handleInputChange(e)}>
+                  <option   value="all">all</option>
                   <option value="Pending">Pending</option>
                   <option value="on-hold">On Hold</option>
                   <option value="on hold artwork issue">On hold -  Artwork issue</option>
@@ -271,6 +301,135 @@ const actualIndexOfLastItem = indexOfLastItem > orderAll.length ? orderAll.lengt
                   <h4>Status</h4>
                 </div>
               </div>
+              {
+                   filerByOrderDate.map((orders,index)=>{ 
+                    matchingMerchant = allMerchant.find(merchant => merchant?.email === orders?.userMail)
+                   let  totalPrintBazCostWithDeliveryFee=Number(orders?.printbazcost) + Number(orders?.deliveryFee)
+                    return (
+                      <Link to={`/viewOrder/${orders?._id}`} state={{orders,matchingMerchant}} key={index}>
+                      <div key={orders?._id} className="row client-list">
+                        <div className="col-lg-2 col-sm-12">
+                         {/* Display the corresponding allMerchant name */}
+                         <p>{matchingMerchant?.name}</p>
+              {/* {index < allMerchant.length && <p>{allMerchant[index]?.name}</p>} */}
+                       
+                        </div>
+                        <div className="col-lg-2 col-sm-12">
+                          <p>{orders?._id}</p>
+                        </div>
+                        <div className="col-lg-3 col-sm-12">
+                          <p>{orders?.name}</p>
+                          <p>{orders?.address}</p>
+                          <p>{orders?.phone}</p>
+                        </div>
+                        <div className="col-lg-2 col-sm-12">
+                          <p className="p-status-btn">{orders?.paymentStatus}</p>
+                        </div>
+                        <div className="col-lg-2 col-sm-12">
+                          <p>{totalPrintBazCostWithDeliveryFee} TK</p>
+                        </div>
+                        <div className="col-lg-1 col-sm-12">
+                          <p className="" style={{backgroundColor:getViewClientColor(orders?.orderStatus)}}>{orders?.orderStatus}</p>
+                          {/* <p style={{fontSize: '14px'}}>{formattedDate}</p> */}
+                          <p style={{fontSize: '14px'}}> created at: {new Date(orders?.createdAt).toLocaleDateString('en-US', options)}</p>
+                      {
+                        orders?.statusDate  && 
+                        <p style={{fontSize: '14px'}}> uppdated at: {new Date(orders?.statusDate).toLocaleDateString('en-US', options)}</p>
+                      }
+                        </div>
+                      </div>
+                    </Link>
+                   
+                   )
+                    }
+                      )
+              }  
+              {/* filter bny brand name   */}
+               {
+                   filterByBrandName.map((orders,index)=>{ 
+                    matchingMerchant = allMerchant.find(merchant => merchant?.email === orders?.userMail)
+                   let  totalPrintBazCostWithDeliveryFee=Number(orders?.printbazcost) + Number(orders?.deliveryFee)
+                    return (
+                      <Link to={`/viewOrder/${orders?._id}`} state={{orders,matchingMerchant}} key={index}>
+                      <div key={orders?._id} className="row client-list">
+                        <div className="col-lg-2 col-sm-12">
+                         {/* Display the corresponding allMerchant name */}
+                         <p>{matchingMerchant?.name}</p>
+              {/* {index < allMerchant.length && <p>{allMerchant[index]?.name}</p>} */}
+                       
+                        </div>
+                        <div className="col-lg-2 col-sm-12">
+                          <p>{orders?._id}</p>
+                        </div>
+                        <div className="col-lg-3 col-sm-12">
+                          <p>{orders?.name}</p>
+                          <p>{orders?.address}</p>
+                          <p>{orders?.phone}</p>
+                        </div>
+                        <div className="col-lg-2 col-sm-12">
+                          <p className="p-status-btn">{orders?.paymentStatus}</p>
+                        </div>
+                        <div className="col-lg-2 col-sm-12">
+                          <p>{totalPrintBazCostWithDeliveryFee} TK</p>
+                        </div>
+                        <div className="col-lg-1 col-sm-12">
+                          <p className="" style={{backgroundColor:getViewClientColor(orders?.orderStatus)}}>{orders?.orderStatus}</p>
+                          {/* <p style={{fontSize: '14px'}}>{formattedDate}</p> */}
+                          <p style={{fontSize: '14px'}}> created at: {new Date(orders?.createdAt).toLocaleDateString('en-US', options)}</p>
+                      {
+                        orders?.statusDate  && 
+                        <p style={{fontSize: '14px'}}> uppdated at: {new Date(orders?.statusDate).toLocaleDateString('en-US', options)}</p>
+                      }
+                        </div>
+                      </div>
+                    </Link>
+                   
+                   )
+                    }
+                      )
+              }   
+              {/* filter by clinet number  */}
+              {/* {
+                   filterOrders && filterByClientPhone?.map((client,index)=>{ 
+                   const matchingMerchantOrders = orderAll?.filter(merchantOrder => merchantOrder?.userMail === client?.email)
+                   console.log("matchingMerchantOrders",matchingMerchantOrders);
+                   let  totalPrintBazCostWithDeliveryFee=Number(client?.printbazcost) + Number(client?.deliveryFee)
+                    return (
+                      <Link to={`/viewOrder/${matchingMerchantOrders?._id}`} state={{client,matchingMerchantOrders}} key={index}>
+                      <div key={matchingMerchantOrders?._id} className="row client-list">
+                        <div className="col-lg-2 col-sm-12">
+                        
+                         <p>{client?.name}</p>
+              
+                       
+                        </div>
+                     
+                        <div className="col-lg-2 col-sm-12">
+                          <p>{matchingMerchantOrders?._id}</p>
+                        </div>
+                        <div className="col-lg-3 col-sm-12">
+                          <p>{matchingMerchantOrders?.name}</p>
+                          <p>{matchingMerchantOrders?.address}</p>
+                          <p>{matchingMerchantOrders?.phone}</p>
+                        </div>
+                        <div className="col-lg-2 col-sm-12">
+                          <p className="p-status-btn">{matchingMerchantOrders?.paymentStatus}</p>
+                        </div>
+                        <div className="col-lg-2 col-sm-12">
+                          <p>{totalPrintBazCostWithDeliveryFee} TK</p>
+                        </div>
+                        <div className="col-lg-1 col-sm-12">
+                          <p className="" style={{backgroundColor:getViewClientColor(matchingMerchantOrders?.orderStatus)}}>{matchingMerchantOrders?.orderStatus}</p>
+                          <p style={{fontSize: '14px'}}>{formattedDate}</p>
+                        </div>
+                      </div>
+                    </Link>
+                   
+                   )
+                    }
+                      )
+              }  */}
+
               {
                    filterOrders && searchByOrderId?.map((orders,index)=>{ 
                     matchingMerchant = allMerchant.find(merchant => merchant?.email === orders?.userMail)

@@ -11,6 +11,8 @@ import Ticket from './Components/ticket/Ticket';
 import ViewClient from './Components/viewClient/ViewClient';
 import ViewOrder from './Components/viewOrder/ViewOrder';
 import ViewTicket from './Components/viewTicket/ViewTicket';
+import SendInvitationPage from './Components/invitaionPage/SendInvitationPage';
+import LoginPage from './Components/login/LoginPage';
 
 function App() {
   return (
@@ -26,6 +28,8 @@ function App() {
        <Route path="/viewClient/:id" element={<ViewClient />} />
        <Route path="/viewOrder/:id" element={<ViewOrder />} />
        <Route path="/viewTicket/:id" element={<ViewTicket/>} />
+       <Route path="/invitaionPage" element={<SendInvitationPage/>} />
+       <Route path="/login" element={<LoginPage/>} />
        </Routes>
     </div>
   );
