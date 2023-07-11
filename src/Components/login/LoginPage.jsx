@@ -1,11 +1,13 @@
-import React, { useState } from "react";
+import React, { useContext, useState } from "react";
 import axios from "axios";
 import { Container, Form } from "react-bootstrap";
 import { Link } from "react-router-dom";
+import { AuthContext } from "../../authProvider/AuthProvider";
 
 function LoginPage() {
   const [email, setEmail] = useState("");
-
+  const {adminUser,loading,loginAdminUser,currentUser}=useContext(AuthContext);
+  console.log("adminUser",adminUser);
   const loginUser = async (e) => {
     e.preventDefault();
     try {
@@ -14,7 +16,9 @@ function LoginPage() {
       if(res.data.token) {
         localStorage.setItem("userToken", res.data.token);
       }
-      console.log("log in successfull");
+       // Store the token in local storage or context for authentication
+       loginAdminUser(res?.data?.token, res?.data);
+    console.log('User logged in successfully', res.data);
       // Then redirect the user to the home page or dashboard
     } catch (error) {
       // handle error

@@ -1,18 +1,76 @@
 import React, { useState } from "react";
 import axios from "axios";
 import { Link } from "react-router-dom";
+import  "../../css/style.css";
 
 function SendInvitationPage() {
   const [email, setEmail] = useState("");
-  const [name, setName] = useState("");
   const [message, setMessage] = useState("");
+  const [newRole, setNewRole] = useState("");  // New Role Input
+  const [roles, setRoles] = useState({
+    designer: false,
+    editor: false,
+    admin: false
+});
+console.log("roles",roles);
+//format date 
+const date=new Date()
+const options={
+  year: 'numeric',
+  month: '2-digit',
+  day: '2-digit',
+  hour: '2-digit',
+  minute: '2-digit',
+  hour12: true,
+}
+const strDate = new Intl.DateTimeFormat('en-US', options).format(date);
+
+// Replace '/' with '.' and ',' with ''
+let inviteCreatedAt = strDate.replace(/\//g, '.').replace(/,/g, '');
+// Remove leading zero from date and month (if any)
+inviteCreatedAt = inviteCreatedAt.replace(/\.0+/g, '.');
+// Replace 'AM' with 'am' and 'PM' with 'pm'
+inviteCreatedAt = inviteCreatedAt.replace('AM', 'am').replace('PM', 'pm');
+
+console.log(inviteCreatedAt);
+const handleRoleChange=(event)=>{
+  setRoles({...roles, [event.target.name]: event.target.checked });
+}
+const addNewRole = async (roleName) => {
+  await setRoles(prevRoles => {
+    const updatedRoles = {...prevRoles, [roleName]: false};
+    sendRolesToServer(updatedRoles);
+    return updatedRoles;
+  });
+  setNewRole(""); // Clear input after adding
+}
+
+const sendRolesToServer = async (roles) => {
+  // Send updated roles to server-side
+  const response = await fetch('http://localhost:5000/allroles', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json'
+    },
+    body: JSON.stringify({roles:roles}) // roles state to be sent
+  });
+
+  if (!response.ok) {
+    throw new Error('HTTP error ' + response.status);
+  }
+
+  const responseData = await response.json();
+  console.log("responseData",responseData);
+}
 
   const sendInvitation = async (e) => {
     e.preventDefault();
+    const chosenRoles = Object.keys(roles).filter(role => roles[role] === true);
+    console.log(chosenRoles); // logs the roles that were checked
     try {
-      const res = await axios.post("http://localhost:5000/sendInvitation", { email,name });
+      const res = await axios.post("http://localhost:5000/sendInvitation", { email,roles:chosenRoles,inviteCreatedAt });
       setMessage(res.data.message);
-      console.log("res.data.message",res.data.message);
+      console.log("res.data.message",res.data);
     } catch (error) {
       setMessage("Failed to send invitation.");
     }
@@ -88,25 +146,39 @@ function SendInvitationPage() {
         <div className=" " style={{textAlign:"center",marginTop:"10%"}}>
              
                
-                  <form onSubmit={sendInvitation}>
-        <input
-          type="email"
-          value={email}
-          onChange={(e) => setEmail(e.target.value)}
-          placeholder="Enter email to invite"
-          required
-        />
-        <br />
+        <form onSubmit={sendInvitation}>
             <input
-          type="text"
-          value={name}
-          onChange={(e) => setName(e.target.value)}
-          placeholder="Enter name to invite"
-          required
-        />
-        <button type="submit">Send Invitation</button>
-                </form>
-            
+                   type="email"
+                   value={email}
+                   onChange={(e) => setEmail(e.target.value)}
+                   placeholder="Enter email to invite"
+                   required
+            /> 
+            <br />
+ <input
+              type="text"
+              value={newRole}
+              onChange={(e) => setNewRole(e.target.value)}
+              placeholder="Add new role"
+            /> 
+            <button type="button" onClick={()=>addNewRole(newRole)}>Add Role</button>
+            <p>Assign role</p>
+            {Object.keys(roles).map(role => (
+                <div key={role}>
+                    <label>
+                        <input 
+                            type="checkbox" 
+                            name={role}
+                            checked={roles[role]}
+                            onChange={handleRoleChange}
+                        />
+                        {role}
+                    </label>
+                </div>
+            ))}
+
+            <button type="submit">Send Invitation</button>
+        </form>
             </div>
    
       {message && <p>{message}</p>}
