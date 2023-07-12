@@ -1,32 +1,153 @@
 import { Button } from 'bootstrap';
-import React, { useEffect, useState } from 'react';
+import React, { useContext, useEffect, useRef, useState } from 'react';
 import SupportTicketPopUp from '../suppoprtTicketPopUp/SupportTicketPopUp';
 import axios from 'axios';
 import UsersStoredSupportTickets from '../userStoredSupportTicket/UsersStoredSupportTickets';
 import Accordion from 'react-bootstrap/Accordion';
+import { AuthContext } from '../../authProvider/AuthProvider';
 function TabForViewOrder({orderId,email,viewClient}) {
+  const {adminUser,loading,loginAdminUser,currentUser}=useContext(AuthContext);
   const {name}=viewClient;
   const [activeTab, setActiveTab] = useState('tab1');
   const [showTicketPopUp, setShowTicketPopUp] = useState(false);
   const [showStoredTicketPopUp, setShowStoredTicketPopUp] = useState(false);
   const [popupId, setPopupId] = useState('');
   const [usersTickets, setUsersTickets] = useState([]);
+  const [usersDiscussMsg, setUsersDiscussMsg] = useState([]);
   const [shownPopupTicketId, setShownPopupTicketId] = useState(null);
+  const [newMsg, setNewMsg] = useState('');
+  const [showAlert, setShowAlert] = useState(false);
+  const [chatLog, setChatLog] = useState([]);
+  const [usersStoredMessage, setUsersStoredMessage] = useState([]);
+  const messagesEndRef = useRef(null);
+
+  const scrollToBottom = () => {
+    messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
+  };
+
   useEffect(() => {
     // Fetch the chat log from the server when the component mounts
     fetchChatLog();
+    fetchDiscussionMsg();
     
-  }, []);
+    
+  },scrollToBottom,[]);
+  // discussion message input 
+  const handleNewMessageChange = (e) => {
+    console.log(e.target.value);
+    setNewMsg(e.target.value);
+};
+useEffect(scrollToBottom, [usersDiscussMsg]);  // This will scroll to bottom on new messages
+///time format 
+function timeSince(date) {
+
+  var seconds = Math.floor((new Date() - date) / 1000);
+
+  var interval = seconds / 31536000;
+
+  if (interval > 1) {
+    return Math.floor(interval) + " years ago";
+  }
+  interval = seconds / 2592000;
+  if (interval > 1) {
+    return Math.floor(interval) + " months ago";
+  }
+  interval = seconds / 86400;
+  if (interval > 1) {
+    return Math.floor(interval) + " days ago";
+  }
+  interval = seconds / 3600;
+  if (interval > 1) {
+    return Math.floor(interval) + " hours ago";
+  }
+  interval = seconds / 60;
+  if (interval > 1) {
+    return Math.floor(interval) + " minutes ago";
+  }
+  return Math.floor(seconds) + " seconds ago";
+}
+let createTime=new Date().toLocaleString("en-US", { month: 'long', day: 'numeric', year: 'numeric', hour: 'numeric', minute: 'numeric' })
+ // fetch msg for discussion msg 
+ const fetchDiscussionMsg = async () => {
+  try {
+    // const response = await axios.get(`http://localhost:5000/getDiscussionMsg/${orderId}`);
+    const response = await axios.get(`https://mserver.printbaz.com/getDiscussionMsg/${orderId}`);
+    setUsersDiscussMsg(response.data.messages);
+    console.log("response.data.messages",response.data?.messages);
+  } catch (err) {
+    console.error(err);
+  }
+};
+///send discussion message handler 
+const handleSendDiscussionMessage = async (e) => {
+  e.preventDefault();
+  try {
+    if (!newMsg.trim() ) {
+      setShowAlert(true)
+      return;
+  }  
+ 
+  const formData=new FormData();
+    const newMessage = {  unread:true,clientOrderId:orderId, content: newMsg,userEmail:adminUser?.email,userName:"admin",userRole:"admin" };
+
+    const chatMessage = {
+     
+      content: newMessage.content,
+      userEmail: newMessage.userEmail,
+      userName: newMessage.userName,
+      unread: newMessage.unread,
+      userRole:newMessage.userRole,
+      clientOrderId:newMessage.clientOrderId,
+      createTime: createTime, // this won't be the exact timestamp saved in the DB
+    };
+    Object.entries(chatMessage).forEach(([key,value])=>{
+      formData.append(key,value)
+    })
+
+    // Add the new message to the local state immediately
+    setChatLog([...chatLog, chatMessage]);
+    
+
+    // const response = await axios.post('http://localhost:5000/discussionMsg', formData, {
+    const response = await axios.post('https://mserver.printbaz.com/discussionMsg', formData, {
+headers: {
+  'Content-Type': 'multipart/form-data',
+},
+});
+    if (!response?.data?.success) {
+      // If the message was not sent successfully, revert the local state
+      setChatLog(oldChatLog => oldChatLog.filter(msg => msg !== chatMessage));
+      setUsersStoredMessage(oldTickets => oldTickets.filter(ticket => ticket !== chatMessage));
+      console.error('Failed to send message');
+    }
+    setUsersStoredMessage(oldTickets => [...oldTickets, {
+      ...chatMessage,
+      messages: [chatMessage]
+    }]);
+    setNewMsg('');
+    fetchDiscussionMsg()
+    //  setCreateTicketnotify(true)
+      // fetchTickets()
+    console.log("chatLog",chatLog);
+  } catch (err) {
+    console.error(err);
+  }
+}; 
+
+
+
+// fetch msg for support ticket 
   const fetchChatLog = async () => {
     try {
-      const response = await axios.get(`http://localhost:5000/getOrderIdmessages/${orderId}`);
-      // const response = await axios.get(`https://mserver.printbaz.com/getOrderIdmessages/${orderId}`);
+      // const response = await axios.get(`http://localhost:5000/getOrderIdmessages/${orderId}`);
+      const response = await axios.get(`https://mserver.printbaz.com/getOrderIdmessages/${orderId}`);
       setUsersTickets(response.data.messages);
       console.log("response.data.messages",response.data.messages);
     } catch (err) {
       console.error(err);
     }
-  };
+  }; 
+ 
 
 
   const handleTabClick = (tabName) => {
@@ -66,6 +187,46 @@ function TabForViewOrder({orderId,email,viewClient}) {
 
       <div id="tab1" className={`tab-content ${activeTab === 'tab1' ? 'active' : ''}`}>
         <h2>Discussion Content</h2>
+        <div className="admin-dis-chat">
+                    <div className="col-12">
+                      <form onSubmit={handleSendDiscussionMessage}>
+                        <input type="text" name="msg" value={newMsg} onChange={handleNewMessageChange} placeholder="Write Your Message....." />
+                        <button type="submit">Post</button>
+                      </form>
+                    </div>
+                  </div>
+                  <div className="col-12 admin-dis-post" style={{overflow:"scroll",maxHeight:"70vh"}}>
+                    {
+                      usersDiscussMsg?.map((msg,index)=>{
+                        return(
+                          <div className="dis-post pb-4"  key={index}>
+                          <div>
+                            <img src="https://bootdey.com/img/Content/avatar/avatar3.png" className="rounded-circle mr-1" alt="Parsha Priya" width={40} height={40} />
+                            {/* <div className="text-muted small text-nowrap mt-2">{msg?.createTime}</div> */}
+                          </div>
+                          <div className="flex-shrink-1 rounded px-3 ml-3">
+                            <div className="font-weight-bold mb-1" style={{fontSize: '20px', fontWeight: 700}}>{msg?.userEmail} <span style={{fontSize: '12px', fontWeight: 700, backgroundColor: 'rgb(255, 38, 38)', color: 'white', padding: '5px', borderRadius: '5px'}}>{msg?.userRole}</span><small style={{fontSize:"14px",marginLeft:"15px",color:"gray",fontWeight:"400"}}>{msg?.createTime}</small></div>
+                            {msg?.content}
+                          </div>
+                        </div>
+                        )
+                      
+                      })
+                    }
+                       <div ref={messagesEndRef} />
+                  
+                    {/* <div className="dis-post pb-4">
+                      <div>
+                        <img src="https://bootdey.com/img/Content/avatar/avatar3.png" className="rounded-circle mr-1" alt="Parsha Priya" width={40} height={40} />
+                        <div className="text-muted small text-nowrap mt-2">2:34 am</div>
+                      </div>
+                      <div className="flex-shrink-1 rounded px-3 ml-3">
+                        <div className="font-weight-bold mb-1" style={{fontSize: '20px', fontWeight: 700}}>Abir Ali Khan <span style={{fontSize: '12px', fontWeight: 700, backgroundColor: 'rgb(38, 139, 255)', color: 'white', padding: '5px', borderRadius: '5px'}}>Designer</span></div>
+                        In publishing and graphic design, Lorem ipsum is a placeholder text commonly used to demonstrate the visual form of a document or a typeface without relying on meaningful content. Lorem ipsum may be used as a placeholder before final copy is available.
+                      </div>
+                    </div> */}
+                 
+                  </div>
       </div>
 
       <div id="tab2" className={`tab-content ${activeTab === 'tab2' ? 'active' : ''}`}>

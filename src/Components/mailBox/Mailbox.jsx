@@ -1,5 +1,6 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
+import Navigationbar from '../navigationBar/Navigationbar';
 
 const Mailbox = () => {
     return (
@@ -12,56 +13,7 @@ const Mailbox = () => {
         <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" integrity="sha512-iecdLmaskl7CVkqkXNQ/ZH/XLlvWZOJyj7Yy7tcenmpD1ypASozpmT/E0iPtmFIB46ZmdtAc9eNBvH0H/ZpiBw==" crossOrigin="anonymous" referrerPolicy="no-referrer" />
         <title>Admin Dashboard</title>
         <style dangerouslySetInnerHTML={{__html: "\n        * {\n            box-sizing: border-box;\n            margin: 0;\n            padding: 0;\n        }\n\n        ul,\n        li,\n        a {\n            text-decoration: none;\n        }\n\n        body {\n            font-family: Arial, sans-serif;\n            line-height: 1.6;\n            background-color: #f4f4f4;\n        }\n\n        /* Nav Bar CSS Start */\n\n.navbar {\n    background: #001846 !important;\n    padding: 0 20px 0 20px;\n}\n\n.navbar-brand img {\n    width: 120px;\n}\n\n.nav-link {\n    color: #ffffff !important;\n    font-size: 18px;\n    font-weight: 500;\n    text-align: center;\n    text-transform: uppercase;\n    padding: 20px 20px 20px 20px;\n    margin: 0 10px 0 10px;\n}\n\n.nav-link:hover {\n    background-color: #ffffff;\n    color: #001846 !important;\n    transition: linear 0.2s;\n}\n\n.nav-dropdown-menu {\n    background-color: #001846;\n}\n\n.nav-dropdown-item {\n    color: #ffffff;\n    text-transform: uppercase;\n}\n\n.navbar-toggler {\n    background-color: #ffffff !important;\n}\n\n/* Nav Bar CSS End */\n\n        .page-content {\n            margin: 50px;\n        }\n\n        .page-title-box {\n            margin-bottom: 20px;\n        }\n\n        .email-leftbar {\n            width: 236px;\n            float: left;\n            padding: 20px;\n            border-radius: 5px\n        }\n\n        .email-rightbar {\n            margin-left: 260px\n        }\n\n        .chat-user-box p.user-title {\n            color: #343a40;\n            font-weight: 600\n        }\n\n        .chat-user-box p {\n            font-size: 12px\n        }\n\n        @media (max-width:767px) {\n            .email-leftbar {\n                float: none;\n                width: 100%\n            }\n\n            .email-rightbar {\n                margin: 0\n            }\n        }\n\n        .mail-list a {\n            display: block;\n            color: #74788d;\n            line-height: 24px;\n            padding: 8px 5px\n        }\n\n        .mail-list a.active {\n            color: #ff3d60;\n            font-weight: 500\n        }\n\n        .message-list {\n            display: block;\n            padding-left: 0\n        }\n\n        .message-list li {\n            position: relative;\n            display: block;\n            height: 50px;\n            line-height: 50px;\n            cursor: default;\n            -webkit-transition-duration: .3s;\n            transition-duration: .3s\n        }\n\n        .message-list li a {\n            color: #74788d\n        }\n\n        .message-list li:hover {\n            background: #f1f5f7;\n            -webkit-transition-duration: .05s;\n            transition-duration: .05s\n        }\n\n        .message-list li .col-mail {\n            float: left;\n            position: relative\n        }\n\n        .message-list li .col-mail-1 {\n            width: 320px\n        }\n\n        .message-list li .col-mail-1 .checkbox-wrapper-mail,\n        .message-list li .col-mail-1 .dot,\n        .message-list li .col-mail-1 .star-toggle {\n            display: block;\n            float: left\n        }\n\n        .message-list li .col-mail-1 .dot {\n            border: 4px solid transparent;\n            border-radius: 100px;\n            margin: 22px 26px 0;\n            height: 0;\n            width: 0;\n            line-height: 0;\n            font-size: 0\n        }\n\n        .message-list li .col-mail-1 .checkbox-wrapper-mail {\n            margin: 15px 10px 0 20px\n        }\n\n        .message-list li .col-mail-1 .star-toggle {\n            margin-top: 18px;\n            margin-left: 5px\n        }\n\n        .message-list li .col-mail-1 .title {\n            position: absolute;\n            top: 0;\n            left: 110px;\n            right: 0;\n            text-overflow: ellipsis;\n            overflow: hidden;\n            white-space: nowrap;\n            margin-bottom: 0\n        }\n\n        .message-list li .col-mail-2 {\n            position: absolute;\n            top: 0;\n            left: 320px;\n            right: 0;\n            bottom: 0\n        }\n\n        .message-list li .col-mail-2 .date,\n        .message-list li .col-mail-2 .subject {\n            position: absolute;\n            top: 0\n        }\n\n        .message-list li .col-mail-2 .subject {\n            left: 0;\n            right: 200px;\n            text-overflow: ellipsis;\n            overflow: hidden;\n            white-space: nowrap\n        }\n\n        .message-list li .col-mail-2 .date {\n            right: 0;\n            width: 170px;\n            padding-left: 80px\n        }\n\n        .message-list li.active,\n        .message-list li.active:hover {\n            -webkit-box-shadow: inset 3px 0 0 #5664d2;\n            box-shadow: inset 3px 0 0 #5664d2\n        }\n\n        .message-list li.unread {\n            background-color: #f1f5f7;\n            font-weight: 500;\n            color: #292d32\n        }\n\n        .message-list li.unread a {\n            color: #292d32;\n            font-weight: 500\n        }\n\n        .message-list .checkbox-wrapper-mail {\n            cursor: pointer;\n            height: 20px;\n            width: 20px;\n            position: relative;\n            display: inline-block;\n            -webkit-box-shadow: inset 0 0 0 1px #ced4da;\n            box-shadow: inset 0 0 0 1px #ced4da;\n            border-radius: 1px\n        }\n\n        .message-list .checkbox-wrapper-mail input {\n            opacity: 0;\n            cursor: pointer\n        }\n\n        .message-list .checkbox-wrapper-mail input:checked~label {\n            opacity: 1\n        }\n\n        .message-list .checkbox-wrapper-mail label {\n            position: absolute;\n            height: 20px;\n            width: 20px;\n            left: 0;\n            cursor: pointer;\n            opacity: 0;\n            margin-bottom: 0;\n            -webkit-transition-duration: .05s;\n            transition-duration: .05s;\n            top: 0\n        }\n\n        .message-list .checkbox-wrapper-mail label:before {\n            content: \"\\F012C\";\n            font-family: \"Material Design Icons\";\n            top: 0;\n            height: 20px;\n            color: #292d32;\n            width: 20px;\n            position: absolute;\n            margin-top: -16px;\n            left: 4px;\n            font-size: 13px\n        }\n\n        @media (max-width:575.98px) {\n            .message-list li .col-mail-1 {\n                width: 200px\n            }\n        }\n\n        .chat-leftsidebar {\n            background-color: #fff;\n            border-radius: .25rem 0 0 .25rem;\n            -webkit-box-shadow: 0 2px 4px rgba(0, 0, 0, .08);\n            box-shadow: 0 2px 4px rgba(0, 0, 0, .08)\n        }\n\n        @media (min-width:992px) {\n            .chat-leftsidebar {\n                min-width: 360px\n            }\n        }\n\n\n        /* Media Queries */\n        @media screen and (max-width: 1024px) {}\n\n        @media screen and (max-width: 768px) {\n            .nav-link {\n                text-align: left;\n            }\n\n            .nav-link:hover {\n                width: 100%;\n\n            }\n\n            .view-client {\n                padding: 30px;\n            }\n\n            .page-content {\n                margin: 10px;\n            }\n\n        }\n\n        /*# sourceMappingURL=app.min.css.map */\n\n    " }} />
-        <nav className="navbar navbar-expand-lg navbar-light bg-light">
-          <div className="container-fluid">
-          <Link className="navbar-brand" to="/">
-              <img src="https://media.discordapp.net/attachments/1069579536842379305/1097040318043537449/Logo-02.png?width=1440&height=392" alt="" />
-            </Link>
-            <button className="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNavDropdown" aria-controls="navbarNavDropdown" aria-expanded="false" aria-label="Toggle navigation">
-              <span className="navbar-toggler-icon" />
-            </button>
-            <div className="collapse navbar-collapse" id="navbarNavDropdown">
-              <ul className="navbar-nav">
-                <li className="nav-item">
-                  <Link className="nav-link active" aria-current="page" to="/">Dashboard</Link>
-
-                </li> 
-                <li className="nav-item">
-                <Link className="nav-link active" aria-current="page" to="/allMerchants">Merchants</Link>
-                </li>
-                <li className="nav-item">
-                <Link className="nav-link active" aria-current="page" to="/orderList">Orders</Link>
-                </li>
-              
-                <li className="nav-item dropdown">
-                  <a className="nav-link dropdown-toggle" href="#" id="navbarDropdownMenuLink" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-                    Analytics
-                  </a>
-                  <ul className="dropdown-menu nav-dropdown-menu" aria-labelledby="navbarDropdownMenuLink">
-                    <li><a className="dropdown-item nav-dropdown-item" href="#">Merchants</a></li>
-                    <li><a className="dropdown-item nav-dropdown-item" href="#">Order</a></li>
-                    <li><a className="dropdown-item nav-dropdown-item" href="#">Transaction</a></li>
-                  </ul>
-                </li>
-                <li className="nav-item">
-                <Link className="nav-link active" aria-current="page" to="/mailBox">Mail Box</Link>
-                </li>
-                <li className="nav-item">
-              
-                  <Link className="nav-link active" aria-current="page" to="/liveChat">Live Chat</Link>
-               
-                </li>
-                <li className="nav-item">
-                <Link className="nav-link active" aria-current="page" to="/ticket">Ticket</Link>
-                </li>
-                <li className="nav-item">
-                  <Link className="nav-link active" aria-current="page" to="/filemanager">File Manager</Link>
-          
-                </li>
-              </ul>
-            </div>
-          </div>
-        </nav>
+        <Navigationbar/>
         {/* Begin page */}
         <div id="layout-wrapper">
           <div className="main-content">

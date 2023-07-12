@@ -13,22 +13,23 @@ import ViewOrder from './Components/viewOrder/ViewOrder';
 import ViewTicket from './Components/viewTicket/ViewTicket';
 import SendInvitationPage from './Components/invitaionPage/SendInvitationPage';
 import LoginPage from './Components/login/LoginPage';
+import PrivateRoute from './routes/PrivateRoute';
 
 function App() {
   return (
     <div className="App">
        <Routes>
-       <Route path="/" element={<Dashboard />} />
-       <Route path="/allMerchants" element={<AllMerchants />} />
-       <Route path="/orderList" element={<OrderList />} />
-       <Route path="/filemanager" element={<Filemanager />} />
-       <Route path="/liveChat" element={<LiveChat />} />
-       <Route path="/mailBox" element={<Mailbox />} />
-       <Route path="/ticket" element={<Ticket />} />
-       <Route path="/viewClient/:id" element={<ViewClient />} />
-       <Route path="/viewOrder/:id" element={<ViewOrder />} />
-       <Route path="/viewTicket/:id" element={<ViewTicket/>} />
-       <Route path="/invitaionPage" element={<SendInvitationPage/>} />
+       <Route path="/" element={<PrivateRoute><Dashboard /></PrivateRoute>} />
+       <Route path="/allMerchants" element={<PrivateRoute><AllMerchants /> </PrivateRoute>} />
+       <Route path="/orderList"    element={<PrivateRoute><OrderList /> </PrivateRoute>} />
+       <Route path="/filemanager"  element={<PrivateRoute><Filemanager /> </PrivateRoute>} />
+       <Route path="/liveChat"     element={<PrivateRoute><LiveChat /> </PrivateRoute>} />
+       <Route path="/mailBox"      element={<PrivateRoute><Mailbox /> </PrivateRoute>} />
+       <Route path="/ticket"       element={<PrivateRoute><Ticket /> </PrivateRoute>} />
+     <Route path="/viewClient/:id" element={<PrivateRoute><ViewClient /> </PrivateRoute>} />
+       <Route path="/viewOrder/:id"element={<PrivateRoute><ViewOrder /> </PrivateRoute>} />
+      <Route path="/viewTicket/:id"element={<PrivateRoute><ViewTicket/> </PrivateRoute>} />
+       <Route path="/invitaionPage"element={<SendInvitationPage/> } />
        <Route path="/login" element={<LoginPage/>} />
        </Routes>
     </div>
