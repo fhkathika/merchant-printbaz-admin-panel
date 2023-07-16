@@ -83,8 +83,8 @@ let paidOrders=orderAll?.filter(users=>users?.paymentStatus==="paid");
 
 let unPaidOrders=orderAll?.filter(users=>users?.paymentStatus==="Unpaid");
 let searchByOrderId= orderAll?.filter(OrederId => OrederId?._id?.includes(filterOrders));
-let filterByClientPhone=allMerchant?.filter(users=>users?.phone===filterOrders);
-let filterByBrandName=allMerchant?.filter(users=>users?.brandName===filterOrders);
+let filterByClientPhone=orderAll?.filter(users=>users?.clientPhone===filterOrders);
+let filterByBrandName=orderAll?.filter(users=>users?.clientbrandName===filterOrders);
 console.log("filterByBrandName",filterByBrandName);
 console.log("filterByClientPhone",filterByClientPhone);
 const handleOrderIdChange = (e) => {
@@ -148,11 +148,50 @@ const handleChangeEndDate=(date)=>{
   setEndDate(date)
   setFilterOrders('')
 }
-const filerByOrderDate=orderAll.filter(order=>{
-  const orderDate=new Date(order?.createdAt)
-  return orderDate>=new Date(startDate) && orderDate<=new Date(endDate)
-})
+// const filerByOrderDate=orderAll.filter(order=>{
+//   const date=new Date(order?.createdAt)
+//   const orderDate=date
+ 
+//   return orderDate>=new Date(startDate) && orderDate<=new Date(endDate)
+// })
+// console.log("filerByOrderDate",filerByOrderDate);
+const filerByOrderDate = orderAll.filter(order => {
+  const date = new Date(order?.createdAt);
+  const orderDate = date;
+  
+   if (startDate && endDate) {
+    // return orderDate >= new Date(startDate) && orderDate <= new Date(endDate);
+    const start = new Date(startDate);
+    const end = new Date(endDate);
+    end.setDate(end.getDate() + 1); // Adjust the end date to the next day
+    return orderDate >= start && orderDate < end;
+  } 
+   else if (startDate && !endDate) {
+    const start = new Date(startDate);
+    const end = new Date(startDate);
+    end.setDate(end.getDate() + 1); // Set the end date to the next day
+    return orderDate >= start && orderDate < end;
+  }
+
+  return false;
+});
+
+console.log("filterByOrderDate", filerByOrderDate);
+
+
 const actualIndexOfLastItem = indexOfLastItem > orderAll.length ? orderAll.length : indexOfLastItem;
+const actualIndexOfLastItemOfpendingOrders = indexOfLastItem > pendingOrders.length ? pendingOrders.length : indexOfLastItem;
+const actualIndexOfLastItemOfapprovedOrders = indexOfLastItem > approvedOrders.length ? approvedOrders.length : indexOfLastItem;
+const actualIndexOfLastItemOfonHoldOrders = indexOfLastItem > onHoldOrders.length ? onHoldOrders.length : indexOfLastItem;
+const actualIndexOfLastItemOfonHoldArtworkIssueOrders = indexOfLastItem > onHoldArtworkIssueOrders.length ? onHoldArtworkIssueOrders.length : indexOfLastItem;
+const actualIndexOfLastItemOfonHoldBillingIssueOrders = indexOfLastItem > onHoldBillingIssueOrders.length ? onHoldBillingIssueOrders.length : indexOfLastItem;
+const actualIndexOfLastItemOfonHoldOutOfStockOrders = indexOfLastItem > onHoldOutOfStockOrders.length ? onHoldOutOfStockOrders.length : indexOfLastItem;
+const actualIndexOfLastItemOfinProductionOrders = indexOfLastItem > inProductionOrders.length ? inProductionOrders.length : indexOfLastItem;
+const actualIndexOfLastItemOfoutForDeliveryOrders = indexOfLastItem > outForDeliveryOrders.length ? outForDeliveryOrders.length : indexOfLastItem;
+const actualIndexOfLastItemOfdeliveredOrders = indexOfLastItem > deliveredOrders.length ? deliveredOrders.length : indexOfLastItem;
+const actualIndexOfLastItemOfcancelOrders = indexOfLastItem > cancelOrders.length ? cancelOrders.length : indexOfLastItem;
+const actualIndexOfLastItemOfPaidOrders = indexOfLastItem > paidOrders.length ? paidOrders.length : indexOfLastItem;
+const actualIndexOfLastItemOfUnpaidOrders = indexOfLastItem > unPaidOrders.length ? unPaidOrders.length : indexOfLastItem;
     return (
         <div>
           <meta charSet="UTF-8" />
@@ -222,20 +261,117 @@ const actualIndexOfLastItem = indexOfLastItem > orderAll.length ? orderAll.lengt
                 </select>
               </div>
               {
-                 filterOrders==="all"  && 
+                 filterOrders === "all" && 
                  <div style={{textAlign:"right"}}>
                  <span style={{marginRight:"20px"}}>{indexOfFirstItem + 1} - {actualIndexOfLastItem} of {orderAll.length}</span>
            <button style={{marginRight:"20px",border:"none"}} onClick={() => setCurrentPage(currentPage - 1)} disabled={currentPage === 1} ><img style={{height:"10px",width:"15px"}} src='images/left-arrow.png' alt="left arrow"/></button>
            <button style={{height:"40px",border:"none"}} onClick={() => setCurrentPage(currentPage + 1)} disabled={currentPage === Math.ceil(orderAll.length / itemsPerPage)}><img style={{height:"10px",width:"15px"}} src='images/right-arrow.png' alt="right arrow"/></button>
           
                  </div>
+              }   {
+                 filterOrders === "Pending" && 
+                 <div style={{textAlign:"right"}}>
+                 <span style={{marginRight:"20px"}}>{indexOfFirstItem + 1} - {actualIndexOfLastItemOfpendingOrders} of {pendingOrders.length}</span>
+           <button style={{marginRight:"20px",border:"none"}} onClick={() => setCurrentPage(currentPage - 1)} disabled={currentPage === 1} ><img style={{height:"10px",width:"15px"}} src='images/left-arrow.png' alt="left arrow"/></button>
+           <button style={{height:"40px",border:"none"}} onClick={() => setCurrentPage(currentPage + 1)} disabled={currentPage === Math.ceil(pendingOrders.length / itemsPerPage)}><img style={{height:"10px",width:"15px"}} src='images/right-arrow.png' alt="right arrow"/></button>
+          
+                 </div>
+              }   {
+                 filterOrders === "on-hold" && 
+                 <div style={{textAlign:"right"}}>
+                 <span style={{marginRight:"20px"}}>{indexOfFirstItem + 1} - {actualIndexOfLastItemOfonHoldOrders} of {onHoldOrders.length}</span>
+           <button style={{marginRight:"20px",border:"none"}} onClick={() => setCurrentPage(currentPage - 1)} disabled={currentPage === 1} ><img style={{height:"10px",width:"15px"}} src='images/left-arrow.png' alt="left arrow"/></button>
+           <button style={{height:"40px",border:"none"}} onClick={() => setCurrentPage(currentPage + 1)} disabled={currentPage === Math.ceil(onHoldOrders.length / itemsPerPage)}><img style={{height:"10px",width:"15px"}} src='images/right-arrow.png' alt="right arrow"/></button>
+          
+                 </div>
+              }  {
+                 filterOrders === "Approved" && 
+                 <div style={{textAlign:"right"}}>
+                 <span style={{marginRight:"20px"}}>{indexOfFirstItem + 1} - {actualIndexOfLastItemOfapprovedOrders} of {approvedOrders.length}</span>
+           <button style={{marginRight:"20px",border:"none"}} onClick={() => setCurrentPage(currentPage - 1)} disabled={currentPage === 1} ><img style={{height:"10px",width:"15px"}} src='images/left-arrow.png' alt="left arrow"/></button>
+           <button style={{height:"40px",border:"none"}} onClick={() => setCurrentPage(currentPage + 1)} disabled={currentPage === Math.ceil(approvedOrders.length / itemsPerPage)}><img style={{height:"10px",width:"15px"}} src='images/right-arrow.png' alt="right arrow"/></button>
+          
+                 </div>
+              } {
+                 filterOrders === "in-production" && 
+                 <div style={{textAlign:"right"}}>
+                 <span style={{marginRight:"20px"}}>{indexOfFirstItem + 1} - {actualIndexOfLastItemOfinProductionOrders} of {inProductionOrders.length}</span>
+           <button style={{marginRight:"20px",border:"none"}} onClick={() => setCurrentPage(currentPage - 1)} disabled={currentPage === 1} ><img style={{height:"10px",width:"15px"}} src='images/left-arrow.png' alt="left arrow"/></button>
+           <button style={{height:"40px",border:"none"}} onClick={() => setCurrentPage(currentPage + 1)} disabled={currentPage === Math.ceil(inProductionOrders.length / itemsPerPage)}><img style={{height:"10px",width:"15px"}} src='images/right-arrow.png' alt="right arrow"/></button>
+          
+                 </div>
+              } {
+                 filterOrders === "on hold artwork issue" && 
+                 <div style={{textAlign:"right"}}>
+                 <span style={{marginRight:"20px"}}>{indexOfFirstItem + 1} - {actualIndexOfLastItemOfonHoldArtworkIssueOrders} of {onHoldArtworkIssueOrders.length}</span>
+           <button style={{marginRight:"20px",border:"none"}} onClick={() => setCurrentPage(currentPage - 1)} disabled={currentPage === 1} ><img style={{height:"10px",width:"15px"}} src='images/left-arrow.png' alt="left arrow"/></button>
+           <button style={{height:"40px",border:"none"}} onClick={() => setCurrentPage(currentPage + 1)} disabled={currentPage === Math.ceil(onHoldArtworkIssueOrders.length / itemsPerPage)}><img style={{height:"10px",width:"15px"}} src='images/right-arrow.png' alt="right arrow"/></button>
+          
+                 </div>
+              }{
+                 filterOrders === "on hold billing issue" && 
+                 <div style={{textAlign:"right"}}>
+                 <span style={{marginRight:"20px"}}>{indexOfFirstItem + 1} - {actualIndexOfLastItemOfonHoldBillingIssueOrders} of {onHoldBillingIssueOrders.length}</span>
+           <button style={{marginRight:"20px",border:"none"}} onClick={() => setCurrentPage(currentPage - 1)} disabled={currentPage === 1} ><img style={{height:"10px",width:"15px"}} src='images/left-arrow.png' alt="left arrow"/></button>
+           <button style={{height:"40px",border:"none"}} onClick={() => setCurrentPage(currentPage + 1)} disabled={currentPage === Math.ceil(onHoldBillingIssueOrders.length / itemsPerPage)}><img style={{height:"10px",width:"15px"}} src='images/right-arrow.png' alt="right arrow"/></button>
+          
+                 </div>
+              }{
+                 filterOrders === "on hold out of stock" && 
+                 <div style={{textAlign:"right"}}>
+                 <span style={{marginRight:"20px"}}>{indexOfFirstItem + 1} - {actualIndexOfLastItemOfonHoldOutOfStockOrders} of {onHoldOutOfStockOrders.length}</span>
+           <button style={{marginRight:"20px",border:"none"}} onClick={() => setCurrentPage(currentPage - 1)} disabled={currentPage === 1} ><img style={{height:"10px",width:"15px"}} src='images/left-arrow.png' alt="left arrow"/></button>
+           <button style={{height:"40px",border:"none"}} onClick={() => setCurrentPage(currentPage + 1)} disabled={currentPage === Math.ceil(onHoldOutOfStockOrders.length / itemsPerPage)}><img style={{height:"10px",width:"15px"}} src='images/right-arrow.png' alt="right arrow"/></button>
+          
+                 </div>
               }
-           
+              {
+                 filterOrders === "out for delivery" && 
+                 <div style={{textAlign:"right"}}>
+                 <span style={{marginRight:"20px"}}>{indexOfFirstItem + 1} - {actualIndexOfLastItemOfoutForDeliveryOrders} of {outForDeliveryOrders.length}</span>
+           <button style={{marginRight:"20px",border:"none"}} onClick={() => setCurrentPage(currentPage - 1)} disabled={currentPage === 1} ><img style={{height:"10px",width:"15px"}} src='images/left-arrow.png' alt="left arrow"/></button>
+           <button style={{height:"40px",border:"none"}} onClick={() => setCurrentPage(currentPage + 1)} disabled={currentPage === Math.ceil(outForDeliveryOrders.length / itemsPerPage)}><img style={{height:"10px",width:"15px"}} src='images/right-arrow.png' alt="right arrow"/></button>
+          
+                 </div>
+              } {
+                 filterOrders === "delivered" && 
+                 <div style={{textAlign:"right"}}>
+                 <span style={{marginRight:"20px"}}>{indexOfFirstItem + 1} - {actualIndexOfLastItemOfdeliveredOrders} of {deliveredOrders.length}</span>
+           <button style={{marginRight:"20px",border:"none"}} onClick={() => setCurrentPage(currentPage - 1)} disabled={currentPage === 1} ><img style={{height:"10px",width:"15px"}} src='images/left-arrow.png' alt="left arrow"/></button>
+           <button style={{height:"40px",border:"none"}} onClick={() => setCurrentPage(currentPage + 1)} disabled={currentPage === Math.ceil(deliveredOrders.length / itemsPerPage)}><img style={{height:"10px",width:"15px"}} src='images/right-arrow.png' alt="right arrow"/></button>
+          
+                 </div>
+              }{
+                 filterOrders === "cancel" && 
+                 <div style={{textAlign:"right"}}>
+                 <span style={{marginRight:"20px"}}>{indexOfFirstItem + 1} - {actualIndexOfLastItemOfcancelOrders} of {cancelOrders.length}</span>
+           <button style={{marginRight:"20px",border:"none"}} onClick={() => setCurrentPage(currentPage - 1)} disabled={currentPage === 1} ><img style={{height:"10px",width:"15px"}} src='images/left-arrow.png' alt="left arrow"/></button>
+           <button style={{height:"40px",border:"none"}} onClick={() => setCurrentPage(currentPage + 1)} disabled={currentPage === Math.ceil(cancelOrders.length / itemsPerPage)}><img style={{height:"10px",width:"15px"}} src='images/right-arrow.png' alt="right arrow"/></button>
+          
+                 </div>
+              }
+              {
+                 filterOrders === "paid" && 
+                 <div style={{textAlign:"right"}}>
+                 <span style={{marginRight:"20px"}}>{indexOfFirstItem + 1} - {actualIndexOfLastItemOfPaidOrders} of {paidOrders.length}</span>
+           <button style={{marginRight:"20px",border:"none"}} onClick={() => setCurrentPage(currentPage - 1)} disabled={currentPage === 1} ><img style={{height:"10px",width:"15px"}} src='images/left-arrow.png' alt="left arrow"/></button>
+           <button style={{height:"40px",border:"none"}} onClick={() => setCurrentPage(currentPage + 1)} disabled={currentPage === Math.ceil(paidOrders.length / itemsPerPage)}><img style={{height:"10px",width:"15px"}} src='images/right-arrow.png' alt="right arrow"/></button>
+          
+                 </div>
+              }  {
+                 filterOrders === "Unpaid" && 
+                 <div style={{textAlign:"right"}}>
+                 <span style={{marginRight:"20px"}}>{indexOfFirstItem + 1} - {actualIndexOfLastItemOfUnpaidOrders} of {unPaidOrders.length}</span>
+           <button style={{marginRight:"20px",border:"none"}} onClick={() => setCurrentPage(currentPage - 1)} disabled={currentPage === 1} ><img style={{height:"10px",width:"15px"}} src='images/left-arrow.png' alt="left arrow"/></button>
+           <button style={{height:"40px",border:"none"}} onClick={() => setCurrentPage(currentPage + 1)} disabled={currentPage === Math.ceil(unPaidOrders.length / itemsPerPage)}><img style={{height:"10px",width:"15px"}} src='images/right-arrow.png' alt="right arrow"/></button>
+          
+                 </div>
+              }
             </div>
             <div className="client-order-list">
               <div className="row" style={{marginBottom: '30px'}}>
                 <div className="col-lg-2 col-sm-12">
-                  <h4>Name</h4>
+                  <h4>Client Name</h4>
                 </div>
                 <div className="col-lg-2 col-sm-12">
                   <h4>Order Id</h4>
@@ -262,7 +398,7 @@ const actualIndexOfLastItem = indexOfLastItem > orderAll.length ? orderAll.lengt
                       <div key={orders?._id} className="row client-list">
                         <div className="col-lg-2 col-sm-12">
                          {/* Display the corresponding allMerchant name */}
-                         <p>{matchingMerchant?.name}</p>
+                         <p>{orders?.clientName}</p>
               {/* {index < allMerchant.length && <p>{allMerchant[index]?.name}</p>} */}
                        
                         </div>
@@ -306,7 +442,7 @@ const actualIndexOfLastItem = indexOfLastItem > orderAll.length ? orderAll.lengt
                       <div key={orders?._id} className="row client-list">
                         <div className="col-lg-2 col-sm-12">
                          {/* Display the corresponding allMerchant name */}
-                         <p>{matchingMerchant?.name}</p>
+                         <p>{orders?.clientName}</p>
               {/* {index < allMerchant.length && <p>{allMerchant[index]?.name}</p>} */}
                        
                         </div>
@@ -341,37 +477,37 @@ const actualIndexOfLastItem = indexOfLastItem > orderAll.length ? orderAll.lengt
                       )
               }   
               {/* filter by clinet number  */}
-              {/* {
-                   filterOrders && filterByClientPhone?.map((client,index)=>{ 
-                   const matchingMerchantOrders = orderAll?.filter(merchantOrder => merchantOrder?.userMail === client?.email)
+              {
+                   filterOrders && filterByClientPhone?.map((orders,index)=>{ 
+                   const matchingMerchantOrders = orderAll?.filter(merchantOrder => merchantOrder?.userMail === orders?.email)
                    console.log("matchingMerchantOrders",matchingMerchantOrders);
-                   let  totalPrintBazCostWithDeliveryFee=Number(client?.printbazcost) + Number(client?.deliveryFee)
+                   let  totalPrintBazCostWithDeliveryFee=Number(orders?.printbazcost) + Number(orders?.deliveryFee)
                     return (
-                      <Link to={`/viewOrder/${matchingMerchantOrders?._id}`} state={{client,matchingMerchantOrders}} key={index}>
+                      <Link to={`/viewOrder/${orders?._id}`} state={{orders,matchingMerchantOrders}} key={index}>
                       <div key={matchingMerchantOrders?._id} className="row client-list">
                         <div className="col-lg-2 col-sm-12">
                         
-                         <p>{client?.name}</p>
+                         <p>{orders?.clientName}</p>
               
                        
                         </div>
                      
                         <div className="col-lg-2 col-sm-12">
-                          <p>{matchingMerchantOrders?._id}</p>
+                          <p>{orders?._id}</p>
                         </div>
                         <div className="col-lg-3 col-sm-12">
-                          <p>{matchingMerchantOrders?.name}</p>
-                          <p>{matchingMerchantOrders?.address}</p>
-                          <p>{matchingMerchantOrders?.phone}</p>
+                          <p>{orders?.name}</p>
+                          <p>{orders?.address}</p>
+                          <p>{orders?.phone}</p>
                         </div>
                         <div className="col-lg-2 col-sm-12">
-                          <p className="p-status-btn">{matchingMerchantOrders?.paymentStatus}</p>
+                          <p className="p-status-btn">{orders?.paymentStatus}</p>
                         </div>
                         <div className="col-lg-2 col-sm-12">
                           <p>{totalPrintBazCostWithDeliveryFee} TK</p>
                         </div>
                         <div className="col-lg-1 col-sm-12">
-                          <p className="" style={{backgroundColor:getViewClientColor(matchingMerchantOrders?.orderStatus)}}>{matchingMerchantOrders?.orderStatus}</p>
+                          <p className="" style={{backgroundColor:getViewClientColor(orders?.orderStatus)}}>{orders?.orderStatus}</p>
                           <p style={{fontSize: '14px'}}>{formattedDate}</p>
                         </div>
                       </div>
@@ -380,10 +516,11 @@ const actualIndexOfLastItem = indexOfLastItem > orderAll.length ? orderAll.lengt
                    )
                     }
                       )
-              }  */}
+              } 
 
               {
-                   filterOrders && searchByOrderId?.map((orders,index)=>{ 
+                   filterOrders && searchByOrderId
+                   ?.map((orders,index)=>{ 
                     matchingMerchant = allMerchant.find(merchant => merchant?.email === orders?.userMail)
                    let  totalPrintBazCostWithDeliveryFee=Number(orders?.printbazcost) + Number(orders?.deliveryFee)
                     return (
@@ -391,7 +528,7 @@ const actualIndexOfLastItem = indexOfLastItem > orderAll.length ? orderAll.lengt
                       <div key={orders?._id} className="row client-list">
                         <div className="col-lg-2 col-sm-12">
                          {/* Display the corresponding allMerchant name */}
-                         <p>{matchingMerchant?.name}</p>
+                         <p>{orders?.clientName}</p>
               {/* {index < allMerchant.length && <p>{allMerchant[index]?.name}</p>} */}
                        
                         </div>
@@ -421,7 +558,11 @@ const actualIndexOfLastItem = indexOfLastItem > orderAll.length ? orderAll.lengt
                       )
               } 
                  {
-                   filterOrders==="paid" && paidOrders.map((orders,index)=>{ 
+                   filterOrders==="paid" && paidOrders
+                   ?.slice(indexOfFirstItem, indexOfLastItem)
+              .sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt))
+              .sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt))
+                   .map((orders,index)=>{ 
                     matchingMerchant = allMerchant.find(merchant => merchant?.email === orders?.userMail)
                    let  totalPrintBazCostWithDeliveryFee=Number(orders?.printbazcost) + Number(orders?.deliveryFee)
                     return (
@@ -429,7 +570,7 @@ const actualIndexOfLastItem = indexOfLastItem > orderAll.length ? orderAll.lengt
                       <div key={orders?._id} className="row client-list">
                         <div className="col-lg-2 col-sm-12">
                          {/* Display the corresponding allMerchant name */}
-                         <p>{matchingMerchant?.name}</p>
+                         <p>{orders?.clientName}</p>
               {/* {index < allMerchant.length && <p>{allMerchant[index]?.name}</p>} */}
                        
                         </div>
@@ -464,7 +605,11 @@ const actualIndexOfLastItem = indexOfLastItem > orderAll.length ? orderAll.lengt
                       )
               } 
                 {
-                   filterOrders==="Unpaid" && unPaidOrders.map((orders,index)=>{ 
+                   filterOrders==="Unpaid" && unPaidOrders
+                   ?.slice(indexOfFirstItem, indexOfLastItem)
+              .sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt))
+              .sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt))
+                   .map((orders,index)=>{ 
                     matchingMerchant = allMerchant.find(merchant => merchant?.email === orders?.userMail)
                    let  totalPrintBazCostWithDeliveryFee=Number(orders?.printbazcost) + Number(orders?.deliveryFee)
                     return (
@@ -472,7 +617,7 @@ const actualIndexOfLastItem = indexOfLastItem > orderAll.length ? orderAll.lengt
                       <div key={orders?._id} className="row client-list">
                         <div className="col-lg-2 col-sm-12">
                          {/* Display the corresponding allMerchant name */}
-                         <p>{matchingMerchant?.name}</p>
+                         <p>{orders?.clientName}</p>
               {/* {index < allMerchant.length && <p>{allMerchant[index]?.name}</p>} */}
                        
                         </div>
@@ -509,7 +654,10 @@ const actualIndexOfLastItem = indexOfLastItem > orderAll.length ? orderAll.lengt
                       )
               }
               {
-              filterOrders==="all" && orderAll?.slice(indexOfFirstItem, indexOfLastItem).sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt)).sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt)).map((orders,index)=>{ 
+              filterOrders==="all" && orderAll?.slice(indexOfFirstItem, indexOfLastItem)
+              .sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt))
+              .sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt))
+              .map((orders,index)=>{ 
                 matchingMerchant = allMerchant.find(merchant => merchant?.email === orders?.userMail)
             let  totalPrintBazCostWithDeliveryFee=Number(orders?.printbazcost) + Number(orders?.deliveryFee)
                  return (
@@ -517,7 +665,7 @@ const actualIndexOfLastItem = indexOfLastItem > orderAll.length ? orderAll.lengt
                   <div key={orders?._id} className="row client-list">
                     <div className="col-lg-2 col-sm-12">
                      {/* Display the corresponding allMerchant name */}
-                     <p>{matchingMerchant?.name}</p>
+                     <p>{orders?.clientName}</p>
           {/* {index < allMerchant.length && <p>{allMerchant[index]?.name}</p>} */}
                    
                     </div>
@@ -554,7 +702,9 @@ const actualIndexOfLastItem = indexOfLastItem > orderAll.length ? orderAll.lengt
                
               }  
               {
-              filterOrders==="Pending" && pendingOrders.map((orders,index)=>{ 
+              filterOrders==="Pending" && pendingOrders?.slice(indexOfFirstItem, indexOfLastItem)
+              .sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt))
+              .sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt)).map((orders,index)=>{ 
                 matchingMerchant = allMerchant.find(merchant => merchant?.email === orders?.userMail)
                let  totalPrintBazCostWithDeliveryFee=Number(orders?.printbazcost) + Number(orders?.deliveryFee)
                 return (
@@ -562,7 +712,7 @@ const actualIndexOfLastItem = indexOfLastItem > orderAll.length ? orderAll.lengt
                   <div key={orders?._id} className="row client-list">
                     <div className="col-lg-2 col-sm-12">
                      {/* Display the corresponding allMerchant name */}
-                     <p>{matchingMerchant?.name}</p>
+                     <p>{orders?.clientName}</p>
           {/* {index < allMerchant.length && <p>{allMerchant[index]?.name}</p>} */}
                    
                     </div>
@@ -600,7 +750,11 @@ const actualIndexOfLastItem = indexOfLastItem > orderAll.length ? orderAll.lengt
                
               } 
                 {
-              filterOrders==="Approved" && approvedOrders.map((orders,index)=>{ 
+              filterOrders==="Approved" && approvedOrders
+              ?.slice(indexOfFirstItem, indexOfLastItem)
+              .sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt))
+              .sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt))
+              .map((orders,index)=>{ 
                 matchingMerchant = allMerchant.find(merchant => merchant?.email === orders?.userMail)
                let  totalPrintBazCostWithDeliveryFee=Number(orders?.printbazcost) + Number(orders?.deliveryFee)
                 return (
@@ -608,7 +762,7 @@ const actualIndexOfLastItem = indexOfLastItem > orderAll.length ? orderAll.lengt
                   <div key={orders?._id} className="row client-list">
                     <div className="col-lg-2 col-sm-12">
                      {/* Display the corresponding allMerchant name */}
-                     <p>{matchingMerchant?.name}</p>
+                     <p>{orders?.clientName}</p>
           {/* {index < allMerchant.length && <p>{allMerchant[index]?.name}</p>} */}
                    
                     </div>
@@ -647,7 +801,11 @@ const actualIndexOfLastItem = indexOfLastItem > orderAll.length ? orderAll.lengt
               }
               
                 {
-              filterOrders==="on-hold" && onHoldOrders.map((orders,index)=>{ 
+              filterOrders==="on-hold" && onHoldOrders
+              ?.slice(indexOfFirstItem, indexOfLastItem)
+              .sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt))
+              .sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt))
+              .map((orders,index)=>{ 
                 matchingMerchant = allMerchant.find(merchant => merchant?.email === orders?.userMail)
                let  totalPrintBazCostWithDeliveryFee=Number(orders?.printbazcost) + Number(orders?.deliveryFee)
                 return (
@@ -655,7 +813,7 @@ const actualIndexOfLastItem = indexOfLastItem > orderAll.length ? orderAll.lengt
                   <div key={orders?._id} className="row client-list">
                     <div className="col-lg-2 col-sm-12">
                      {/* Display the corresponding allMerchant name */}
-                     <p>{matchingMerchant?.name}</p>
+                     <p>{orders?.clientName}</p>
           {/* {index < allMerchant.length && <p>{allMerchant[index]?.name}</p>} */}
                    
                     </div>
@@ -693,7 +851,11 @@ const actualIndexOfLastItem = indexOfLastItem > orderAll.length ? orderAll.lengt
                
               }  
                 {
-              filterOrders==="in-production" && inProductionOrders.map((orders,index)=>{ 
+              filterOrders==="in-production" && inProductionOrders
+              ?.slice(indexOfFirstItem, indexOfLastItem)
+              .sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt))
+              .sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt))
+              .map((orders,index)=>{ 
                 matchingMerchant = allMerchant.find(merchant => merchant?.email === orders?.userMail)
                let  totalPrintBazCostWithDeliveryFee=Number(orders?.printbazcost) + Number(orders?.deliveryFee)
                 return (
@@ -701,7 +863,7 @@ const actualIndexOfLastItem = indexOfLastItem > orderAll.length ? orderAll.lengt
                   <div key={orders?._id} className="row client-list">
                     <div className="col-lg-2 col-sm-12">
                      {/* Display the corresponding allMerchant name */}
-                     <p>{matchingMerchant?.name}</p>
+                     <p>{orders?.clientName}</p>
           {/* {index < allMerchant.length && <p>{allMerchant[index]?.name}</p>} */}
                    
                     </div>
@@ -739,7 +901,11 @@ const actualIndexOfLastItem = indexOfLastItem > orderAll.length ? orderAll.lengt
                
               }
               {
-              filterOrders==="out for delivery" && outForDeliveryOrders.map((orders,index)=>{ 
+              filterOrders==="out for delivery" && outForDeliveryOrders
+              ?.slice(indexOfFirstItem, indexOfLastItem)
+              .sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt))
+              .sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt))
+              .map((orders,index)=>{ 
                 matchingMerchant = allMerchant.find(merchant => merchant?.email === orders?.userMail)
                let  totalPrintBazCostWithDeliveryFee=Number(orders?.printbazcost) + Number(orders?.deliveryFee)
                 return (
@@ -747,7 +913,7 @@ const actualIndexOfLastItem = indexOfLastItem > orderAll.length ? orderAll.lengt
                   <div key={orders?._id} className="row client-list">
                     <div className="col-lg-2 col-sm-12">
                      {/* Display the corresponding allMerchant name */}
-                     <p>{matchingMerchant?.name}</p>
+                     <p>{orders?.clientName}</p>
           {/* {index < allMerchant.length && <p>{allMerchant[index]?.name}</p>} */}
                    
                     </div>
@@ -785,7 +951,11 @@ const actualIndexOfLastItem = indexOfLastItem > orderAll.length ? orderAll.lengt
                
               }  
                 {
-              filterOrders==="delivered" && deliveredOrders.map((orders,index)=>{ 
+              filterOrders==="delivered" && deliveredOrders
+              ?.slice(indexOfFirstItem, indexOfLastItem)
+              .sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt))
+              .sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt))
+              .map((orders,index)=>{ 
                 matchingMerchant = allMerchant.find(merchant => merchant?.email === orders?.userMail)
                let  totalPrintBazCostWithDeliveryFee=Number(orders?.printbazcost) + Number(orders?.deliveryFee)
                 return (
@@ -793,7 +963,7 @@ const actualIndexOfLastItem = indexOfLastItem > orderAll.length ? orderAll.lengt
                   <div key={orders?._id} className="row client-list">
                     <div className="col-lg-2 col-sm-12">
                      {/* Display the corresponding allMerchant name */}
-                     <p>{matchingMerchant?.name}</p>
+                     <p>{orders?.clientName}</p>
           {/* {index < allMerchant.length && <p>{allMerchant[index]?.name}</p>} */}
                    
                     </div>
@@ -831,7 +1001,11 @@ const actualIndexOfLastItem = indexOfLastItem > orderAll.length ? orderAll.lengt
                
               }
               {
-              filterOrders==="on hold artwork issue" && onHoldArtworkIssueOrders.map((orders,index)=>{ 
+              filterOrders==="on hold artwork issue" && onHoldArtworkIssueOrders
+              ?.slice(indexOfFirstItem, indexOfLastItem)
+              .sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt))
+              .sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt))
+              .map((orders,index)=>{ 
                 matchingMerchant = allMerchant.find(merchant => merchant?.email === orders?.userMail)
                let  totalPrintBazCostWithDeliveryFee=Number(orders?.printbazcost) + Number(orders?.deliveryFee)
                 return (
@@ -839,7 +1013,7 @@ const actualIndexOfLastItem = indexOfLastItem > orderAll.length ? orderAll.lengt
                   <div key={orders?._id} className="row client-list">
                     <div className="col-lg-2 col-sm-12">
                      {/* Display the corresponding allMerchant name */}
-                     <p>{matchingMerchant?.name}</p>
+                     <p>{orders?.clientName}</p>
           {/* {index < allMerchant.length && <p>{allMerchant[index]?.name}</p>} */}
                    
                     </div>
@@ -878,7 +1052,11 @@ const actualIndexOfLastItem = indexOfLastItem > orderAll.length ? orderAll.lengt
                
               }
              {
-              filterOrders==="on hold billing issue" && onHoldBillingIssueOrders.map((orders,index)=>{ 
+              filterOrders==="on hold billing issue" && onHoldBillingIssueOrders
+              ?.slice(indexOfFirstItem, indexOfLastItem)
+              .sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt))
+              .sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt))
+              .map((orders,index)=>{ 
                 matchingMerchant = allMerchant.find(merchant => merchant?.email === orders?.userMail)
                let  totalPrintBazCostWithDeliveryFee=Number(orders?.printbazcost) + Number(orders?.deliveryFee)
                 return (
@@ -886,7 +1064,7 @@ const actualIndexOfLastItem = indexOfLastItem > orderAll.length ? orderAll.lengt
                   <div key={orders?._id} className="row client-list">
                     <div className="col-lg-2 col-sm-12">
                      {/* Display the corresponding allMerchant name */}
-                     <p>{matchingMerchant?.name}</p>
+                     <p>{orders?.clientName}</p>
           {/* {index < allMerchant.length && <p>{allMerchant[index]?.name}</p>} */}
                    
                     </div>
@@ -924,7 +1102,11 @@ const actualIndexOfLastItem = indexOfLastItem > orderAll.length ? orderAll.lengt
                
               } 
                 {
-              filterOrders==="on hold out of stock" && onHoldOutOfStockOrders.map((orders,index)=>{ 
+              filterOrders==="on hold out of stock" && onHoldOutOfStockOrders
+              ?.slice(indexOfFirstItem, indexOfLastItem)
+              .sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt))
+              .sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt))
+              .map((orders,index)=>{ 
                 matchingMerchant = allMerchant.find(merchant => merchant?.email === orders?.userMail)
                let  totalPrintBazCostWithDeliveryFee=Number(orders?.printbazcost) + Number(orders?.deliveryFee)
                 return (
@@ -932,7 +1114,7 @@ const actualIndexOfLastItem = indexOfLastItem > orderAll.length ? orderAll.lengt
                   <div key={orders?._id} className="row client-list">
                     <div className="col-lg-2 col-sm-12">
                      {/* Display the corresponding allMerchant name */}
-                     <p>{matchingMerchant?.name}</p>
+                     <p>{orders?.clientName}</p>
           {/* {index < allMerchant.length && <p>{allMerchant[index]?.name}</p>} */}
                    
                     </div>
@@ -970,7 +1152,11 @@ const actualIndexOfLastItem = indexOfLastItem > orderAll.length ? orderAll.lengt
                
               }  
                {
-              filterOrders==="cancel" && cancelOrders.map((orders,index)=>{ 
+              filterOrders==="cancel" && cancelOrders
+              ?.slice(indexOfFirstItem, indexOfLastItem)
+              .sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt))
+              .sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt))
+              .map((orders,index)=>{ 
                 matchingMerchant = allMerchant.find(merchant => merchant?.email === orders?.userMail)
                 let  totalPrintBazCostWithDeliveryFee=Number(orders?.printbazcost) + Number(orders?.deliveryFee)
                 return (
@@ -978,7 +1164,7 @@ const actualIndexOfLastItem = indexOfLastItem > orderAll.length ? orderAll.lengt
                   <div key={orders?._id} className="row client-list">
                     <div className="col-lg-2 col-sm-12">
                      {/* Display the corresponding allMerchant name */}
-                     <p>{matchingMerchant?.name}</p>
+                     <p>{orders?.clientName}</p>
           {/* {index < allMerchant.length && <p>{allMerchant[index]?.name}</p>} */}
                    
                     </div>

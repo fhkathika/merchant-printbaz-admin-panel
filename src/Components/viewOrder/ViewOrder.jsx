@@ -8,37 +8,45 @@ import SendOrderStatusMail from '../sendOrderStatusMail/SendOrderStatusMail';
 import { Button } from 'react-bootstrap';
 import UpdateOrder from '../updateOrder/UpdateOrder';
 import Navigationbar from '../navigationBar/Navigationbar';
+import { useParams } from "react-router-dom";
 const ViewOrder = () => {
+  let { id } = useParams();
+  console.log("id",id);
   const location = useLocation();
+  const [getSpecificOrderById, setGetSpecificOrderById] = useState();
   const viewOrder = location.state ? location?.state?.orders : null;
   const viewClient = location.state?.matchingMerchant;
-  const [orderStatus, setOrderStatus] = useState(viewOrder?.orderStatus);
-  const [paymentStatus, setPaymentStatus] = useState(viewOrder?.paymentStatus);
-  const [updateOrder, setUpdateOrder] = useState(false);
-  const [getSpecificOrderById, setGetSpecificOrderById] = useState();
-
-  const [show, setShow] = useState(false);
-  const target = useRef(null);
-  let date = new Date(viewOrder?.createdAt); // create a new Date object
-
-  let options = {month: 'long', day: 'numeric', year: 'numeric', hour: 'numeric', minute: 'numeric'  }; // options for toLocaleDateString
-  
-  let formattedDate = date.toLocaleDateString('en-US', options); // use toLocaleDateString to format the date
-  
-  // console.log("viewOrder",viewOrder); 
   useEffect(()=>{
     const getOrderById=async()=>{
              // Fetch the updated order details
-    await fetch(`https://mserver.printbaz.com/getorder/${viewOrder?._id}`)
-    // await fetch(`http://localhost:5000/getorder/${viewOrder?._id}`)
+    await fetch(`https://mserver.printbaz.com/getorder/${id}`)
+    // await fetch(`http://localhost:5000/getorder/${id}`)
     .then(res=>res.json())
-    .then(data => setGetSpecificOrderById(data))
+    .then(data => {setGetSpecificOrderById(data)
+      setOrderStatus(data.orderStatus);
+      setPaymentStatus(data.paymentStatus);
+    })
       
     
          }
          getOrderById()
         },[getSpecificOrderById])
-    
+  const [orderStatus, setOrderStatus] = useState();
+  const [paymentStatus, setPaymentStatus] = useState();
+  const [updateOrder, setUpdateOrder] = useState(false);
+ 
+console.log("orderStatus",orderStatus);
+  const [show, setShow] = useState(false);
+  const target = useRef(null);
+  let date = new Date(getSpecificOrderById?.createdAt); // create a new Date object
+
+  let options = {month: 'long', day: 'numeric', year: 'numeric', hour: 'numeric', minute: 'numeric'  }; // options for toLocaleDateString
+  
+  let formattedDate = date.toLocaleDateString('en-US', options); // use toLocaleDateString to format the date
+  
+  console.log("viewOrder",viewOrder); 
+
+    console.log("getSpecificOrderById",getSpecificOrderById);
   const handleInputChange = async (e) => {
     const status = e.target.value; // the new status
   console.log("status",status);
@@ -47,8 +55,8 @@ const ViewOrder = () => {
     try {
       const response = await fetch(
         
-        `https://mserver.printbaz.com/updateOrderStatus/${viewOrder?._id}`,
-      // `http://localhost:5000/updateOrderStatus/${viewOrder?._id}`,
+        `https://mserver.printbaz.com/updateOrderStatus/${id}`,
+      // `http://localhost:5000/updateOrderStatus/${id}`,
         {
           method: "PUT",
           headers: {
@@ -61,7 +69,7 @@ const ViewOrder = () => {
       if (response.ok) {
         // Update the approval status in the viewClient object
         setOrderStatus(status);
-        SendOrderStatusMail({status:status,_id:viewOrder?._id,userMail:viewOrder?.userMail })
+        SendOrderStatusMail({status:status,_id:getSpecificOrderById?._id,userMail:getSpecificOrderById?.userMail })
         console.log("Success:", viewOrder);
         // Update your state or perform any other necessary operations with the updated viewClient object
       } else {
@@ -82,8 +90,8 @@ const ViewOrder = () => {
     try {
       const response = await fetch(
         
-        `https://mserver.printbaz.com/updatePaymentStatus/${viewOrder?._id}`,
-      // `http://localhost:5000/updatePaymentStatus/${viewOrder?._id}`,
+        `https://mserver.printbaz.com/updatePaymentStatus/${id}`,
+      // `http://localhost:5000/updatePaymentStatus/${id}`,
         {
           method: "PUT",
           headers: {
@@ -97,7 +105,7 @@ const ViewOrder = () => {
         // Update the approval status in the viewClient object
         setPaymentStatus(status);
   
-        console.log("Success:", viewOrder);
+        console.log("Success:", getSpecificOrderById);
         // Update your state or perform any other necessary operations with the updated viewClient object
       } else {
         console.error("status Error:", response);
@@ -178,6 +186,8 @@ const ViewOrder = () => {
     
     // Show a notification or perform any other action after copying the ID
   };
+  const fileId = getSpecificOrderById?.qrCodeUrl?.split('/d/')[1].split('/view')[0];
+  const previewURL = `https://drive.google.com/file/d/${fileId}/preview`;
     return (
         <div>
           <meta charSet="UTF-8" />
@@ -207,7 +217,7 @@ const ViewOrder = () => {
               <div className="col-12">
                 <div className="order-id bg-white p-4  shadow-sm" >
                 <div style={{display:"flex",justifyContent:"space-between"}}>
-                <h3 className="d-inline-block font-weight-bold" onClick={copyOrderId}>ORDER ID: {viewOrder?._id} &nbsp;<span style={{cursor:"pointer",padding:"5px",fontSize:"16px"}} ref={target}  onClick={copyOrderId}><i class="fa fa-copy ml-2 mt-1 text-green cursor-pointer text-sm"></i></span> <h5 style={{marginTop:"10px"}}>{formattedDate}</h5></h3>
+                <h3 className="d-inline-block font-weight-bold" onClick={copyOrderId}>ORDER ID: {id} &nbsp;<span style={{cursor:"pointer",padding:"5px",fontSize:"16px"}} ref={target}  onClick={copyOrderId}><i class="fa fa-copy ml-2 mt-1 text-green cursor-pointer text-sm"></i></span> <h5 style={{marginTop:"10px"}}>{formattedDate}</h5></h3>
                   {/* <button className="status-btn d-inline-block py-2 px-3 font-weight-bold">{viewOrder?.orderStatus}</button> */}
                   <Overlay target={target.current} show={show} placement="right">
         {(props) => (
@@ -216,6 +226,9 @@ const ViewOrder = () => {
           </Tooltip>
         )}
       </Overlay>
+      {/* <img style={{width:"30px",height:"30px"}} src={viewOrder?.qrCodeUrl} alt="orcode"/> */}
+    
+      <iframe src={previewURL} height="200" width="300" title="orcode"></iframe>
                   <div
                         className=" d-inline-block  font-weight-bold"
                         style={{ marginBottom: "20px" }}
@@ -481,7 +494,7 @@ const ViewOrder = () => {
                         </div>
                         
                        
-                <p style={{textAlign:"center",marginTop:'10px'}}>Status changed at: {viewOrder?.statusDate}</p>
+                <p style={{textAlign:"center",marginTop:'10px'}}>Status changed at: {getSpecificOrderById?.statusDate}</p>
 
                       </div>
                 </div>
@@ -566,19 +579,19 @@ const ViewOrder = () => {
                     </div>
                     <div className="col-md-6 col-sm-12">
                       <h5>Name</h5>
-                      <p>{viewClient?.name}</p>
+                      <p>{getSpecificOrderById?.clientName}</p>
                     </div>
                     <div className="col-md-6 col-sm-12">
                       <h5>Brand Name</h5>
-                      <p>{viewClient?.brandName}</p>
+                      <p>{getSpecificOrderById?.clientbrandName}</p>
                     </div>
                     <div className="col-md-6 col-sm-12">
                       <h5>Email</h5>
-                      <p>{viewClient?.email}</p>
+                      <p>{getSpecificOrderById?.userMail}</p>
                     </div>
                     <div className="col-md-6 col-sm-12">
                       <h5>Contact Number</h5>
-                      <p>{viewClient?.phone}</p>
+                      <p>{getSpecificOrderById?.clientPhone}</p>
                     </div>
                   </div>
                 </div>
@@ -822,7 +835,7 @@ const ViewOrder = () => {
                 <div className="admin-dis section">
                   <div className="row admin-dis-tab">
                     <div className="col-12">
-                      <TabForViewOrder orderId={viewOrder?._id} email={viewClient?.email} viewClient={viewClient}></TabForViewOrder>
+                      <TabForViewOrder orderId={viewOrder?._id} email={viewOrder?.userMail} viewOrder={viewOrder} clientName={getSpecificOrderById?.clientName}  ></TabForViewOrder>
                       {/* <Ticket style={{visibility:"none"}}  email={viewClient?.email}/> */}
                       {/* <ul className="nav nav-tabs admin-dis">
                         <li className="nav-item admin-dis-li">

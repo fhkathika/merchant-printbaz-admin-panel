@@ -5,9 +5,9 @@ import axios from 'axios';
 import UsersStoredSupportTickets from '../userStoredSupportTicket/UsersStoredSupportTickets';
 import Accordion from 'react-bootstrap/Accordion';
 import { AuthContext } from '../../authProvider/AuthProvider';
-function TabForViewOrder({orderId,email,viewClient}) {
+function TabForViewOrder({orderId,email,viewClient,viewOrder,clientName}) {
   const {adminUser,loading,loginAdminUser,currentUser}=useContext(AuthContext);
-  const {name}=viewClient;
+  // const {clientName}=viewOrder;
   const [activeTab, setActiveTab] = useState('tab1');
   const [showTicketPopUp, setShowTicketPopUp] = useState(false);
   const [showStoredTicketPopUp, setShowStoredTicketPopUp] = useState(false);
@@ -241,7 +241,7 @@ headers: {
             ticketId={popupId}
             fetchTickets={fetchChatLog}
             userEmail={email}
-            userName={name}
+            userName={clientName}
             
             />
             )
@@ -280,7 +280,7 @@ headers: {
                    ticketId={tickets?.ticketId}
                    ticketIssue={tickets?.ticketIssue}
                    userEmail={email}
-                   userName={name}
+                   userName={clientName}
                />
         </Accordion.Body>
       </Accordion.Item>
