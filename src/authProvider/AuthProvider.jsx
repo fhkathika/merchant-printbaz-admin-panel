@@ -1,5 +1,5 @@
 import React, { createContext, useEffect, useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 
 export const AuthContext = createContext();
 
@@ -7,6 +7,7 @@ const AuthProvider = ({ children }) => {
   const [adminUser, setAdminUser] = useState(null);
   const [token, setToken] = useState('');
   const [loading, setLoading] = useState(true);
+  const location=useLocation()
 const navigate=useNavigate()
 const fetchUserData = async (token) => {
   try {
@@ -46,7 +47,9 @@ const loginAdminUser = async (token, userData) => {
     console.log('User logged in successfully from auth provider', fetchedUser);
 
     // Navigate to the dashboard after setting the user state
-    navigate("/");
+    // Navigate to the intended page or the default page after successful login
+    const { from } = location.state || { from: '/' };
+    navigate(from);
   } catch (error) {
     console.error("Error logging in:", error);
   }
