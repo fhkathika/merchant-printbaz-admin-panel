@@ -9,6 +9,10 @@ import { Button } from 'react-bootstrap';
 import UpdateOrder from '../updateOrder/UpdateOrder';
 import Navigationbar from '../navigationBar/Navigationbar';
 import { useParams } from "react-router-dom";
+import ShippingDetail from '../shippingDetail/ShippingDetail';
+import { jsPDF } from "jspdf";
+import html2canvas from "html2canvas";
+import ReactDOMServer from 'react-dom/server';
 const ViewOrder = () => {
   let { id } = useParams();
   console.log("id",id);
@@ -122,6 +126,24 @@ console.log("orderStatus",orderStatus);
     setUpdateOrder(true)
     console.log("setUpdateOrder",updateOrder);
   }
+  const downloadShippingDetail = async () => {
+    const shippingDetailElement = document.getElementById('shipping-detail');
+
+    // Capture a screenshot of the component with html2canvas
+    html2canvas(shippingDetailElement, { scale: 1 })  // adjust the scale as needed
+    .then((canvas) => {
+        // Convert the canvas to a data URL
+        const imgData = canvas.toDataURL('image/png');
+
+        // Create a new PDF with jsPDF
+        const pdf = new jsPDF('p', 'mm', 'a4');  // create A4 portrait pdf
+        const imgProps= pdf.getImageProperties(imgData);
+        const pdfWidth = pdf.internal.pageSize.getWidth();
+        const pdfHeight = (imgProps.height * pdfWidth) / imgProps.width;
+        pdf.addImage(imgData, 'PNG', 0, 0, pdfWidth, pdfHeight);
+        pdf.save("ShippingDetail.pdf");
+    });
+}
   const getViewClientColor = (status) => {
     if (status === "Pending") {
       return "Orange";
@@ -187,6 +209,7 @@ console.log("orderStatus",orderStatus);
     // Show a notification or perform any other action after copying the ID
   };
   const fileId = getSpecificOrderById?.qrCodeUrl?.split('/d/')[1].split('/view')[0];
+  const qrDownLoadURL = `https://drive.google.com/uc?export=download&id=${fileId}`;
   const previewURL = `https://drive.google.com/file/d/${fileId}/preview`;
     return (
         <div>
@@ -208,9 +231,20 @@ console.log("orderStatus",orderStatus);
                   <Link to="/orderList"><span style={{fontSize: '30px'}}>
                       &lt; </span> View Order Details</Link>
                 </div> 
-                 <div className="view-client-title my-3">
+                <div className='flex '>
+                <div className="view-client-title my-3 mx-3">
+            <Button variant="warning" onClick={downloadShippingDetail}><span><img style={{width:"23px",hight:"20px"}} src="/images/download.png" alt='download'/></span>Shipping Detail</Button>
+            <div id="shipping-detail" style={{position: 'absolute', left: '-10000px', top: '-10000px'}}>
+                <ShippingDetail getSpecificOrderById={getSpecificOrderById} />
+            </div>
+          
+        </div>
+                
+                <div className="view-client-title my-3">
                 <Button variant="success" onClick={handleUpdatePopUp}>Edit Order</Button>
                 </div>
+                </div>
+                 
               </div>
             </div>
             <div className="row">
@@ -226,9 +260,15 @@ console.log("orderStatus",orderStatus);
           </Tooltip>
         )}
       </Overlay>
-      {/* <img style={{width:"30px",height:"30px"}} src={viewOrder?.qrCodeUrl} alt="orcode"/> */}
+   
+{
+  (previewURL && fileId) &&
+  <div className="qr-container">
+     <iframe src={previewURL}  style={{ textDecoration: "none" }} height="200" width="200" title="orcode"></iframe>
+    <a href={qrDownLoadURL} download className="qr-download-link">Download QR code</a>
+  </div>
+}
     
-      <iframe src={previewURL} height="200" width="300" title="orcode"></iframe>
                   <div
                         className=" d-inline-block  font-weight-bold"
                         style={{ marginBottom: "20px" }}
@@ -835,7 +875,7 @@ console.log("orderStatus",orderStatus);
                 <div className="admin-dis section">
                   <div className="row admin-dis-tab">
                     <div className="col-12">
-                      <TabForViewOrder orderId={viewOrder?._id} email={viewOrder?.userMail} viewOrder={viewOrder} clientName={getSpecificOrderById?.clientName}  ></TabForViewOrder>
+                      <TabForViewOrder orderId={getSpecificOrderById?._id} email={viewOrder?.userMail} viewOrder={viewOrder} clientName={getSpecificOrderById?.clientName}  ></TabForViewOrder>
                       {/* <Ticket style={{visibility:"none"}}  email={viewClient?.email}/> */}
                       {/* <ul className="nav nav-tabs admin-dis">
                         <li className="nav-item admin-dis-li">

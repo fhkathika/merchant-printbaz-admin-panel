@@ -157,14 +157,15 @@ headers: {
   const closePopup = () => {setShowTicketPopUp(false);setShowStoredTicketPopUp(false)};
   const generateId = () => {
     // Generate an ID using your logic (e.g., library or custom code)
-    const id = Math.random().toString(36).substr(2, 9);
-    return id;
+    const id = Math.random().toString(36).substr(2, 6); // Change the substring length to 6
+    const paddedId = id.padStart(6, '0'); // Add leading zeros to ensure a 6-digit ID
+    return paddedId;
   };
-  const handleShowTicketPopUp=()=>{
-    setShowTicketPopUp(true)
-    setPopupId(generateId); // Set the generated ID
-  } 
-   
+  
+  const handleShowTicketPopUp = () => {
+    setShowTicketPopUp(true);
+    setPopupId(generateId()); // Call the generateId function to get the generated ID
+  };
   return (
     <div className="TabForViewOrder">
       <button
