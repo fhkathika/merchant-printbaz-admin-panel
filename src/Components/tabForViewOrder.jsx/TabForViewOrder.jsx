@@ -20,7 +20,7 @@ function TabForViewOrder({orderId,email,viewClient,viewOrder,clientName}) {
   const [chatLog, setChatLog] = useState([]);
   const [usersStoredMessage, setUsersStoredMessage] = useState([]);
   const messagesEndRef = useRef(null);
-
+  const[fetchAllTicket,setFetchAllTicket]=useState([])
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
   };
@@ -29,12 +29,13 @@ function TabForViewOrder({orderId,email,viewClient,viewOrder,clientName}) {
     // Fetch the chat log from the server when the component mounts
     fetchChatLog();
     fetchDiscussionMsg();
-    
+    fetchAllTicketData()
+   
     
   },scrollToBottom,[]);
   // discussion message input 
   const handleNewMessageChange = (e) => {
-    console.log(e.target.value);
+    // console.log(e.target.value);
     setNewMsg(e.target.value);
 };
 useEffect(scrollToBottom, [usersDiscussMsg]);  // This will scroll to bottom on new messages
@@ -73,7 +74,7 @@ let createTime=new Date().toLocaleString("en-US", { month: 'long', day: 'numeric
     // const response = await axios.get(`http://localhost:5000/getDiscussionMsg/${orderId}`);
     const response = await axios.get(`https://mserver.printbaz.com/getDiscussionMsg/${orderId}`);
     setUsersDiscussMsg(response.data.messages);
-    console.log("response.data.messages",response.data?.messages);
+    // console.log("response.data.messages",response.data?.messages);
   } catch (err) {
     console.error(err);
   }
@@ -118,7 +119,7 @@ headers: {
       // If the message was not sent successfully, revert the local state
       setChatLog(oldChatLog => oldChatLog.filter(msg => msg !== chatMessage));
       setUsersStoredMessage(oldTickets => oldTickets.filter(ticket => ticket !== chatMessage));
-      console.error('Failed to send message');
+      // console.error('Failed to send message');
     }
     setUsersStoredMessage(oldTickets => [...oldTickets, {
       ...chatMessage,
@@ -128,7 +129,7 @@ headers: {
     fetchDiscussionMsg()
     //  setCreateTicketnotify(true)
       // fetchTickets()
-    console.log("chatLog",chatLog);
+    // console.log("chatLog",chatLog);
   } catch (err) {
     console.error(err);
   }
@@ -142,28 +143,47 @@ headers: {
       // const response = await axios.get(`http://localhost:5000/getOrderIdmessages/${orderId}`);
       const response = await axios.get(`https://mserver.printbaz.com/getOrderIdmessages/${orderId}`);
       setUsersTickets(response.data.messages);
-      console.log("response.data.messages",response.data.messages);
+      // console.log("response.data.messages",response.data.messages);
     } catch (err) {
       console.error(err);
     }
   }; 
  
-
+  const fetchAllTicketData = async () => {
+    try {
+      // const response = await axios.get('http://localhost:5000/allTicket');
+      const response = await axios.get('https://mserver.printbaz.com/allTicket');
+      setFetchAllTicket(response.data);
+   
+    } catch (err) {
+      console.error(err);
+    }
+  };
 
   const handleTabClick = (tabName) => {
     setActiveTab(tabName);
   };
 
   const closePopup = () => {setShowTicketPopUp(false);setShowStoredTicketPopUp(false)};
+  let idCounter = 1; // Initialize a counter for the IDs
   const generateId = () => {
-    // Generate an ID using your logic (e.g., library or custom code)
-    const id = Math.random().toString(36).substr(2, 6); // Change the substring length to 6
-    const paddedId = id.padStart(6, '0'); // Add leading zeros to ensure a 6-digit ID
+    const paddedId = String(idCounter).padStart(6, '0'); // Convert counter to string and pad with leading zeros
+  
+    if (fetchAllTicket?.filter(users => users?.ticketId === paddedId).length > 0) {
+      idCounter++; // Increment the counter
+      return generateId(); // Recursively call the function to generate the next ID
+    }
+  
+    idCounter++; // Increment the counter
     return paddedId;
   };
   
+  
+  
   const handleShowTicketPopUp = () => {
+    fetchAllTicketData()
     setShowTicketPopUp(true);
+    
     setPopupId(generateId()); // Call the generateId function to get the generated ID
   };
   return (
