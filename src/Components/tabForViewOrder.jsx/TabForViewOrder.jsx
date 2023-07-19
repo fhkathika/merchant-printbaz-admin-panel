@@ -25,6 +25,18 @@ function TabForViewOrder({orderId,email,viewClient,viewOrder,clientName}) {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
   };
 
+// fetch msg for support ticket 
+const fetchChatLog = async () => {
+  try {
+    // const response = await axios.get(`http://localhost:5000/getOrderIdmessages/${orderId}`);
+    const response = await axios.get(`https://mserver.printbaz.com/getOrderIdmessages/${orderId}`);
+    setUsersTickets(response.data.messages);
+    console.log("response.data.messages",response.data.messages);
+  } catch (err) {
+    console.error(err);
+  }
+};
+// console.log("setUsersTicketsdd",usersTickets); 
   useEffect(() => {
     // Fetch the chat log from the server when the component mounts
     fetchChatLog();
@@ -137,17 +149,6 @@ headers: {
 
 
 
-// fetch msg for support ticket 
-  const fetchChatLog = async () => {
-    try {
-      // const response = await axios.get(`http://localhost:5000/getOrderIdmessages/${orderId}`);
-      const response = await axios.get(`https://mserver.printbaz.com/getOrderIdmessages/${orderId}`);
-      setUsersTickets(response.data.messages);
-      // console.log("response.data.messages",response.data.messages);
-    } catch (err) {
-      console.error(err);
-    }
-  }; 
  
   const fetchAllTicketData = async () => {
     try {

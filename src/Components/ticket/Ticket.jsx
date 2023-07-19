@@ -154,7 +154,7 @@ console.log("closeQuery",closeQuery);
                 {allTicket?.ticketIssue==="general query" &&"General Query"}
                </h6>  
                
-                        <h3>{allTicket?.userName}</h3>
+                        <h3>{allTicket?.userName ? allTicket?.userName : "Printbaz"}</h3>
                         <h4>Order ID: {allTicket?.orderId}</h4>
                         <h5>Ticket ID: {allTicket?.ticketId}</h5>
                        

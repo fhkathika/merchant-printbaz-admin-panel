@@ -875,7 +875,7 @@ console.log("orderStatus",orderStatus);
                 <div className="admin-dis section">
                   <div className="row admin-dis-tab">
                     <div className="col-12">
-                      <TabForViewOrder orderId={getSpecificOrderById?._id} email={viewOrder?.userMail} viewOrder={viewOrder} clientName={getSpecificOrderById?.clientName}  ></TabForViewOrder>
+                      <TabForViewOrder orderId={id} email={getSpecificOrderById?.userMail} viewOrder={viewOrder} clientName={getSpecificOrderById?.clientName}  ></TabForViewOrder>
                       {/* <Ticket style={{visibility:"none"}}  email={viewClient?.email}/> */}
                       {/* <ul className="nav nav-tabs admin-dis">
                         <li className="nav-item admin-dis-li">
