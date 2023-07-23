@@ -245,12 +245,40 @@
           position: absolute;
          
           bottom: 0;
-          left: 0;
-          width: 100%;
+          left: 11px;
+          width: auto;
+         
           background-color: #eaeaea;
           padding: 10px;
           text-align: center;
           text-decoration: none;
           color: #000;
         }
+        .align_center{
+          align-items: center;
+        }
+
+        .bold{
+          font-weight:bold
+        }
+        .d-none{
+          display: none ;
+        }
+        .d-block-phone{
+          display: none ;
+        }
+        @media only screen and (max-width: 600px) {
         
+          /* .d-none{
+            display: block;
+          } */
+
+          .test{
+            display: block !important;
+          }
+
+          .d-none-phone{
+            display: none !important ;
+          }
+
+        }

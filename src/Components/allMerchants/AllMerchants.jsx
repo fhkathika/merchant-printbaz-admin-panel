@@ -10,7 +10,7 @@ const AllMerchants = () => {
   const [itemsPerPage, setItemsPerPage] = useState(30); 
   const indexOfLastItem = currentPage * itemsPerPage;
 const indexOfFirstItem = indexOfLastItem - itemsPerPage;
-
+let count=0
   useEffect(()=>{
     const getOrders = async () => {
      await fetch('https://mserver.printbaz.com/alluser') //for main site
@@ -240,38 +240,66 @@ let searchByPhoneNumber= allMerchant?.filter(Phone => Phone?.phone?.includes(fil
             
             </>) 
           }
+          
               {
-            filterUser==="approved" &&  approvedUsers.map(merchants=><>
-               <Link key={merchants?._id} to={`/viewClient/${merchants?._id}`} state={{merchants}}>
-            <div className="row client-list">
-              <div className="col-lg-2 col-sm-12">
-                <p>{merchants?.phone}</p>
-              </div>
-              <div className="col-lg-2 col-sm-12">
-                <p>{merchants?.name}</p>
-              </div>
-              <div className="col-lg-2 col-sm-12">
-                <p>{merchants?.brandName}</p>
-              </div>
-              <div className="col-lg-2 col-sm-12">
-                <p>{merchants?.email}</p>
-              </div>
-              <div className="col-lg-2 col-sm-12">
-                <p>{merchants?.createdAt?.slice(0,10)}</p>
-              </div>
-              <div className="col-lg-2 col-sm-12">
-             
-                 {
-                  merchants?.approval==="approved" &&   <p className="status-btn"  >{merchants?.approval}</p>
-                } 
-               
+            filterUser==="approved" &&  approvedUsers.map(merchants=>{
               
-              </div>
-            </div>
-          </Link>
+              if(merchants?.email){
+                count++
+              }
+            //  console.log("count",count);
+              return(
+             
+                <Link key={merchants?._id} to={`/viewClient/${merchants?._id}`} state={{merchants}}>
+                <div className="row client-list">
+                  <div className="col-lg-2 col-sm-12">
+                    <p>{merchants?.phone}</p>
+                  </div>
+                  <div className="col-lg-2 col-sm-12">
+                    <p>{merchants?.name}</p>
+                  </div>
+                  <div className="col-lg-2 col-sm-12">
+                    <p>{merchants?.brandName}</p>
+                  </div>
+                  <div className="col-lg-2 col-sm-12">
+                    <p>{merchants?.email}</p>
+                    
+                  </div>
+                  <div className="col-lg-2 col-sm-12">
+                    <p>{merchants?.createdAt?.slice(0,10)}</p>
+                  </div>
+                  <div className="col-lg-2 col-sm-12">
+                 
+                     {
+                      merchants?.approval==="approved" &&   <p className="status-btn"  >{merchants?.approval}</p>
+                    } 
+                   
+                  
+                  </div>
+                </div>
+              </Link>
+              )
+             
+            }
+             
             
-            </>) 
+            ) 
           }  
+
+{/* {
+  filterUser==="approved" && 
+  [...new Set(approvedUsers.map(user => user.email))].map((email, index) => {
+    console.log("count", index + 1);
+    return (
+      <>
+      <span key={index}>{email}</span>
+      <br />
+      </>
+      
+    )
+  }) 
+} */}
+
             {
             filterUser==="ban" &&  bannedUsers.map(merchants=><>
                <Link key={merchants?._id} to={`/viewClient/${merchants?._id}`} state={{merchants}}>

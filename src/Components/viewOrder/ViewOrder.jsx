@@ -226,13 +226,13 @@ console.log("orderStatus",orderStatus);
           <Navigationbar/>
           <div className="all-content">
             <div className="row">
-              <div className="col-lg-12 col-sm-12 flex">
-                <div className="view-client-title my-3">
+              {/* <div className="col-lg-12 col-sm-12 flex"> */}
+                <div className="view-client-title my-3 col-lg-10 col-sm-10">
                   <Link to="/orderList"><span style={{fontSize: '30px'}}>
                       &lt; </span> View Order Details</Link>
                 </div> 
-                <div className='flex '>
-                <div className="view-client-title my-3 mx-3">
+                <div className='d-flex  align_center col-lg- col-sm-2'>
+                <div className="view-client-title " style={{marginRight:"10px"}}>
             <Button variant="warning" onClick={downloadShippingDetail}><span><img style={{width:"23px",hight:"20px"}} src="/images/download.png" alt='download'/></span>Shipping Detail</Button>
             <div id="shipping-detail" style={{position: 'absolute', left: '-10000px', top: '-10000px'}}>
                 <ShippingDetail getSpecificOrderById={getSpecificOrderById} />
@@ -240,18 +240,19 @@ console.log("orderStatus",orderStatus);
           
         </div>
                 
-                <div className="view-client-title my-3">
+                <div className="view-client-title my-3  " >
                 <Button variant="success" onClick={handleUpdatePopUp}>Edit Order</Button>
                 </div>
                 </div>
                  
-              </div>
+              {/* </div> */}
             </div>
+            
             <div className="row">
               <div className="col-12">
                 <div className="order-id bg-white p-4  shadow-sm" >
-                <div style={{display:"flex",justifyContent:"space-between"}}>
-                <h3 className="d-inline-block font-weight-bold" onClick={copyOrderId}>ORDER ID: {id} &nbsp;<span style={{cursor:"pointer",padding:"5px",fontSize:"16px"}} ref={target}  onClick={copyOrderId}><i class="fa fa-copy ml-2 mt-1 text-green cursor-pointer text-sm"></i></span> <h5 style={{marginTop:"10px"}}>{formattedDate}</h5></h3>
+                <div style={{display:""}} className="row">
+                <h3 className=" font-weight-bold col-lg-6" onClick={copyOrderId}>ORDER ID: {id} &nbsp;<span style={{cursor:"pointer",padding:"5px",fontSize:"16px"}} ref={target}  onClick={copyOrderId}><i class="fa fa-copy ml-2 mt-1 text-green cursor-pointer text-sm"></i></span> <h5 style={{marginTop:"10px"}}>{formattedDate}</h5></h3>
                   {/* <button className="status-btn d-inline-block py-2 px-3 font-weight-bold">{viewOrder?.orderStatus}</button> */}
                   <Overlay target={target.current} show={show} placement="right">
         {(props) => (
@@ -263,24 +264,26 @@ console.log("orderStatus",orderStatus);
    
 {
   (previewURL && fileId) &&
-  <div className="qr-container">
+  <div className="qr-container col-lg-3" style={{marginBottom:"10px"}}>
      <iframe src={previewURL}  style={{ textDecoration: "none" }} height="200" width="200" title="orcode"></iframe>
     <a href={qrDownLoadURL} download className="qr-download-link">Download QR code</a>
   </div>
 }
     
                   <div
-                        className=" d-inline-block  font-weight-bold"
+                        className="   font-weight-bold col-lg-3 "
                         style={{ marginBottom: "20px" }}
                       >
-                        <div style={{display:"flex"}}>
+                        <div style={{display:""}}>
                         <select
                           id="status-filter"
                           className="status-btn"
                           style={{
                             border: "none",
                             padding: "8px",
+                          
                             marginRight:'20px',
+                            marginBottom:"5px",
                             backgroundColor: getViewClientColor(
                               paymentStatus
                             ),
@@ -705,7 +708,7 @@ console.log("orderStatus",orderStatus);
                     </div>
                   </div>
                
-                  <div className="row order-list-title">
+                  <div className="row order-list-title d-none-phone">
                     <div className="col-1">
                       <h4>Color</h4>
                     </div>
@@ -733,7 +736,7 @@ console.log("orderStatus",orderStatus);
                   </div>
                   {
                     getSpecificOrderById?.orderDetailArr?.map((orderDetail,orderIndex)=><>
-                      <div className="row order-tab" key={orderIndex}>
+                      <div className="row order-tab d-none-phone " key={orderIndex}>
                     <div className="col-1">
                       <p>{orderDetail?.color}</p>
                     </div>
@@ -860,6 +863,18 @@ console.log("orderStatus",orderStatus);
   }
 
 </div>
+                    </div>
+                  </div>
+
+                  <div className="row d-none test" >
+                    <div className="col-12 "  key={orderIndex}>
+                   <p >Color:  <span className='bold'>{orderDetail?.color}</span></p>
+                   <p >T-shirt Size : <span className='bold'> {orderDetail?.teshirtSize}</span></p>
+                   <p >Quantity : <span className='bold'> {orderDetail?.quantity}</span></p>
+                   <p >Print Size : <span className='bold'>{orderDetail?.printSize}</span></p>
+                   <p >Main File :</p>
+                   <p >Picture :</p>
+                   <p >BrandLogo :</p>
                     </div>
                   </div>
                     </>)
