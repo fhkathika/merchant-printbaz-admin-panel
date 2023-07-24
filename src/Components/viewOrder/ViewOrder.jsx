@@ -252,7 +252,9 @@ console.log("orderStatus",orderStatus);
               <div className="col-12">
                 <div className="order-id bg-white p-4  shadow-sm" >
                 <div style={{display:""}} className="row">
-                <h3 className=" font-weight-bold col-lg-6" onClick={copyOrderId}>ORDER ID: {id} &nbsp;<span style={{cursor:"pointer",padding:"5px",fontSize:"16px"}} ref={target}  onClick={copyOrderId}><i class="fa fa-copy ml-2 mt-1 text-green cursor-pointer text-sm"></i></span> <h5 style={{marginTop:"10px"}}>{formattedDate}</h5></h3>
+                <h3 className=" font-weight-bold col-lg-6 font_16" onClick={copyOrderId}>ORDER ID: {id} &nbsp;<span style={{cursor:"pointer",padding:"5px",fontSize:"16px"}} ref={target}  onClick={copyOrderId}><i class="fa fa-copy ml-2 mt-1 text-green cursor-pointer text-sm"></i></span> 
+                <h5 className='font_16' style={{marginTop:"10px"}}>{formattedDate}</h5>
+                </h3>
                   {/* <button className="status-btn d-inline-block py-2 px-3 font-weight-bold">{viewOrder?.orderStatus}</button> */}
                   <Overlay target={target.current} show={show} placement="right">
         {(props) => (
@@ -669,16 +671,30 @@ console.log("orderStatus",orderStatus);
                   <div className="row amu-title">
                     <div className="col-12">
                       <h3 className="all-title">Cost of Order</h3>
+                      <div className='flex'>
                       <h6>Printbaz Cost</h6>
-                      <p>{getSpecificOrderById?.printbazcost} BDT</p>
+                      <span style={{marginTop:"10px"}}>{getSpecificOrderById?.printbazcost} BDT</span>
+                      </div>
+                      <div className='flex'>
                       <h6>Delivery Fee</h6>
-                      <p>{getSpecificOrderById?.deliveryFee} BDT</p>
+                      <span style={{marginTop:"10px"}}>{getSpecificOrderById?.deliveryFee} BDT</span>
+                      </div> 
+                      <div className='flex'>
                       <h6>Collect Amount</h6>
-                      <p>{getSpecificOrderById?.collectAmount} BDT</p>
+                      <span style={{marginTop:"10px"}}>{getSpecificOrderById?.collectAmount} BDT</span>
+                      </div> 
+                      <div className='flex'>
+                      
                       <h6>Cash Handling Fee</h6>
-                      <p>2% BDT</p>
+                      <span style={{marginTop:"10px"}}>2% BDT</span>
+                      </div>
+                   
+                  
+                      <div className='flex'>
                       <h6>Receivable Amount</h6>
-                      <p>{getSpecificOrderById?.recvMoney} BDT</p>
+                      <span style={{marginTop:"10px"}}>{getSpecificOrderById?.recvMoney}BDT</span>
+                      </div>
+                      
                     </div>
                   </div>
                 </div>
@@ -694,7 +710,7 @@ console.log("orderStatus",orderStatus);
                
                   <div className="row order-list-title">
                     <div className="col-12">
-                      <h4>{getSpecificOrderById?.instruction}</h4>
+                      <h4 className='font_16'>{getSpecificOrderById?.instruction}</h4>
                     </div>
               
                   </div>
