@@ -4,7 +4,7 @@ import { useLocation } from "react-router-dom";
 const ShippingDetail = ({getSpecificOrderById}) => {
     // const location = useLocation();
     // const viewOrder = location.state ? location?.state?.orderInfo : null;
-  
+  console.log("getSpecificOrderById",getSpecificOrderById?._id);
     return (
         <div >
           <meta charSet="UTF-8" />
@@ -22,7 +22,9 @@ const ShippingDetail = ({getSpecificOrderById}) => {
                   <h2>Shipping Detail </h2>
                 
                 </div>
-               
+               <div>
+                 <h4>Order ID: <span>{getSpecificOrderById?._id}</span></h4>
+               </div>
         
               </div>
             
@@ -32,15 +34,15 @@ const ShippingDetail = ({getSpecificOrderById}) => {
             
                 <div className="col-md-6 col-sm-12 mb-3">
                   
-                  <strong>Name: <p>{getSpecificOrderById?.name}</p></strong>
-                  <strong>Contact: <p>{getSpecificOrderById?.phone}</p></strong>
-                  <strong>Address: <p>{getSpecificOrderById?.address}</p></strong>
+                  <p style={{fontWeight:"600",fontSize:"25px",marginTop:"15px"}}>Name: <span>{getSpecificOrderById?.name}</span></p>
+                  <p style={{fontWeight:"600",fontSize:"25px"}}>Contact: <span>{getSpecificOrderById?.phone}</span></p>
+                  <p style={{fontWeight:"600",fontSize:"25px"}}>Address: <span>{getSpecificOrderById?.address}</span></p>
                 </div>
               
                 <div className="col-md-6 col-sm-12 mb-3 mt-3">
-                  <strong>Collect Amount</strong>
-                  <p>{getSpecificOrderById?.collectAmount}tk</p>
-                  <strong>Brand Name: <p>{getSpecificOrderById?.clientbrandName}</p></strong>
+                  <p style={{fontWeight:"600",fontSize:"25px"}}>Collect Amount</p>
+                  <p style={{fontWeight:"600",fontSize:"25px"}}>{getSpecificOrderById?.collectAmount}tk</p>
+                  <p style={{fontWeight:"600",fontSize:"25px"}}>Brand Name: <span>{getSpecificOrderById?.clientbrandName}</span></p>
    
                   
                 </div>
