@@ -213,11 +213,11 @@ headers: {
                     <div className="col-12">
                       <form onSubmit={handleSendDiscussionMessage}>
                         <input type="text" name="msg" value={newMsg} onChange={handleNewMessageChange} placeholder="Write Your Message....." />
-                        <button type="submit">Post</button>
+                        <button className='btn_phone' type="submit">Post</button>
                       </form>
                     </div>
                   </div>
-                  <div className="col-12 admin-dis-post" style={{overflow:"scroll",maxHeight:"70vh"}}>
+                  <div className="col-lg-12 admin-dis-post" style={{overflow:"scroll",maxHeight:"70vh"}}>
                     {
                       usersDiscussMsg?.map((msg,index)=>{
                         return(
@@ -227,7 +227,10 @@ headers: {
                             {/* <div className="text-muted small text-nowrap mt-2">{msg?.createTime}</div> */}
                           </div>
                           <div className="flex-shrink-1 rounded px-3 ml-3">
-                            <div className="font-weight-bold mb-1" style={{fontSize: '20px', fontWeight: 700}}>{msg?.userEmail} <span style={{fontSize: '12px', fontWeight: 700, backgroundColor: 'rgb(255, 38, 38)', color: 'white', padding: '5px', borderRadius: '5px'}}>{msg?.userRole}</span><small style={{fontSize:"14px",marginLeft:"15px",color:"gray",fontWeight:"400"}}>{msg?.createTime}</small></div>
+                            <div className=" font-weight-bold mb-1  block_phone "  style={{display:"flex" ,justifyContent:"cenetr",alignItems:"center"}}><p className='font_16 weight_600' style={{fontSize:"20px",fontWeight:"700"}}>{msg?.userEmail}</p>
+                             <span style={{fontSize: '12px', fontWeight: 700, backgroundColor: 'rgb(255, 38, 38)', color: 'white', padding: '5px',marginLeft:"5px", borderRadius: '5px'}}>{msg?.userRole}</span>
+                             <small style={{fontSize:"14px",marginLeft:"15px",color:"gray",fontWeight:"400"}}>{msg?.createTime}</small>
+                             </div>
                             {msg?.content}
                           </div>
                         </div>

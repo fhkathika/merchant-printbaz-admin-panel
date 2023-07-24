@@ -231,7 +231,7 @@ console.log("orderStatus",orderStatus);
                   <Link to="/orderList"><span style={{fontSize: '30px'}}>
                       &lt; </span> View Order Details</Link>
                 </div> 
-                <div className='d-flex  align_center col-lg- col-sm-2'>
+                <div className='d-flex  align_center col-lg- col-sm-2 '>
                 <div className="view-client-title " style={{marginRight:"10px"}}>
             <Button variant="warning" onClick={downloadShippingDetail}><span><img style={{width:"23px",hight:"20px"}} src="/images/download.png" alt='download'/></span>Shipping Detail</Button>
             <div id="shipping-detail" style={{position: 'absolute', left: '-10000px', top: '-10000px'}}>
@@ -264,15 +264,18 @@ console.log("orderStatus",orderStatus);
    
 {
   (previewURL && fileId) &&
-  <div className="qr-container col-lg-3" style={{marginBottom:"10px"}}>
+  <div className="col-lg-2" style={{display:"flex"}}>
+     <div className="qr-container " style={{marginBottom:"10px"}}>
      <iframe src={previewURL}  style={{ textDecoration: "none" }} height="200" width="200" title="orcode"></iframe>
     <a href={qrDownLoadURL} download className="qr-download-link">Download QR code</a>
   </div>
+</div>
+ 
 }
     
                   <div
-                        className="   font-weight-bold col-lg-3 "
-                        style={{ marginBottom: "20px" }}
+                        className="   font-weight-bold col-lg-4 "
+                        style={{ marginBottom: "20px",display:"flex",justifyContent:"flex-end" }}
                       >
                         <div style={{display:""}}>
                         <select
@@ -534,10 +537,11 @@ console.log("orderStatus",orderStatus);
                             </>
                           )}
                         </select>
+                        <p className='text_Align_Left' style={{textAlign:"center",marginTop:'10px'}}>Status changed at: {getSpecificOrderById?.statusDate}</p>
                         </div>
                         
                        
-                <p style={{textAlign:"center",marginTop:'10px'}}>Status changed at: {getSpecificOrderById?.statusDate}</p>
+               
 
                       </div>
                 </div>
@@ -712,19 +716,19 @@ console.log("orderStatus",orderStatus);
                     <div className="col-1">
                       <h4>Color</h4>
                     </div>
-                    <div className="col-2">
+                    <div className="col-1" style={{display:"flex",justifyContent:"center"}}>
                       <h4>T-shirt Size</h4>
                     </div>
-                    <div className="col-2">
+                    <div className="col-2" style={{display:"flex",justifyContent:"center"}}>
                       <h4>Quantity</h4>
                     </div>
-                    <div className="col-2">
+                    <div className="col-1" style={{display:"flex",justifyContent:"center"}}>
                       <h4>Print Size</h4>
                     </div>
-                    <div className="col-2">
+                    <div className="col-3" style={{display:"flex",justifyContent:"center"}}>
                       <h4>Main File</h4>
                     </div>
-                    <div className="col-2">
+                    <div className="col-3" style={{display:"flex",justifyContent:"center"}}>
                       <h4>Picture</h4>
                     </div>
                       <div className="col-1">
@@ -740,13 +744,13 @@ console.log("orderStatus",orderStatus);
                     <div className="col-1">
                       <p>{orderDetail?.color}</p>
                     </div>
-                    <div className="col-2">
+                    <div className="col-1" style={{display:"flex",justifyContent:"center"}}>
                       {orderDetail?.teshirtSize}
                     </div>
-                    <div className="col-2">
+                    <div className="col-2" style={{display:"flex",justifyContent:"center"}}>
                     {orderDetail?.quantity}
                     </div>
-                    <div className="col-2">
+                    <div className="col-1" style={{display:"flex",justifyContent:"center"}}>
                     {/* {orderDetail?.printSide} */}
                     <p>frontSide :{orderDetail?.printSize}</p>
                     {
@@ -756,43 +760,31 @@ console.log("orderStatus",orderStatus);
                   
                      
                     </div>
-                    <div className="col-lg-2">
+                    <div className="col-lg-3" style={{display:"flex",justifyContent:"center"}}>
                     <div className="card file">
   {
     orderDetail?.file?.map((fileUrl,fileIndex) => {
      // Extract the file ID from the URL
-     let fileId = "";
-     if (fileUrl?.includes("/file/d/")) {
-       fileId = fileUrl?.split("/file/d/")[1]?.split("/")[0];
-     } else if (fileUrl?.includes("id=")) {
-       fileId = fileUrl?.split("id=")[1];
-     }
+    //  let fileId = "";
+    //  if (fileUrl?.includes("/file/d/")) {
+    //    fileId = fileUrl?.split("/file/d/")[1]?.split("/")[0];
+    //  } else if (fileUrl?.includes("id=")) {
+    //    fileId = fileUrl?.split("id=")[1];
+    //  }
+
+    const fileId = fileUrl?.split('/d/')[1].split('/view')[0];
+    const downloadUrl = `https://drive.google.com/uc?export=download&id=${fileId}`;
+    const previewURL = `https://drive.google.com/file/d/${fileId}/preview`;
      // Construct the direct download link
-     const downloadUrl = `https://drive.google.com/uc?export=download&id=${fileId}`;
+    //  const downloadUrl = `https://drive.google.com/uc?export=download&id=${fileId}`;
      let dropdownId = `dropdown${orderIndex}-${fileIndex}`;
       return (
         <div key={fileIndex}>
          
-          <div className="card-body file-info">
+          <div className="file-info">
+          <iframe src={previewURL}  style={{ textDecoration: "none" }} height="auto" width="auto" title="orcode"></iframe>
+            <a className="dropdown-item" href={downloadUrl} download><p style={{cursor:"pointer"}} href={downloadUrl} download>download</p></a>
             
-            <a className="dropdown-item" href={downloadUrl} download><p style={{cursor:"pointer"}} href={downloadUrl} download>{fileUrl.substring(fileUrl.lastIndexOf('/') + 1)}</p></a>
-            {/* <ul className="file-options dropdown" >
-            <a className="dropdown-toggle" href="#" id={dropdownId} data-bs-toggle="dropdown" aria-expanded="false">
-              <i className="material-icons">more_vert</i>
-            </a>
-            <ul className="dropdown-menu dropdown-menu-right">
-              <li>
-                <a className="dropdown-item"    href="#">View Details</a>
-              </li>
-              <li>
-                <a className="dropdown-item" href={downloadUrl} download>Download</a>
-               
-              </li>
-              <li>
-                <a className="dropdown-item" href="#">Copy Link</a>
-              </li>
-            </ul>
-          </ul> */}
           </div>
         </div>
       )
@@ -801,27 +793,29 @@ console.log("orderStatus",orderStatus);
 </div>
 
 </div>
-                    <div className="col-lg-2">
+                    <div className="col-lg-3" style={{display:"flex",justifyContent:"center"}}>
                     <div className="card file">
   {
     orderDetail?.image?.map(imageUrl => {
      // Extract the file ID from the URL
-     let fileId = "";
-     if (imageUrl.includes("/file/d/")) {
-       fileId = imageUrl.split("/file/d/")[1].split("/")[0];
-     } else if (imageUrl.includes("id=")) {
-       fileId = imageUrl.split("id=")[1];
-     }
-     // Construct the direct download link
-     const downloadUrl = `https://drive.google.com/uc?export=download&id=${fileId}`;
+    //  let fileId = "";
+    //  if (imageUrl.includes("/file/d/")) {
+    //    fileId = imageUrl.split("/file/d/")[1].split("/")[0];
+    //  } else if (imageUrl.includes("id=")) {
+    //    fileId = imageUrl.split("id=")[1];
+    //  }
 
+    const fileId = imageUrl?.split('/d/')[1].split('/view')[0];
+    const downloadUrl = `https://drive.google.com/uc?export=download&id=${fileId}`;
+    const previewURL = `https://drive.google.com/file/d/${fileId}/preview`;
+   
       return (
         <div key={imageUrl}>
         
-          <div className="card-body file-info">
-           
-            <a className="dropdown-item" href={downloadUrl} download> <p>{imageUrl.substring(imageUrl.lastIndexOf('/') + 1)}</p></a>
-            {/* <span className="file-size">1009.2kb</span><br /> */}
+        <div className="file-info">
+          <iframe src={previewURL}  style={{ textDecoration: "none" }} height="auto" width="auto" title="orcode"></iframe>
+            <a className="dropdown-item" href={downloadUrl} download><p style={{cursor:"pointer"}} href={downloadUrl} download>download</p></a>
+            
           </div>
         </div>
       )
@@ -830,7 +824,126 @@ console.log("orderStatus",orderStatus);
 </div>
                     </div>
                      <div className="col-lg-1">
+                     {
+  orderDetail?.brandLogo &&
+  <>
+
+  <div className="card file">
+                    {
+    (() => {
+     // Extract the file ID from the URL
+     let fileId = "";
+     if (orderDetail?.brandLogo?.includes("/file/d/")) {
+       fileId = orderDetail?.brandLogo?.split("/file/d/")[1].split("/")[0];
+     } else if (orderDetail?.brandLogo?.includes("id=")) {
+       fileId = orderDetail?.brandLogo?.split("id=")[1];
+     }
+     // Construct the direct download link
+     const downloadUrl = `https://drive.google.com/uc?export=download&id=${fileId}`;
+
+      return (
+        <div>
+        
+         
+           {
+             orderDetail?.brandLogo ?
+             <a className="dropdown-item"  href={downloadUrl} download> Brand Logo</a>
+             :
+             ""
+           }
+           
+        
+        </div>
+      )
+    })()
+  }
+
+</div>
+  </>
+  
+}
+                    </div>
+                  </div>
+
+                  <div className="row  diplay_none" >
+                    <h3 style={{color:"orange"}}>Line Item: {orderIndex+1}</h3>
+                    <div className="col-12 "  key={orderIndex}>
+                   <p >Color:  <span className='bold'>{orderDetail?.color}</span></p>
+                   <p >T-shirt Size : <span className='bold'> {orderDetail?.teshirtSize}</span></p>
+                   <p >Quantity : <span className='bold'> {orderDetail?.quantity}</span></p>
+                   <p >Print Size : <span className='bold'>{orderDetail?.printSize}</span></p>
+                   <div className="col-lg-12" >
+                   <p>Main File :</p>
                     <div className="card file">
+  {
+    orderDetail?.file?.map((fileUrl,fileIndex) => {
+     // Extract the file ID from the URL
+    //  let fileId = "";
+    //  if (fileUrl?.includes("/file/d/")) {
+    //    fileId = fileUrl?.split("/file/d/")[1]?.split("/")[0];
+    //  } else if (fileUrl?.includes("id=")) {
+    //    fileId = fileUrl?.split("id=")[1];
+    //  }
+
+    const fileId = fileUrl?.split('/d/')[1].split('/view')[0];
+    const downloadUrl = `https://drive.google.com/uc?export=download&id=${fileId}`;
+    const previewURL = `https://drive.google.com/file/d/${fileId}/preview`;
+     // Construct the direct download link
+    //  const downloadUrl = `https://drive.google.com/uc?export=download&id=${fileId}`;
+     let dropdownId = `dropdown${orderIndex}-${fileIndex}`;
+      return (
+        <div key={fileIndex}>
+         
+          <div className="file-info">
+          <iframe src={previewURL}  style={{ textDecoration: "none" }} height="auto" width="auto" title="orcode"></iframe>
+            <a className="dropdown-item" href={downloadUrl} download><p style={{cursor:"pointer"}} href={downloadUrl} download>download</p></a>
+            
+          </div>
+        </div>
+      )
+    })
+  }
+</div>
+
+</div>
+                   
+                   {/* <p >Main File :<div className="file-info">
+          <iframe src={previewURL}  style={{ textDecoration: "none" }} height="auto" width="auto" title="orcode"></iframe>
+            <a className="dropdown-item" href={downloadUrl} download><p style={{cursor:"pointer"}} href={downloadUrl} download>download</p></a>
+            
+          </div></p> */}
+                              <div className="col-lg-12" >
+                   <p>Picture :</p>
+                    <div className="card file">
+                    {
+    orderDetail?.image?.map(imageUrl => {
+  
+
+    const fileId = imageUrl?.split('/d/')[1].split('/view')[0];
+    const downloadUrl = `https://drive.google.com/uc?export=download&id=${fileId}`;
+    const previewURL = `https://drive.google.com/file/d/${fileId}/preview`;
+   
+      return (
+        <div key={imageUrl}>
+        
+        <div className="file-info">
+          <iframe src={previewURL}  style={{ textDecoration: "none" }} height="auto" width="auto" title="orcode"></iframe>
+            <a className="dropdown-item" href={downloadUrl} download><p style={{cursor:"pointer"}} href={downloadUrl} download>download</p></a>
+            
+          </div>
+        </div>
+      )
+    })
+  }
+</div>
+
+</div>
+
+{
+  orderDetail?.brandLogo &&
+  <>
+  <p>Brang Logo :</p>
+  <div className="card file">
                     {
     (() => {
      // Extract the file ID from the URL
@@ -849,7 +962,7 @@ console.log("orderStatus",orderStatus);
           <div className="card-body file-info">
            {
              orderDetail?.brandLogo ?
-             <a className="dropdown-item" href={downloadUrl} download> <p>{orderDetail?.brandLogo.substring(orderDetail?.brandLogo.lastIndexOf('/') + 1)}</p></a>
+             <a className="dropdown-item" href={downloadUrl} download> <p>Brand Logo</p></a>
              :
              ""
            }
@@ -863,19 +976,12 @@ console.log("orderStatus",orderStatus);
   }
 
 </div>
-                    </div>
-                  </div>
+  </>
+  
+}
 
-                  <div className="row d-none test" >
-                    <div className="col-12 "  key={orderIndex}>
-                   <p >Color:  <span className='bold'>{orderDetail?.color}</span></p>
-                   <p >T-shirt Size : <span className='bold'> {orderDetail?.teshirtSize}</span></p>
-                   <p >Quantity : <span className='bold'> {orderDetail?.quantity}</span></p>
-                   <p >Print Size : <span className='bold'>{orderDetail?.printSize}</span></p>
-                   <p >Main File :</p>
-                   <p >Picture :</p>
-                   <p >BrandLogo :</p>
                     </div>
+                    <hr />
                   </div>
                     </>)
                   }

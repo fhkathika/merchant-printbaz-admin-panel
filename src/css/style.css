@@ -156,7 +156,7 @@
       #root .ql-snow.ql-toolbar {
         display: block;
         width: 100%;
-        height: 3rem;
+        height: auto;
         background: #eaecec;
         border-top-left-radius: 0.5em;
         border-top-right-radius: 0.5em;
@@ -245,8 +245,8 @@
           position: absolute;
          
           bottom: 0;
-          left: 11px;
-          width: auto;
+          left: 0;
+          width: 100%;
          
           background-color: #eaeaea;
           padding: 10px;
@@ -261,24 +261,59 @@
         .bold{
           font-weight:bold
         }
-        .d-none{
-          display: none ;
+        .diplay_none{
+          display: none !important;
         }
-        .d-block-phone{
-          display: none ;
-        }
+
+     
         @media only screen and (max-width: 600px) {
         
           /* .d-none{
             display: block;
           } */
-
-          .test{
+          .block_phone{
+            display: block !important;
+          }
+        
+.all-content{
+  margin: 20px !important;
+}
+          .diplay_none{
             display: block !important;
           }
 
           .d-none-phone{
             display: none !important ;
           }
+          .text_Align_Left{
+text-align: left !important;
+          }
 
+          .tab{
+            font-size: 14px;
+            padding:8px 11px
+          }
+          .admin-dis-chat{
+            padding: 10px !important;
+          }
+          .tab-content{
+            padding:20px 10px !important;
+          }
+          .btn_phone{
+            padding: 8px 10px !important;
+          }
+
+          .p-4{
+            padding:0rem !important;
+          }
+          .px-4{
+            padding-left: 2px !important;
+            padding-right: 2px !important;
+          }
+      .font_16{
+        font-size: 16px !important ;
+      }
+      .weight_600{
+        font-weight: 600;
+      }
         }

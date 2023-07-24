@@ -201,9 +201,9 @@ headers: {
               <div className="row g-0">
                
                 <div className="col-12 col-lg-7 col-xl-12">
-                  <div className="py-2 px-4 border-bottom d-none d-lg-block">
-                  <div className="flex align-items-center py-1" >
-                        <div className='d-flex align-items-center'>
+                  <div className="py-2 px-2 border-bottom  d-lg-block">
+                  <div className="flex align-items-center py-1 block_phone" >
+                      
 
                        
                       <div className="flex-grow-1 pl-3" style={{ marginLeft:"10px",textAlign:"left"}}>
@@ -211,9 +211,9 @@ headers: {
                         <p>Ticket id: <span style={{color:"orange"}}>{ticketId}</span> </p>
                        
                       </div>
-                        </div>
+                       
                     
-                      <div>
+                      <div style={{marginLeft:"10px"}} >
                       <select
                           id="status-filter"
                           className="status-btn"
@@ -267,18 +267,17 @@ headers: {
      
     </div> */}
                   </div>
-                  <div className="flex-grow-0 py-3 px-4 border-top">
+                  <div className="flex-grow-0 py-3 px-2  border-top phone-py-0 " >
                     <div >
-                    <form className="input-group chat-messages p-4" onSubmit={handleSendMessage}>
+                    <form style={{padding:"5px"}} className="input-group chat-messages  block_phone" onSubmit={handleSendMessage}>
                     <div   ref={quillRef}  />
-             <div style={{ position:"relative"}}>
-             <i className="fa fa-paperclip"  aria-hidden="true" /> 
+             <div style={{ position:"relative"}} >
   
                       <input
-                  className="btn"
+                  className="btn "
                   type="file"
                   name="file"
-                style={{height:"100%",weight:"100%"}}
+                style={{height:"100%",weight:"100%",marginRight:"15px",padding:"8px 0px"}}
                   multiple
                   
                   onChange={handleFileChange}
