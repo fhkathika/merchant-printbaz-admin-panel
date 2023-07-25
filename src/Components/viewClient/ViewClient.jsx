@@ -22,6 +22,7 @@ console.log("viewClient",viewClient);
     try {
       const response = await fetch(
         `https://mserver.printbaz.com/update-approval/${viewClient?._id}`,
+        // `http://localhost:5000/update-approval/${viewClient?._id}`,
         {
           method: "PUT",
           headers: {
@@ -36,7 +37,7 @@ console.log("viewClient",viewClient);
         viewClient.approval = status;
   
         console.log("Success:", viewClient);
-        SendUserApproveMail(viewClient?.email)
+        SendUserApproveMail({email:viewClient?.email,requestStatus:viewClient?.approval})
         // Update your state or perform any other necessary operations with the updated viewClient object
       } else {
         console.error("Error:", response.status);
