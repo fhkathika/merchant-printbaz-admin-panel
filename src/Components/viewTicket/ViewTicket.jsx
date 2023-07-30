@@ -335,7 +335,8 @@ const ViewTicket = () => {
                "General Query"
                 
                 }</h2>
-                <p>Order ID: {viewTicketDetail?.orderId}</p>
+                
+                <p>Order ID: <Link to={`/viewOrder/${viewTicketDetail?.orderId}`}>{viewTicketDetail?.orderId}</Link> </p>
                 <p>Ticket ID: {viewTicketDetail?.ticketId}</p>
               </div>
             </div>
