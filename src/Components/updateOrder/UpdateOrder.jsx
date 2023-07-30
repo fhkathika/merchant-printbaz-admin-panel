@@ -14,11 +14,10 @@ const UpdateOrder = ({ onClose,viewOrder,viewClient,getSpecificOrderById }) => {
     console.log("viewOrder",viewOrder);
     const [selectedFile, setSelectedFile] = useState(null);
     const [previewUrl, setPreviewUrl] = useState('');
+    const [updateOrderArr, setUpdateOrderArr] = useState([]);
+
     console.log("getSpecificOrderById",getSpecificOrderById);
-   const ordersArray = getSpecificOrderById?.orderDetailArr?.map(order => {
-   
-    return order;
-});
+
 // useEffect(()=>{
 //   const getOrderById=async()=>{
 //     // Fetch the updated order details
@@ -34,11 +33,11 @@ const UpdateOrder = ({ onClose,viewOrder,viewClient,getSpecificOrderById }) => {
  
    
 let  individualOrder
-if(ordersArray){
-    for(let i=0;i<ordersArray.length;i++){
- individualOrder=ordersArray[i]
-    }
-}
+// if(ordersArray){
+//     for(let i=0;i<ordersArray.length;i++){
+//  individualOrder=ordersArray[i]
+//     }
+// }
 const filesArr=individualOrder?.file?.map(singleFile=>{
   
     return singleFile
@@ -68,20 +67,23 @@ console.log("individualImage",individualImage);
         instruction: getSpecificOrderById?.instruction,
         collectAmount: getSpecificOrderById?.collectAmount,
         area: getSpecificOrderById?.area,
-        orderDetailArr: [
-          {
-            color: individualOrder?.color,
-            teshirtSize: individualOrder?.teshirtSize,
-            quantity: individualOrder?.quantity,
-            printSide:individualOrder?.printSide,
-            printSize: individualOrder?.printSize,
-            printSizeBack:individualOrder?.printSizeBack,
+        orderDetailArr:  getSpecificOrderById?.orderDetailArr?.map(order => {
+        
+           return order
+           })
+          // {
+          //   color: individualOrder?.color,
+          //   teshirtSize: individualOrder?.teshirtSize,
+          //   quantity: individualOrder?.quantity,
+          //   printSide:individualOrder?.printSide,
+          //   printSize: individualOrder?.printSize,
+          //   printSizeBack:individualOrder?.printSizeBack,
             
-            file: filesArr,
-            image: ImagesArr,
-            brandLogo: individualOrder?.brandLogo,
-          },
-        ],
+          //   file: filesArr,
+          //   image: ImagesArr,
+          //   brandLogo: individualOrder?.brandLogo,
+          // },
+      
       });
       useEffect(() => {
         console.log('Updated Order State:', formData);
@@ -639,7 +641,7 @@ console.log("individualImage",individualImage);
                  
                     {formData.orderDetailArr.map((item, index) => (
                       <>
-                      
+                       <h4 style={{textAlign:"start",color:"orange"}}>Line Item : {index+1}</h4>
                   <Form.Group
                       className="mb-3 Print Side w-100 m-auto"
                       controlId="wccalcPrintSide"
@@ -1033,7 +1035,6 @@ console.log("individualImage",individualImage);
 </Form.Group>
 }
 
-         
                      </>
                      ))}
                   </div>
