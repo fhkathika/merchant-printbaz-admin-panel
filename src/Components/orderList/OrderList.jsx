@@ -7,7 +7,7 @@ import Navigationbar from '../navigationBar/Navigationbar';
 const OrderList = () => {
   const { orderAll } = useGetMongoData();
   const [allMerchant,setAllMerchant]=useState([])
-  console.log("orderAll", orderAll);
+  // console.log("orderAll", orderAll);
   const [show, setShow] = useState({});
   const [filterOrders,setFilterOrders]=useState('all');
   const [currentPage, setCurrentPage] = useState(1);
@@ -26,7 +26,7 @@ const OrderList = () => {
     getOrders()
 },[allMerchant])
 let matchingMerchant
- console.log("allMerchant",allMerchant);
+//  console.log("allMerchant",allMerchant);
 let date = new Date(orderAll?.createdAt); // create a new Date object
 
 let options = { month: 'long', day: 'numeric', year: 'numeric', hour: 'numeric', minute: 'numeric' }; // options for toLocaleDateString
@@ -59,7 +59,7 @@ function timeSince(date) {
   }
   return Math.floor(seconds) + " seconds ago";
 }
-console.log("formattedDate",formattedDate);
+// console.log("formattedDate",formattedDate);
 const handleInputChange = (event, index) => {
   const { name, value } = event.target;
   setFilterOrders(value)
@@ -85,11 +85,11 @@ let unPaidOrders=orderAll?.filter(users=>users?.paymentStatus==="Unpaid");
 let searchByOrderId= orderAll?.filter(OrederId => OrederId?._id?.includes(filterOrders));
 let filterByClientPhone=orderAll?.filter(users=>users?.clientPhone===filterOrders);
 let filterByBrandName=orderAll?.filter(users=>users?.clientbrandName===filterOrders);
-console.log("filterByBrandName",filterByBrandName);
-console.log("filterByClientPhone",filterByClientPhone);
+// console.log("filterByBrandName",filterByBrandName);
+// console.log("filterByClientPhone",filterByClientPhone);
 const handleOrderIdChange = (e) => {
   const value = e.target.value;
-  console.log(value);
+  // console.log(value);
   setFilterOrders(value);
 }
 const getViewClientColor = (status) => {
@@ -176,7 +176,7 @@ const filerByOrderDate = orderAll.filter(order => {
   return false;
 });
 
-console.log("filterByOrderDate", filerByOrderDate);
+// console.log("filterByOrderDate", filerByOrderDate);
 
 
 const actualIndexOfLastItem = indexOfLastItem > orderAll.length ? orderAll.length : indexOfLastItem;
@@ -480,7 +480,7 @@ const actualIndexOfLastItemOfUnpaidOrders = indexOfLastItem > unPaidOrders.lengt
               {
                    filterOrders && filterByClientPhone?.map((orders,index)=>{ 
                    const matchingMerchantOrders = orderAll?.filter(merchantOrder => merchantOrder?.userMail === orders?.email)
-                   console.log("matchingMerchantOrders",matchingMerchantOrders);
+                  //  console.log("matchingMerchantOrders",matchingMerchantOrders);
                    let  totalPrintBazCostWithDeliveryFee=Number(orders?.printbazcost) + Number(orders?.deliveryFee)
                     return (
                       <Link to={`/viewOrder/${orders?._id}`} state={{orders,matchingMerchantOrders}} key={index}>

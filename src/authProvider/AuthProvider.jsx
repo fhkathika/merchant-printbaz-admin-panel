@@ -21,7 +21,7 @@ const fetchUserData = async (token) => {
 
       if (response.ok) {
           const userData = await response.json();
-          console.log('fetchUserData response', userData);
+          // console.log('fetchUserData response', userData);
           setAdminUser(userData)
           return userData;
       } else {
@@ -44,7 +44,7 @@ const loginAdminUser = async (token, userData) => {
   try {
     const fetchedUser = await fetchUserData(token); 
     setAdminUser(fetchedUser); // Update the user state with fetchedUser
-    console.log('User logged in successfully from auth provider', fetchedUser);
+    // console.log('User logged in successfully from auth provider', fetchedUser);
 
     // Navigate to the dashboard after setting the user state
     // Navigate to the intended page or the default page after successful login

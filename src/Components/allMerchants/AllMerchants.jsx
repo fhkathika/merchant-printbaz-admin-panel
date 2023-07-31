@@ -26,11 +26,11 @@ const handleInputChange = (event, index) => {
 }
 const handleEmailChange = (e) => {
   const value = e.target.value;
-  console.log(value);
+  // console.log(value);
   setFilterEmail(value);
 }
 
-console.log("filterEmail",filterEmail);
+// console.log("filterEmail",filterEmail);
 let pendingUsers=allMerchant?.filter(users=>users?.approval==="request");
 let approvedUsers=allMerchant?.filter(users=>users?.approval==="approved");
 let bannedUsers=allMerchant?.filter(users=>users?.approval==="ban");
@@ -54,12 +54,12 @@ allMerchant?.map(merchant=>{
   return(formattedDate)
 
 })
-console.log("formattedDate",formattedDate);
-console.log("SingleEmailOneTime",SingleEmailOneTime);
+// console.log("formattedDate",formattedDate);
+// console.log("SingleEmailOneTime",SingleEmailOneTime);
 
 const handleContactChange=(e)=>{
   const value = e.target.value;
-  console.log(value);
+  // console.log(value);
   setFilterUsers(value);
 }
 let searchByPhoneNumber= allMerchant?.filter(Phone => Phone?.phone?.includes(filterUser));

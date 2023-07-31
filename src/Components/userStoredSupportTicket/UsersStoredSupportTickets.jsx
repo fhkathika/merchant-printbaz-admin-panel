@@ -29,26 +29,26 @@ const UsersStoredSupportTickets = ({ message,ticketId,userOrderId,ticketIssue, o
       quill.on('text-change', (delta, oldContents) => {
         // const text =  quillRef.current.getEditor().getText();
         // setNewMsg(text)
-        console.log("delta,delta",delta);
+        // console.log("delta,delta",delta);
         delta.ops.forEach((op) => {
           if (typeof op.insert === 'string') {
-            console.log('Inserted text:', op.insert);
-            console.log('Applied formats:', op.attributes);
+            // console.log('Inserted text:', op.insert);
+            // console.log('Applied formats:', op.attributes);
           } else if (op.insert && typeof op.insert === 'object') {
             // handle embeds like images, video etc.
             Object.keys(op.insert).forEach((key) => {
-              console.log('Inserted object of type:', key);
-              console.log('Object value:', op.insert[key]);
-              console.log('Applied formats:', op.attributes);
+              // console.log('Inserted object of type:', key);
+              // console.log('Object value:', op.insert[key]);
+              // console.log('Applied formats:', op.attributes);
             });
           }
         });
         const currentContents = quill.getContents();
-        console.log(currentContents.diff(oldContents));
+        // console.log(currentContents.diff(oldContents));
 
         const text = quill.getText();
         const format=quill.getFormat();
-        console.log('Typed text:', format);
+        // console.log('Typed text:', format);
         // setNewMsg(text)
         setNewMsg(quill.root.innerHTML);
       });
@@ -74,10 +74,10 @@ const UsersStoredSupportTickets = ({ message,ticketId,userOrderId,ticketIssue, o
   };
   
   let filterByTicketId=usersStoredTickets?.find(ticket=>ticket.ticketId===ticketId)
-console.log("usersStoredTickets",usersStoredTickets?.files);
+// console.log("usersStoredTickets",usersStoredTickets?.files);
 
 const handleNewMessageChange = (e) => {
-      console.log(e.target.value);
+      // console.log(e.target.value);
       setNewMsg(e.target.value);
   };
       //upload files
@@ -86,10 +86,10 @@ const handleNewMessageChange = (e) => {
       setSelectedFiles(filesArray);
       };
       
- console.log("newMessage",newMsg); 
+//  console.log("newMessage",newMsg); 
  const handleInputTicketIssueChange = async (e) => {
   const status = e.target.value; // the new status
-console.log("status",status);
+// console.log("status",status);
  }
 
     
@@ -148,7 +148,7 @@ headers: {
     setNewMsg('');
     setSelectedFiles('');
    fetchOrderIddata();
-    console.log("chatLog",chatLog);
+    // console.log("chatLog",chatLog);
   } catch (err) {
     console.error(err);
   }

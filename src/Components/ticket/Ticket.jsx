@@ -24,7 +24,7 @@ const Ticket = () => {
       console.error(err);
     }
   };
-  console.log("fetchAllTicket",fetchAllTicket);
+  // console.log("fetchAllTicket",fetchAllTicket);
   const handleInputTicketIssueChange = async (e) => {
     e.preventDefault()
   
@@ -64,7 +64,7 @@ const Ticket = () => {
     return Math.floor(seconds) + " seconds ago";
   }
  
-console.log("ticketIssue",ticketIssue);
+// console.log("ticketIssue",ticketIssue);
 let artWorkIssue=fetchAllTicket?.filter(users=>users?.ticketIssue==="onHold artwork issue");
 let billingIssue=fetchAllTicket?.filter(users=>users?.ticketIssue==="onHold billing issue");
 let outOfStock=fetchAllTicket?.filter(users=>users?.ticketIssue==="onHold out of stock");
@@ -75,7 +75,7 @@ let closeQuery=fetchAllTicket?.filter(users=>users?.ticketStatus==="close");
 let repliedQuery=fetchAllTicket?.filter(users=>users?.ticketStatus==="replied");
 let openQuery=fetchAllTicket?.filter(users=>users?.ticketStatus==="open");
 let pendingQuery=fetchAllTicket?.filter(users=>users?.ticketStatus==="pending");
-console.log("closeQuery",closeQuery);
+// console.log("closeQuery",closeQuery);
   return (
     <div>
     <meta charSet="UTF-8" />

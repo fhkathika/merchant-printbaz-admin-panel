@@ -103,13 +103,13 @@ const validatePassword = (password) => {
             setShowAlert(true)
             setShowLoginButton(true)
      
-            console.log("responseData", responseData);
+            // console.log("responseData", responseData);
         } catch (error) {
            console.error("error", error);
         }
     };
     
-console.log("formData",formData);
+//  console.log("formData",formData);
     return (
 
 

@@ -13,7 +13,7 @@ function SendInvitationPage() {
     editor: false,
     admin: false
 });
-console.log("roles",roles);
+// console.log("roles",roles);
 //format date 
 const date=new Date()
 const options={
@@ -33,7 +33,7 @@ inviteCreatedAt = inviteCreatedAt.replace(/\.0+/g, '.');
 // Replace 'AM' with 'am' and 'PM' with 'pm'
 inviteCreatedAt = inviteCreatedAt.replace('AM', 'am').replace('PM', 'pm');
 
-console.log(inviteCreatedAt);
+// console.log(inviteCreatedAt);
 const handleRoleChange=(event)=>{
   setRoles({...roles, [event.target.name]: event.target.checked });
 }
@@ -61,18 +61,18 @@ const sendRolesToServer = async (roles) => {
   }
 
   const responseData = await response.json();
-  console.log("responseData",responseData);
+  // console.log("responseData",responseData);
 }
 
   const sendInvitation = async (e) => {
     e.preventDefault();
     const chosenRoles = Object.keys(roles).filter(role => roles[role] === true);
-    console.log(chosenRoles); // logs the roles that were checked
+    // console.log(chosenRoles); // logs the roles that were checked
     try {
       // const res = await axios.post("http://localhost:5000/sendInvitation", { email,roles:chosenRoles,inviteCreatedAt });
       const res = await axios.post("https://mserver.printbaz.com/sendInvitation", { email,roles:chosenRoles,inviteCreatedAt });
       setMessage(res.data.message);
-      console.log("res.data.message",res.data);
+      // console.log("res.data.message",res.data);
     } catch (error) {
       setMessage("Failed to send invitation.");
     }

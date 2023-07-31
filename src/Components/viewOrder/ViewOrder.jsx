@@ -15,7 +15,6 @@ import html2canvas from "html2canvas";
 import ReactDOMServer from 'react-dom/server';
 const ViewOrder = () => {
   let { id } = useParams();
-  console.log("id",id);
   const location = useLocation();
   const [getSpecificOrderById, setGetSpecificOrderById] = useState();
   const viewOrder = location.state ? location?.state?.orders : null;
@@ -39,7 +38,6 @@ const ViewOrder = () => {
   const [paymentStatus, setPaymentStatus] = useState();
   const [updateOrder, setUpdateOrder] = useState(false);
  
-console.log("orderStatus",orderStatus);
   const [show, setShow] = useState(false);
   const target = useRef(null);
   let date = new Date(getSpecificOrderById?.createdAt); // create a new Date object
@@ -48,12 +46,9 @@ console.log("orderStatus",orderStatus);
   
   let formattedDate = date.toLocaleDateString('en-US', options); // use toLocaleDateString to format the date
   
-  console.log("viewOrder",viewOrder); 
-
-    console.log("getSpecificOrderById",getSpecificOrderById);
   const handleInputChange = async (e) => {
     const status = e.target.value; // the new status
-  console.log("status",status);
+  // console.log("status",status);
 
     //   await fetch(`http://localhost:5000/update-approval/${viewClient?._id}`, { //for testing site
     try {
@@ -74,7 +69,7 @@ console.log("orderStatus",orderStatus);
         // Update the approval status in the viewClient object
         setOrderStatus(status);
         SendOrderStatusMail({status:status,_id:getSpecificOrderById?._id,userMail:getSpecificOrderById?.userMail })
-        console.log("Success:", viewOrder);
+        // console.log("Success:", viewOrder);
         // Update your state or perform any other necessary operations with the updated viewClient object
       } else {
         console.error("status Error:", response);
@@ -88,7 +83,7 @@ console.log("orderStatus",orderStatus);
   
   const handleInputPaymentChange = async (e) => {
     const status = e.target.value; // the new status
-  console.log("status",status);
+  // console.log("status",status);
 
     //   await fetch(`http://localhost:5000/update-approval/${viewClient?._id}`, { //for testing site
     try {
@@ -109,7 +104,7 @@ console.log("orderStatus",orderStatus);
         // Update the approval status in the viewClient object
         setPaymentStatus(status);
   
-        console.log("Success:", getSpecificOrderById);
+        // console.log("Success:", getSpecificOrderById);
         // Update your state or perform any other necessary operations with the updated viewClient object
       } else {
         console.error("status Error:", response);
@@ -124,7 +119,7 @@ console.log("orderStatus",orderStatus);
     e.preventDefault()
 
     setUpdateOrder(true)
-    console.log("setUpdateOrder",updateOrder);
+    // console.log("setUpdateOrder",updateOrder);
   }
   const downloadShippingDetail = async () => {
     const shippingDetailElement = document.getElementById('shipping-detail');
@@ -201,7 +196,7 @@ console.log("orderStatus",orderStatus);
     navigator.clipboard.writeText(viewOrder?._id);
     
     setShow(true)
-    console.log("viewOrder?._id",viewOrder?._id);
+    // console.log("viewOrder?._id",viewOrder?._id);
     setTimeout(() => {
       setShow(false);
     }, 1000);

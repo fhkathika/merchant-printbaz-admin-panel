@@ -11,12 +11,12 @@ import AlertMessage from '../alert/AlertMessage';
 import OrderUpdateAlert from '../alert/OrderUpdateAlert';
 
 const UpdateOrder = ({ onClose,viewOrder,viewClient,getSpecificOrderById }) => {
-    console.log("viewOrder",viewOrder);
+    // console.log("viewOrder",viewOrder);
     const [selectedFile, setSelectedFile] = useState(null);
     const [previewUrl, setPreviewUrl] = useState('');
     const [updateOrderArr, setUpdateOrderArr] = useState([]);
 
-    console.log("getSpecificOrderById",getSpecificOrderById);
+    // console.log("getSpecificOrderById",getSpecificOrderById);
 
 // useEffect(()=>{
 //   const getOrderById=async()=>{
@@ -58,8 +58,7 @@ if(ImagesArr){
       individualImage=ImagesArr[i]
     }
 }
-console.log("individualFile",individualFile);
-console.log("individualImage",individualImage);
+
    const [formData, setFormData] = useState({
         name: getSpecificOrderById?.name,
         phone: getSpecificOrderById?.phone,
@@ -110,7 +109,7 @@ console.log("individualImage",individualImage);
       const [recvAmount,setRecvAmount]=useState()
       const [formValid, setFormValid] = useState(false);
     
-    console.log("individualOrder?.image",individualOrder?.image);
+    
       const d = new Date();
         const options = { month: "long", day: "numeric", year: "numeric" };
         const formattedDate = d.toLocaleDateString("en-US", options);
@@ -156,7 +155,7 @@ console.log("individualImage",individualImage);
       const handleInputChange = (event, index) => {
         const { name, value } = event.target;
         if (name==="color" || name==="teshirtSize" || name==="quantity" || name==="printSize"|| name==="printSide" || name==="printSizeBack") {
-          console.log(value)
+       
           // const fieldName = name.split('.')[1];
           const newOrderDetailArr = [...formData.orderDetailArr];
           newOrderDetailArr[index][event.target.name]=event.target.value;
@@ -166,14 +165,13 @@ console.log("individualImage",individualImage);
        else {
             setFormData({ ...formData, [name]: value });
             // setSum(formData.reduce((total, input) => total + Number(input.value), 0));
-            console.log('order address',formData);
+          
           }
         } 
         const handleFileChange = (event, orderIndex, fileIndex) => {
-          console.log("orderIndex", orderIndex);
-          console.log("fileIndex", fileIndex);
+         
           const { name, files } = event.target;
-          console.log("name",name);
+         
           if (files.length > 0) {
               setFormData(prevState => {
                   const newOrderDetailArr = prevState.orderDetailArr.map((item, index) => {
@@ -197,10 +195,6 @@ console.log("individualImage",individualImage);
       };
       
         
-   
-    
-  
-      console.log("setFormData",formData);
 
       // const handleFileChange = (file, index) => {
       //   const name = "file"; // Assuming the name is always "file" in this case
@@ -304,11 +298,11 @@ console.log("individualImage",individualImage);
           else if(formData?.orderDetailArr[i]?.printSizeBack==="2.5 X 5"){
             backSidePrintCost= formData?.orderDetailArr[i]?.quantity * 15
           }
-          console.log("formData?.orderDetailArr[i]?.printSizeBack",(formData?.orderDetailArr[i]?.quantity * 80));
+         
     
       printbazcostbase = Number(totalPrice)+backSidePrintCost;
       printbazcost += printbazcostbase;
-      console.log("printbazcost",Number(printbazcost),"+",printbazcostbase)
+      // console.log("printbazcost",Number(printbazcost),"+",printbazcostbase)
     
           
                 
@@ -394,7 +388,7 @@ console.log("individualImage",individualImage);
         // costHandlingfee = recvMoneyWithouthandling * 0.02;
         costHandlingfee = Number(formData.collectAmount * 0.02);
         recvMoney = recvMoneyWithouthandling - costHandlingfee;
-        console.log("recvMoney",recvMoney)
+        // console.log("recvMoney",recvMoney)
         const validateForm = () => {
           if (recvMoney < 0) {
             setFormValid(true);
@@ -419,17 +413,17 @@ console.log("individualImage",individualImage);
               const formData2 = new FormData();
               const orderDetailArr = formData.orderDetailArr || [];
               const filesAndImagesArr = [];
-          console.log("formData.orderDetailArr",formData.orderDetailArr);
+          // console.log("formData.orderDetailArr",formData.orderDetailArr);
               orderDetailArr?.forEach((item, index) => {
                 const fileAndImageData = {};
                // Only append 'file' and 'image' fields if they have been updated:
                if (item.file && item.file.length > 0) {
-                console.log("item.file.length",item.file.length);
+                // console.log("item.file.length",item.file.length);
                 item.file.forEach((file, fileIndex) => {
                   if (file instanceof File) {
                     formData2.append(`file${index}_${fileIndex}`, file); // Append each file
                   } else {
-                    console.error(`item.file[${fileIndex}] is not a File object:`, file);
+                    // console.error(`item.file[${fileIndex}] is not a File object:`, file);
                   }
                 });
               }
@@ -442,7 +436,7 @@ console.log("individualImage",individualImage);
           
                 // Append brandLogo
                 if (item.brandLogo ) {
-                  console.log("item.brandLogo",item.brandLogo);
+                  // console.log("item.brandLogo",item.brandLogo);
                   formData2.append(`brandLogo${index}`, item.brandLogo);
               }
           
@@ -485,15 +479,15 @@ console.log("individualImage",individualImage);
           
               if (response.ok) {
                 const result = await response.json();
-                console.log("Success:", result);
-                console.log('API response:', response);
+                // console.log("Success:", result);
+                // console.log('API response:', response);
             
              // Fetch the updated order details
   const orderResponse = await fetch(`https://mserver.printbaz.com/getorder/${viewOrder?._id}`);
   // const orderResponse = await fetch(`http://localhost:5000/getorder/${viewOrder?._id}`);
   if (orderResponse.ok) {
     const updatedOrder = await orderResponse.json();
-    console.log('Updated order:', updatedOrder);
+    // console.log('Updated order:', updatedOrder);
   } else {
     throw new Error('Order fetch error: ' + orderResponse.status);
   }
