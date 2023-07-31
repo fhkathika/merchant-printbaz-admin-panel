@@ -63,10 +63,10 @@ const Navigationbar = () => {
                   <Link className="nav-link active" aria-current="page" to="/filemanager">File Manager</Link>
           
                 </li> 
-                 {/* <li className="nav-item">
+                 <li className="nav-item">
                   <Link className="nav-link active" aria-current="page" to="/invitaionPage">Send Invitation</Link>
           
-                </li> */}
+                </li>
                 <li className="nav-item">
                   <Link className="nav-link active" aria-current="page" to="/login">Log in</Link>
           

@@ -1,6 +1,6 @@
 import logo from './logo.svg';
 import './App.css';
-import { Route, Routes } from 'react-router-dom';
+import { Route, Routes, useLocation } from 'react-router-dom';
 import Dashboard from './Components/dashboard/Dashboard';
 import AllMerchants from './Components/allMerchants/AllMerchants';
 import OrderList from './Components/orderList/OrderList';
@@ -14,7 +14,7 @@ import ViewTicket from './Components/viewTicket/ViewTicket';
 import SendInvitationPage from './Components/invitaionPage/SendInvitationPage';
 import LoginPage from './Components/login/LoginPage';
 import PrivateRoute from './routes/PrivateRoute';
-
+import Register from './Components/registerAdminPage/Register';
 function App() {
   return (
     <div className="">
@@ -31,6 +31,13 @@ function App() {
       <Route path="/viewTicket/:id"element={<PrivateRoute><ViewTicket/> </PrivateRoute>} />
        <Route path="/invitaionPage"element={<SendInvitationPage/> } />
        <Route path="/login" element={<LoginPage/>} />
+       {/* <Route path="/registerAdminPage" element={<Register/>} /> */}
+       <Route
+  path="/registerAdminPage"
+  element={
+    <Register token={new URLSearchParams(useLocation().search).get('token')} />
+  }
+/>
        </Routes>
     </div>
   );
