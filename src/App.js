@@ -15,6 +15,7 @@ import SendInvitationPage from './Components/invitaionPage/SendInvitationPage';
 import LoginPage from './Components/login/LoginPage';
 import PrivateRoute from './routes/PrivateRoute';
 import Register from './Components/registerAdminPage/Register';
+import Role from './Components/role/Role';
 function App() {
   return (
     <div className="">
@@ -31,7 +32,7 @@ function App() {
       <Route path="/viewTicket/:id"element={<PrivateRoute><ViewTicket/> </PrivateRoute>} />
        <Route path="/invitaionPage"element={<SendInvitationPage/> } />
        <Route path="/login" element={<LoginPage/>} />
-       {/* <Route path="/registerAdminPage" element={<Register/>} /> */}
+       <Route path="/role" element={<Role/>} />
        <Route
   path="/registerAdminPage"
   element={

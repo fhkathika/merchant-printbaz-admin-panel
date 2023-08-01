@@ -6,12 +6,16 @@ import Navigationbar from '../navigationBar/Navigationbar';
 const Ticket = () => {
   const[fetchAllTicket,setFetchAllTicket]=useState([])
   const [ticketIssue, setTicketIssue] = useState("all");
+
   // const [ticketStatus, setTicketStatus] = useState("");
   useEffect(() => {
     // Fetch the chat log from the server when the component mounts
    
     fetchOrderIddata();
   }, []);
+
+
+       
 
   
   const fetchOrderIddata = async () => {

@@ -34,10 +34,11 @@ const ViewOrder = () => {
          }
          getOrderById()
         },[getSpecificOrderById])
+      
   const [orderStatus, setOrderStatus] = useState();
   const [paymentStatus, setPaymentStatus] = useState();
   const [updateOrder, setUpdateOrder] = useState(false);
- 
+ console.log("getSpecificOrderById",getSpecificOrderById);
   const [show, setShow] = useState(false);
   const target = useRef(null);
   let date = new Date(getSpecificOrderById?.createdAt); // create a new Date object

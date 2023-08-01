@@ -68,9 +68,14 @@ const Navigationbar = () => {
           
                 </li>
                 <li className="nav-item">
-                  <Link className="nav-link active" aria-current="page" to="/login">Log in</Link>
+                  <Link className="nav-link active" aria-current="page" to="/role">Role</Link>
           
                 </li>
+                <li className="nav-item">
+                  <Link className="nav-link active" aria-current="page" to="/login">Log in</Link>
+          
+                </li>  
+            
               </ul>
               <p style={{color:"white",marginTop:"13px"}}>{adminUser?.email}</p>
             </div>

@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { Form, Link, useLocation } from "react-router-dom";
 import "../../css/style.css";
 import useGetMongoData from "../../hooks/useGetMongoData";
@@ -9,7 +9,22 @@ const ViewClient = () => {
   const { orderAll } = useGetMongoData();
   const location = useLocation();
   const viewClient = location.state ? location?.state?.merchants : null;
-console.log("viewClient",viewClient);
+  const [getUserById, setGetUserById] = useState();
+  console.log("viewClient",viewClient);
+useEffect(()=>{
+  const getOrderById=async()=>{
+           // Fetch the updated order details
+  // await fetch(`https://mserver.printbaz.com/getUser/${viewClient?._id}`)
+  await fetch(`http://localhost:5000/getUser/${viewClient?._id}`)
+  .then(res=>res.json())
+  .then(data => {setGetUserById(data)})
+    
+  
+       }
+       getOrderById()
+      },[getUserById])
+
+      console.log("getUserById",getUserById);
   const handleInputChange = async (e) => {
     const status = e.target.value; // the new status
     // status === "request" && setApprovalRequest("request");

@@ -140,6 +140,7 @@ let searchByPhoneNumber= allMerchant?.filter(Phone => Phone?.phone?.includes(fil
 
           {
           filterUser &&  searchByPhoneNumber?.map((merchants)=><>
+           {/* <Link  key={merchants?._id} to={`/viewTicket/${merchants?._id}`} state={{merchants}}></Link> */}
              <Link key={merchants?._id} to={`/viewClient/${merchants?._id}`} state={{merchants}}>
             <div className="row client-list">
               <div className="col-lg-2 col-sm-12">

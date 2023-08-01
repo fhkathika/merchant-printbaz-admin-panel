@@ -25,11 +25,14 @@ const ViewTicket = () => {
     const [ticketStatus, setTicketStatus] = useState(viewTicketDetail?.ticketStatus);
     const [showAlert, setShowAlert] = useState(false);
     const [showMailTooltip, setShowMailTooltip] = useState(false);
+    const [getUserById, setGetUserById] = useState();
+
   const target = useRef(null);
     const [formatType, setFormatType] = useState({});
     console.log("viewTicketDetail",viewTicketDetail);
     console.log("openTextBox",openTextBox);
     console.log("ticketStatus",ticketStatus);
+  
 
     const { quill, quillRef, Quill } = useQuill({
       modules: { blotFormatter: {} }
@@ -73,7 +76,7 @@ const ViewTicket = () => {
 
 
     useEffect(() => {
-        // Fetch the chat log from the server when the component mounts
+ // Fetch the chat log from the server when the component mounts
        
         fetchOrderIddata();
             // Fetch the chat log every 10 seconds
@@ -82,6 +85,8 @@ const ViewTicket = () => {
       // Clean up the interval on unmount
       return () => clearInterval(intervalId);
       }, [messagesEndRef.current?.scrollIntoView({ behavior: "smooth" })]);
+
+      console.log("getUserById",getUserById);
       const fetchOrderIddata = async () => {
         try {
           // const response = await axios.get(`http://localhost:5000/getOrderIdmessages/${viewTicketDetail?.orderId}`);
@@ -352,7 +357,18 @@ const ViewTicket = () => {
            
                 <div className="col-12">
                 <div className="mer-info">
-                  <img src="https://media.discordapp.net/attachments/1069579536842379305/1107191553501450260/Logo-01.jpg?width=616&height=616" alt="" />
+                  {
+                    getUserById?.clientbrandLogoURL &&
+                    <img src={getUserById?.clientbrandLogoURL} alt="" />
+                    
+//                     <div style={{display:"flex",justifyContent:"center",alignItems:"center",marginLeft:'10px'}}>
+//  <svg id="Layer_2" height="30" viewBox="0 0 512 512" width="30" xmlns="http://www.w3.org/2000/svg"><g><g><g><circle cx="256" cy="256" fill="#6e83b7" r="246"/></g><g><ellipse cx="256" cy="356" fill="#edeff1" rx="173.237" ry="100"/></g><g><circle cx="256" cy="156" fill="#edeff1" r="100"/></g></g><g><path d="m256 376 80.714-103.039c-24.687-10.903-51.992-16.961-80.714-16.961s-56.027 6.058-80.714 16.961z" fill="#d3d3d3"/></g></g></svg>
+
+//                     </div>
+                   
+
+                }
+                 
                   <h2 >{viewTicketDetail?.userName}</h2>
                   <h3 >{timeSince(new Date(viewTick?.timestamp))} ({new Date(viewTick?.timestamp).toLocaleString("en-US", { month: 'long', day: 'numeric', year: 'numeric', hour: 'numeric', minute: 'numeric' })})</h3>
                   <hr className='hr_lineStyle'/>
