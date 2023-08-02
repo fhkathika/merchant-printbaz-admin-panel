@@ -78,6 +78,7 @@ let inProductionOrders=orderAll?.filter(users=>users?.orderStatus==="in-producti
 let outForDeliveryOrders=orderAll?.filter(users=>users?.orderStatus==="out for delivery");
 let deliveredOrders=orderAll?.filter(users=>users?.orderStatus==="delivered");
 let cancelOrders=orderAll?.filter(users=>users?.orderStatus==="cancel");
+let returnOrders=orderAll?.filter(users=>users?.orderStatus==="returned");
 // payment staus
 let paidOrders=orderAll?.filter(users=>users?.paymentStatus==="paid");
 
@@ -190,6 +191,7 @@ const actualIndexOfLastItemOfinProductionOrders = indexOfLastItem > inProduction
 const actualIndexOfLastItemOfoutForDeliveryOrders = indexOfLastItem > outForDeliveryOrders.length ? outForDeliveryOrders.length : indexOfLastItem;
 const actualIndexOfLastItemOfdeliveredOrders = indexOfLastItem > deliveredOrders.length ? deliveredOrders.length : indexOfLastItem;
 const actualIndexOfLastItemOfcancelOrders = indexOfLastItem > cancelOrders.length ? cancelOrders.length : indexOfLastItem;
+const actualIndexOfLastItemOfreturnOrders = indexOfLastItem > returnOrders.length ? returnOrders.length : indexOfLastItem;
 const actualIndexOfLastItemOfPaidOrders = indexOfLastItem > paidOrders.length ? paidOrders.length : indexOfLastItem;
 const actualIndexOfLastItemOfUnpaidOrders = indexOfLastItem > unPaidOrders.length ? unPaidOrders.length : indexOfLastItem;
     return (
@@ -347,6 +349,14 @@ const actualIndexOfLastItemOfUnpaidOrders = indexOfLastItem > unPaidOrders.lengt
                  <span style={{marginRight:"20px"}}>{indexOfFirstItem + 1} - {actualIndexOfLastItemOfcancelOrders} of {cancelOrders.length}</span>
            <button style={{marginRight:"20px",border:"none"}} onClick={() => setCurrentPage(currentPage - 1)} disabled={currentPage === 1} ><img style={{height:"10px",width:"15px"}} src='images/left-arrow.png' alt="left arrow"/></button>
            <button style={{height:"40px",border:"none"}} onClick={() => setCurrentPage(currentPage + 1)} disabled={currentPage === Math.ceil(cancelOrders.length / itemsPerPage)}><img style={{height:"10px",width:"15px"}} src='images/right-arrow.png' alt="right arrow"/></button>
+          
+                 </div>
+              }{
+                 filterOrders === "returned" && 
+                 <div style={{textAlign:"right"}}>
+                 <span style={{marginRight:"20px"}}>{indexOfFirstItem + 1} - {actualIndexOfLastItemOfreturnOrders} of {returnOrders.length}</span>
+           <button style={{marginRight:"20px",border:"none"}} onClick={() => setCurrentPage(currentPage - 1)} disabled={currentPage === 1} ><img style={{height:"10px",width:"15px"}} src='images/left-arrow.png' alt="left arrow"/></button>
+           <button style={{height:"40px",border:"none"}} onClick={() => setCurrentPage(currentPage + 1)} disabled={currentPage === Math.ceil(returnOrders.length / itemsPerPage)}><img style={{height:"10px",width:"15px"}} src='images/right-arrow.png' alt="right arrow"/></button>
           
                  </div>
               }
@@ -1153,6 +1163,56 @@ const actualIndexOfLastItemOfUnpaidOrders = indexOfLastItem > unPaidOrders.lengt
               }  
                {
               filterOrders==="cancel" && cancelOrders
+              ?.slice(indexOfFirstItem, indexOfLastItem)
+              .sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt))
+              .sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt))
+              .map((orders,index)=>{ 
+                matchingMerchant = allMerchant.find(merchant => merchant?.email === orders?.userMail)
+                let  totalPrintBazCostWithDeliveryFee=Number(orders?.printbazcost) + Number(orders?.deliveryFee)
+                return (
+                  <Link to={`/viewOrder/${orders?._id}`} state={{orders,matchingMerchant}} key={index}>
+                  <div key={orders?._id} className="row client-list">
+                    <div className="col-lg-2 col-sm-12">
+                     {/* Display the corresponding allMerchant name */}
+                     <p>{orders?.clientName}</p>
+          {/* {index < allMerchant.length && <p>{allMerchant[index]?.name}</p>} */}
+                   
+                    </div>
+                    <div className="col-lg-2 col-sm-12">
+                      <p>{orders?._id}</p>
+                    </div>
+                    <div className="col-lg-3 col-sm-12">
+                      <p>{orders?.name}</p>
+                      <p>{orders?.address}</p>
+                      <p>{orders?.phone}</p>
+                    </div>
+                    <div className="col-lg-2 col-sm-12">
+                      <p className="p-status-btn">{orders?.paymentStatus}</p>
+                    </div>
+                    <div className="col-lg-2 col-sm-12">
+                      <p>{totalPrintBazCostWithDeliveryFee} TK</p>
+                    </div>
+                    <div className="col-lg-1 col-sm-12">
+                      <p className="status-btn" style={{    backgroundColor: getViewClientColor(
+                            orders?.orderStatus
+                            ),}}>{orders?.orderStatus}</p>
+                              <p style={{fontSize: '14px'}}> created at: {new Date(orders?.createdAt).toLocaleDateString('en-US', options)}</p>
+                      {
+                        orders?.statusDate  && 
+                        <p style={{fontSize: '14px'}}> uppdated at: {new Date(orders?.statusDate).toLocaleDateString('en-US', options)}</p>
+                      }
+                      {/* <p style={{fontSize: '14px'}}>{formattedDate}</p> */}
+                    </div>
+                  </div>
+                </Link>
+               
+               )
+                }
+                  )
+               
+              }
+               {
+              filterOrders==="returned" && returnOrders
               ?.slice(indexOfFirstItem, indexOfLastItem)
               .sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt))
               .sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt))

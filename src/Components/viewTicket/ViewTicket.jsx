@@ -357,6 +357,7 @@ const ViewTicket = () => {
            
                 <div className="col-12">
                 <div className="mer-info">
+                <img src="/images/profile.jpg" alt="" />
                   {
                     getUserById?.clientbrandLogoURL &&
                     <img src={getUserById?.clientbrandLogoURL} alt="" />
@@ -402,6 +403,7 @@ const ViewTicket = () => {
                   <img src="https://media.discordapp.net/attachments/1069579536842379305/1107191553501450260/Logo-01.jpg?width=616&height=616" alt="" />
                   <h2 style={{color: 'red'}}>{viewTick.admin}</h2>
                   <h3>{timeSince(new Date(viewTick?.timestamp))} ({new Date(viewTick?.timestamp).toLocaleString("en-US", { month: 'long', day: 'numeric', year: 'numeric', hour: 'numeric', minute: 'numeric' })})</h3>
+                  <hr />
                   {/* <p style={{}}>{viewTick?.content}</p> */}
                   <div dangerouslySetInnerHTML={{ __html: viewTick.content }} />
                   {/* <ReactMarkdown >{viewTick.content}</ReactMarkdown> */}
@@ -431,11 +433,7 @@ const ViewTicket = () => {
   })
 }
 
-
-
-
-                
-                </div>
+ </div>
               </div>
               }
 
