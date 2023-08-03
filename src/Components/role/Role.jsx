@@ -8,9 +8,11 @@ import Navigationbar from '../navigationBar/Navigationbar';
 const Role = () => {
     const [activeTab, setActiveTab] = useState('London');
     const [isModalOpen, setModalOpen] = useState(false);
+    const [updateModalOpen, setUpdateModalOpen] = useState(false);
     const [getAllRoles, setGetAllRoles] = useState([]);
     const [getRoleById, setGetRoleById] = useState();
     const [isDataSent, setDataSent] = useState(false);
+    const [updateDataSent, setUpdateDataSent] = useState(false);
     const [showCreateRole, setShowCreateRole] = useState(false);
 const [formRoleData,setFormRoleData]=useState({
     roleName:"",
@@ -49,9 +51,98 @@ const [formRoleData,setFormRoleData]=useState({
    
 
 })
+console.log("isDataSent",isDataSent);
+const handleItemClick = async (itemId) => {
+  console.log("Clicked item:", itemId);
+  setUpdateModalOpen(false)
+  setUpdateDataSent(false)
+  try {
+    const response = await fetch(`http://localhost:5000/getRoleById${itemId}`);
+    const data = await response.json();
+    setGetRoleById(data)
+  
+    // Update the formRoleUpdateData state once data is fetched
+    setFormRoleUpdateData({
+      ...formRoleUpdateData,
+      roleName: data?.roleName,
+      Dashboard:data?.Dashboard,
+      Merchants:data?.Merchants,
+      Orders:data?.Orders,
+      Ticket:data?.Ticket,
+      MerchantView:data?.MerchantView,
+      OrderView:data?.OrderView,
+      ticketView:data?.ticketView,
+      analytics:data?.analytics,
+      mailBox:data?.mailBox,
+      liveChat:data?.liveChat,
+      fileManager:data?.fileManager,
+      clientDetails:data?.clientDetails,
+      recipientDetails:data?.recipientDetails,
+      costOfOrder_FullDetails:data?.costOfOrder_FullDetails,
+      costOfOrder_CollectAmount:data?.costOfOrder_CollectAmount,
+      orderDetails:data?.orderDetails,
+      discussionView:data?.discussionView,
+      supportTickets:data?.supportTickets,
+      basicInformation:data?.basicInformation,
+      personalInformation:data?.personalInformation,
+      brandInformation:data?.brandInformation,
+      paymentInformation:data?.paymentInformation,
+      orderList:data?.orderList,
+      merchant_approval:data?.merchant_approval,
+      merchant_Info_Edit:data?.merchant_Info_Edit,
+      edit_Order:data?.edit_Order,
+      payment_Status:data?.payment_Status,
+      orderStatus:data?.orderStatus,
+      discussion:data?.discussion,
+      ticketCreateAndResponse:data?.ticketCreateAndResponse,
+      fileUpload_download:data?.fileUpload_download,
+  
+      // Include other properties as needed
+    });
+    setUpdateDataSent(false);
+  } catch (error) {
+    console.error("Error fetching data:", error);
+  }
+};
+
+const [formRoleUpdateData,setFormRoleUpdateData]=useState({
+    roleName:getRoleById?.roleName,
+    Dashboard:getRoleById?.Dashboard,
+    Merchants:getRoleById?.Merchants,
+    Orders:getRoleById?.Orders,
+    Ticket:getRoleById?.Ticket,
+    MerchantView:getRoleById?.MerchantView,
+    OrderView:getRoleById?.OrderView,
+    ticketView:getRoleById?.ticketView,
+    analytics:getRoleById?.analytics,
+    mailBox:getRoleById?.mailBox,
+    liveChat:getRoleById?.liveChat,
+    fileManager:getRoleById?.fileManager,
+    clientDetails:getRoleById?.clientDetails,
+    recipientDetails:getRoleById?.recipientDetails,
+    costOfOrder_FullDetails:getRoleById?.costOfOrder_FullDetails,
+    costOfOrder_CollectAmount:getRoleById?.costOfOrder_CollectAmount,
+    orderDetails:getRoleById?.orderDetails,
+    discussionView:getRoleById?.discussionView,
+    supportTickets:getRoleById?.supportTickets,
+    basicInformation:getRoleById?.basicInformation,
+    personalInformation:getRoleById?.personalInformation,
+    brandInformation:getRoleById?.brandInformation,
+    paymentInformation:getRoleById?.paymentInformation,
+    orderList:getRoleById?.orderList,
+    merchant_approval:getRoleById?.merchant_approval,
+    merchant_Info_Edit:getRoleById?.merchant_Info_Edit,
+    edit_Order:getRoleById?.edit_Order,
+    payment_Status:getRoleById?.payment_Status,
+    orderStatus:getRoleById?.orderStatus,
+    discussion:getRoleById?.discussion,
+    ticketCreateAndResponse:getRoleById?.ticketCreateAndResponse,
+    fileUpload_download:getRoleById?.fileUpload_download,
+
+})
 
 const [isButtonDisabled, setButtonDisabled] = useState(true);
-console.log("showCreateRole",showCreateRole);
+console.log("formRoleUpdateData",formRoleUpdateData);
 // Effect to update the disabled status of the button whenever formRoleData changes
 useEffect(() => {
   fetchAllRoles()
@@ -71,17 +162,27 @@ const handleModalClose = () => {
   // Close the modal when the "Cancel" button is clicked
   setModalOpen(false);
 };
+const handleUpdateSubmit = () => {
+  // Show the modal when the "Create Role" button is clicked
+  setUpdateModalOpen(true);
+};
+const handleUpdateModalClose = () => {
+  // Close the modal when the "Cancel" button is clicked
+  setUpdateModalOpen(false);
+};
     const clickCreateRole=(e)=>{
         e.preventDefault()
         console.log("click create role");
        setShowCreateRole(true)
        setGetRoleById("")
+       setFormRoleData("")
+       setFormRoleUpdateData()
     } 
     const clickDelect=(e)=>{
         e.preventDefault()
         console.log("delete clicked");
     }
-console.log("form data",formRoleData);
+
     const handleInputChange = (event) => {
         const { name, value, checked, type } = event.target;
       
@@ -94,6 +195,23 @@ console.log("form data",formRoleData);
         } else {
           // For text inputs, update the state based on 'value'
           setFormRoleData((prevState) => ({
+            ...prevState,
+            [name]: value,
+          }));
+        }
+      };  
+        const handleInputChangeUpdate = (event) => {
+        const { name, value, checked, type } = event.target;
+      
+        // If the input is a checkbox, update the state based on 'checked'
+        if (type === 'checkbox') {
+          setFormRoleUpdateData((prevState) => ({
+            ...prevState,
+            [name]: checked,
+          }));
+        } else {
+          // For text inputs, update the state based on 'value'
+          setFormRoleUpdateData((prevState) => ({
             ...prevState,
             [name]: value,
           }));
@@ -142,31 +260,37 @@ console.log("form data",formRoleData);
         setDataSent(true);
       });
   };
-  const handleUpdateRole=(itemId)=>{
-    console.log("click update button");
-    fetch(`http://localhost:5000/updateRole${itemId}`, {
-      method: "PUT",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify(formRoleData),
-    })
-      .then((response) => response.json())
-      .then((data) => {
-        // Handle the response from the server if needed
-        console.log(data);
-        fetchAllRoles()
-       
-      })
-      .catch((error) => {
-        // Handle errors
-        console.error("Error:", error);
-      })
-      .finally(() => {
-        // Set the state to indicate data is sent and the modal should close
-        setDataSent(true);
+  const handleUpdateRole = async (itemId) => {
+    console.log("click update button", itemId);
+  
+    try {
+      const response = await fetch(`http://localhost:5000/updateRole/${itemId}`, {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(formRoleUpdateData),
       });
-  }
+  
+      const data = await response.json();
+      setFormRoleUpdateData(data);
+  
+      // Set the state to indicate data is sent and the modal should close
+      setUpdateDataSent(true);
+  
+      // Fetch the updated role details and update the state
+      await handleItemClick(itemId);
+  
+      // Handle the response from the server if needed
+      console.log(data);
+      fetchAllRoles();
+    } catch (error) {
+      // Handle errors
+      console.error("Error:", error);
+    }
+  };
+  
+  console.log("setUpdateDataSent",updateDataSent);
   const handleDeleteItem = (itemId) => {
     console.log("click Delete button ");
     // Filter the items to remove the one with the given itemId
@@ -174,18 +298,8 @@ console.log("form data",formRoleData);
     setGetAllRoles(updatedItems);
   };
 
-  const handleItemClick = (itemId) => {
-    // Perform another activity when clicking the name
-    console.log("Clicked item:", itemId);
- 
-        // Fetch the updated order details
-//  fetch(`https://mserver.printbaz.com/getRoleById/${itemId}`)
- fetch(`http://localhost:5000/getRoleById${itemId}`)
-.then(res=>res.json())
-.then(data => {setGetRoleById(data)})
-   
-  };
-console.log("setGetRoleById",getRoleById);
+
+
     return (
         <div>
         <meta charSet="UTF-8" />
@@ -244,154 +358,157 @@ console.log("setGetRoleById",getRoleById);
 
               <div id="London" className={`tab-content ${activeTab === 'London' ? 'active' : ''}`}>
             {
-              getRoleById ?
-              <form  onSubmit={()=>handleUpdateRole(getRoleById?._id)}>
+               getRoleById  ?
+              <form  onSubmit={(e) => {
+                e.preventDefault(); // Prevent the default form submission behavior
+                handleUpdateRole(getRoleById._id);
+              }}>
                 
               <label htmlFor="fname" style={{display: 'block', fontSize: '18px', marginBottom: '20px'}}>Role Name
-<input onChange={handleInputChange} type="text" id="fname" name="roleName" value={getRoleById.roleName} placeholder="Role Name..." style={{border: '#e0e0e0 1px solid', padding: '10px', width: '100%'}} />
+<input onChange={handleInputChangeUpdate} type="text" id="fname" name="roleName" value={formRoleUpdateData?.roleName} placeholder="Role Name..." style={{border: '#e0e0e0 1px solid', padding: '10px', width: '100%'}} />
 </label>
 
                 <label style={{display: 'block', fontSize: '18px', marginBottom: '20px'}}>Dashboard
                   <div className="switch" style={{float: 'right'}}>
-                    <input type="checkbox"  name="Dashboard"  checked={getRoleById.Dashboard} onChange={(e) => handleInputChange(e)} />
+                    <input type="checkbox"  name="Dashboard"  checked={formRoleUpdateData.Dashboard} onChange={(e) => handleInputChangeUpdate(e)} />
                     <span className="slider round" />
                   </div>
                 </label>
                 <label style={{display: 'block', fontSize: '18px', marginBottom: '20px'}}>Merchants
                   <div className="switch" style={{float: 'right'}}>
-                    <input type="checkbox" name="Merchants"  checked={getRoleById.Merchants} onChange={(e) => handleInputChange(e)} />
+                    <input type="checkbox" name="Merchants"  checked={formRoleUpdateData.Merchants} onChange={(e) => handleInputChangeUpdate(e)} />
                     <span className="slider round" />
                   </div>
                 </label>
                 <label style={{display: 'block', fontSize: '18px', marginBottom: '20px'}}>Orders
                   <div className="switch" style={{float: 'right'}}>
-                    <input type="checkbox" name="Orders"  checked={getRoleById.Orders} onChange={(e) => handleInputChange(e)} />
+                    <input type="checkbox" name="Orders"  checked={formRoleUpdateData.Orders} onChange={(e) => handleInputChangeUpdate(e)} />
                     <span className="slider round" />
                   </div>
                 </label>
                 <label style={{display: 'block', fontSize: '18px', marginBottom: '20px'}}>Analytics
                   <div className="switch" style={{float: 'right'}}>
-                    <input type="checkbox" name="analytics"  checked={getRoleById.analytics} onChange={(e) => handleInputChange(e)} />
+                    <input type="checkbox" name="analytics"  checked={formRoleUpdateData.analytics} onChange={(e) => handleInputChangeUpdate(e)} />
                     <span className="slider round" />
                   </div>
                 </label>
                 <label style={{display: 'block', fontSize: '18px', marginBottom: '20px'}}>Mail box
                   <div className="switch" style={{float: 'right'}}>
-                    <input type="checkbox" name="mailBox"  checked={getRoleById.mailBox} onChange={(e) => handleInputChange(e)}/>
+                    <input type="checkbox" name="mailBox"  checked={formRoleUpdateData.mailBox} onChange={(e) => handleInputChangeUpdate(e)}/>
                     <span className="slider round" />
                   </div>
                 </label>
                 <label style={{display: 'block', fontSize: '18px', marginBottom: '20px'}}>Live chat
                   <div className="switch" style={{float: 'right'}}>
-                    <input type="checkbox" name="liveChat"  checked={getRoleById.liveChat} onChange={(e) => handleInputChange(e)} />
+                    <input type="checkbox" name="liveChat"  checked={formRoleUpdateData.liveChat} onChange={(e) => handleInputChangeUpdate(e)} />
                     <span className="slider round" />
                   </div>
                 </label>
                 <label style={{display: 'block', fontSize: '18px', marginBottom: '20px'}}>Ticket
                   <div className="switch" style={{float: 'right'}}>
-                    <input type="checkbox" name="Ticket"  checked={getRoleById.Ticket} onChange={(e) => handleInputChange(e)} />
+                    <input type="checkbox" name="Ticket"  checked={formRoleUpdateData.Ticket} onChange={(e) => handleInputChangeUpdate(e)} />
                     <span className="slider round" />
                   </div>
                 </label>
                 <label style={{display: 'block', fontSize: '18px', marginBottom: '20px'}}>File Manager
                   <div className="switch" style={{float: 'right'}}>
-                    <input type="checkbox"  name="fileManager"  checked={getRoleById.fileManager} onChange={(e) => handleInputChange(e)} />
+                    <input type="checkbox"  name="fileManager"  checked={formRoleUpdateData.fileManager} onChange={(e) => handleInputChangeUpdate(e)} />
                     <span className="slider round" />
                   </div>
                 </label>
                 <label style={{display: 'block', fontSize: '18px', marginBottom: '20px'}}>Merchant View
                   <div className="switch" style={{float: 'right'}}>
-                    <input type="checkbox"  name="MerchantView"  checked={getRoleById.MerchantView} onChange={(e) => handleInputChange(e)} />
+                    <input type="checkbox"  name="MerchantView"  checked={formRoleUpdateData.MerchantView} onChange={(e) => handleInputChangeUpdate(e)} />
                     <span className="slider round" />
                   </div>
                 </label>
                 <label style={{display: 'block', fontSize: '18px', marginBottom: '20px'}}>Order View
                   <div className="switch" style={{float: 'right'}}>
-                    <input type="checkbox" name="OrderView"  checked={getRoleById.OrderView}  onChange={(e) => handleInputChange(e)}/>
+                    <input type="checkbox" name="OrderView"  checked={formRoleUpdateData.OrderView}  onChange={(e) => handleInputChangeUpdate(e)}/>
                     <span className="slider round" />
                   </div>
                 </label>
               
                 <label style={{display: 'block', fontSize: '18px', marginBottom: '20px'}}>Ticket View
                   <div className="switch" style={{float: 'right'}}>
-                    <input type="checkbox" name="ticketView"  checked={getRoleById.ticketView}  onChange={(e) => handleInputChange(e)}/>
+                    <input type="checkbox" name="ticketView"  checked={formRoleUpdateData.ticketView}  onChange={(e) => handleInputChangeUpdate(e)}/>
                     <span className="slider round" />
                   </div>
                 </label>  <label style={{display: 'block', fontSize: '18px', marginBottom: '20px'}}>Client Details
                   <div className="switch" style={{float: 'right'}}>
-                    <input type="checkbox" name="clientDetails"  checked={getRoleById.clientDetails}  onChange={(e) => handleInputChange(e)}/>
+                    <input type="checkbox" name="clientDetails"  checked={formRoleUpdateData.clientDetails}  onChange={(e) => handleInputChangeUpdate(e)}/>
                     <span className="slider round" />
                   </div>
                 </label>
                 <label style={{display: 'block', fontSize: '18px', marginBottom: '20px'}}>Recipient Details
                   <div className="switch" style={{float: 'right'}}>
-                    <input type="checkbox"  name="recipientDetails"  checked={getRoleById.recipientDetails}  onChange={(e) => handleInputChange(e)}/>
+                    <input type="checkbox"  name="recipientDetails"  checked={formRoleUpdateData.recipientDetails}  onChange={(e) => handleInputChangeUpdate(e)}/>
                     <span className="slider round" />
                   </div>
                 </label>
                 <label style={{display: 'block', fontSize: '18px', marginBottom: '20px'}}>Cost of Order (Full Details)
                   <div className="switch" style={{float: 'right'}}>
-                    <input type="checkbox" name="costOfOrder_FullDetails"  checked={getRoleById.costOfOrder_FullDetails}  onChange={(e) => handleInputChange(e)} />
+                    <input type="checkbox" name="costOfOrder_FullDetails"  checked={formRoleUpdateData.costOfOrder_FullDetails}  onChange={(e) => handleInputChangeUpdate(e)} />
                     <span className="slider round" />
                   </div>
                 </label>
                 <label style={{display: 'block', fontSize: '18px', marginBottom: '20px'}}>Cost of order (Collect Amount)
                   <div className="switch" style={{float: 'right'}}>
-                    <input type="checkbox" name="costOfOrder_CollectAmount"  checked={getRoleById.costOfOrder_CollectAmount}  onChange={(e) => handleInputChange(e)} />
+                    <input type="checkbox" name="costOfOrder_CollectAmount"  checked={formRoleUpdateData.costOfOrder_CollectAmount}  onChange={(e) => handleInputChangeUpdate(e)} />
                     <span className="slider round" />
                   </div>
                 </label>
                 <label style={{display: 'block', fontSize: '18px', marginBottom: '20px'}}>Order Details
                   <div className="switch" style={{float: 'right'}}>
-                    <input type="checkbox"  name="orderDetails"  checked={getRoleById.orderDetails}  onChange={(e) => handleInputChange(e)}/>
+                    <input type="checkbox"  name="orderDetails"  checked={formRoleUpdateData.orderDetails}  onChange={(e) => handleInputChangeUpdate(e)}/>
                     <span className="slider round" />
                   </div>
                 </label>
                 <label style={{display: 'block', fontSize: '18px', marginBottom: '20px'}}>Discussion View
                   <div className="switch" style={{float: 'right'}}>
-                    <input type="checkbox"  name="discussionView"  checked={getRoleById.discussionView}  onChange={(e) => handleInputChange(e)}/>
+                    <input type="checkbox"  name="discussionView"  checked={formRoleUpdateData.discussionView}  onChange={(e) => handleInputChangeUpdate(e)}/>
                     <span className="slider round" />
                   </div>
                 </label>
                 <label style={{display: 'block', fontSize: '18px', marginBottom: '20px'}}>Support Tickets
                   <div className="switch" style={{float: 'right'}}>
-                    <input type="checkbox"  name="supportTickets"  checked={getRoleById.supportTickets}  onChange={(e) => handleInputChange(e)}/>
+                    <input type="checkbox"  name="supportTickets"  checked={formRoleUpdateData.supportTickets}  onChange={(e) => handleInputChangeUpdate(e)}/>
                     <span className="slider round" />
                   </div>
                 </label>
                 <label style={{display: 'block', borderBottom: '2px solid #d8d8d8', marginBottom: '10px', fontSize: '18px', paddingBottom: '20px'}}>File manager(view order)
                   <div className="switch" style={{float: 'right'}}>
-                    <input type="checkbox" name="fileManager"  checked={getRoleById.fileManager_viewOrder}  onChange={(e) => handleInputChange(e)} />
+                    <input type="checkbox" name="fileManager"  checked={formRoleUpdateData.fileManager_viewOrder}  onChange={(e) => handleInputChangeUpdate(e)} />
                     <span className="slider round" />
                   </div>
                 </label>
                 <label style={{display: 'block', fontSize: '18px', marginBottom: '20px'}}>Basic Information
                   <div className="switch" style={{float: 'right'}}>
-                    <input type="checkbox" name="basicInformation"  checked={getRoleById.basicInformation}  onChange={(e) => handleInputChange(e)} />
+                    <input type="checkbox" name="basicInformation"  checked={formRoleUpdateData.basicInformation}  onChange={(e) => handleInputChangeUpdate(e)} />
                     <span className="slider round" />
                   </div>
                 </label>
                 <label style={{display: 'block', fontSize: '18px', marginBottom: '20px'}}>Personal Information
                   <div className="switch" style={{float: 'right'}}>
-                    <input type="checkbox"  name="personalInformation"  checked={getRoleById.personalInformation}  onChange={(e) => handleInputChange(e)}/>
+                    <input type="checkbox"  name="personalInformation"  checked={formRoleUpdateData.personalInformation}  onChange={(e) => handleInputChangeUpdate(e)}/>
                     <span className="slider round" />
                   </div>
                 </label>
                 <label style={{display: 'block', fontSize: '18px', marginBottom: '20px'}}>Brand Information
                   <div className="switch" style={{float: 'right'}}>
-                    <input type="checkbox"  name="brandInformation"  checked={getRoleById.brandInformation}  onChange={(e) => handleInputChange(e)}/>
+                    <input type="checkbox"  name="brandInformation"  checked={formRoleUpdateData.brandInformation}  onChange={(e) => handleInputChangeUpdate(e)}/>
                     <span className="slider round" />
                   </div>
                 </label>
                 <label style={{display: 'block', fontSize: '18px', marginBottom: '20px'}}>Payment Information
                   <div className="switch" style={{float: 'right'}}>
-                    <input type="checkbox"  name="paymentInformation"  checked={getRoleById.paymentInformation}  onChange={(e) => handleInputChange(e)}/>
+                    <input type="checkbox"  name="paymentInformation"  checked={formRoleUpdateData.paymentInformation}  onChange={(e) => handleInputChangeUpdate(e)}/>
                     <span className="slider round" />
                   </div>
                 </label>
                 <label style={{display: 'block', fontSize: '18px', marginBottom: '20px'}}>Order list
                   <div className="switch" style={{float: 'right'}}>
-                    <input type="checkbox"  name="orderList"  checked={getRoleById.orderList}  onChange={(e) => handleInputChange(e)}/>
+                    <input type="checkbox"  name="orderList"  checked={formRoleUpdateData.orderList}  onChange={(e) => handleInputChangeUpdate(e)}/>
                     <span className="slider round" />
                   </div>
                 </label>
@@ -552,8 +669,9 @@ console.log("setGetRoleById",getRoleById);
                 </form>
             
               :
+              formRoleData && !getRoleById  &&
               <form  onSubmit={handleCreateRole}>
-                  
+                  <h1>basic</h1>
               <label htmlFor="fname" style={{display: 'block', fontSize: '18px', marginBottom: '20px'}}>Role Name
 <input onChange={handleInputChange} type="text" id="fname" name="roleName" value={formRoleData.roleName} placeholder="Role Name..." style={{border: '#e0e0e0 1px solid', padding: '10px', width: '100%'}} />
 </label>
@@ -712,59 +830,113 @@ console.log("setGetRoleById",getRoleById);
               <div id="Paris" className={`tab-content ${activeTab === 'Paris' ? 'active' : ''}`}>
                {
                  getRoleById ?
-                 <form onSubmit={handleCreateRole}>
+                 <form onSubmit={()=>handleUpdateRole(getRoleById?._id)}>
                  <label style={{display: 'block', fontSize: '18px', marginBottom: '20px'}}>Merchant Request Approval/Ban
                    <div className="switch" style={{float: 'right'}}>
-                     <input type="checkbox" name="merchant_approval"  checked={getRoleById.merchant_approval} onChange={(e) => handleInputChange(e)} />
+                     <input type="checkbox" name="merchant_approval"  checked={formRoleUpdateData.merchant_approval} onChange={(e) => handleInputChangeUpdate(e)} />
                      <span className="slider round" />
                    </div>
                  </label>
                  <label style={{display: 'block', borderBottom: '2px solid #d8d8d8', marginBottom: '10px', fontSize: '18px', paddingBottom: '20px'}}>Merchant Info Edit
                    <div className="switch" style={{float: 'right'}}>
-                     <input type="checkbox" name="merchant_Info_Edit"  checked={getRoleById.merchant_Info_Edit} onChange={(e) => handleInputChange(e)} />
+                     <input type="checkbox" name="merchant_Info_Edit"  checked={formRoleUpdateData.merchant_Info_Edit} onChange={(e) => handleInputChangeUpdate(e)} />
                      <span className="slider round" />
                    </div>
                  </label>
                  <label style={{display: 'block', fontSize: '18px', marginBottom: '20px'}}>Edit Order
                    <div className="switch" style={{float: 'right'}}>
-                     <input type="checkbox" name="edit_Order"  checked={getRoleById.edit_Order} onChange={(e) => handleInputChange(e)} />
+                     <input type="checkbox" name="edit_Order"  checked={formRoleUpdateData.edit_Order} onChange={(e) => handleInputChangeUpdate(e)} />
                      <span className="slider round" />
                    </div>
                  </label>
                  <label style={{display: 'block', fontSize: '18px', marginBottom: '20px'}}>Payment Status
                    <div className="switch" style={{float: 'right'}}>
-                     <input type="checkbox" name="payment_Status"  checked={getRoleById.payment_Status} onChange={(e) => handleInputChange(e)} />
+                     <input type="checkbox" name="payment_Status"  checked={formRoleUpdateData.payment_Status} onChange={(e) => handleInputChangeUpdate(e)} />
                      <span className="slider round" />
                    </div>
                  </label>
                  <label style={{display: 'block', fontSize: '18px', marginBottom: '20px'}}>Order status
                    <div className="switch" style={{float: 'right'}}>
-                     <input type="checkbox" name="orderStatus"  checked={getRoleById.orderStatus} onChange={(e) => handleInputChange(e)} />
+                     <input type="checkbox" name="orderStatus"  checked={formRoleUpdateData.orderStatus} onChange={(e) => handleInputChangeUpdate(e)} />
                      <span className="slider round" />
                    </div>
                  </label>
                  <label style={{display: 'block', fontSize: '18px', marginBottom: '20px'}}>Discussion
                    <div className="switch" style={{float: 'right'}}>
-                     <input type="checkbox" name="discussion"  checked={getRoleById.discussion} onChange={(e) => handleInputChange(e)} />
+                     <input type="checkbox" name="discussion"  checked={formRoleUpdateData.discussion} onChange={(e) => handleInputChangeUpdate(e)} />
                      <span className="slider round" />
                    </div>
                  </label>
                  <label style={{display: 'block', fontSize: '18px', marginBottom: '20px'}}>Ticket Create And Response
                    <div className="switch" style={{float: 'right'}}>
-                     <input type="checkbox" name="ticketCreateAndResponse"  checked={getRoleById.ticketCreateAndResponse} onChange={(e) => handleInputChange(e)} />
+                     <input type="checkbox" name="ticketCreateAndResponse"  checked={formRoleUpdateData.ticketCreateAndResponse} onChange={(e) => handleInputChangeUpdate(e)} />
                      <span className="slider round" />
                    </div>
                  </label>
                  <label style={{display: 'block', fontSize: '18px', marginBottom: '20px'}}>File upload/download
                    <div className="switch" style={{float: 'right'}}>
-                     <input type="checkbox" name="fileUpload_download"  checked={getRoleById.fileUpload_download} onChange={(e) => handleInputChange(e)} />
+                     <input type="checkbox" name="fileUpload_download"  checked={formRoleUpdateData.fileUpload_download} onChange={(e) => handleInputChangeUpdate(e)} />
                      <span className="slider round" />
                    </div>
                  </label>
                 
                </form>
-:
+:   showCreateRole ?
 <form onSubmit={handleCreateRole}>
+  <h1>basic2</h1>
+<label style={{display: 'block', fontSize: '18px', marginBottom: '20px'}}>Merchant Request Approval/Ban
+  <div className="switch" style={{float: 'right'}}>
+    <input type="checkbox" name="merchant_approval"  checked={formRoleData.merchant_approval} onChange={(e) => handleInputChange(e)} />
+    <span className="slider round" />
+  </div>
+</label>
+<label style={{display: 'block', borderBottom: '2px solid #d8d8d8', marginBottom: '10px', fontSize: '18px', paddingBottom: '20px'}}>Merchant Info Edit
+  <div className="switch" style={{float: 'right'}}>
+    <input type="checkbox" name="merchant_Info_Edit"  checked={formRoleData.merchant_Info_Edit} onChange={(e) => handleInputChange(e)} />
+    <span className="slider round" />
+  </div>
+</label>
+<label style={{display: 'block', fontSize: '18px', marginBottom: '20px'}}>Edit Order
+  <div className="switch" style={{float: 'right'}}>
+    <input type="checkbox" name="edit_Order"  checked={formRoleData.edit_Order} onChange={(e) => handleInputChange(e)} />
+    <span className="slider round" />
+  </div>
+</label>
+<label style={{display: 'block', fontSize: '18px', marginBottom: '20px'}}>Payment Status
+  <div className="switch" style={{float: 'right'}}>
+    <input type="checkbox" name="payment_Status"  checked={formRoleData.payment_Status} onChange={(e) => handleInputChange(e)} />
+    <span className="slider round" />
+  </div>
+</label>
+<label style={{display: 'block', fontSize: '18px', marginBottom: '20px'}}>Order status
+  <div className="switch" style={{float: 'right'}}>
+    <input type="checkbox" name="orderStatus"  checked={formRoleData.orderStatus} onChange={(e) => handleInputChange(e)} />
+    <span className="slider round" />
+  </div>
+</label>
+<label style={{display: 'block', fontSize: '18px', marginBottom: '20px'}}>Discussion
+  <div className="switch" style={{float: 'right'}}>
+    <input type="checkbox" name="discussion"  checked={formRoleData.discussion} onChange={(e) => handleInputChange(e)} />
+    <span className="slider round" />
+  </div>
+</label>
+<label style={{display: 'block', fontSize: '18px', marginBottom: '20px'}}>Ticket Create And Response
+  <div className="switch" style={{float: 'right'}}>
+    <input type="checkbox" name="ticketCreateAndResponse"  checked={formRoleData.ticketCreateAndResponse} onChange={(e) => handleInputChange(e)} />
+    <span className="slider round" />
+  </div>
+</label>
+<label style={{display: 'block', fontSize: '18px', marginBottom: '20px'}}>File upload/download
+  <div className="switch" style={{float: 'right'}}>
+    <input type="checkbox" name="fileUpload_download"  checked={formRoleData.fileUpload_download} onChange={(e) => handleInputChange(e)} />
+    <span className="slider round" />
+  </div>
+</label>
+
+</form>
+:  formRoleData && !getRoleById  &&
+<form onSubmit={handleCreateRole}>
+  <h1>basic2</h1>
 <label style={{display: 'block', fontSize: '18px', marginBottom: '20px'}}>Merchant Request Approval/Ban
   <div className="switch" style={{float: 'right'}}>
     <input type="checkbox" name="merchant_approval"  checked={formRoleData.merchant_approval} onChange={(e) => handleInputChange(e)} />
@@ -818,20 +990,24 @@ console.log("setGetRoleById",getRoleById);
                }
                
 {
-  getRoleById ?
+  getRoleById &&
 <>
-<button className="status-btn" style={{ padding: '10px 20px 10px 20px' }}   disabled={isButtonDisabled } onClick={handleSubmit}>Update Role</button>
-  <ConfirmRole isOpen={!isDataSent && isModalOpen} onClose={handleModalClose} onConfirm={handleCreateRole} />
+<button className="status-btn" style={{ padding: '10px 20px 10px 20px' }}  onClick={handleUpdateSubmit} >Update Role</button>
+  <ConfirmRole isOpen={!updateDataSent  && updateModalOpen} onClose={handleUpdateModalClose} onConfirm={()=>handleUpdateRole(getRoleById?._id)} />
 
 </>
  
-  :
-<>
-<button className="status-btn" style={{ padding: '10px 20px 10px 20px' }}   disabled={isButtonDisabled } onClick={handleSubmit}>Create Role</button>
-  <ConfirmRole isOpen={!isDataSent && isModalOpen} onClose={handleModalClose} onConfirm={handleCreateRole} />
-
-</>
 }
+  {
+    formRoleData && !getRoleById &&
+    <>
+    <button className="status-btn" style={{ padding: '10px 20px 10px 20px' }}   disabled={isButtonDisabled } onClick={handleSubmit}>Create Role</button>
+      <ConfirmRole isOpen={!isDataSent && isModalOpen} onClose={handleModalClose} onConfirm={handleCreateRole} />
+    
+    </>
+  }
+
+
        
               </div>
             </div>
