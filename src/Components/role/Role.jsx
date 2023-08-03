@@ -14,6 +14,7 @@ const Role = () => {
     const [isDataSent, setDataSent] = useState(false);
     const [updateDataSent, setUpdateDataSent] = useState(false);
     const [showCreateRole, setShowCreateRole] = useState(false);
+    const [deleteItem, setDeleteItem] = useState();
 const [formRoleData,setFormRoleData]=useState({
     roleName:"",
     Dashboard:false,
@@ -291,14 +292,19 @@ const handleUpdateModalClose = () => {
   };
   
   console.log("setUpdateDataSent",updateDataSent);
-  const handleDeleteItem = (itemId) => {
-    console.log("click Delete button ");
+  const handleDeleteItem = (event, itemId) => {
+    event.stopPropagation();
+    console.log("click Delete button ", itemId);
+  
     // Filter the items to remove the one with the given itemId
-    const updatedItems = getAllRoles.filter((item) => item.id !== itemId);
-    setGetAllRoles(updatedItems);
+    const updatedItems = getAllRoles.filter((item) => item._id !== itemId);
+  
+    // Now 'updatedItems' will be an array without the item that matches 'itemId'
+    setDeleteItem(updatedItems);
   };
+  
 
-
+console.log("setDeleteItem",deleteItem);
 
     return (
         <div>
@@ -332,7 +338,7 @@ const handleUpdateModalClose = () => {
                  <span >
                    {role?.roleName}
                  </span>
-                 <button onClick={() => handleDeleteItem(role._id)} style={{float: 'right', background: 'transparent', border: 'none', color: 'red', fontSize: '16px'}}><i className="fa fa-trash" aria-hidden="true" /></button>
+                 <button onClick={(e) => handleDeleteItem(e,role._id)} style={{float: 'right', background: 'transparent', border: 'none', color: 'red', fontSize: '16px'}}><i className="fa fa-trash" aria-hidden="true" /></button>
                </p>
                
                  )
