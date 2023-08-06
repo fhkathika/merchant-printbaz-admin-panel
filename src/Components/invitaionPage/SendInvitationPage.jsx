@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import axios from "axios";
 import { Link } from "react-router-dom";
 import  "../../css/style.css";
@@ -8,12 +8,8 @@ function SendInvitationPage() {
   const [email, setEmail] = useState("");
   const [message, setMessage] = useState("");
   const [newRole, setNewRole] = useState("");  // New Role Input
-  const [roles, setRoles] = useState({
-    designer: false,
-    editor: false,
-    admin: false
-});
-// console.log("roles",roles);
+  const [roles, setRoles] = useState();
+console.log("roles",roles);
 //format date 
 const date=new Date()
 const options={
@@ -25,7 +21,9 @@ const options={
   hour12: true,
 }
 const strDate = new Intl.DateTimeFormat('en-US', options).format(date);
-
+useEffect(()=>{
+  fetchAllRoles()
+},[])
 // Replace '/' with '.' and ',' with ''
 let inviteCreatedAt = strDate.replace(/\//g, '.').replace(/,/g, '');
 // Remove leading zero from date and month (if any)
@@ -45,7 +43,17 @@ const addNewRole = async (roleName) => {
   });
   setNewRole(""); // Clear input after adding
 }
+const fetchAllRoles= async () => {
+  try {
+    const response = await axios.get("http://localhost:5000/getAllRole");
+    // const response = await axios.get(`https://mserver.printbaz.com/getAllRole`);
 
+    setRoles(response?.data);
+ 
+  } catch (err) {
+    console.error(err);
+  }
+}; 
 const sendRolesToServer = async (roles) => {
   // Send updated roles to server-side
   const response = await fetch('http://localhost:5000/allroles', {
@@ -104,27 +112,27 @@ const sendRolesToServer = async (roles) => {
                    required
             /> 
             <br />
- <input
+ {/* <input
               type="text"
               value={newRole}
               onChange={(e) => setNewRole(e.target.value)}
               placeholder="Add new role"
-            /> 
+            />  */}
             <button type="button" onClick={()=>addNewRole(newRole)}>Add Role</button>
             <p>Assign role</p>
-            {Object.keys(roles).map(role => (
+            {/* {roles.map(role => (
                 <div key={role}>
                     <label>
                         <input 
                             type="checkbox" 
                             name={role}
-                            checked={roles[role]}
+                            checked={role?.roleName}
                             onChange={handleRoleChange}
                         />
                         {role}
                     </label>
                 </div>
-            ))}
+            ))} */}
 
             <button type="submit">Send Invitation</button>
         </form>

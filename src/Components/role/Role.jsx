@@ -3,6 +3,7 @@ import axios from 'axios';
 import React, { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import ConfirmRole from '../alert/ConfirmRole';
+import DeleteRoleAlert from '../alert/DeleteRoleAlert';
 import Navigationbar from '../navigationBar/Navigationbar';
 
 const Role = () => {
@@ -10,11 +11,13 @@ const Role = () => {
     const [isModalOpen, setModalOpen] = useState(false);
     const [updateModalOpen, setUpdateModalOpen] = useState(false);
     const [getAllRoles, setGetAllRoles] = useState([]);
+    const [getAllInvitors, setGetAllInvitors] = useState([]);
     const [getRoleById, setGetRoleById] = useState();
     const [isDataSent, setDataSent] = useState(false);
     const [updateDataSent, setUpdateDataSent] = useState(false);
     const [showCreateRole, setShowCreateRole] = useState(false);
-    const [deleteItem, setDeleteItem] = useState();
+    const [deletepopUp, setDeletepopUp] = useState(false);
+    const [deleteId, setDeleteId] = useState();
 const [formRoleData,setFormRoleData]=useState({
     roleName:"",
     Dashboard:false,
@@ -147,6 +150,7 @@ console.log("formRoleUpdateData",formRoleUpdateData);
 // Effect to update the disabled status of the button whenever formRoleData changes
 useEffect(() => {
   fetchAllRoles()
+  fetchAllInvitors()
   const roleNameSelected = formRoleData.roleName !== "";
   const atLeastOneToggleSelected = Object.values(formRoleData).some(
     (value) => value === true
@@ -155,7 +159,8 @@ useEffect(() => {
   setButtonDisabled(!(roleNameSelected && atLeastOneToggleSelected));
 }, [formRoleData]);
 
-const handleSubmit = () => {
+const handleSubmit = (e) => {
+  e.preventDefault()
   // Show the modal when the "Create Role" button is clicked
   setModalOpen(true);
 };
@@ -163,7 +168,8 @@ const handleModalClose = () => {
   // Close the modal when the "Cancel" button is clicked
   setModalOpen(false);
 };
-const handleUpdateSubmit = () => {
+const handleUpdateSubmit = (e) => {
+  e.preventDefault()
   // Show the modal when the "Create Role" button is clicked
   setUpdateModalOpen(true);
 };
@@ -176,8 +182,10 @@ const handleUpdateModalClose = () => {
         console.log("click create role");
        setShowCreateRole(true)
        setGetRoleById("")
-       setFormRoleData("")
-       setFormRoleUpdateData()
+         // Trigger page reload
+    window.location.reload();
+      //  setFormRoleData({})
+      //  setFormRoleUpdateData({})
     } 
     const clickDelect=(e)=>{
         e.preventDefault()
@@ -234,9 +242,21 @@ const handleUpdateModalClose = () => {
         } catch (err) {
           console.error(err);
         }
+      }; 
+        const fetchAllInvitors= async () => {
+        try {
+          const response = await axios.get("http://localhost:5000/getAllInvitor");
+          // const response = await axios.get(`https://mserver.printbaz.com/getAllInvitor`);
+ 
+          setGetAllInvitors(response?.data);
+       
+        } catch (err) {
+          console.error(err);
+        }
       };
+     
   const handleCreateRole = (e) => {
-    e.preventDefault()
+  
     console.log("createROl;e call");
     // Making an HTTP POST request to send formRoleData to the server
     fetch("http://localhost:5000/roleFromAdminPanel", {
@@ -292,19 +312,56 @@ const handleUpdateModalClose = () => {
   };
   
   console.log("setUpdateDataSent",updateDataSent);
-  const handleDeleteItem = (event, itemId) => {
-    event.stopPropagation();
-    console.log("click Delete button ", itemId);
+  // const handleDeleteItem = (event, itemId) => {
+  //   event.stopPropagation();
+  //   console.log("click Delete button ", itemId);
   
-    // Filter the items to remove the one with the given itemId
-    const updatedItems = getAllRoles.filter((item) => item._id !== itemId);
+  //   // Filter the items to remove the one with the given itemId
+  //   const updatedItems = getAllRoles.filter((item) => item._id !== itemId);
   
-    // Now 'updatedItems' will be an array without the item that matches 'itemId'
-    setDeleteItem(updatedItems);
-  };
+  //   // Now 'updatedItems' will be an array without the item that matches 'itemId'
+  //   setDeleteItem(updatedItems);
+  // };
+const handleDeletePopUp=(e,id)=>{
+  // e.stopPropagation();
+  e.preventDefault()
+  setDeletepopUp(true)
+  // setDeleteId(id)
+}
+const handleDeleteModalClose=()=>{
+  setDeletepopUp(false)
+}
+  const handleDeleteItem =(e,id)=>{
+    // e.stopPropagation();
+    setDeletepopUp(true)
+    console.log("click Delete button ", id);
   
+    // const proceed= window.confirm('Do you want to remove?')
+    if(deletepopUp){
+      fetch(`http://localhost:5000/deleteRole/${id}`,{
+        method : 'DELETE'
+      })
+      .then(res => res.json())
+      .then(data => {
+        console.log("data delete",data);
+        if(data?.deletedCount>0){
+        
+          // convert object into array
+          // const asArray = Object.entries(getAllRoles);
+          const remainingrole=getAllRoles.filter(userSingleorder=> userSingleorder._id !==id)
+          setGetAllRoles(remainingrole )
+          setDataSent(true)
+          setDeletepopUp(false)
+setFormRoleUpdateData({})
+        }
+        
+      })
+    }
+   
+    
+  }
 
-console.log("setDeleteItem",deleteItem);
+
 
     return (
         <div>
@@ -338,7 +395,14 @@ console.log("setDeleteItem",deleteItem);
                  <span >
                    {role?.roleName}
                  </span>
-                 <button onClick={(e) => handleDeleteItem(e,role._id)} style={{float: 'right', background: 'transparent', border: 'none', color: 'red', fontSize: '16px'}}><i className="fa fa-trash" aria-hidden="true" /></button>
+                 
+                 {/* <button onClick={(e)=>handleDeletePopUp(e,role?._id)} style={{float: 'right', background: 'transparent', border: 'none', color: 'red', fontSize: '16px'}}><i className="fa fa-trash" aria-hidden="true" /></button>
+                 <DeleteRoleAlert isOpen={ deletepopUp} deleteId={deleteId} onClose={handleDeleteModalClose} onConfirm={()=>handleDeleteItem(role?._id)} /> */}
+                 {/* {
+                   deletepopUp &&
+                   <ConfirmRole isOpen={ deletepopUp} onClose={handleDeleteModalClose} onConfirm={()=>handleDeleteItem(role?._id)} />
+                 } */}
+                 {/* <ConfirmRole isOpen={ deletepopUp} onClose={handleDeleteModalClose} onConfirm={()=>handleDeleteItem(role?._id)} /> */}
                </p>
                
                  )
@@ -365,156 +429,156 @@ console.log("setDeleteItem",deleteItem);
               <div id="London" className={`tab-content ${activeTab === 'London' ? 'active' : ''}`}>
             {
                getRoleById  ?
-              <form  onSubmit={(e) => {
-                e.preventDefault(); // Prevent the default form submission behavior
+              <form  onSubmit={() => {
+              // Prevent the default form submission behavior
                 handleUpdateRole(getRoleById._id);
               }}>
-                
+                 <h1>update button pag1</h1>
               <label htmlFor="fname" style={{display: 'block', fontSize: '18px', marginBottom: '20px'}}>Role Name
 <input onChange={handleInputChangeUpdate} type="text" id="fname" name="roleName" value={formRoleUpdateData?.roleName} placeholder="Role Name..." style={{border: '#e0e0e0 1px solid', padding: '10px', width: '100%'}} />
 </label>
 
                 <label style={{display: 'block', fontSize: '18px', marginBottom: '20px'}}>Dashboard
                   <div className="switch" style={{float: 'right'}}>
-                    <input type="checkbox"  name="Dashboard"  checked={formRoleUpdateData.Dashboard} onChange={(e) => handleInputChangeUpdate(e)} />
+                    <input type="checkbox"  name="Dashboard"  checked={formRoleUpdateData?.Dashboard} onChange={(e) => handleInputChangeUpdate(e)} />
                     <span className="slider round" />
                   </div>
                 </label>
                 <label style={{display: 'block', fontSize: '18px', marginBottom: '20px'}}>Merchants
                   <div className="switch" style={{float: 'right'}}>
-                    <input type="checkbox" name="Merchants"  checked={formRoleUpdateData.Merchants} onChange={(e) => handleInputChangeUpdate(e)} />
+                    <input type="checkbox" name="Merchants"  checked={formRoleUpdateData?.Merchants} onChange={(e) => handleInputChangeUpdate(e)} />
                     <span className="slider round" />
                   </div>
                 </label>
                 <label style={{display: 'block', fontSize: '18px', marginBottom: '20px'}}>Orders
                   <div className="switch" style={{float: 'right'}}>
-                    <input type="checkbox" name="Orders"  checked={formRoleUpdateData.Orders} onChange={(e) => handleInputChangeUpdate(e)} />
+                    <input type="checkbox" name="Orders"  checked={formRoleUpdateData?.Orders} onChange={(e) => handleInputChangeUpdate(e)} />
                     <span className="slider round" />
                   </div>
                 </label>
                 <label style={{display: 'block', fontSize: '18px', marginBottom: '20px'}}>Analytics
                   <div className="switch" style={{float: 'right'}}>
-                    <input type="checkbox" name="analytics"  checked={formRoleUpdateData.analytics} onChange={(e) => handleInputChangeUpdate(e)} />
+                    <input type="checkbox" name="analytics"  checked={formRoleUpdateData?.analytics} onChange={(e) => handleInputChangeUpdate(e)} />
                     <span className="slider round" />
                   </div>
                 </label>
                 <label style={{display: 'block', fontSize: '18px', marginBottom: '20px'}}>Mail box
                   <div className="switch" style={{float: 'right'}}>
-                    <input type="checkbox" name="mailBox"  checked={formRoleUpdateData.mailBox} onChange={(e) => handleInputChangeUpdate(e)}/>
+                    <input type="checkbox" name="mailBox"  checked={formRoleUpdateData?.mailBox} onChange={(e) => handleInputChangeUpdate(e)}/>
                     <span className="slider round" />
                   </div>
                 </label>
                 <label style={{display: 'block', fontSize: '18px', marginBottom: '20px'}}>Live chat
                   <div className="switch" style={{float: 'right'}}>
-                    <input type="checkbox" name="liveChat"  checked={formRoleUpdateData.liveChat} onChange={(e) => handleInputChangeUpdate(e)} />
+                    <input type="checkbox" name="liveChat"  checked={formRoleUpdateData?.liveChat} onChange={(e) => handleInputChangeUpdate(e)} />
                     <span className="slider round" />
                   </div>
                 </label>
                 <label style={{display: 'block', fontSize: '18px', marginBottom: '20px'}}>Ticket
                   <div className="switch" style={{float: 'right'}}>
-                    <input type="checkbox" name="Ticket"  checked={formRoleUpdateData.Ticket} onChange={(e) => handleInputChangeUpdate(e)} />
+                    <input type="checkbox" name="Ticket"  checked={formRoleUpdateData?.Ticket} onChange={(e) => handleInputChangeUpdate(e)} />
                     <span className="slider round" />
                   </div>
                 </label>
                 <label style={{display: 'block', fontSize: '18px', marginBottom: '20px'}}>File Manager
                   <div className="switch" style={{float: 'right'}}>
-                    <input type="checkbox"  name="fileManager"  checked={formRoleUpdateData.fileManager} onChange={(e) => handleInputChangeUpdate(e)} />
+                    <input type="checkbox"  name="fileManager"  checked={formRoleUpdateData?.fileManager} onChange={(e) => handleInputChangeUpdate(e)} />
                     <span className="slider round" />
                   </div>
                 </label>
                 <label style={{display: 'block', fontSize: '18px', marginBottom: '20px'}}>Merchant View
                   <div className="switch" style={{float: 'right'}}>
-                    <input type="checkbox"  name="MerchantView"  checked={formRoleUpdateData.MerchantView} onChange={(e) => handleInputChangeUpdate(e)} />
+                    <input type="checkbox"  name="MerchantView"  checked={formRoleUpdateData?.MerchantView} onChange={(e) => handleInputChangeUpdate(e)} />
                     <span className="slider round" />
                   </div>
                 </label>
                 <label style={{display: 'block', fontSize: '18px', marginBottom: '20px'}}>Order View
                   <div className="switch" style={{float: 'right'}}>
-                    <input type="checkbox" name="OrderView"  checked={formRoleUpdateData.OrderView}  onChange={(e) => handleInputChangeUpdate(e)}/>
+                    <input type="checkbox" name="OrderView"  checked={formRoleUpdateData?.OrderView}  onChange={(e) => handleInputChangeUpdate(e)}/>
                     <span className="slider round" />
                   </div>
                 </label>
               
                 <label style={{display: 'block', fontSize: '18px', marginBottom: '20px'}}>Ticket View
                   <div className="switch" style={{float: 'right'}}>
-                    <input type="checkbox" name="ticketView"  checked={formRoleUpdateData.ticketView}  onChange={(e) => handleInputChangeUpdate(e)}/>
+                    <input type="checkbox" name="ticketView"  checked={formRoleUpdateData?.ticketView}  onChange={(e) => handleInputChangeUpdate(e)}/>
                     <span className="slider round" />
                   </div>
                 </label>  <label style={{display: 'block', fontSize: '18px', marginBottom: '20px'}}>Client Details
                   <div className="switch" style={{float: 'right'}}>
-                    <input type="checkbox" name="clientDetails"  checked={formRoleUpdateData.clientDetails}  onChange={(e) => handleInputChangeUpdate(e)}/>
+                    <input type="checkbox" name="clientDetails"  checked={formRoleUpdateData?.clientDetails}  onChange={(e) => handleInputChangeUpdate(e)}/>
                     <span className="slider round" />
                   </div>
                 </label>
                 <label style={{display: 'block', fontSize: '18px', marginBottom: '20px'}}>Recipient Details
                   <div className="switch" style={{float: 'right'}}>
-                    <input type="checkbox"  name="recipientDetails"  checked={formRoleUpdateData.recipientDetails}  onChange={(e) => handleInputChangeUpdate(e)}/>
+                    <input type="checkbox"  name="recipientDetails"  checked={formRoleUpdateData?.recipientDetails}  onChange={(e) => handleInputChangeUpdate(e)}/>
                     <span className="slider round" />
                   </div>
                 </label>
                 <label style={{display: 'block', fontSize: '18px', marginBottom: '20px'}}>Cost of Order (Full Details)
                   <div className="switch" style={{float: 'right'}}>
-                    <input type="checkbox" name="costOfOrder_FullDetails"  checked={formRoleUpdateData.costOfOrder_FullDetails}  onChange={(e) => handleInputChangeUpdate(e)} />
+                    <input type="checkbox" name="costOfOrder_FullDetails"  checked={formRoleUpdateData?.costOfOrder_FullDetails}  onChange={(e) => handleInputChangeUpdate(e)} />
                     <span className="slider round" />
                   </div>
                 </label>
                 <label style={{display: 'block', fontSize: '18px', marginBottom: '20px'}}>Cost of order (Collect Amount)
                   <div className="switch" style={{float: 'right'}}>
-                    <input type="checkbox" name="costOfOrder_CollectAmount"  checked={formRoleUpdateData.costOfOrder_CollectAmount}  onChange={(e) => handleInputChangeUpdate(e)} />
+                    <input type="checkbox" name="costOfOrder_CollectAmount"  checked={formRoleUpdateData?.costOfOrder_CollectAmount}  onChange={(e) => handleInputChangeUpdate(e)} />
                     <span className="slider round" />
                   </div>
                 </label>
                 <label style={{display: 'block', fontSize: '18px', marginBottom: '20px'}}>Order Details
                   <div className="switch" style={{float: 'right'}}>
-                    <input type="checkbox"  name="orderDetails"  checked={formRoleUpdateData.orderDetails}  onChange={(e) => handleInputChangeUpdate(e)}/>
+                    <input type="checkbox"  name="orderDetails"  checked={formRoleUpdateData?.orderDetails}  onChange={(e) => handleInputChangeUpdate(e)}/>
                     <span className="slider round" />
                   </div>
                 </label>
                 <label style={{display: 'block', fontSize: '18px', marginBottom: '20px'}}>Discussion View
                   <div className="switch" style={{float: 'right'}}>
-                    <input type="checkbox"  name="discussionView"  checked={formRoleUpdateData.discussionView}  onChange={(e) => handleInputChangeUpdate(e)}/>
+                    <input type="checkbox"  name="discussionView"  checked={formRoleUpdateData?.discussionView}  onChange={(e) => handleInputChangeUpdate(e)}/>
                     <span className="slider round" />
                   </div>
                 </label>
                 <label style={{display: 'block', fontSize: '18px', marginBottom: '20px'}}>Support Tickets
                   <div className="switch" style={{float: 'right'}}>
-                    <input type="checkbox"  name="supportTickets"  checked={formRoleUpdateData.supportTickets}  onChange={(e) => handleInputChangeUpdate(e)}/>
+                    <input type="checkbox"  name="supportTickets"  checked={formRoleUpdateData?.supportTickets}  onChange={(e) => handleInputChangeUpdate(e)}/>
                     <span className="slider round" />
                   </div>
                 </label>
                 <label style={{display: 'block', borderBottom: '2px solid #d8d8d8', marginBottom: '10px', fontSize: '18px', paddingBottom: '20px'}}>File manager(view order)
                   <div className="switch" style={{float: 'right'}}>
-                    <input type="checkbox" name="fileManager"  checked={formRoleUpdateData.fileManager_viewOrder}  onChange={(e) => handleInputChangeUpdate(e)} />
+                    <input type="checkbox" name="fileManager"  checked={formRoleUpdateData?.fileManager_viewOrder}  onChange={(e) => handleInputChangeUpdate(e)} />
                     <span className="slider round" />
                   </div>
                 </label>
                 <label style={{display: 'block', fontSize: '18px', marginBottom: '20px'}}>Basic Information
                   <div className="switch" style={{float: 'right'}}>
-                    <input type="checkbox" name="basicInformation"  checked={formRoleUpdateData.basicInformation}  onChange={(e) => handleInputChangeUpdate(e)} />
+                    <input type="checkbox" name="basicInformation"  checked={formRoleUpdateData?.basicInformation}  onChange={(e) => handleInputChangeUpdate(e)} />
                     <span className="slider round" />
                   </div>
                 </label>
                 <label style={{display: 'block', fontSize: '18px', marginBottom: '20px'}}>Personal Information
                   <div className="switch" style={{float: 'right'}}>
-                    <input type="checkbox"  name="personalInformation"  checked={formRoleUpdateData.personalInformation}  onChange={(e) => handleInputChangeUpdate(e)}/>
+                    <input type="checkbox"  name="personalInformation"  checked={formRoleUpdateData?.personalInformation}  onChange={(e) => handleInputChangeUpdate(e)}/>
                     <span className="slider round" />
                   </div>
                 </label>
                 <label style={{display: 'block', fontSize: '18px', marginBottom: '20px'}}>Brand Information
                   <div className="switch" style={{float: 'right'}}>
-                    <input type="checkbox"  name="brandInformation"  checked={formRoleUpdateData.brandInformation}  onChange={(e) => handleInputChangeUpdate(e)}/>
+                    <input type="checkbox"  name="brandInformation"  checked={formRoleUpdateData?.brandInformation}  onChange={(e) => handleInputChangeUpdate(e)}/>
                     <span className="slider round" />
                   </div>
                 </label>
                 <label style={{display: 'block', fontSize: '18px', marginBottom: '20px'}}>Payment Information
                   <div className="switch" style={{float: 'right'}}>
-                    <input type="checkbox"  name="paymentInformation"  checked={formRoleUpdateData.paymentInformation}  onChange={(e) => handleInputChangeUpdate(e)}/>
+                    <input type="checkbox"  name="paymentInformation"  checked={formRoleUpdateData?.paymentInformation}  onChange={(e) => handleInputChangeUpdate(e)}/>
                     <span className="slider round" />
                   </div>
                 </label>
                 <label style={{display: 'block', fontSize: '18px', marginBottom: '20px'}}>Order list
                   <div className="switch" style={{float: 'right'}}>
-                    <input type="checkbox"  name="orderList"  checked={formRoleUpdateData.orderList}  onChange={(e) => handleInputChangeUpdate(e)}/>
+                    <input type="checkbox"  name="orderList"  checked={formRoleUpdateData?.orderList}  onChange={(e) => handleInputChangeUpdate(e)}/>
                     <span className="slider round" />
                   </div>
                 </label>
@@ -522,8 +586,8 @@ console.log("setDeleteItem",deleteItem);
               :
               
                 showCreateRole ?
-                <form  onSubmit={handleCreateRole}>
-                  
+                <form  onSubmit={()=>handleCreateRole}>
+                   <h1>create button page1</h1>
                 <label htmlFor="fname" style={{display: 'block', fontSize: '18px', marginBottom: '20px'}}>Role Name
   <input onChange={handleInputChange} type="text" id="fname" name="roleName" value={formRoleData.roleName} placeholder="Role Name..." style={{border: '#e0e0e0 1px solid', padding: '10px', width: '100%'}} />
   </label>
@@ -675,8 +739,9 @@ console.log("setDeleteItem",deleteItem);
                 </form>
             
               :
-              formRoleData && !getRoleById  &&
-              <form  onSubmit={handleCreateRole}>
+              <>
+               <h1>by default page 1</h1>
+              <form  onSubmit={()=>handleCreateRole}>
                   <h1>basic</h1>
               <label htmlFor="fname" style={{display: 'block', fontSize: '18px', marginBottom: '20px'}}>Role Name
 <input onChange={handleInputChange} type="text" id="fname" name="roleName" value={formRoleData.roleName} placeholder="Role Name..." style={{border: '#e0e0e0 1px solid', padding: '10px', width: '100%'}} />
@@ -827,6 +892,8 @@ console.log("setDeleteItem",deleteItem);
                   </div>
                 </label>
               </form>
+              </>
+             
 
             }
             
@@ -837,59 +904,135 @@ console.log("setDeleteItem",deleteItem);
                {
                  getRoleById ?
                  <form onSubmit={()=>handleUpdateRole(getRoleById?._id)}>
+                    <h1>update button pag2</h1>
                  <label style={{display: 'block', fontSize: '18px', marginBottom: '20px'}}>Merchant Request Approval/Ban
                    <div className="switch" style={{float: 'right'}}>
-                     <input type="checkbox" name="merchant_approval"  checked={formRoleUpdateData.merchant_approval} onChange={(e) => handleInputChangeUpdate(e)} />
+                     <input type="checkbox" name="merchant_approval"  checked={formRoleUpdateData?.merchant_approval} onChange={(e) => handleInputChangeUpdate(e)} />
                      <span className="slider round" />
                    </div>
                  </label>
                  <label style={{display: 'block', borderBottom: '2px solid #d8d8d8', marginBottom: '10px', fontSize: '18px', paddingBottom: '20px'}}>Merchant Info Edit
                    <div className="switch" style={{float: 'right'}}>
-                     <input type="checkbox" name="merchant_Info_Edit"  checked={formRoleUpdateData.merchant_Info_Edit} onChange={(e) => handleInputChangeUpdate(e)} />
+                     <input type="checkbox" name="merchant_Info_Edit"  checked={formRoleUpdateData?.merchant_Info_Edit} onChange={(e) => handleInputChangeUpdate(e)} />
                      <span className="slider round" />
                    </div>
                  </label>
                  <label style={{display: 'block', fontSize: '18px', marginBottom: '20px'}}>Edit Order
                    <div className="switch" style={{float: 'right'}}>
-                     <input type="checkbox" name="edit_Order"  checked={formRoleUpdateData.edit_Order} onChange={(e) => handleInputChangeUpdate(e)} />
+                     <input type="checkbox" name="edit_Order"  checked={formRoleUpdateData?.edit_Order} onChange={(e) => handleInputChangeUpdate(e)} />
                      <span className="slider round" />
                    </div>
                  </label>
                  <label style={{display: 'block', fontSize: '18px', marginBottom: '20px'}}>Payment Status
                    <div className="switch" style={{float: 'right'}}>
-                     <input type="checkbox" name="payment_Status"  checked={formRoleUpdateData.payment_Status} onChange={(e) => handleInputChangeUpdate(e)} />
+                     <input type="checkbox" name="payment_Status"  checked={formRoleUpdateData?.payment_Status} onChange={(e) => handleInputChangeUpdate(e)} />
                      <span className="slider round" />
                    </div>
                  </label>
                  <label style={{display: 'block', fontSize: '18px', marginBottom: '20px'}}>Order status
                    <div className="switch" style={{float: 'right'}}>
-                     <input type="checkbox" name="orderStatus"  checked={formRoleUpdateData.orderStatus} onChange={(e) => handleInputChangeUpdate(e)} />
+                     <input type="checkbox" name="orderStatus"  checked={formRoleUpdateData?.orderStatus} onChange={(e) => handleInputChangeUpdate(e)} />
                      <span className="slider round" />
                    </div>
                  </label>
                  <label style={{display: 'block', fontSize: '18px', marginBottom: '20px'}}>Discussion
                    <div className="switch" style={{float: 'right'}}>
-                     <input type="checkbox" name="discussion"  checked={formRoleUpdateData.discussion} onChange={(e) => handleInputChangeUpdate(e)} />
+                     <input type="checkbox" name="discussion"  checked={formRoleUpdateData?.discussion} onChange={(e) => handleInputChangeUpdate(e)} />
                      <span className="slider round" />
                    </div>
                  </label>
                  <label style={{display: 'block', fontSize: '18px', marginBottom: '20px'}}>Ticket Create And Response
                    <div className="switch" style={{float: 'right'}}>
-                     <input type="checkbox" name="ticketCreateAndResponse"  checked={formRoleUpdateData.ticketCreateAndResponse} onChange={(e) => handleInputChangeUpdate(e)} />
+                     <input type="checkbox" name="ticketCreateAndResponse"  checked={formRoleUpdateData?.ticketCreateAndResponse} onChange={(e) => handleInputChangeUpdate(e)} />
                      <span className="slider round" />
                    </div>
                  </label>
                  <label style={{display: 'block', fontSize: '18px', marginBottom: '20px'}}>File upload/download
                    <div className="switch" style={{float: 'right'}}>
-                     <input type="checkbox" name="fileUpload_download"  checked={formRoleUpdateData.fileUpload_download} onChange={(e) => handleInputChangeUpdate(e)} />
+                     <input type="checkbox" name="fileUpload_download"  checked={formRoleUpdateData?.fileUpload_download} onChange={(e) => handleInputChangeUpdate(e)} />
                      <span className="slider round" />
                    </div>
                  </label>
-                
+                 <div className='col-lg-3 flex'>
+                 
+                <div style={{flex:"start"}}>
+                <button className="status-btn" style={{ padding: '10px 20px 10px 20px' }}  onClick={handleUpdateSubmit} >Update Role</button>
+  <ConfirmRole isOpen={updateModalOpen} onClose={handleUpdateModalClose} onConfirm={()=>handleUpdateRole(getRoleById?._id)} />
+
+                </div>
+                <div>
+                 <button onClick={handleDeletePopUp} style={{borderRadius:"5px",padding: '10px 20px 10px 20px',float: 'right', background: 'transparent', border: 'none', color: 'white',backgroundColor:"red", fontSize: '16px'}}><i className="fa fa-trash" aria-hidden="true" /><span style={{marginLeft:"5px"}}>Delete</span></button>
+                 <DeleteRoleAlert isOpen={ deletepopUp} deleteId={deleteId} onClose={handleDeleteModalClose} onConfirm={(e)=>handleDeleteItem(e,getRoleById?._id)} />
+                 </div>
+
+</div>
                </form>
 :   showCreateRole ?
+<>
 <form onSubmit={handleCreateRole}>
-  <h1>basic2</h1>
+  <h1>create button pag2</h1>
+<label style={{display: 'block', fontSize: '18px', marginBottom: '20px'}}>Merchant Request Approval/Ban
+  <div className="switch" style={{float: 'right'}}>
+    <input type="checkbox" name="merchant_approval"  checked={formRoleData.merchant_approval} onChange={(e) => handleInputChange(e)} />
+    <span className="slider round" />
+  </div>
+</label>
+<label style={{display: 'block', borderBottom: '2px solid #d8d8d8', marginBottom: '10px', fontSize: '18px', paddingBottom: '20px'}}>Merchant Info Edit
+  <div className="switch" style={{float: 'right'}}>
+    <input type="checkbox" name="merchant_Info_Edit"  checked={formRoleData.merchant_Info_Edit} onChange={(e) => handleInputChange(e)} />
+    <span className="slider round" />
+  </div>
+</label>
+<label style={{display: 'block', fontSize: '18px', marginBottom: '20px'}}>Edit Order
+  <div className="switch" style={{float: 'right'}}>
+    <input type="checkbox" name="edit_Order"  checked={formRoleData.edit_Order} onChange={(e) => handleInputChange(e)} />
+    <span className="slider round" />
+  </div>
+</label>
+<label style={{display: 'block', fontSize: '18px', marginBottom: '20px'}}>Payment Status
+  <div className="switch" style={{float: 'right'}}>
+    <input type="checkbox" name="payment_Status"  checked={formRoleData.payment_Status} onChange={(e) => handleInputChange(e)} />
+    <span className="slider round" />
+  </div>
+</label>
+<label style={{display: 'block', fontSize: '18px', marginBottom: '20px'}}>Order status
+  <div className="switch" style={{float: 'right'}}>
+    <input type="checkbox" name="orderStatus"  checked={formRoleData.orderStatus} onChange={(e) => handleInputChange(e)} />
+    <span className="slider round" />
+  </div>
+</label>
+<label style={{display: 'block', fontSize: '18px', marginBottom: '20px'}}>Discussion
+  <div className="switch" style={{float: 'right'}}>
+    <input type="checkbox" name="discussion"  checked={formRoleData.discussion} onChange={(e) => handleInputChange(e)} />
+    <span className="slider round" />
+  </div>
+</label>
+<label style={{display: 'block', fontSize: '18px', marginBottom: '20px'}}>Ticket Create And Response
+  <div className="switch" style={{float: 'right'}}>
+    <input type="checkbox" name="ticketCreateAndResponse"  checked={formRoleData.ticketCreateAndResponse} onChange={(e) => handleInputChange(e)} />
+    <span className="slider round" />
+  </div>
+</label>
+<label style={{display: 'block', fontSize: '18px', marginBottom: '20px'}}>File upload/download
+  <div className="switch" style={{float: 'right'}}>
+    <input type="checkbox" name="fileUpload_download"  checked={formRoleData.fileUpload_download} onChange={(e) => handleInputChange(e)} />
+    <span className="slider round" />
+  </div>
+</label>
+
+  
+    
+</form>
+  <button className="status-btn" style={{ padding: '10px 20px 10px 20px' }}   disabled={isButtonDisabled } onClick={handleSubmit}>Create Role</button>
+  <ConfirmRole isOpen={ isModalOpen} onClose={handleModalClose} onConfirm={(e)=>handleCreateRole(e)} />
+
+</>
+
+: 
+
+<>
+<form onSubmit={handleCreateRole}>
+  <h1>by default page 2</h1>
 <label style={{display: 'block', fontSize: '18px', marginBottom: '20px'}}>Merchant Request Approval/Ban
   <div className="switch" style={{float: 'right'}}>
     <input type="checkbox" name="merchant_approval"  checked={formRoleData.merchant_approval} onChange={(e) => handleInputChange(e)} />
@@ -940,62 +1083,14 @@ console.log("setDeleteItem",deleteItem);
 </label>
 
 </form>
-:  formRoleData && !getRoleById  &&
-<form onSubmit={handleCreateRole}>
-  <h1>basic2</h1>
-<label style={{display: 'block', fontSize: '18px', marginBottom: '20px'}}>Merchant Request Approval/Ban
-  <div className="switch" style={{float: 'right'}}>
-    <input type="checkbox" name="merchant_approval"  checked={formRoleData.merchant_approval} onChange={(e) => handleInputChange(e)} />
-    <span className="slider round" />
-  </div>
-</label>
-<label style={{display: 'block', borderBottom: '2px solid #d8d8d8', marginBottom: '10px', fontSize: '18px', paddingBottom: '20px'}}>Merchant Info Edit
-  <div className="switch" style={{float: 'right'}}>
-    <input type="checkbox" name="merchant_Info_Edit"  checked={formRoleData.merchant_Info_Edit} onChange={(e) => handleInputChange(e)} />
-    <span className="slider round" />
-  </div>
-</label>
-<label style={{display: 'block', fontSize: '18px', marginBottom: '20px'}}>Edit Order
-  <div className="switch" style={{float: 'right'}}>
-    <input type="checkbox" name="edit_Order"  checked={formRoleData.edit_Order} onChange={(e) => handleInputChange(e)} />
-    <span className="slider round" />
-  </div>
-</label>
-<label style={{display: 'block', fontSize: '18px', marginBottom: '20px'}}>Payment Status
-  <div className="switch" style={{float: 'right'}}>
-    <input type="checkbox" name="payment_Status"  checked={formRoleData.payment_Status} onChange={(e) => handleInputChange(e)} />
-    <span className="slider round" />
-  </div>
-</label>
-<label style={{display: 'block', fontSize: '18px', marginBottom: '20px'}}>Order status
-  <div className="switch" style={{float: 'right'}}>
-    <input type="checkbox" name="orderStatus"  checked={formRoleData.orderStatus} onChange={(e) => handleInputChange(e)} />
-    <span className="slider round" />
-  </div>
-</label>
-<label style={{display: 'block', fontSize: '18px', marginBottom: '20px'}}>Discussion
-  <div className="switch" style={{float: 'right'}}>
-    <input type="checkbox" name="discussion"  checked={formRoleData.discussion} onChange={(e) => handleInputChange(e)} />
-    <span className="slider round" />
-  </div>
-</label>
-<label style={{display: 'block', fontSize: '18px', marginBottom: '20px'}}>Ticket Create And Response
-  <div className="switch" style={{float: 'right'}}>
-    <input type="checkbox" name="ticketCreateAndResponse"  checked={formRoleData.ticketCreateAndResponse} onChange={(e) => handleInputChange(e)} />
-    <span className="slider round" />
-  </div>
-</label>
-<label style={{display: 'block', fontSize: '18px', marginBottom: '20px'}}>File upload/download
-  <div className="switch" style={{float: 'right'}}>
-    <input type="checkbox" name="fileUpload_download"  checked={formRoleData.fileUpload_download} onChange={(e) => handleInputChange(e)} />
-    <span className="slider round" />
-  </div>
-</label>
+<button className="status-btn" style={{ padding: '10px 20px 10px 20px' }}   disabled={isButtonDisabled } onClick={handleSubmit}>Create Role</button>
+  <ConfirmRole isOpen={ isModalOpen} onClose={handleModalClose} onConfirm={(e)=>handleCreateRole(e)} />
 
-</form>
+</>
+
                }
                
-{
+{/* {
   getRoleById &&
 <>
 <button className="status-btn" style={{ padding: '10px 20px 10px 20px' }}  onClick={handleUpdateSubmit} >Update Role</button>
@@ -1003,15 +1098,15 @@ console.log("setDeleteItem",deleteItem);
 
 </>
  
-}
-  {
+} */}
+  {/* {
     formRoleData && !getRoleById &&
     <>
     <button className="status-btn" style={{ padding: '10px 20px 10px 20px' }}   disabled={isButtonDisabled } onClick={handleSubmit}>Create Role</button>
       <ConfirmRole isOpen={!isDataSent && isModalOpen} onClose={handleModalClose} onConfirm={handleCreateRole} />
     
     </>
-  }
+  } */}
 
 
        
@@ -1025,150 +1120,18 @@ console.log("setDeleteItem",deleteItem);
                 <button className='col-1' style={{textAlign:"right",background:'none',border:"none",fontSize:"20px"}}>+</button>
                 </div>
                 <hr className='mt-0' />
-                <p className="role-button" style={{display: 'block', width: '100%', textAlign: 'left', marginBottom: '10px', borderRadius: 0, border: 'none', backgroundColor: 'white', color: '#000', fontSize: '18px', fontWeight: 500, padding: '5px 10px'}}>
-                  <span>
-                    Abir Ali Khan
-                  </span>
-                  <button style={{float: 'right', background: 'transparent', border: 'none', color: 'red', fontSize: '16px'}}><i className="fa fa-trash" aria-hidden="true" /></button>
-                </p>
-                <p className="role-button" style={{display: 'block', width: '100%', textAlign: 'left', marginBottom: '10px', borderRadius: 0, border: 'none', backgroundColor: 'white', color: '#000', fontSize: '18px', fontWeight: 500, padding: '5px 10px'}}>
-                  <span>
-                    Fariha Hasan
-                  </span>
-                  <button style={{float: 'right', background: 'transparent', border: 'none', color: 'red', fontSize: '16px'}}><i className="fa fa-trash" aria-hidden="true" /></button>
-                </p>
-                <p className="role-button" style={{display: 'block', width: '100%', textAlign: 'left', marginBottom: '10px', borderRadius: 0, border: 'none', backgroundColor: 'white', color: '#000', fontSize: '18px', fontWeight: 500, padding: '5px 10px'}}>
-                  <span>
-                    Shuvro Haque
-                  </span>
-                  <button style={{float: 'right', background: 'transparent', border: 'none', color: 'red', fontSize: '16px'}}><i className="fa fa-trash" aria-hidden="true" /></button>
-                </p>
-                <p className="role-button" style={{display: 'block', width: '100%', textAlign: 'left', marginBottom: '10px', borderRadius: 0, border: 'none', backgroundColor: 'white', color: '#000', fontSize: '18px', fontWeight: 500, padding: '5px 10px'}}>
-                  <span>
-                    Tashfin Rahaman
-                  </span>
-                  <button style={{float: 'right', background: 'transparent', border: 'none', color: 'red', fontSize: '16px'}}><i className="fa fa-trash" aria-hidden="true" /></button>
-                </p>
-                <p className="role-button" style={{display: 'block', width: '100%', textAlign: 'left', marginBottom: '10px', borderRadius: 0, border: 'none', backgroundColor: 'white', color: '#000', fontSize: '18px', fontWeight: 500, padding: '5px 10px'}}>
-                  <span>
-                    Abir Ali Khan
-                  </span>
-                  <button style={{float: 'right', background: 'transparent', border: 'none', color: 'red', fontSize: '16px'}}><i className="fa fa-trash" aria-hidden="true" /></button>
-                </p>
-                <p className="role-button" style={{display: 'block', width: '100%', textAlign: 'left', marginBottom: '10px', borderRadius: 0, border: 'none', backgroundColor: 'white', color: '#000', fontSize: '18px', fontWeight: 500, padding: '5px 10px'}}>
-                  <span>
-                    Fariha Hasan
-                  </span>
-                  <button style={{float: 'right', background: 'transparent', border: 'none', color: 'red', fontSize: '16px'}}><i className="fa fa-trash" aria-hidden="true" /></button>
-                </p>
-                <p className="role-button" style={{display: 'block', width: '100%', textAlign: 'left', marginBottom: '10px', borderRadius: 0, border: 'none', backgroundColor: 'white', color: '#000', fontSize: '18px', fontWeight: 500, padding: '5px 10px'}}>
-                  <span>
-                    Shuvro Haque
-                  </span>
-                  <button style={{float: 'right', background: 'transparent', border: 'none', color: 'red', fontSize: '16px'}}><i className="fa fa-trash" aria-hidden="true" /></button>
-                </p>
-                <p className="role-button" style={{display: 'block', width: '100%', textAlign: 'left', marginBottom: '10px', borderRadius: 0, border: 'none', backgroundColor: 'white', color: '#000', fontSize: '18px', fontWeight: 500, padding: '5px 10px'}}>
-                  <span>
-                    Tashfin Rahaman
-                  </span>
-                  <button style={{float: 'right', background: 'transparent', border: 'none', color: 'red', fontSize: '16px'}}><i className="fa fa-trash" aria-hidden="true" /></button>
-                </p>
-                <p className="role-button" style={{display: 'block', width: '100%', textAlign: 'left', marginBottom: '10px', borderRadius: 0, border: 'none', backgroundColor: 'white', color: '#000', fontSize: '18px', fontWeight: 500, padding: '5px 10px'}}>
-                  <span>
-                    Abir Ali Khan
-                  </span>
-                  <button style={{float: 'right', background: 'transparent', border: 'none', color: 'red', fontSize: '16px'}}><i className="fa fa-trash" aria-hidden="true" /></button>
-                </p>
-                <p className="role-button" style={{display: 'block', width: '100%', textAlign: 'left', marginBottom: '10px', borderRadius: 0, border: 'none', backgroundColor: 'white', color: '#000', fontSize: '18px', fontWeight: 500, padding: '5px 10px'}}>
-                  <span>
-                    Fariha Hasan
-                  </span>
-                  <button style={{float: 'right', background: 'transparent', border: 'none', color: 'red', fontSize: '16px'}}><i className="fa fa-trash" aria-hidden="true" /></button>
-                </p>
-                <p className="role-button" style={{display: 'block', width: '100%', textAlign: 'left', marginBottom: '10px', borderRadius: 0, border: 'none', backgroundColor: 'white', color: '#000', fontSize: '18px', fontWeight: 500, padding: '5px 10px'}}>
-                  <span>
-                    Shuvro Haque
-                  </span>
-                  <button style={{float: 'right', background: 'transparent', border: 'none', color: 'red', fontSize: '16px'}}><i className="fa fa-trash" aria-hidden="true" /></button>
-                </p>
-                <p className="role-button" style={{display: 'block', width: '100%', textAlign: 'left', marginBottom: '10px', borderRadius: 0, border: 'none', backgroundColor: 'white', color: '#000', fontSize: '18px', fontWeight: 500, padding: '5px 10px'}}>
-                  <span>
-                    Tashfin Rahaman
-                  </span>
-                  <button style={{float: 'right', background: 'transparent', border: 'none', color: 'red', fontSize: '16px'}}><i className="fa fa-trash" aria-hidden="true" /></button>
-                </p>
-                <p className="role-button" style={{display: 'block', width: '100%', textAlign: 'left', marginBottom: '10px', borderRadius: 0, border: 'none', backgroundColor: 'white', color: '#000', fontSize: '18px', fontWeight: 500, padding: '5px 10px'}}>
-                  <span>
-                    Abir Ali Khan
-                  </span>
-                  <button style={{float: 'right', background: 'transparent', border: 'none', color: 'red', fontSize: '16px'}}><i className="fa fa-trash" aria-hidden="true" /></button>
-                </p>
-                <p className="role-button" style={{display: 'block', width: '100%', textAlign: 'left', marginBottom: '10px', borderRadius: 0, border: 'none', backgroundColor: 'white', color: '#000', fontSize: '18px', fontWeight: 500, padding: '5px 10px'}}>
-                  <span>
-                    Fariha Hasan
-                  </span>
-                  <button style={{float: 'right', background: 'transparent', border: 'none', color: 'red', fontSize: '16px'}}><i className="fa fa-trash" aria-hidden="true" /></button>
-                </p>
-                <p className="role-button" style={{display: 'block', width: '100%', textAlign: 'left', marginBottom: '10px', borderRadius: 0, border: 'none', backgroundColor: 'white', color: '#000', fontSize: '18px', fontWeight: 500, padding: '5px 10px'}}>
-                  <span>
-                    Shuvro Haque
-                  </span>
-                  <button style={{float: 'right', background: 'transparent', border: 'none', color: 'red', fontSize: '16px'}}><i className="fa fa-trash" aria-hidden="true" /></button>
-                </p>
-                <p className="role-button" style={{display: 'block', width: '100%', textAlign: 'left', marginBottom: '10px', borderRadius: 0, border: 'none', backgroundColor: 'white', color: '#000', fontSize: '18px', fontWeight: 500, padding: '5px 10px'}}>
-                  <span>
-                    Tashfin Rahaman
-                  </span>
-                  <button style={{float: 'right', background: 'transparent', border: 'none', color: 'red', fontSize: '16px'}}><i className="fa fa-trash" aria-hidden="true" /></button>
-                </p>
-                <p className="role-button" style={{display: 'block', width: '100%', textAlign: 'left', marginBottom: '10px', borderRadius: 0, border: 'none', backgroundColor: 'white', color: '#000', fontSize: '18px', fontWeight: 500, padding: '5px 10px'}}>
-                  <span>
-                    Abir Ali Khan
-                  </span>
-                  <button style={{float: 'right', background: 'transparent', border: 'none', color: 'red', fontSize: '16px'}}><i className="fa fa-trash" aria-hidden="true" /></button>
-                </p>
-                <p className="role-button" style={{display: 'block', width: '100%', textAlign: 'left', marginBottom: '10px', borderRadius: 0, border: 'none', backgroundColor: 'white', color: '#000', fontSize: '18px', fontWeight: 500, padding: '5px 10px'}}>
-                  <span>
-                    Fariha Hasan
-                  </span>
-                  <button style={{float: 'right', background: 'transparent', border: 'none', color: 'red', fontSize: '16px'}}><i className="fa fa-trash" aria-hidden="true" /></button>
-                </p>
-                <p className="role-button" style={{display: 'block', width: '100%', textAlign: 'left', marginBottom: '10px', borderRadius: 0, border: 'none', backgroundColor: 'white', color: '#000', fontSize: '18px', fontWeight: 500, padding: '5px 10px'}}>
-                  <span>
-                    Shuvro Haque
-                  </span>
-                  <button style={{float: 'right', background: 'transparent', border: 'none', color: 'red', fontSize: '16px'}}><i className="fa fa-trash" aria-hidden="true" /></button>
-                </p>
-                <p className="role-button" style={{display: 'block', width: '100%', textAlign: 'left', marginBottom: '10px', borderRadius: 0, border: 'none', backgroundColor: 'white', color: '#000', fontSize: '18px', fontWeight: 500, padding: '5px 10px'}}>
-                  <span>
-                    Tashfin Rahaman
-                  </span>
-                  <button style={{float: 'right', background: 'transparent', border: 'none', color: 'red', fontSize: '16px'}}><i className="fa fa-trash" aria-hidden="true" /></button>
-                </p>
-                <p className="role-button" style={{display: 'block', width: '100%', textAlign: 'left', marginBottom: '10px', borderRadius: 0, border: 'none', backgroundColor: 'white', color: '#000', fontSize: '18px', fontWeight: 500, padding: '5px 10px'}}>
-                  <span>
-                    Abir Ali Khan
-                  </span>
-                  <button style={{float: 'right', background: 'transparent', border: 'none', color: 'red', fontSize: '16px'}}><i className="fa fa-trash" aria-hidden="true" /></button>
-                </p>
-                <p className="role-button" style={{display: 'block', width: '100%', textAlign: 'left', marginBottom: '10px', borderRadius: 0, border: 'none', backgroundColor: 'white', color: '#000', fontSize: '18px', fontWeight: 500, padding: '5px 10px'}}>
-                  <span>
-                    Fariha Hasan
-                  </span>
-                  <button style={{float: 'right', background: 'transparent', border: 'none', color: 'red', fontSize: '16px'}}><i className="fa fa-trash" aria-hidden="true" /></button>
-                </p>
-                <p className="role-button" style={{display: 'block', width: '100%', textAlign: 'left', marginBottom: '10px', borderRadius: 0, border: 'none', backgroundColor: 'white', color: '#000', fontSize: '18px', fontWeight: 500, padding: '5px 10px'}}>
-                  <span>
-                    Shuvro Haque
-                  </span>
-                  <button style={{float: 'right', background: 'transparent', border: 'none', color: 'red', fontSize: '16px'}}><i className="fa fa-trash" aria-hidden="true" /></button>
-                </p>
-                <p className="role-button" style={{display: 'block', width: '100%', textAlign: 'left', marginBottom: '10px', borderRadius: 0, border: 'none', backgroundColor: 'white', color: '#000', fontSize: '18px', fontWeight: 500, padding: '5px 10px'}}>
-                  <span>
-                    Tashfin Rahaman
-                  </span>
-                  <button style={{float: 'right', background: 'transparent', border: 'none', color: 'red', fontSize: '16px'}}><i className="fa fa-trash" aria-hidden="true" /></button>
-                </p>
+                {
+                  getAllInvitors?.map(invitor=>
+                    <p className="role-button" style={{display: 'block', width: '100%', textAlign: 'left', marginBottom: '10px', borderRadius: 0, border: 'none', backgroundColor: 'white', color: '#000', fontSize: '18px', fontWeight: 500, padding: '5px 10px'}}>
+                    <span>
+                      {invitor?.name}
+                    </span>
+                    <button style={{float: 'right', background: 'transparent', border: 'none', color: 'red', fontSize: '16px'}}><i className="fa fa-trash" aria-hidden="true" /></button>
+                  </p>
+                    )
+                }
+               
+               
               </div>
             </div>
           </div>
