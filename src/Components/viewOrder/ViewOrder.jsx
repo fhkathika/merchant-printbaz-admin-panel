@@ -350,10 +350,11 @@ const ViewOrder = () => {
                           {orderStatus === "Approved" && (
                             <>
                               <option value="Pending">Pending</option>
-                              <option value="confirmed">Confirmed</option>
+                              
                               <option value="on hold artwork issue">On hold -  Artwork issue</option>
                   <option value="on hold billing issue">On hold - Billing Issue</option>
                   <option value="on hold out of stock">On hold - Out of Stock</option>
+                  <option value="confirmed">Confirmed</option>
                               <option value="in-production">In Production</option>
                               <option value="out for delivery">Out for delivery</option>
                               <option value="delivered">Delivered</option>
@@ -365,11 +366,12 @@ const ViewOrder = () => {
                           {orderStatus === "Pending" && (
                             <>
                              
-                             <option value="confirmed">Confirmed</option>
+                            
                               <option value="on hold artwork issue">On hold -  Artwork issue</option>
                   <option value="on hold billing issue">On hold - Billing Issue</option>
                   <option value="on hold out of stock">On hold - Out of Stock</option>
                               <option value="Approved">Approved</option>
+                              <option value="confirmed">Confirmed</option>
                               <option value="in-production">In Production</option>
                               <option value="out for delivery">Out for delivery</option>
                               <option value="delivered">Delivered</option>
@@ -395,12 +397,13 @@ const ViewOrder = () => {
                           )}  
                             {orderStatus === "in-production" && (
                             <>
-                                 <option value="confirmed">Confirmed</option>
+                                
                                 <option value="on hold artwork issue">On hold -  Artwork issue</option>
                   <option value="on hold billing issue">On hold - Billing Issue</option>
                   <option value="on hold out of stock">On hold - Out of Stock</option>
                              <option value="Pending">Pending</option>
                              <option value="Approved">Approved</option>
+                             <option value="confirmed">Confirmed</option>
                               <option value="out for delivery">Out for delivery</option>
                               <option value="delivered">Delivered</option>
                               <option value="payment-released">Payment Released</option>
@@ -410,12 +413,13 @@ const ViewOrder = () => {
                           )}  
                               {orderStatus === "out for delivery" && (
                             <>
-                                  <option value="confirmed">Confirmed</option>
+                                 
                                 <option value="on hold artwork issue">On hold -  Artwork issue</option>
                   <option value="on hold billing issue">On hold - Billing Issue</option>
                   <option value="on hold out of stock">On hold - Out of Stock</option>
                              <option value="Pending">Pending</option>
                              <option value="Approved">Approved</option>
+                             <option value="confirmed">Confirmed</option>
                              <option value="in-production">In Production</option>
                               <option value="delivered">Delivered</option>
                               <option value="payment-released">Payment Released</option>
@@ -425,12 +429,13 @@ const ViewOrder = () => {
                           )}
                             {orderStatus === "delivered" && (
                             <>
-                                  <option value="confirmed">Confirmed</option>
+                                 
                                 <option value="on hold artwork issue">On hold -  Artwork issue</option>
                   <option value="on hold billing issue">On hold - Billing Issue</option>
                   <option value="on hold out of stock">On hold - Out of Stock</option>
                              <option value="Pending">Pending</option>
                              <option value="Approved">Approved</option>
+                             <option value="confirmed">Confirmed</option>
                              <option value="in-production">In Production</option>
                              <option value="out for delivery">Out for delivery</option>
                               <option value="payment-released">Payment Released</option>
@@ -440,12 +445,13 @@ const ViewOrder = () => {
                           )} 
                            {orderStatus === "payment-released" && (
                             <>
-                                  <option value="confirmed">Confirmed</option>
+                                 
                                 <option value="on hold artwork issue">On hold -  Artwork issue</option>
                   <option value="on hold billing issue">On hold - Billing Issue</option>
                   <option value="on hold out of stock">On hold - Out of Stock</option>
                              <option value="Pending">Pending</option>
                              <option value="Approved">Approved</option>
+                             <option value="confirmed">Confirmed</option>
                              <option value="in-production">In Production</option>
                              <option value="out for delivery">Out for delivery</option>
                              <option value="delivered">Delivered</option>
@@ -455,12 +461,13 @@ const ViewOrder = () => {
                           )}  
                           {orderStatus === "returned" && (
                             <>
-                                  <option value="confirmed">Confirmed</option>
+                               
                                 <option value="on hold artwork issue">On hold -  Artwork issue</option>
                   <option value="on hold billing issue">On hold - Billing Issue</option>
                   <option value="on hold out of stock">On hold - Out of Stock</option>
                              <option value="Pending">Pending</option>
                              <option value="Approved">Approved</option>
+                             <option value="confirmed">Confirmed</option>
                              <option value="in-production">In Production</option>
                              <option value="out for delivery">Out for delivery</option>
                              <option value="delivered">Delivered</option>
@@ -473,10 +480,11 @@ const ViewOrder = () => {
                           {orderStatus === "on hold artwork issue" && (
                             <>
                               <option value="Pending">Pending</option>
-                                <option value="confirmed">Confirmed</option>
+                               
                               <option value="on hold billing issue">On hold - Billing Issue</option>
                   <option value="on hold out of stock">On hold - Out of Stock</option>
                               <option value="Approved">Approved</option>
+                              <option value="confirmed">Confirmed</option>
                               <option value="in-production">In Production</option>
                               <option value="out for delivery">Out for delivery</option>
                               <option value="delivered">Delivered</option>
@@ -489,10 +497,11 @@ const ViewOrder = () => {
 {orderStatus === "on hold billing issue" && (
                             <>
                               <option value="Pending">Pending</option>
-                                <option value="confirmed">Confirmed</option>
+                               
                               <option value="on hold artwork issue">On hold - Artwork Issue</option>
                   <option value="on hold out of stock">On hold - Out of Stock</option>
                               <option value="Approved">Approved</option>
+                              <option value="confirmed">Confirmed</option>
                               <option value="in-production">In Production</option>
                               <option value="out for delivery">Out for delivery</option>
                               <option value="delivered">Delivered</option>
@@ -505,10 +514,11 @@ const ViewOrder = () => {
 {orderStatus === "on hold out of stock" && (
                             <>
                               <option value="Pending">Pending</option>
-                                <option value="confirmed">Confirmed</option>
+                               
                               <option value="on hold artwork issue">On hold - Artwork Issue</option>
                               <option value="on hold billing issue">On hold - Billing Issue</option>
                               <option value="Approved">Approved</option>
+                              <option value="confirmed">Confirmed</option>
                               <option value="in-production">In Production</option>
                               <option value="out for delivery">Out for delivery</option>
                               <option value="delivered">Delivered</option>
@@ -521,11 +531,12 @@ const ViewOrder = () => {
 {orderStatus === "cancel" && (
                             <>
                               <option value="Pending">Pending</option>
-                                <option value="confirmed">Confirmed</option>
+                               
                               <option value="on hold artwork issue">On hold - Artwork Issue</option>
                               <option value="on hold billing issue">On hold - Billing Issue</option>
                               <option value="on hold out of stock">On hold - Out Of Stock</option>
                               <option value="Approved">Approved</option>
+                              <option value="confirmed">Confirmed</option>
                               <option value="in-production">In Production</option>
                               <option value="out for delivery">Out for delivery</option>
                               <option value="delivered">Delivered</option>
