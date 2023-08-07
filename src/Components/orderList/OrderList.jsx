@@ -70,7 +70,7 @@ const handlePaymentStausInputChange = (event, index) => {
 }
 let pendingOrders=orderAll?.filter(users=>users?.orderStatus==="Pending");
 let approvedOrders=orderAll?.filter(users=>users?.orderStatus==="Approved");
-let onHoldOrders=orderAll?.filter(users=>users?.orderStatus==="on-hold");
+let  confirmedOrders=orderAll?.filter(users=>users?.orderStatus==="confirmed");
 let onHoldArtworkIssueOrders=orderAll?.filter(users=>users?.orderStatus==="on hold artwork issue");
 let onHoldBillingIssueOrders=orderAll?.filter(users=>users?.orderStatus==="on hold billing issue");
 let onHoldOutOfStockOrders=orderAll?.filter(users=>users?.orderStatus==="on hold out of stock");
@@ -183,7 +183,7 @@ const filerByOrderDate = orderAll.filter(order => {
 const actualIndexOfLastItem = indexOfLastItem > orderAll.length ? orderAll.length : indexOfLastItem;
 const actualIndexOfLastItemOfpendingOrders = indexOfLastItem > pendingOrders.length ? pendingOrders.length : indexOfLastItem;
 const actualIndexOfLastItemOfapprovedOrders = indexOfLastItem > approvedOrders.length ? approvedOrders.length : indexOfLastItem;
-const actualIndexOfLastItemOfonHoldOrders = indexOfLastItem > onHoldOrders.length ? onHoldOrders.length : indexOfLastItem;
+const actualIndexOfLastItemOfconfirmedOrders = indexOfLastItem >  confirmedOrders.length ?  confirmedOrders.length : indexOfLastItem;
 const actualIndexOfLastItemOfonHoldArtworkIssueOrders = indexOfLastItem > onHoldArtworkIssueOrders.length ? onHoldArtworkIssueOrders.length : indexOfLastItem;
 const actualIndexOfLastItemOfonHoldBillingIssueOrders = indexOfLastItem > onHoldBillingIssueOrders.length ? onHoldBillingIssueOrders.length : indexOfLastItem;
 const actualIndexOfLastItemOfonHoldOutOfStockOrders = indexOfLastItem > onHoldOutOfStockOrders.length ? onHoldOutOfStockOrders.length : indexOfLastItem;
@@ -248,7 +248,7 @@ const actualIndexOfLastItemOfUnpaidOrders = indexOfLastItem > unPaidOrders.lengt
                 <select id="status-filter"  className="form-control" onChange={(e) =>  handleInputChange(e)}>
                   <option   value="all">all</option>
                   <option value="Pending">Pending</option>
-                  <option value="on-hold">On Hold</option>
+                  <option value="confirmed">Confirmed</option>
                   <option value="on hold artwork issue">On hold -  Artwork issue</option>
                   <option value="on hold billing issue">On hold - Billing Issue</option>
                   <option value="on hold out of stock">On hold - Out of Stock</option>
@@ -279,11 +279,11 @@ const actualIndexOfLastItemOfUnpaidOrders = indexOfLastItem > unPaidOrders.lengt
           
                  </div>
               }   {
-                 filterOrders === "on-hold" && 
+                 filterOrders === "confirmed" && 
                  <div style={{textAlign:"right"}}>
-                 <span style={{marginRight:"20px"}}>{indexOfFirstItem + 1} - {actualIndexOfLastItemOfonHoldOrders} of {onHoldOrders.length}</span>
+                 <span style={{marginRight:"20px"}}>{indexOfFirstItem + 1} - {actualIndexOfLastItemOfconfirmedOrders} of { confirmedOrders.length}</span>
            <button style={{marginRight:"20px",border:"none"}} onClick={() => setCurrentPage(currentPage - 1)} disabled={currentPage === 1} ><img style={{height:"10px",width:"15px"}} src='images/left-arrow.png' alt="left arrow"/></button>
-           <button style={{height:"40px",border:"none"}} onClick={() => setCurrentPage(currentPage + 1)} disabled={currentPage === Math.ceil(onHoldOrders.length / itemsPerPage)}><img style={{height:"10px",width:"15px"}} src='images/right-arrow.png' alt="right arrow"/></button>
+           <button style={{height:"40px",border:"none"}} onClick={() => setCurrentPage(currentPage + 1)} disabled={currentPage === Math.ceil( confirmedOrders.length / itemsPerPage)}><img style={{height:"10px",width:"15px"}} src='images/right-arrow.png' alt="right arrow"/></button>
           
                  </div>
               }  {
@@ -811,7 +811,7 @@ const actualIndexOfLastItemOfUnpaidOrders = indexOfLastItem > unPaidOrders.lengt
               }
               
                 {
-              filterOrders==="on-hold" && onHoldOrders
+              filterOrders==="confirmed" &&  confirmedOrders
               ?.slice(indexOfFirstItem, indexOfLastItem)
               .sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt))
               .sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt))
