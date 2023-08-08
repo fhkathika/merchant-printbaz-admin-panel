@@ -11,6 +11,7 @@ import BlotFormatter from 'quill-blot-formatter';
 import 'quill/dist/quill.snow.css';
 import { Overlay, Tooltip } from 'react-bootstrap';
 import Navigationbar from '../navigationBar/Navigationbar';
+import { useRoleAsignData } from '../../hooks/useRoleAsignData';
 
 const ViewTicket = () => {
   const messagesEndRef = React.useRef(null);
@@ -26,7 +27,7 @@ const ViewTicket = () => {
     const [showAlert, setShowAlert] = useState(false);
     const [showMailTooltip, setShowMailTooltip] = useState(false);
     const [getUserById, setGetUserById] = useState();
-
+    const {value_count}=useRoleAsignData()
   const target = useRef(null);
     const [formatType, setFormatType] = useState({});
     console.log("viewTicketDetail",viewTicketDetail);

@@ -4,10 +4,12 @@ import useGetMongoData from '../../hooks/useGetMongoData';
 import DatePicker from 'react-datepicker';
 import 'react-datepicker/dist/react-datepicker.css';
 import Navigationbar from '../navigationBar/Navigationbar';
+import { useRoleAsignData } from '../../hooks/useRoleAsignData';
 const OrderList = () => {
   const { orderAll } = useGetMongoData();
   const [allMerchant,setAllMerchant]=useState([])
-  // console.log("orderAll", orderAll);
+  const {value_count}=useRoleAsignData()
+  console.log("value_count?viewOrders", value_count?.OrderView);
   const [show, setShow] = useState({});
   const [filterOrders,setFilterOrders]=useState('all');
   const [currentPage, setCurrentPage] = useState(1);
@@ -404,6 +406,7 @@ const actualIndexOfLastItemOfUnpaidOrders = indexOfLastItem > unPaidOrders.lengt
                     matchingMerchant = allMerchant.find(merchant => merchant?.email === orders?.userMail)
                    let  totalPrintBazCostWithDeliveryFee=Number(orders?.printbazcost) + Number(orders?.deliveryFee)
                     return (
+                      value_count?.OrderView ?
                       <Link to={`/viewOrder/${orders?._id}`} state={{orders,matchingMerchant}} key={index}>
                       <div key={orders?._id} className="row client-list">
                         <div className="col-lg-2 col-sm-12">
@@ -437,6 +440,38 @@ const actualIndexOfLastItemOfUnpaidOrders = indexOfLastItem > unPaidOrders.lengt
                         </div>
                       </div>
                     </Link>
+                    :
+                    <div key={orders?._id} className="row client-list">
+                    <div className="col-lg-2 col-sm-12">
+                     {/* Display the corresponding allMerchant name */}
+                     <p>{orders?.clientName}</p>
+          {/* {index < allMerchant.length && <p>{allMerchant[index]?.name}</p>} */}
+                   
+                    </div>
+                    <div className="col-lg-2 col-sm-12">
+                      <p>{orders?._id}</p>
+                    </div>
+                    <div className="col-lg-3 col-sm-12">
+                      <p>{orders?.name}</p>
+                      <p>{orders?.address}</p>
+                      <p>{orders?.phone}</p>
+                    </div>
+                    <div className="col-lg-2 col-sm-12">
+                      <p className="p-status-btn">{orders?.paymentStatus}</p>
+                    </div>
+                    <div className="col-lg-2 col-sm-12">
+                      <p>{totalPrintBazCostWithDeliveryFee} TK</p>
+                    </div>
+                    <div className="col-lg-1 col-sm-12">
+                      <p className="" style={{backgroundColor:getViewClientColor(orders?.orderStatus)}}>{orders?.orderStatus}</p>
+                      {/* <p style={{fontSize: '14px'}}>{formattedDate}</p> */}
+                      <p style={{fontSize: '14px'}}> created at: {new Date(orders?.createdAt).toLocaleDateString('en-US', options)}</p>
+                  {
+                    orders?.statusDate  && 
+                    <p style={{fontSize: '14px'}}> uppdated at: {new Date(orders?.statusDate).toLocaleDateString('en-US', options)}</p>
+                  }
+                    </div>
+                  </div>
                    
                    )
                     }
@@ -448,6 +483,7 @@ const actualIndexOfLastItemOfUnpaidOrders = indexOfLastItem > unPaidOrders.lengt
                     matchingMerchant = allMerchant.find(merchant => merchant?.email === orders?.userMail)
                    let  totalPrintBazCostWithDeliveryFee=Number(orders?.printbazcost) + Number(orders?.deliveryFee)
                     return (
+                      value_count?.OrderView ?
                       <Link to={`/viewOrder/${orders?._id}`} state={{orders,matchingMerchant}} key={index}>
                       <div key={orders?._id} className="row client-list">
                         <div className="col-lg-2 col-sm-12">
@@ -481,6 +517,38 @@ const actualIndexOfLastItemOfUnpaidOrders = indexOfLastItem > unPaidOrders.lengt
                         </div>
                       </div>
                     </Link>
+                    :
+                    <div key={orders?._id} className="row client-list">
+                        <div className="col-lg-2 col-sm-12">
+                         {/* Display the corresponding allMerchant name */}
+                         <p>{orders?.clientName}</p>
+              {/* {index < allMerchant.length && <p>{allMerchant[index]?.name}</p>} */}
+                       
+                        </div>
+                        <div className="col-lg-2 col-sm-12">
+                          <p>{orders?._id}</p>
+                        </div>
+                        <div className="col-lg-3 col-sm-12">
+                          <p>{orders?.name}</p>
+                          <p>{orders?.address}</p>
+                          <p>{orders?.phone}</p>
+                        </div>
+                        <div className="col-lg-2 col-sm-12">
+                          <p className="p-status-btn">{orders?.paymentStatus}</p>
+                        </div>
+                        <div className="col-lg-2 col-sm-12">
+                          <p>{totalPrintBazCostWithDeliveryFee} TK</p>
+                        </div>
+                        <div className="col-lg-1 col-sm-12">
+                          <p className="" style={{backgroundColor:getViewClientColor(orders?.orderStatus)}}>{orders?.orderStatus}</p>
+                          {/* <p style={{fontSize: '14px'}}>{formattedDate}</p> */}
+                          <p style={{fontSize: '14px'}}> created at: {new Date(orders?.createdAt).toLocaleDateString('en-US', options)}</p>
+                      {
+                        orders?.statusDate  && 
+                        <p style={{fontSize: '14px'}}> uppdated at: {new Date(orders?.statusDate).toLocaleDateString('en-US', options)}</p>
+                      }
+                        </div>
+                      </div>
                    
                    )
                     }
@@ -493,6 +561,7 @@ const actualIndexOfLastItemOfUnpaidOrders = indexOfLastItem > unPaidOrders.lengt
                   //  console.log("matchingMerchantOrders",matchingMerchantOrders);
                    let  totalPrintBazCostWithDeliveryFee=Number(orders?.printbazcost) + Number(orders?.deliveryFee)
                     return (
+                      value_count?.OrderView ?
                       <Link to={`/viewOrder/${orders?._id}`} state={{orders,matchingMerchantOrders}} key={index}>
                       <div key={matchingMerchantOrders?._id} className="row client-list">
                         <div className="col-lg-2 col-sm-12">
@@ -522,6 +591,34 @@ const actualIndexOfLastItemOfUnpaidOrders = indexOfLastItem > unPaidOrders.lengt
                         </div>
                       </div>
                     </Link>
+                    :
+                    <div key={matchingMerchantOrders?._id} className="row client-list">
+                    <div className="col-lg-2 col-sm-12">
+                    
+                     <p>{orders?.clientName}</p>
+          
+                   
+                    </div>
+                 
+                    <div className="col-lg-2 col-sm-12">
+                      <p>{orders?._id}</p>
+                    </div>
+                    <div className="col-lg-3 col-sm-12">
+                      <p>{orders?.name}</p>
+                      <p>{orders?.address}</p>
+                      <p>{orders?.phone}</p>
+                    </div>
+                    <div className="col-lg-2 col-sm-12">
+                      <p className="p-status-btn">{orders?.paymentStatus}</p>
+                    </div>
+                    <div className="col-lg-2 col-sm-12">
+                      <p>{totalPrintBazCostWithDeliveryFee} TK</p>
+                    </div>
+                    <div className="col-lg-1 col-sm-12">
+                      <p className="" style={{backgroundColor:getViewClientColor(orders?.orderStatus)}}>{orders?.orderStatus}</p>
+                      <p style={{fontSize: '14px'}}>{formattedDate}</p>
+                    </div>
+                  </div>
                    
                    )
                     }
@@ -534,6 +631,7 @@ const actualIndexOfLastItemOfUnpaidOrders = indexOfLastItem > unPaidOrders.lengt
                     matchingMerchant = allMerchant.find(merchant => merchant?.email === orders?.userMail)
                    let  totalPrintBazCostWithDeliveryFee=Number(orders?.printbazcost) + Number(orders?.deliveryFee)
                     return (
+                      value_count?.OrderView ?
                       <Link to={`/viewOrder/${orders?._id}`} state={{orders,matchingMerchant}} key={index}>
                       <div key={orders?._id} className="row client-list">
                         <div className="col-lg-2 col-sm-12">
@@ -562,6 +660,33 @@ const actualIndexOfLastItemOfUnpaidOrders = indexOfLastItem > unPaidOrders.lengt
                         </div>
                       </div>
                     </Link>
+                    :
+                    <div key={orders?._id} className="row client-list">
+                    <div className="col-lg-2 col-sm-12">
+                     {/* Display the corresponding allMerchant name */}
+                     <p>{orders?.clientName}</p>
+          {/* {index < allMerchant.length && <p>{allMerchant[index]?.name}</p>} */}
+                   
+                    </div>
+                    <div className="col-lg-2 col-sm-12">
+                      <p>{orders?._id}</p>
+                    </div>
+                    <div className="col-lg-3 col-sm-12">
+                      <p>{orders?.name}</p>
+                      <p>{orders?.address}</p>
+                      <p>{orders?.phone}</p>
+                    </div>
+                    <div className="col-lg-2 col-sm-12">
+                      <p className="p-status-btn">{orders?.paymentStatus}</p>
+                    </div>
+                    <div className="col-lg-2 col-sm-12">
+                      <p>{totalPrintBazCostWithDeliveryFee} TK</p>
+                    </div>
+                    <div className="col-lg-1 col-sm-12">
+                      <p className="" style={{backgroundColor:getViewClientColor(orders?.orderStatus)}}>{orders?.orderStatus}</p>
+                      <p style={{fontSize: '14px'}}>{formattedDate}</p>
+                    </div>
+                  </div>
                    
                    )
                     }
@@ -576,6 +701,7 @@ const actualIndexOfLastItemOfUnpaidOrders = indexOfLastItem > unPaidOrders.lengt
                     matchingMerchant = allMerchant.find(merchant => merchant?.email === orders?.userMail)
                    let  totalPrintBazCostWithDeliveryFee=Number(orders?.printbazcost) + Number(orders?.deliveryFee)
                     return (
+                      value_count?.OrderView ?
                       <Link to={`/viewOrder/${orders?._id}`} state={{orders,matchingMerchant}} key={index}>
                       <div key={orders?._id} className="row client-list">
                         <div className="col-lg-2 col-sm-12">
@@ -609,6 +735,38 @@ const actualIndexOfLastItemOfUnpaidOrders = indexOfLastItem > unPaidOrders.lengt
                         </div>
                       </div>
                     </Link>
+                    :
+                    <div key={orders?._id} className="row client-list">
+                    <div className="col-lg-2 col-sm-12">
+                     {/* Display the corresponding allMerchant name */}
+                     <p>{orders?.clientName}</p>
+          {/* {index < allMerchant.length && <p>{allMerchant[index]?.name}</p>} */}
+                   
+                    </div>
+                    <div className="col-lg-2 col-sm-12">
+                      <p>{orders?._id}</p>
+                    </div>
+                    <div className="col-lg-3 col-sm-12">
+                      <p>{orders?.name}</p>
+                      <p>{orders?.address}</p>
+                      <p>{orders?.phone}</p>
+                    </div>
+                    <div className="col-lg-2 col-sm-12">
+                      <p className="p-status-btn">{orders?.paymentStatus}</p>
+                    </div>
+                    <div className="col-lg-2 col-sm-12">
+                      <p>{totalPrintBazCostWithDeliveryFee} TK</p>
+                    </div>
+                    <div className="col-lg-1 col-sm-12">
+                      <p className="" style={{backgroundColor:getViewClientColor(orders?.orderStatus)}}>{orders?.orderStatus}</p>
+                      {/* <p style={{fontSize: '14px'}}>{formattedDate}</p> */}
+                      <p style={{fontSize: '14px'}}> created at: {new Date(orders?.createdAt).toLocaleDateString('en-US', options)}</p>
+                  {
+                    orders?.statusDate  && 
+                    <p style={{fontSize: '14px'}}> uppdated at: {new Date(orders?.statusDate).toLocaleDateString('en-US', options)}</p>
+                  }
+                    </div>
+                  </div>
                    
                    )
                     }
@@ -623,6 +781,7 @@ const actualIndexOfLastItemOfUnpaidOrders = indexOfLastItem > unPaidOrders.lengt
                     matchingMerchant = allMerchant.find(merchant => merchant?.email === orders?.userMail)
                    let  totalPrintBazCostWithDeliveryFee=Number(orders?.printbazcost) + Number(orders?.deliveryFee)
                     return (
+                      value_count?.OrderView ?
                       <Link to={`/viewOrder/${orders?._id}`} state={{orders,matchingMerchant}} key={index}>
                       <div key={orders?._id} className="row client-list">
                         <div className="col-lg-2 col-sm-12">
@@ -658,6 +817,40 @@ const actualIndexOfLastItemOfUnpaidOrders = indexOfLastItem > unPaidOrders.lengt
                         </div>
                       </div>
                     </Link>
+                    :
+                    <div key={orders?._id} className="row client-list">
+                    <div className="col-lg-2 col-sm-12">
+                     {/* Display the corresponding allMerchant name */}
+                     <p>{orders?.clientName}</p>
+          {/* {index < allMerchant.length && <p>{allMerchant[index]?.name}</p>} */}
+                   
+                    </div>
+                    <div className="col-lg-2 col-sm-12">
+                      <p>{orders?._id}</p>
+                    </div>
+                    <div className="col-lg-3 col-sm-12">
+                      <p>{orders?.name}</p>
+                      <p>{orders?.address}</p>
+                      <p>{orders?.phone}</p>
+                    </div>
+                    <div className="col-lg-2 col-sm-12">
+                      <p className="p-status-btn">{orders?.paymentStatus}</p>
+                    </div>
+                    <div className="col-lg-2 col-sm-12">
+                      <p>{totalPrintBazCostWithDeliveryFee} TK</p>
+                    </div>
+                    <div className="col-lg-1 col-sm-12">
+                      <p className="status-btn" style={{    backgroundColor: getViewClientColor(
+                            orders?.orderStatus
+                            )}}>{orders?.orderStatus}</p>
+                              <p style={{fontSize: '14px'}}> created at: {new Date(orders?.createdAt).toLocaleDateString('en-US', options)}</p>
+                  {
+                    orders?.statusDate  && 
+                    <p style={{fontSize: '14px'}}> uppdated at: {new Date(orders?.statusDate).toLocaleDateString('en-US', options)}</p>
+                  }
+                      {/* <p style={{fontSize: '14px'}}>{formattedDate}</p> */}
+                    </div>
+                  </div>
                    
                    )
                     }
@@ -671,6 +864,7 @@ const actualIndexOfLastItemOfUnpaidOrders = indexOfLastItem > unPaidOrders.lengt
                 matchingMerchant = allMerchant.find(merchant => merchant?.email === orders?.userMail)
             let  totalPrintBazCostWithDeliveryFee=Number(orders?.printbazcost) + Number(orders?.deliveryFee)
                  return (
+                  value_count?.OrderView ?
                   <Link to={`/viewOrder/${orders?._id}`} state={{orders,matchingMerchant}} key={index}>
                   <div key={orders?._id} className="row client-list">
                     <div className="col-lg-2 col-sm-12">
@@ -705,6 +899,39 @@ const actualIndexOfLastItemOfUnpaidOrders = indexOfLastItem > unPaidOrders.lengt
                     </div>
                   </div>
                 </Link>
+                :    
+                <div key={orders?._id} className="row client-list">
+                <div className="col-lg-2 col-sm-12">
+                 {/* Display the corresponding allMerchant name */}
+                 <p>{orders?.clientName}</p>
+      {/* {index < allMerchant.length && <p>{allMerchant[index]?.name}</p>} */}
+               
+                </div>
+                <div className="col-lg-2 col-sm-12">
+                  <p>{orders?._id}</p>
+                </div>
+                <div className="col-lg-3 col-sm-12">
+                  <p>{orders?.name}</p>
+                  <p>{orders?.address}</p>
+                  <p>{orders?.phone}</p>
+                </div>
+                <div className="col-lg-2 col-sm-12">
+                  <p className="p-status-btn">{orders?.paymentStatus}</p>
+                </div>
+                <div className="col-lg-2 col-sm-12">
+                  <p> {totalPrintBazCostWithDeliveryFee} TK</p>
+                </div>
+                <div className="col-lg-1 col-sm-12">
+                  <p className="status-btn" style={{backgroundColor:getViewClientColor(orders?.orderStatus)}}>{orders?.orderStatus}</p>
+                  {/* <p style={{fontSize: '14px'}}>{formattedDate}</p> */}
+                  <p style={{fontSize: '14px'}}> created at: {new Date(orders?.createdAt).toLocaleDateString('en-US', options)}</p>
+                  {
+                    orders?.statusDate  && 
+                    <p style={{fontSize: '14px'}}> uppdated at: {new Date(orders?.statusDate).toLocaleDateString('en-US', options)}</p>
+                  }
+                 
+                </div>
+              </div>
                
                )
                 }
@@ -718,6 +945,7 @@ const actualIndexOfLastItemOfUnpaidOrders = indexOfLastItem > unPaidOrders.lengt
                 matchingMerchant = allMerchant.find(merchant => merchant?.email === orders?.userMail)
                let  totalPrintBazCostWithDeliveryFee=Number(orders?.printbazcost) + Number(orders?.deliveryFee)
                 return (
+                  value_count?.OrderView ?
                   <Link to={`/viewOrder/${orders?._id}`} state={{orders,matchingMerchant}} key={index}>
                   <div key={orders?._id} className="row client-list">
                     <div className="col-lg-2 col-sm-12">
@@ -753,6 +981,40 @@ const actualIndexOfLastItemOfUnpaidOrders = indexOfLastItem > unPaidOrders.lengt
                     </div>
                   </div>
                 </Link>
+                :
+                <div key={orders?._id} className="row client-list">
+                <div className="col-lg-2 col-sm-12">
+                 {/* Display the corresponding allMerchant name */}
+                 <p>{orders?.clientName}</p>
+      {/* {index < allMerchant.length && <p>{allMerchant[index]?.name}</p>} */}
+               
+                </div>
+                <div className="col-lg-2 col-sm-12">
+                  <p>{orders?._id}</p>
+                </div>
+                <div className="col-lg-3 col-sm-12">
+                  <p>{orders?.name}</p>
+                  <p>{orders?.address}</p>
+                  <p>{orders?.phone}</p>
+                </div>
+                <div className="col-lg-2 col-sm-12">
+                  <p className="p-status-btn">{orders?.paymentStatus}</p>
+                </div>
+                <div className="col-lg-2 col-sm-12">
+                  <p>{totalPrintBazCostWithDeliveryFee} TK</p>
+                </div>
+                <div className="col-lg-1 col-sm-12">
+                  <p className="status-btn" style={{    backgroundColor: getViewClientColor(
+                        orders?.orderStatus
+                        ),}}>{orders?.orderStatus}</p>
+                           <p style={{fontSize: '14px'}}> created at: {new Date(orders?.createdAt).toLocaleDateString('en-US', options)}</p>
+                  {
+                    orders?.statusDate  && 
+                    <p style={{fontSize: '14px'}}> uppdated at: {new Date(orders?.statusDate).toLocaleDateString('en-US', options)}</p>
+                  }
+                  {/* <p style={{fontSize: '14px'}}>{formattedDate}</p> */}
+                </div>
+              </div>
                
                )
                 }
@@ -768,6 +1030,7 @@ const actualIndexOfLastItemOfUnpaidOrders = indexOfLastItem > unPaidOrders.lengt
                 matchingMerchant = allMerchant.find(merchant => merchant?.email === orders?.userMail)
                let  totalPrintBazCostWithDeliveryFee=Number(orders?.printbazcost) + Number(orders?.deliveryFee)
                 return (
+                  value_count?.OrderView ?
                   <Link to={`/viewOrder/${orders?._id}`} state={{orders,matchingMerchant}} key={index}>
                   <div key={orders?._id} className="row client-list">
                     <div className="col-lg-2 col-sm-12">
@@ -803,6 +1066,40 @@ const actualIndexOfLastItemOfUnpaidOrders = indexOfLastItem > unPaidOrders.lengt
                     </div>
                   </div>
                 </Link>
+                :
+                 <div key={orders?._id} className="row client-list">
+                <div className="col-lg-2 col-sm-12">
+                 {/* Display the corresponding allMerchant name */}
+                 <p>{orders?.clientName}</p>
+      {/* {index < allMerchant.length && <p>{allMerchant[index]?.name}</p>} */}
+               
+                </div>
+                <div className="col-lg-2 col-sm-12">
+                  <p>{orders?._id}</p>
+                </div>
+                <div className="col-lg-3 col-sm-12">
+                  <p>{orders?.name}</p>
+                  <p>{orders?.address}</p>
+                  <p>{orders?.phone}</p>
+                </div>
+                <div className="col-lg-2 col-sm-12">
+                  <p className="p-status-btn">{orders?.paymentStatus}</p>
+                </div>
+                <div className="col-lg-2 col-sm-12">
+                  <p>{totalPrintBazCostWithDeliveryFee} TK</p>
+                </div>
+                <div className="col-lg-1 col-sm-12">
+                  <p className="status-btn" style={{    backgroundColor: getViewClientColor(
+                        orders?.orderStatus
+                        ),}}>{orders?.orderStatus}</p>
+                         <p style={{fontSize: '14px'}}> created at: {new Date(orders?.createdAt).toLocaleDateString('en-US', options)}</p>
+                  {
+                    orders?.statusDate  && 
+                    <p style={{fontSize: '14px'}}> uppdated at: {new Date(orders?.statusDate).toLocaleDateString('en-US', options)}</p>
+                  }
+                  {/* <p style={{fontSize: '14px'}}>{formattedDate}</p> */}
+                </div>
+              </div>
                
                )
                 }
@@ -819,6 +1116,7 @@ const actualIndexOfLastItemOfUnpaidOrders = indexOfLastItem > unPaidOrders.lengt
                 matchingMerchant = allMerchant.find(merchant => merchant?.email === orders?.userMail)
                let  totalPrintBazCostWithDeliveryFee=Number(orders?.printbazcost) + Number(orders?.deliveryFee)
                 return (
+                  value_count?.OrderView ?
                   <Link to={`/viewOrder/${orders?._id}`} state={{orders,matchingMerchant}} key={index}>
                   <div key={orders?._id} className="row client-list">
                     <div className="col-lg-2 col-sm-12">
@@ -854,6 +1152,40 @@ const actualIndexOfLastItemOfUnpaidOrders = indexOfLastItem > unPaidOrders.lengt
                     </div>
                   </div>
                 </Link>
+                :
+                <div key={orders?._id} className="row client-list">
+                <div className="col-lg-2 col-sm-12">
+                 {/* Display the corresponding allMerchant name */}
+                 <p>{orders?.clientName}</p>
+      {/* {index < allMerchant.length && <p>{allMerchant[index]?.name}</p>} */}
+               
+                </div>
+                <div className="col-lg-2 col-sm-12">
+                  <p>{orders?._id}</p>
+                </div>
+                <div className="col-lg-3 col-sm-12">
+                  <p>{orders?.name}</p>
+                  <p>{orders?.address}</p>
+                  <p>{orders?.phone}</p>
+                </div>
+                <div className="col-lg-2 col-sm-12">
+                  <p className="p-status-btn">{orders?.paymentStatus}</p>
+                </div>
+                <div className="col-lg-2 col-sm-12">
+                  <p>{totalPrintBazCostWithDeliveryFee} TK</p>
+                </div>
+                <div className="col-lg-1 col-sm-12">
+                  <p className="status-btn" style={{    backgroundColor: getViewClientColor(
+                        orders?.orderStatus
+                        ),}}>{orders?.orderStatus}</p>
+                           <p style={{fontSize: '14px'}}> created at: {new Date(orders?.createdAt).toLocaleDateString('en-US', options)}</p>
+                  {
+                    orders?.statusDate  && 
+                    <p style={{fontSize: '14px'}}> uppdated at: {new Date(orders?.statusDate).toLocaleDateString('en-US', options)}</p>
+                  }
+                  {/* <p style={{fontSize: '14px'}}>{formattedDate}</p> */}
+                </div>
+              </div>
                
                )
                 }
@@ -869,6 +1201,7 @@ const actualIndexOfLastItemOfUnpaidOrders = indexOfLastItem > unPaidOrders.lengt
                 matchingMerchant = allMerchant.find(merchant => merchant?.email === orders?.userMail)
                let  totalPrintBazCostWithDeliveryFee=Number(orders?.printbazcost) + Number(orders?.deliveryFee)
                 return (
+                  value_count?.OrderView ?
                   <Link to={`/viewOrder/${orders?._id}`} state={{orders,matchingMerchant}} key={index}>
                   <div key={orders?._id} className="row client-list">
                     <div className="col-lg-2 col-sm-12">
@@ -904,6 +1237,40 @@ const actualIndexOfLastItemOfUnpaidOrders = indexOfLastItem > unPaidOrders.lengt
                     </div>
                   </div>
                 </Link>
+                :
+                <div key={orders?._id} className="row client-list">
+                <div className="col-lg-2 col-sm-12">
+                 {/* Display the corresponding allMerchant name */}
+                 <p>{orders?.clientName}</p>
+      {/* {index < allMerchant.length && <p>{allMerchant[index]?.name}</p>} */}
+               
+                </div>
+                <div className="col-lg-2 col-sm-12">
+                  <p>{orders?._id}</p>
+                </div>
+                <div className="col-lg-3 col-sm-12">
+                  <p>{orders?.name}</p>
+                  <p>{orders?.address}</p>
+                  <p>{orders?.phone}</p>
+                </div>
+                <div className="col-lg-2 col-sm-12">
+                  <p className="p-status-btn">{orders?.paymentStatus}</p>
+                </div>
+                <div className="col-lg-2 col-sm-12">
+                  <p>{totalPrintBazCostWithDeliveryFee} TK</p>
+                </div>
+                <div className="col-lg-1 col-sm-12">
+                  <p className="status-btn" style={{    backgroundColor: getViewClientColor(
+                        orders?.orderStatus
+                        ),}}>{orders?.orderStatus}</p>
+                           <p style={{fontSize: '14px'}}> created at: {new Date(orders?.createdAt).toLocaleDateString('en-US', options)}</p>
+                  {
+                    orders?.statusDate  && 
+                    <p style={{fontSize: '14px'}}> uppdated at: {new Date(orders?.statusDate).toLocaleDateString('en-US', options)}</p>
+                  }
+                  {/* <p style={{fontSize: '14px'}}>{formattedDate}</p> */}
+                </div>
+              </div>
                
                )
                 }
@@ -919,6 +1286,7 @@ const actualIndexOfLastItemOfUnpaidOrders = indexOfLastItem > unPaidOrders.lengt
                 matchingMerchant = allMerchant.find(merchant => merchant?.email === orders?.userMail)
                let  totalPrintBazCostWithDeliveryFee=Number(orders?.printbazcost) + Number(orders?.deliveryFee)
                 return (
+                  value_count?.OrderView ?
                   <Link to={`/viewOrder/${orders?._id}`} state={{orders,matchingMerchant}} key={index}>
                   <div key={orders?._id} className="row client-list">
                     <div className="col-lg-2 col-sm-12">
@@ -954,6 +1322,40 @@ const actualIndexOfLastItemOfUnpaidOrders = indexOfLastItem > unPaidOrders.lengt
                     </div>
                   </div>
                 </Link>
+                :
+                <div key={orders?._id} className="row client-list">
+                <div className="col-lg-2 col-sm-12">
+                 {/* Display the corresponding allMerchant name */}
+                 <p>{orders?.clientName}</p>
+      {/* {index < allMerchant.length && <p>{allMerchant[index]?.name}</p>} */}
+               
+                </div>
+                <div className="col-lg-2 col-sm-12">
+                  <p>{orders?._id}</p>
+                </div>
+                <div className="col-lg-3 col-sm-12">
+                  <p>{orders?.name}</p>
+                  <p>{orders?.address}</p>
+                  <p>{orders?.phone}</p>
+                </div>
+                <div className="col-lg-2 col-sm-12">
+                  <p className="p-status-btn">{orders?.paymentStatus}</p>
+                </div>
+                <div className="col-lg-2 col-sm-12">
+                  <p>{totalPrintBazCostWithDeliveryFee} TK</p>
+                </div>
+                <div className="col-lg-1 col-sm-12">
+                  <p className="status-btn" style={{    backgroundColor: getViewClientColor(
+                        orders?.orderStatus
+                        ),}}>{orders?.orderStatus}</p>
+                           <p style={{fontSize: '14px'}}> created at: {new Date(orders?.createdAt).toLocaleDateString('en-US', options)}</p>
+                  {
+                    orders?.statusDate  && 
+                    <p style={{fontSize: '14px'}}> uppdated at: {new Date(orders?.statusDate).toLocaleDateString('en-US', options)}</p>
+                  }
+                  {/* <p style={{fontSize: '14px'}}>{formattedDate}</p> */}
+                </div>
+              </div>
                
                )
                 }
@@ -969,6 +1371,7 @@ const actualIndexOfLastItemOfUnpaidOrders = indexOfLastItem > unPaidOrders.lengt
                 matchingMerchant = allMerchant.find(merchant => merchant?.email === orders?.userMail)
                let  totalPrintBazCostWithDeliveryFee=Number(orders?.printbazcost) + Number(orders?.deliveryFee)
                 return (
+                  value_count?.OrderView ?
                   <Link to={`/viewOrder/${orders?._id}`} state={{orders,matchingMerchant}} key={index}>
                   <div key={orders?._id} className="row client-list">
                     <div className="col-lg-2 col-sm-12">
@@ -1004,6 +1407,40 @@ const actualIndexOfLastItemOfUnpaidOrders = indexOfLastItem > unPaidOrders.lengt
                     </div>
                   </div>
                 </Link>
+                :
+                <div key={orders?._id} className="row client-list">
+                <div className="col-lg-2 col-sm-12">
+                 {/* Display the corresponding allMerchant name */}
+                 <p>{orders?.clientName}</p>
+      {/* {index < allMerchant.length && <p>{allMerchant[index]?.name}</p>} */}
+               
+                </div>
+                <div className="col-lg-2 col-sm-12">
+                  <p>{orders?._id}</p>
+                </div>
+                <div className="col-lg-3 col-sm-12">
+                  <p>{orders?.name}</p>
+                  <p>{orders?.address}</p>
+                  <p>{orders?.phone}</p>
+                </div>
+                <div className="col-lg-2 col-sm-12">
+                  <p className="p-status-btn">{orders?.paymentStatus}</p>
+                </div>
+                <div className="col-lg-2 col-sm-12">
+                  <p>{totalPrintBazCostWithDeliveryFee} TK</p>
+                </div>
+                <div className="col-lg-1 col-sm-12">
+                  <p className="status-btn" style={{    backgroundColor: getViewClientColor(
+                        orders?.orderStatus
+                        ),}}>{orders?.orderStatus}</p>
+                           <p style={{fontSize: '14px'}}> created at: {new Date(orders?.createdAt).toLocaleDateString('en-US', options)}</p>
+                  {
+                    orders?.statusDate  && 
+                    <p style={{fontSize: '14px'}}> uppdated at: {new Date(orders?.statusDate).toLocaleDateString('en-US', options)}</p>
+                  }
+                  {/* <p style={{fontSize: '14px'}}>{formattedDate}</p> */}
+                </div>
+              </div>
                
                )
                 }
@@ -1019,6 +1456,7 @@ const actualIndexOfLastItemOfUnpaidOrders = indexOfLastItem > unPaidOrders.lengt
                 matchingMerchant = allMerchant.find(merchant => merchant?.email === orders?.userMail)
                let  totalPrintBazCostWithDeliveryFee=Number(orders?.printbazcost) + Number(orders?.deliveryFee)
                 return (
+                  value_count?.OrderView ?
                   <Link to={`/viewOrder/${orders?._id}`} state={{orders,matchingMerchant}} key={index}>
                   <div key={orders?._id} className="row client-list">
                     <div className="col-lg-2 col-sm-12">
@@ -1055,6 +1493,41 @@ const actualIndexOfLastItemOfUnpaidOrders = indexOfLastItem > unPaidOrders.lengt
                     </div>
                   </div>
                 </Link>
+                :
+                <div key={orders?._id} className="row client-list">
+                <div className="col-lg-2 col-sm-12">
+                 {/* Display the corresponding allMerchant name */}
+                 <p>{orders?.clientName}</p>
+      {/* {index < allMerchant.length && <p>{allMerchant[index]?.name}</p>} */}
+               
+                </div>
+                <div className="col-lg-2 col-sm-12">
+                  <p>{orders?._id}</p>
+                </div>
+                <div className="col-lg-3 col-sm-12">
+                  <p>{orders?.name}</p>
+                  <p>{orders?.address}</p>
+                  <p>{orders?.phone}</p>
+                </div>
+                <div className="col-lg-2 col-sm-12">
+                  <p className="p-status-btn">{orders?.paymentStatus}</p>
+                </div>
+                <div className="col-lg-2 col-sm-12">
+                  <p>{totalPrintBazCostWithDeliveryFee} TK</p>
+                </div>
+                <div className="col-lg-1 col-sm-12">
+                  <p className="status-btn" style={{    backgroundColor: getViewClientColor(
+                        orders?.orderStatus
+                        )}}>{orders?.orderStatus}</p>
+                          <p style={{fontSize: '14px'}}> created at: {new Date(orders?.createdAt).toLocaleDateString('en-US', options)}</p>
+                  {
+                    orders?.statusDate  && 
+                    <p style={{fontSize: '14px'}}> uppdated at: {new Date(orders?.statusDate).toLocaleDateString('en-US', options)}</p>
+                  }
+
+                  {/* <p style={{fontSize: '14px'}}>{formattedDate}</p> */}
+                </div>
+              </div>
                
                )
                 }
@@ -1070,6 +1543,7 @@ const actualIndexOfLastItemOfUnpaidOrders = indexOfLastItem > unPaidOrders.lengt
                 matchingMerchant = allMerchant.find(merchant => merchant?.email === orders?.userMail)
                let  totalPrintBazCostWithDeliveryFee=Number(orders?.printbazcost) + Number(orders?.deliveryFee)
                 return (
+                  value_count?.OrderView ?
                   <Link to={`/viewOrder/${orders?._id}`} state={{orders,matchingMerchant}} key={index}>
                   <div key={orders?._id} className="row client-list">
                     <div className="col-lg-2 col-sm-12">
@@ -1105,6 +1579,40 @@ const actualIndexOfLastItemOfUnpaidOrders = indexOfLastItem > unPaidOrders.lengt
                     </div>
                   </div>
                 </Link>
+                :
+                <div key={orders?._id} className="row client-list">
+                <div className="col-lg-2 col-sm-12">
+                 {/* Display the corresponding allMerchant name */}
+                 <p>{orders?.clientName}</p>
+      {/* {index < allMerchant.length && <p>{allMerchant[index]?.name}</p>} */}
+               
+                </div>
+                <div className="col-lg-2 col-sm-12">
+                  <p>{orders?._id}</p>
+                </div>
+                <div className="col-lg-3 col-sm-12">
+                  <p>{orders?.name}</p>
+                  <p>{orders?.address}</p>
+                  <p>{orders?.phone}</p>
+                </div>
+                <div className="col-lg-2 col-sm-12">
+                  <p className="p-status-btn">{orders?.paymentStatus}</p>
+                </div>
+                <div className="col-lg-2 col-sm-12">
+                  <p>{totalPrintBazCostWithDeliveryFee} TK</p>
+                </div>
+                <div className="col-lg-1 col-sm-12">
+                  <p className="status-btn" style={{    backgroundColor: getViewClientColor(
+                        orders?.orderStatus
+                        )}}>{orders?.orderStatus}</p>
+                          <p style={{fontSize: '14px'}}> created at: {new Date(orders?.createdAt).toLocaleDateString('en-US', options)}</p>
+                  {
+                    orders?.statusDate  && 
+                    <p style={{fontSize: '14px'}}> uppdated at: {new Date(orders?.statusDate).toLocaleDateString('en-US', options)}</p>
+                  }
+                  {/* <p style={{fontSize: '14px'}}>{formattedDate}</p> */}
+                </div>
+              </div>
                
                )
                 }
@@ -1120,6 +1628,7 @@ const actualIndexOfLastItemOfUnpaidOrders = indexOfLastItem > unPaidOrders.lengt
                 matchingMerchant = allMerchant.find(merchant => merchant?.email === orders?.userMail)
                let  totalPrintBazCostWithDeliveryFee=Number(orders?.printbazcost) + Number(orders?.deliveryFee)
                 return (
+                  value_count?.OrderView ?
                   <Link to={`/viewOrder/${orders?._id}`} state={{orders,matchingMerchant}} key={index}>
                   <div key={orders?._id} className="row client-list">
                     <div className="col-lg-2 col-sm-12">
@@ -1155,6 +1664,40 @@ const actualIndexOfLastItemOfUnpaidOrders = indexOfLastItem > unPaidOrders.lengt
                     </div>
                   </div>
                 </Link>
+                :
+                <div key={orders?._id} className="row client-list">
+                <div className="col-lg-2 col-sm-12">
+                 {/* Display the corresponding allMerchant name */}
+                 <p>{orders?.clientName}</p>
+      {/* {index < allMerchant.length && <p>{allMerchant[index]?.name}</p>} */}
+               
+                </div>
+                <div className="col-lg-2 col-sm-12">
+                  <p>{orders?._id}</p>
+                </div>
+                <div className="col-lg-3 col-sm-12">
+                  <p>{orders?.name}</p>
+                  <p>{orders?.address}</p>
+                  <p>{orders?.phone}</p>
+                </div>
+                <div className="col-lg-2 col-sm-12">
+                  <p className="p-status-btn">{orders?.paymentStatus}</p>
+                </div>
+                <div className="col-lg-2 col-sm-12">
+                  <p>{totalPrintBazCostWithDeliveryFee} TK</p>
+                </div>
+                <div className="col-lg-1 col-sm-12">
+                  <p className="status-btn" style={{    backgroundColor: getViewClientColor(
+                        orders?.orderStatus
+                        ),}}>{orders?.orderStatus}</p>
+                          <p style={{fontSize: '14px'}}> created at: {new Date(orders?.createdAt).toLocaleDateString('en-US', options)}</p>
+                  {
+                    orders?.statusDate  && 
+                    <p style={{fontSize: '14px'}}> uppdated at: {new Date(orders?.statusDate).toLocaleDateString('en-US', options)}</p>
+                  }
+                  {/* <p style={{fontSize: '14px'}}>{formattedDate}</p> */}
+                </div>
+              </div>
                
                )
                 }
@@ -1170,6 +1713,7 @@ const actualIndexOfLastItemOfUnpaidOrders = indexOfLastItem > unPaidOrders.lengt
                 matchingMerchant = allMerchant.find(merchant => merchant?.email === orders?.userMail)
                 let  totalPrintBazCostWithDeliveryFee=Number(orders?.printbazcost) + Number(orders?.deliveryFee)
                 return (
+                  value_count?.OrderView ?
                   <Link to={`/viewOrder/${orders?._id}`} state={{orders,matchingMerchant}} key={index}>
                   <div key={orders?._id} className="row client-list">
                     <div className="col-lg-2 col-sm-12">
@@ -1205,6 +1749,40 @@ const actualIndexOfLastItemOfUnpaidOrders = indexOfLastItem > unPaidOrders.lengt
                     </div>
                   </div>
                 </Link>
+                :
+                <div key={orders?._id} className="row client-list">
+                <div className="col-lg-2 col-sm-12">
+                 {/* Display the corresponding allMerchant name */}
+                 <p>{orders?.clientName}</p>
+      {/* {index < allMerchant.length && <p>{allMerchant[index]?.name}</p>} */}
+               
+                </div>
+                <div className="col-lg-2 col-sm-12">
+                  <p>{orders?._id}</p>
+                </div>
+                <div className="col-lg-3 col-sm-12">
+                  <p>{orders?.name}</p>
+                  <p>{orders?.address}</p>
+                  <p>{orders?.phone}</p>
+                </div>
+                <div className="col-lg-2 col-sm-12">
+                  <p className="p-status-btn">{orders?.paymentStatus}</p>
+                </div>
+                <div className="col-lg-2 col-sm-12">
+                  <p>{totalPrintBazCostWithDeliveryFee} TK</p>
+                </div>
+                <div className="col-lg-1 col-sm-12">
+                  <p className="status-btn" style={{    backgroundColor: getViewClientColor(
+                        orders?.orderStatus
+                        ),}}>{orders?.orderStatus}</p>
+                          <p style={{fontSize: '14px'}}> created at: {new Date(orders?.createdAt).toLocaleDateString('en-US', options)}</p>
+                  {
+                    orders?.statusDate  && 
+                    <p style={{fontSize: '14px'}}> uppdated at: {new Date(orders?.statusDate).toLocaleDateString('en-US', options)}</p>
+                  }
+                  {/* <p style={{fontSize: '14px'}}>{formattedDate}</p> */}
+                </div>
+              </div>
                
                )
                 }
@@ -1220,6 +1798,7 @@ const actualIndexOfLastItemOfUnpaidOrders = indexOfLastItem > unPaidOrders.lengt
                 matchingMerchant = allMerchant.find(merchant => merchant?.email === orders?.userMail)
                 let  totalPrintBazCostWithDeliveryFee=Number(orders?.printbazcost) + Number(orders?.deliveryFee)
                 return (
+                  value_count?.OrderView ?
                   <Link to={`/viewOrder/${orders?._id}`} state={{orders,matchingMerchant}} key={index}>
                   <div key={orders?._id} className="row client-list">
                     <div className="col-lg-2 col-sm-12">
@@ -1255,6 +1834,40 @@ const actualIndexOfLastItemOfUnpaidOrders = indexOfLastItem > unPaidOrders.lengt
                     </div>
                   </div>
                 </Link>
+                :
+                <div key={orders?._id} className="row client-list">
+                <div className="col-lg-2 col-sm-12">
+                 {/* Display the corresponding allMerchant name */}
+                 <p>{orders?.clientName}</p>
+      {/* {index < allMerchant.length && <p>{allMerchant[index]?.name}</p>} */}
+               
+                </div>
+                <div className="col-lg-2 col-sm-12">
+                  <p>{orders?._id}</p>
+                </div>
+                <div className="col-lg-3 col-sm-12">
+                  <p>{orders?.name}</p>
+                  <p>{orders?.address}</p>
+                  <p>{orders?.phone}</p>
+                </div>
+                <div className="col-lg-2 col-sm-12">
+                  <p className="p-status-btn">{orders?.paymentStatus}</p>
+                </div>
+                <div className="col-lg-2 col-sm-12">
+                  <p>{totalPrintBazCostWithDeliveryFee} TK</p>
+                </div>
+                <div className="col-lg-1 col-sm-12">
+                  <p className="status-btn" style={{    backgroundColor: getViewClientColor(
+                        orders?.orderStatus
+                        ),}}>{orders?.orderStatus}</p>
+                          <p style={{fontSize: '14px'}}> created at: {new Date(orders?.createdAt).toLocaleDateString('en-US', options)}</p>
+                  {
+                    orders?.statusDate  && 
+                    <p style={{fontSize: '14px'}}> uppdated at: {new Date(orders?.statusDate).toLocaleDateString('en-US', options)}</p>
+                  }
+                  {/* <p style={{fontSize: '14px'}}>{formattedDate}</p> */}
+                </div>
+              </div>
                
                )
                 }

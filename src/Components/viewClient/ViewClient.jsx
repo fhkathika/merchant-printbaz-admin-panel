@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react";
 import { Form, Link, useLocation } from "react-router-dom";
 import "../../css/style.css";
 import useGetMongoData from "../../hooks/useGetMongoData";
+import { useRoleAsignData } from "../../hooks/useRoleAsignData";
 import Navigationbar from "../navigationBar/Navigationbar";
 import SendUserApproveMail from "../sendUserApproveMail/SendUserApproveMail";
 
@@ -10,6 +11,7 @@ const ViewClient = () => {
   const location = useLocation();
   const viewClient = location.state ? location?.state?.merchants : null;
   const [getUserById, setGetUserById] = useState();
+  const {value_count}=useRoleAsignData()
   console.log("viewClient",viewClient);
 useEffect(()=>{
   const getOrderById=async()=>{
@@ -128,7 +130,9 @@ useEffect(()=>{
                         className="col-lg-12 col-sm-12"
                         style={{ marginBottom: "20px" }}
                       >
-                        <select
+                        {
+                          value_count?.merchant_approval ?
+                          <select
                           id="status-filter"
                           className="status-btn"
                           style={{
@@ -164,12 +168,54 @@ useEffect(()=>{
                             </>
                           )}
                         </select>
+                        :
+                        <select
+                        id="status-filter"
+                        className="status-btn"
+                        disabled
+                        style={{
+                          border: "none",
+                          padding: "8px",
+                          backgroundColor: getViewClientColor(
+                            viewClient?.approval
+                          ),
+                        }}
+                        onChange={(e) => handleInputChange(e)}
+                      >
+                        <option value={viewClient?.approval}>
+                          {viewClient?.approval=== "approved"&& "Approved" }
+                          {viewClient?.approval=== "request"&& "Request" }
+                          {viewClient?.approval=== "ban"&& "Ban" }
+                        </option>
+                        {viewClient?.approval === "approved" && (
+                          <>
+                            <option value="ban">Ban</option>
+                            <option value="request">Request</option>
+                          </>
+                        )}
+                        {viewClient?.approval === "request" && (
+                          <>
+                            <option value="approved">Approved</option>
+                            <option value="ban">Ban</option>
+                          </>
+                        )}
+                        {viewClient?.approval === "ban" && (
+                          <>
+                            <option value="approved">Approved</option>
+                            <option value="request">Request</option>
+                          </>
+                        )}
+                      </select>
+                        }
+                       
                       </div>
 
                       {/* <p className="status-btn">{viewClient?.approval}</p> */}
                     </div>
                     <div className="accordion" id="accordionExample">
-                      <div className="accordion-item">
+                      {
+                        value_count?.basicInformation &&
+                        <div className="accordion-item">
                         <h2 className="accordion-header" id="headingOne">
                           <button
                             className="accordion-button"
@@ -202,7 +248,10 @@ useEffect(()=>{
                           </div>
                         </div>
                       </div>
-                      <div className="accordion-item">
+                      }
+                      {
+                        value_count?.personalInformation &&
+<div className="accordion-item">
                         <h2 className="accordion-header" id="headingTwo">
                           <button
                             className="accordion-button collapsed"
@@ -237,44 +286,50 @@ useEffect(()=>{
                           </div>
                         </div>
                       </div>
-                      <div className="accordion-item">
-                        <h2 className="accordion-header" id="headingThree">
-                          <button
-                            className="accordion-button collapsed"
-                            type="button"
-                            data-bs-toggle="collapse"
-                            data-bs-target="#collapseThree"
-                            aria-expanded="false"
-                            aria-controls="collapseThree"
-                          >
-                            Brand Information
-                          </button>
-                        </h2>
-                        <div
-                          id="collapseThree"
-                          className="accordion-collapse collapse"
-                          aria-labelledby="headingThree"
-                          data-bs-parent="#accordionExample"
-                        >
-                          <div className="accordion-body">
-                            <h5>Brand Name</h5>
-                            <p>{viewClient?.brandName}</p>
-                            <h5>Facebook/Instagram Page Link</h5>
-                            <p>{viewClient?.fbPageLink}</p>
-                            <h5>Logo</h5>
-                            <img
-                              style={{ width: "50%" }}
-                              src={
-                                viewClient?.brandLogo
-                                  ? viewClient?.brandLogo
-                                  : viewClient?.brandLogoURL
-                              }
-                              alt=""
-                            />
-                          </div>
-                        </div>
-                      </div>
-                      <div className="accordion-item">
+                      }
+                    {
+                         value_count?.brandInformation &&
+                         <div className="accordion-item">
+                         <h2 className="accordion-header" id="headingThree">
+                           <button
+                             className="accordion-button collapsed"
+                             type="button"
+                             data-bs-toggle="collapse"
+                             data-bs-target="#collapseThree"
+                             aria-expanded="false"
+                             aria-controls="collapseThree"
+                           >
+                             Brand Information
+                           </button>
+                         </h2>
+                         <div
+                           id="collapseThree"
+                           className="accordion-collapse collapse"
+                           aria-labelledby="headingThree"
+                           data-bs-parent="#accordionExample"
+                         >
+                           <div className="accordion-body">
+                             <h5>Brand Name</h5>
+                             <p>{viewClient?.brandName}</p>
+                             <h5>Facebook/Instagram Page Link</h5>
+                             <p>{viewClient?.fbPageLink}</p>
+                             <h5>Logo</h5>
+                             <img
+                               style={{ width: "50%" }}
+                               src={
+                                 viewClient?.brandLogo
+                                   ? viewClient?.brandLogo
+                                   : viewClient?.brandLogoURL
+                               }
+                               alt=""
+                             />
+                           </div>
+                         </div>
+                       </div>
+                    }
+                      {
+                        value_count?.paymentInformation &&
+                        <div className="accordion-item">
                         <h2 className="accordion-header" id="headingFour">
                           <button
                             className="accordion-button collapsed"
@@ -340,12 +395,17 @@ useEffect(()=>{
                           </div>
                         </div>
                       </div>
+                      }
+                    
+                    
                     </div>
                   </div>
                 </div>
               </div>
               <div className="col-lg-9 col-sm-12">
-                <div className="client-order-list">
+                {
+                  value_count?.orderList &&
+                  <div className="client-order-list">
                   <div className="row" style={{ marginBottom: "30px" }}>
                     <div className="col-lg-2 col-sm-12">
                       <h4>Name</h4>
@@ -396,6 +456,8 @@ useEffect(()=>{
                       </div>
                     ))}
                 </div>
+                }
+              
               </div>
             </div>
           </div>

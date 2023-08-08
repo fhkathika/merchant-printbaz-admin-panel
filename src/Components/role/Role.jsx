@@ -31,6 +31,7 @@ const [formRoleData,setFormRoleData]=useState({
     mailBox:false,
     liveChat:false,
     fileManager:false,
+    fileManager_viewOrder:false,
     clientDetails:false,
     recipientDetails:false,
     costOfOrder_FullDetails:false,
@@ -122,6 +123,7 @@ const [formRoleUpdateData,setFormRoleUpdateData]=useState({
     mailBox:getRoleById?.mailBox,
     liveChat:getRoleById?.liveChat,
     fileManager:getRoleById?.fileManager,
+    fileManager_viewOrder:getRoleById?.fileManager_viewOrder,
     clientDetails:getRoleById?.clientDetails,
     recipientDetails:getRoleById?.recipientDetails,
     costOfOrder_FullDetails:getRoleById?.costOfOrder_FullDetails,
@@ -548,7 +550,7 @@ setFormRoleUpdateData({})
                 </label>
                 <label style={{display: 'block', borderBottom: '2px solid #d8d8d8', marginBottom: '10px', fontSize: '18px', paddingBottom: '20px'}}>File manager(view order)
                   <div className="switch" style={{float: 'right'}}>
-                    <input type="checkbox" name="fileManager"  checked={formRoleUpdateData?.fileManager_viewOrder}  onChange={(e) => handleInputChangeUpdate(e)} />
+                    <input type="checkbox" name="fileManager_viewOrder"  checked={formRoleUpdateData?.fileManager_viewOrder}  onChange={(e) => handleInputChangeUpdate(e)} />
                     <span className="slider round" />
                   </div>
                 </label>
@@ -702,7 +704,7 @@ setFormRoleUpdateData({})
                   </label>
                   <label style={{display: 'block', borderBottom: '2px solid #d8d8d8', marginBottom: '10px', fontSize: '18px', paddingBottom: '20px'}}>File manager(view order)
                     <div className="switch" style={{float: 'right'}}>
-                      <input type="checkbox" name="fileManager"  checked={formRoleData.fileManager_viewOrder}  onChange={(e) => handleInputChange(e)} />
+                      <input type="checkbox" name="fileManager_viewOrder"  checked={formRoleData.fileManager_viewOrder}  onChange={(e) => handleInputChange(e)} />
                       <span className="slider round" />
                     </div>
                   </label>
@@ -857,7 +859,7 @@ setFormRoleUpdateData({})
                 </label>
                 <label style={{display: 'block', borderBottom: '2px solid #d8d8d8', marginBottom: '10px', fontSize: '18px', paddingBottom: '20px'}}>File manager(view order)
                   <div className="switch" style={{float: 'right'}}>
-                    <input type="checkbox" name="fileManager"  checked={formRoleData.fileManager_viewOrder}  onChange={(e) => handleInputChange(e)} />
+                    <input type="checkbox" name="fileManager_viewOrder"  checked={formRoleData.fileManager_viewOrder}  onChange={(e) => handleInputChange(e)} />
                     <span className="slider round" />
                   </div>
                 </label>

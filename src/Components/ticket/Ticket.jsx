@@ -1,12 +1,13 @@
 import axios from 'axios';
 import React, { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
+import { useRoleAsignData } from '../../hooks/useRoleAsignData';
 import Navigationbar from '../navigationBar/Navigationbar';
 
 const Ticket = () => {
   const[fetchAllTicket,setFetchAllTicket]=useState([])
   const [ticketIssue, setTicketIssue] = useState("all");
-
+const {value_count}=useRoleAsignData()
   // const [ticketStatus, setTicketStatus] = useState("");
   useEffect(() => {
     // Fetch the chat log from the server when the component mounts
@@ -138,6 +139,7 @@ let pendingQuery=fetchAllTicket?.filter(users=>users?.ticketStatus==="pending");
                 lastUser = lastMessage.admin;
               }
               return(
+                value_count?.ticketView?
                 <Link to={`/viewTicket/${allTicket?._id}`} state={{allTicket}} key={index}>
 
 <div className="ticket-display">
@@ -207,6 +209,73 @@ let pendingQuery=fetchAllTicket?.filter(users=>users?.ticketStatus==="pending");
                 </div>
               </div>
                 </Link>
+                :
+                <div className="ticket-display">
+                <div className="row">
+                  <div className="col-8">
+                    <div className="td-box1">
+                      <div className="box1-left">
+                        <input className="check-box" type="checkbox" />
+                        <img src="https://media.discordapp.net/attachments/1069579536842379305/1107191553501450260/Logo-01.jpg?width=616&height=616" alt="" />
+                      </div>
+                      <div className="box1-right">
+                        
+                        <h6>{allTicket?.ticketIssue==="onHold out of stock" &&" Out of Stock"}
+               {allTicket?.ticketIssue==="onHold artwork issue" &&" Artwork Issue"}
+                {allTicket?.ticketIssue==="onHold billing issue" &&"Billing Issue"}
+                {allTicket?.ticketIssue==="returned" &&"Returned"}
+                {allTicket?.ticketIssue==="cancellation" &&"Cancellation"}
+                {allTicket?.ticketIssue==="general query" &&"General Query"}
+               </h6>  
+               
+                        <h3>{allTicket?.userName ? allTicket?.userName : "Printbaz"}</h3>
+                        <h4>Order ID: {allTicket?.orderId}</h4>
+                        <h5>Ticket ID: {allTicket?.ticketId}</h5>
+                       
+                        <span>
+                             {lastTimestamp && <p>{exactTime} {lastTimestamp}</p>}
+  
+                        </span>
+                         
+                        
+                      </div>
+                    </div>
+                  </div>
+                  <div className="col-4">
+                    <div className="td-box2">
+                      <div className="box-text">
+                        {
+                          allTicket?.ticketIssue==="onHold billing issue" &&
+                          <p><i className="fa fa-square" aria-hidden="true" style={{color: 'red'}} />High</p>
+                        }
+                          {
+                          allTicket?.ticketIssue==="returned" &&
+                          <p><i className="fa fa-square" aria-hidden="true" style={{color: 'blue'}} />Medium</p>
+                        } 
+                          {
+                          allTicket?.ticketIssue==="onHold artwork issue" &&
+                          <p><i className="fa fa-square" aria-hidden="true" style={{color: 'blue'}} />Medium</p>
+                        }
+                         {
+                          allTicket?.ticketIssue==="cancellation" &&
+                          <p><i className="fa fa-square" aria-hidden="true" style={{color: 'blue'}} />Medium</p>
+                        } 
+                         {
+                          allTicket?.ticketIssue==="onHold out of stock" &&
+                          <p><i className="fa fa-square" aria-hidden="true" style={{color: 'yellow'}} />Low</p>
+                        } 
+                        {
+                          allTicket?.ticketIssue==="general query" &&
+                          <p><i className="fa fa-square" aria-hidden="true" style={{color: 'yellow'}} />Low</p>
+                        }
+                       
+                        <p><i className="fa fa-user" aria-hidden="true" style={{color: 'rgb(0, 174, 255)'}} />{lastUser}</p>
+                        <p><i className="fa fa-envelope-open" aria-hidden="true" style={{color: 'rgb(0, 172, 0)'}} />{allTicket?.ticketStatus}</p>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
               
               )
              
@@ -229,6 +298,7 @@ let pendingQuery=fetchAllTicket?.filter(users=>users?.ticketStatus==="pending");
                 lastUser = lastMessage.admin;
               }
               return(
+                value_count?.ticketView?
                 <Link to={`/viewTicket/${allTicket?._id}`} state={{allTicket}} key={index}>
 
 <div className="ticket-display">
@@ -298,6 +368,73 @@ let pendingQuery=fetchAllTicket?.filter(users=>users?.ticketStatus==="pending");
                 </div>
               </div>
                 </Link>
+                :
+                <div className="ticket-display">
+                <div className="row">
+                  <div className="col-8">
+                    <div className="td-box1">
+                      <div className="box1-left">
+                        <input className="check-box" type="checkbox" />
+                        <img src="https://media.discordapp.net/attachments/1069579536842379305/1107191553501450260/Logo-01.jpg?width=616&height=616" alt="" />
+                      </div>
+                      <div className="box1-right">
+                        
+                        <h6>{allTicket?.ticketIssue==="onHold out of stock" &&"Out of stock"}
+               {allTicket?.ticketIssue==="onHold artwork issue" &&"Artwork issue"}
+                {allTicket?.ticketIssue==="onHold billing issue" &&"Billing Issue"}
+                {allTicket?.ticketIssue==="returned" &&"Returned"}
+                {allTicket?.ticketIssue==="cancellation" &&"Cancellation"}
+                {allTicket?.ticketIssue==="general query" &&"General Query"}
+               </h6>  
+               
+                        <h3>{allTicket?.userName}</h3>
+                        <h4>Order ID: {allTicket?.orderId}</h4>
+                        <h5>Ticket ID: {allTicket?.ticketId}</h5>
+                       
+                        <span>
+                             {lastTimestamp && <p>{exactTime} {lastTimestamp}</p>}
+  
+                        </span>
+                         
+                        
+                      </div>
+                    </div>
+                  </div>
+                  <div className="col-4">
+                    <div className="td-box2">
+                      <div className="box-text">
+                        {
+                          allTicket?.ticketIssue==="onHold billing issue" &&
+                          <p><i className="fa fa-square" aria-hidden="true" style={{color: 'red'}} />High</p>
+                        }
+                          {
+                          allTicket?.ticketIssue==="returned" &&
+                          <p><i className="fa fa-square" aria-hidden="true" style={{color: 'blue'}} />Medium</p>
+                        } 
+                          {
+                          allTicket?.ticketIssue==="onHold artwork issue" &&
+                          <p><i className="fa fa-square" aria-hidden="true" style={{color: 'blue'}} />Medium</p>
+                        }
+                         {
+                          allTicket?.ticketIssue==="cancellation" &&
+                          <p><i className="fa fa-square" aria-hidden="true" style={{color: 'blue'}} />Medium</p>
+                        } 
+                         {
+                          allTicket?.ticketIssue==="onHold out of stock" &&
+                          <p><i className="fa fa-square" aria-hidden="true" style={{color: 'yellow'}} />Low</p>
+                        } 
+                        {
+                          allTicket?.ticketIssue==="general query" &&
+                          <p><i className="fa fa-square" aria-hidden="true" style={{color: 'yellow'}} />Low</p>
+                        }
+                       
+                        <p><i className="fa fa-user" aria-hidden="true" style={{color: 'rgb(0, 174, 255)'}} />{lastUser}</p>
+                        <p><i className="fa fa-envelope-open" aria-hidden="true" style={{color: 'rgb(0, 172, 0)'}} />{allTicket?.ticketStatus}</p>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
               
               )
              
@@ -320,6 +457,7 @@ let pendingQuery=fetchAllTicket?.filter(users=>users?.ticketStatus==="pending");
                 lastUser = lastMessage.admin;
               }
               return(
+                value_count?.ticketView?
                 <Link to={`/viewTicket/${allTicket?._id}`} state={{allTicket}} key={index}>
 
 <div className="ticket-display">
@@ -389,6 +527,73 @@ let pendingQuery=fetchAllTicket?.filter(users=>users?.ticketStatus==="pending");
                 </div>
               </div>
                 </Link>
+                :
+                <div className="ticket-display">
+                <div className="row">
+                  <div className="col-8">
+                    <div className="td-box1">
+                      <div className="box1-left">
+                        <input className="check-box" type="checkbox" />
+                        <img src="https://media.discordapp.net/attachments/1069579536842379305/1107191553501450260/Logo-01.jpg?width=616&height=616" alt="" />
+                      </div>
+                      <div className="box1-right">
+                        
+                        <h6>{allTicket?.ticketIssue==="onHold out of stock" &&"Out of stock"}
+               {allTicket?.ticketIssue==="onHold artwork issue" &&"Artwork issue"}
+                {allTicket?.ticketIssue==="onHold billing issue" &&"Billing Issue"}
+                {allTicket?.ticketIssue==="returned" &&"Returned"}
+                {allTicket?.ticketIssue==="cancellation" &&"Cancellation"}
+                {allTicket?.ticketIssue==="general query" &&"General Query"}
+               </h6>  
+               
+                        <h3>{allTicket?.userName}</h3>
+                        <h4>Order ID: {allTicket?.orderId}</h4>
+                        <h5>Ticket ID: {allTicket?.ticketId}</h5>
+                       
+                        <span>
+                             {lastTimestamp && <p>{exactTime} {lastTimestamp}</p>}
+  
+                        </span>
+                         
+                        
+                      </div>
+                    </div>
+                  </div>
+                  <div className="col-4">
+                    <div className="td-box2">
+                      <div className="box-text">
+                        {
+                          allTicket?.ticketIssue==="onHold billing issue" &&
+                          <p><i className="fa fa-square" aria-hidden="true" style={{color: 'red'}} />High</p>
+                        }
+                          {
+                          allTicket?.ticketIssue==="returned" &&
+                          <p><i className="fa fa-square" aria-hidden="true" style={{color: 'blue'}} />Medium</p>
+                        } 
+                          {
+                          allTicket?.ticketIssue==="onHold artwork issue" &&
+                          <p><i className="fa fa-square" aria-hidden="true" style={{color: 'blue'}} />Medium</p>
+                        }
+                         {
+                          allTicket?.ticketIssue==="cancellation" &&
+                          <p><i className="fa fa-square" aria-hidden="true" style={{color: 'blue'}} />Medium</p>
+                        } 
+                         {
+                          allTicket?.ticketIssue==="onHold out of stock" &&
+                          <p><i className="fa fa-square" aria-hidden="true" style={{color: 'yellow'}} />Low</p>
+                        } 
+                        {
+                          allTicket?.ticketIssue==="general query" &&
+                          <p><i className="fa fa-square" aria-hidden="true" style={{color: 'yellow'}} />Low</p>
+                        }
+                       
+                        <p><i className="fa fa-user" aria-hidden="true" style={{color: 'rgb(0, 174, 255)'}} />{lastUser}</p>
+                        <p><i className="fa fa-envelope-open" aria-hidden="true" style={{color: 'rgb(0, 172, 0)'}} />{allTicket?.ticketStatus}</p>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
               
               )
              
@@ -411,6 +616,7 @@ let pendingQuery=fetchAllTicket?.filter(users=>users?.ticketStatus==="pending");
                 lastUser = lastMessage.admin;
               }
               return(
+                value_count?.ticketView?
                 <Link to={`/viewTicket/${allTicket?._id}`} state={{allTicket}} key={index}>
 
 <div className="ticket-display">
@@ -480,6 +686,73 @@ let pendingQuery=fetchAllTicket?.filter(users=>users?.ticketStatus==="pending");
                 </div>
               </div>
                 </Link>
+                :
+                <div className="ticket-display">
+                <div className="row">
+                  <div className="col-8">
+                    <div className="td-box1">
+                      <div className="box1-left">
+                        <input className="check-box" type="checkbox" />
+                        <img src="https://media.discordapp.net/attachments/1069579536842379305/1107191553501450260/Logo-01.jpg?width=616&height=616" alt="" />
+                      </div>
+                      <div className="box1-right">
+                        
+                        <h6>{allTicket?.ticketIssue==="onHold out of stock" &&"Out of stock"}
+               {allTicket?.ticketIssue==="onHold artwork issue" &&"Artwork issue"}
+                {allTicket?.ticketIssue==="onHold billing issue" &&"Billing Issue"}
+                {allTicket?.ticketIssue==="returned" &&"Returned"}
+                {allTicket?.ticketIssue==="cancellation" &&"Cancellation"}
+                {allTicket?.ticketIssue==="general query" &&"General Query"}
+               </h6>  
+               
+                        <h3>{allTicket?.userName}</h3>
+                        <h4>Order ID: {allTicket?.orderId}</h4>
+                        <h5>Ticket ID: {allTicket?.ticketId}</h5>
+                       
+                        <span>
+                             {lastTimestamp && <p>{exactTime} {lastTimestamp}</p>}
+  
+                        </span>
+                         
+                        
+                      </div>
+                    </div>
+                  </div>
+                  <div className="col-4">
+                    <div className="td-box2">
+                      <div className="box-text">
+                        {
+                          allTicket?.ticketIssue==="onHold billing issue" &&
+                          <p><i className="fa fa-square" aria-hidden="true" style={{color: 'red'}} />High</p>
+                        }
+                          {
+                          allTicket?.ticketIssue==="returned" &&
+                          <p><i className="fa fa-square" aria-hidden="true" style={{color: 'blue'}} />Medium</p>
+                        } 
+                          {
+                          allTicket?.ticketIssue==="onHold artwork issue" &&
+                          <p><i className="fa fa-square" aria-hidden="true" style={{color: 'blue'}} />Medium</p>
+                        }
+                         {
+                          allTicket?.ticketIssue==="cancellation" &&
+                          <p><i className="fa fa-square" aria-hidden="true" style={{color: 'blue'}} />Medium</p>
+                        } 
+                         {
+                          allTicket?.ticketIssue==="onHold out of stock" &&
+                          <p><i className="fa fa-square" aria-hidden="true" style={{color: 'yellow'}} />Low</p>
+                        } 
+                        {
+                          allTicket?.ticketIssue==="general query" &&
+                          <p><i className="fa fa-square" aria-hidden="true" style={{color: 'yellow'}} />Low</p>
+                        }
+                       
+                        <p><i className="fa fa-user" aria-hidden="true" style={{color: 'rgb(0, 174, 255)'}} />{lastUser}</p>
+                        <p><i className="fa fa-envelope-open" aria-hidden="true" style={{color: 'rgb(0, 172, 0)'}} />{allTicket?.ticketStatus}</p>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
               
               )
              
@@ -502,6 +775,7 @@ let pendingQuery=fetchAllTicket?.filter(users=>users?.ticketStatus==="pending");
                 lastUser = lastMessage.admin;
               }
               return(
+                value_count?.ticketView?
                 <Link to={`/viewTicket/${allTicket?._id}`} state={{allTicket}} key={index}>
 
 <div className="ticket-display">
@@ -571,6 +845,74 @@ let pendingQuery=fetchAllTicket?.filter(users=>users?.ticketStatus==="pending");
                 </div>
               </div>
                 </Link>
+                :
+
+<div className="ticket-display">
+                <div className="row">
+                  <div className="col-8">
+                    <div className="td-box1">
+                      <div className="box1-left">
+                        <input className="check-box" type="checkbox" />
+                        <img src="https://media.discordapp.net/attachments/1069579536842379305/1107191553501450260/Logo-01.jpg?width=616&height=616" alt="" />
+                      </div>
+                      <div className="box1-right">
+                        
+                        <h6>{allTicket?.ticketIssue==="onHold out of stock" &&" Out of stock"}
+               {allTicket?.ticketIssue==="onHold artwork issue" &&"Artwork issue"}
+                {allTicket?.ticketIssue==="onHold billing issue" &&"Billing Issue"}
+                {allTicket?.ticketIssue==="returned" &&"Returned"}
+                {allTicket?.ticketIssue==="cancellation" &&"Cancellation"}
+                {allTicket?.ticketIssue==="general query" &&"General Query"}
+               </h6>  
+               
+                        <h3>{allTicket?.userName}</h3>
+                        <h4>Order ID: {allTicket?.orderId}</h4>
+                        <h5>Ticket ID: {allTicket?.ticketId}</h5>
+                       
+                        <span>
+                             {lastTimestamp && <p>{exactTime} {lastTimestamp}</p>}
+  
+                        </span>
+                         
+                        
+                      </div>
+                    </div>
+                  </div>
+                  <div className="col-4">
+                    <div className="td-box2">
+                      <div className="box-text">
+                        {
+                          allTicket?.ticketIssue==="onHold billing issue" &&
+                          <p><i className="fa fa-square" aria-hidden="true" style={{color: 'red'}} />High</p>
+                        }
+                          {
+                          allTicket?.ticketIssue==="returned" &&
+                          <p><i className="fa fa-square" aria-hidden="true" style={{color: 'blue'}} />Medium</p>
+                        } 
+                          {
+                          allTicket?.ticketIssue==="onHold artwork issue" &&
+                          <p><i className="fa fa-square" aria-hidden="true" style={{color: 'blue'}} />Medium</p>
+                        }
+                         {
+                          allTicket?.ticketIssue==="cancellation" &&
+                          <p><i className="fa fa-square" aria-hidden="true" style={{color: 'blue'}} />Medium</p>
+                        } 
+                         {
+                          allTicket?.ticketIssue==="onHold out of stock" &&
+                          <p><i className="fa fa-square" aria-hidden="true" style={{color: 'yellow'}} />Low</p>
+                        } 
+                        {
+                          allTicket?.ticketIssue==="general query" &&
+                          <p><i className="fa fa-square" aria-hidden="true" style={{color: 'yellow'}} />Low</p>
+                        }
+                       
+                        <p><i className="fa fa-user" aria-hidden="true" style={{color: 'rgb(0, 174, 255)'}} />{lastUser}</p>
+                        <p><i className="fa fa-envelope-open" aria-hidden="true" style={{color: 'rgb(0, 172, 0)'}} />{allTicket?.ticketStatus}</p>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
               
               )
              
@@ -593,6 +935,7 @@ let pendingQuery=fetchAllTicket?.filter(users=>users?.ticketStatus==="pending");
                 lastUser = lastMessage.admin;
               }
               return(
+                value_count?.ticketView?
                 <Link to={`/viewTicket/${allTicket?._id}`} state={{allTicket}} key={index}>
 
 <div className="ticket-display">
@@ -662,6 +1005,73 @@ let pendingQuery=fetchAllTicket?.filter(users=>users?.ticketStatus==="pending");
                 </div>
               </div>
                 </Link>
+                :
+                <div className="ticket-display">
+                <div className="row">
+                  <div className="col-8">
+                    <div className="td-box1">
+                      <div className="box1-left">
+                        <input className="check-box" type="checkbox" />
+                        <img src="https://media.discordapp.net/attachments/1069579536842379305/1107191553501450260/Logo-01.jpg?width=616&height=616" alt="" />
+                      </div>
+                      <div className="box1-right">
+                        
+                        <h6>{allTicket?.ticketIssue==="onHold out of stock" &&"Out of stock"}
+               {allTicket?.ticketIssue==="onHold artwork issue" &&"Artwork issue"}
+                {allTicket?.ticketIssue==="onHold billing issue" &&"Billing Issue"}
+                {allTicket?.ticketIssue==="returned" &&"Returned"}
+                {allTicket?.ticketIssue==="cancellation" &&"Cancellation"}
+                {allTicket?.ticketIssue==="general query" &&"General Query"}
+               </h6>  
+               
+                        <h3>{allTicket?.userName}</h3>
+                        <h4>Order ID: {allTicket?.orderId}</h4>
+                        <h5>Ticket ID: {allTicket?.ticketId}</h5>
+                       
+                        <span>
+                             {lastTimestamp && <p>{exactTime} {lastTimestamp}</p>}
+  
+                        </span>
+                         
+                        
+                      </div>
+                    </div>
+                  </div>
+                  <div className="col-4">
+                    <div className="td-box2">
+                      <div className="box-text">
+                        {
+                          allTicket?.ticketIssue==="onHold billing issue" &&
+                          <p><i className="fa fa-square" aria-hidden="true" style={{color: 'red'}} />High</p>
+                        }
+                          {
+                          allTicket?.ticketIssue==="returned" &&
+                          <p><i className="fa fa-square" aria-hidden="true" style={{color: 'blue'}} />Medium</p>
+                        } 
+                          {
+                          allTicket?.ticketIssue==="onHold artwork issue" &&
+                          <p><i className="fa fa-square" aria-hidden="true" style={{color: 'blue'}} />Medium</p>
+                        }
+                         {
+                          allTicket?.ticketIssue==="cancellation" &&
+                          <p><i className="fa fa-square" aria-hidden="true" style={{color: 'blue'}} />Medium</p>
+                        } 
+                         {
+                          allTicket?.ticketIssue==="onHold out of stock" &&
+                          <p><i className="fa fa-square" aria-hidden="true" style={{color: 'yellow'}} />Low</p>
+                        } 
+                        {
+                          allTicket?.ticketIssue==="general query" &&
+                          <p><i className="fa fa-square" aria-hidden="true" style={{color: 'yellow'}} />Low</p>
+                        }
+                       
+                        <p><i className="fa fa-user" aria-hidden="true" style={{color: 'rgb(0, 174, 255)'}} />{lastUser}</p>
+                        <p><i className="fa fa-envelope-open" aria-hidden="true" style={{color: 'rgb(0, 172, 0)'}} />{allTicket?.ticketStatus}</p>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
               
               )
              
@@ -684,6 +1094,7 @@ let pendingQuery=fetchAllTicket?.filter(users=>users?.ticketStatus==="pending");
                 lastUser = lastMessage.admin;
               }
               return(
+                value_count?.ticketView?
                 <Link to={`/viewTicket/${allTicket?._id}`} state={{allTicket}} key={index}>
 
 <div className="ticket-display">
@@ -753,6 +1164,73 @@ let pendingQuery=fetchAllTicket?.filter(users=>users?.ticketStatus==="pending");
                 </div>
               </div>
                 </Link>
+                :
+                <div className="ticket-display">
+                <div className="row">
+                  <div className="col-8">
+                    <div className="td-box1">
+                      <div className="box1-left">
+                        <input className="check-box" type="checkbox" />
+                        <img src="https://media.discordapp.net/attachments/1069579536842379305/1107191553501450260/Logo-01.jpg?width=616&height=616" alt="" />
+                      </div>
+                      <div className="box1-right">
+                        
+                        <h6>{allTicket?.ticketIssue==="onHold out of stock" &&"Out of stock"}
+               {allTicket?.ticketIssue==="onHold artwork issue" &&"Artwork issue"}
+                {allTicket?.ticketIssue==="onHold billing issue" &&"Billing Issue"}
+                {allTicket?.ticketIssue==="returned" &&"Returned"}
+                {allTicket?.ticketIssue==="cancellation" &&"Cancellation"}
+                {allTicket?.ticketIssue==="general query" &&"General Query"}
+               </h6>  
+               
+                        <h3>{allTicket?.userName}</h3>
+                        <h4>Order ID: {allTicket?.orderId}</h4>
+                        <h5>Ticket ID: {allTicket?.ticketId}</h5>
+                       
+                        <span>
+                             {lastTimestamp && <p>{exactTime} {lastTimestamp}</p>}
+  
+                        </span>
+                         
+                        
+                      </div>
+                    </div>
+                  </div>
+                  <div className="col-4">
+                    <div className="td-box2">
+                      <div className="box-text">
+                        {
+                          allTicket?.ticketIssue==="onHold billing issue" &&
+                          <p><i className="fa fa-square" aria-hidden="true" style={{color: 'red'}} />High</p>
+                        }
+                          {
+                          allTicket?.ticketIssue==="returned" &&
+                          <p><i className="fa fa-square" aria-hidden="true" style={{color: 'blue'}} />Medium</p>
+                        } 
+                          {
+                          allTicket?.ticketIssue==="onHold artwork issue" &&
+                          <p><i className="fa fa-square" aria-hidden="true" style={{color: 'blue'}} />Medium</p>
+                        }
+                         {
+                          allTicket?.ticketIssue==="cancellation" &&
+                          <p><i className="fa fa-square" aria-hidden="true" style={{color: 'blue'}} />Medium</p>
+                        } 
+                         {
+                          allTicket?.ticketIssue==="onHold out of stock" &&
+                          <p><i className="fa fa-square" aria-hidden="true" style={{color: 'yellow'}} />Low</p>
+                        } 
+                        {
+                          allTicket?.ticketIssue==="general query" &&
+                          <p><i className="fa fa-square" aria-hidden="true" style={{color: 'yellow'}} />Low</p>
+                        }
+                       
+                        <p><i className="fa fa-user" aria-hidden="true" style={{color: 'rgb(0, 174, 255)'}} />{lastUser}</p>
+                        <p><i className="fa fa-envelope-open" aria-hidden="true" style={{color: 'rgb(0, 172, 0)'}} />{allTicket?.ticketStatus}</p>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
               
               )
              
@@ -777,6 +1255,7 @@ let pendingQuery=fetchAllTicket?.filter(users=>users?.ticketStatus==="pending");
                 lastUser = lastMessage.admin;
               }
               return(
+                value_count?.ticketView?
                 <Link to={`/viewTicket/${allTicket?._id}`} state={{allTicket}} key={index}>
 
 <div className="ticket-display">
@@ -846,6 +1325,73 @@ let pendingQuery=fetchAllTicket?.filter(users=>users?.ticketStatus==="pending");
                 </div>
               </div>
                 </Link>
+                :
+                <div className="ticket-display">
+                <div className="row">
+                  <div className="col-8">
+                    <div className="td-box1">
+                      <div className="box1-left">
+                        <input className="check-box" type="checkbox" />
+                        <img src="https://media.discordapp.net/attachments/1069579536842379305/1107191553501450260/Logo-01.jpg?width=616&height=616" alt="" />
+                      </div>
+                      <div className="box1-right">
+                        
+                        <h6>{allTicket?.ticketIssue==="onHold out of stock" &&"Out of stock"}
+               {allTicket?.ticketIssue==="onHold artwork issue" &&"Artwork issue"}
+                {allTicket?.ticketIssue==="onHold billing issue" &&"Billing Issue"}
+                {allTicket?.ticketIssue==="returned" &&"Returned"}
+                {allTicket?.ticketIssue==="cancellation" &&"Cancellation"}
+                {allTicket?.ticketIssue==="general query" &&"General Query"}
+               </h6>  
+               
+                        <h3>{allTicket?.userName}</h3>
+                        <h4>Order ID: {allTicket?.orderId}</h4>
+                        <h5>Ticket ID: {allTicket?.ticketId}</h5>
+                       
+                        <span>
+                             {lastTimestamp && <p>{exactTime} {lastTimestamp}</p>}
+  
+                        </span>
+                         
+                        
+                      </div>
+                    </div>
+                  </div>
+                  <div className="col-4">
+                    <div className="td-box2">
+                      <div className="box-text">
+                        {
+                          allTicket?.ticketIssue==="onHold billing issue" &&
+                          <p><i className="fa fa-square" aria-hidden="true" style={{color: 'red'}} />High</p>
+                        }
+                          {
+                          allTicket?.ticketIssue==="returned" &&
+                          <p><i className="fa fa-square" aria-hidden="true" style={{color: 'blue'}} />Medium</p>
+                        } 
+                          {
+                          allTicket?.ticketIssue==="onHold artwork issue" &&
+                          <p><i className="fa fa-square" aria-hidden="true" style={{color: 'blue'}} />Medium</p>
+                        }
+                         {
+                          allTicket?.ticketIssue==="cancellation" &&
+                          <p><i className="fa fa-square" aria-hidden="true" style={{color: 'blue'}} />Medium</p>
+                        } 
+                         {
+                          allTicket?.ticketIssue==="onHold out of stock" &&
+                          <p><i className="fa fa-square" aria-hidden="true" style={{color: 'yellow'}} />Low</p>
+                        } 
+                        {
+                          allTicket?.ticketIssue==="general query" &&
+                          <p><i className="fa fa-square" aria-hidden="true" style={{color: 'yellow'}} />Low</p>
+                        }
+                       
+                        <p><i className="fa fa-user" aria-hidden="true" style={{color: 'rgb(0, 174, 255)'}} />{lastUser}</p>
+                        <p><i className="fa fa-envelope-open" aria-hidden="true" style={{color: 'rgb(0, 172, 0)'}} />{allTicket?.ticketStatus}</p>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
               
               )
              
@@ -868,6 +1414,7 @@ let pendingQuery=fetchAllTicket?.filter(users=>users?.ticketStatus==="pending");
                 lastUser = lastMessage.admin;
               }
               return(
+                value_count?.ticketView?
                 <Link to={`/viewTicket/${allTicket?._id}`} state={{allTicket}} key={index}>
 
 <div className="ticket-display">
@@ -937,6 +1484,74 @@ let pendingQuery=fetchAllTicket?.filter(users=>users?.ticketStatus==="pending");
                 </div>
               </div>
                 </Link>
+                :
+
+<div className="ticket-display">
+                <div className="row">
+                  <div className="col-8">
+                    <div className="td-box1">
+                      <div className="box1-left">
+                        <input className="check-box" type="checkbox" />
+                        <img src="https://media.discordapp.net/attachments/1069579536842379305/1107191553501450260/Logo-01.jpg?width=616&height=616" alt="" />
+                      </div>
+                      <div className="box1-right">
+                        
+                        <h6>{allTicket?.ticketIssue==="onHold out of stock" &&"Out of stock"}
+               {allTicket?.ticketIssue==="onHold artwork issue" &&"Artwork issue"}
+                {allTicket?.ticketIssue==="onHold billing issue" &&"Billing Issue"}
+                {allTicket?.ticketIssue==="returned" &&"Returned"}
+                {allTicket?.ticketIssue==="cancellation" &&"Cancellation"}
+                {allTicket?.ticketIssue==="general query" &&"General Query"}
+               </h6>  
+               
+                        <h3>{allTicket?.userName}</h3>
+                        <h4>Order ID: {allTicket?.orderId}</h4>
+                        <h5>Ticket ID: {allTicket?.ticketId}</h5>
+                       
+                        <span>
+                             {lastTimestamp && <p>{exactTime} {lastTimestamp}</p>}
+  
+                        </span>
+                         
+                        
+                      </div>
+                    </div>
+                  </div>
+                  <div className="col-4">
+                    <div className="td-box2">
+                      <div className="box-text">
+                        {
+                          allTicket?.ticketIssue==="onHold billing issue" &&
+                          <p><i className="fa fa-square" aria-hidden="true" style={{color: 'red'}} />High</p>
+                        }
+                          {
+                          allTicket?.ticketIssue==="returned" &&
+                          <p><i className="fa fa-square" aria-hidden="true" style={{color: 'blue'}} />Medium</p>
+                        } 
+                          {
+                          allTicket?.ticketIssue==="onHold artwork issue" &&
+                          <p><i className="fa fa-square" aria-hidden="true" style={{color: 'blue'}} />Medium</p>
+                        }
+                         {
+                          allTicket?.ticketIssue==="cancellation" &&
+                          <p><i className="fa fa-square" aria-hidden="true" style={{color: 'blue'}} />Medium</p>
+                        } 
+                         {
+                          allTicket?.ticketIssue==="onHold out of stock" &&
+                          <p><i className="fa fa-square" aria-hidden="true" style={{color: 'yellow'}} />Low</p>
+                        } 
+                        {
+                          allTicket?.ticketIssue==="general query" &&
+                          <p><i className="fa fa-square" aria-hidden="true" style={{color: 'yellow'}} />Low</p>
+                        }
+                       
+                        <p><i className="fa fa-user" aria-hidden="true" style={{color: 'rgb(0, 174, 255)'}} />{lastUser}</p>
+                        <p><i className="fa fa-envelope-open" aria-hidden="true" style={{color: 'rgb(0, 172, 0)'}} />{allTicket?.ticketStatus}</p>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
               
               )
              
@@ -959,6 +1574,7 @@ let pendingQuery=fetchAllTicket?.filter(users=>users?.ticketStatus==="pending");
                 lastUser = lastMessage.admin;
               }
               return(
+                value_count?.ticketView?
                 <Link to={`/viewTicket/${allTicket?._id}`} state={{allTicket}} key={index}>
 
 <div className="ticket-display">
@@ -1028,6 +1644,73 @@ let pendingQuery=fetchAllTicket?.filter(users=>users?.ticketStatus==="pending");
                 </div>
               </div>
                 </Link>
+                :
+                <div className="ticket-display">
+                <div className="row">
+                  <div className="col-8">
+                    <div className="td-box1">
+                      <div className="box1-left">
+                        <input className="check-box" type="checkbox" />
+                        <img src="https://media.discordapp.net/attachments/1069579536842379305/1107191553501450260/Logo-01.jpg?width=616&height=616" alt="" />
+                      </div>
+                      <div className="box1-right">
+                        
+                        <h6>{allTicket?.ticketIssue==="onHold out of stock" &&"Out of stock"}
+               {allTicket?.ticketIssue==="onHold artwork issue" &&"Artwork issue"}
+                {allTicket?.ticketIssue==="onHold billing issue" &&"Billing Issue"}
+                {allTicket?.ticketIssue==="returned" &&"Returned"}
+                {allTicket?.ticketIssue==="cancellation" &&"Cancellation"}
+                {allTicket?.ticketIssue==="general query" &&"General Query"}
+               </h6>  
+               
+                        <h3>{allTicket?.userName}</h3>
+                        <h4>Order ID: {allTicket?.orderId}</h4>
+                        <h5>Ticket ID: {allTicket?.ticketId}</h5>
+                       
+                        <span>
+                             {lastTimestamp && <p>{exactTime} {lastTimestamp}</p>}
+  
+                        </span>
+                         
+                        
+                      </div>
+                    </div>
+                  </div>
+                  <div className="col-4">
+                    <div className="td-box2">
+                      <div className="box-text">
+                        {
+                          allTicket?.ticketIssue==="onHold billing issue" &&
+                          <p><i className="fa fa-square" aria-hidden="true" style={{color: 'red'}} />High</p>
+                        }
+                          {
+                          allTicket?.ticketIssue==="returned" &&
+                          <p><i className="fa fa-square" aria-hidden="true" style={{color: 'blue'}} />Medium</p>
+                        } 
+                          {
+                          allTicket?.ticketIssue==="onHold artwork issue" &&
+                          <p><i className="fa fa-square" aria-hidden="true" style={{color: 'blue'}} />Medium</p>
+                        }
+                         {
+                          allTicket?.ticketIssue==="cancellation" &&
+                          <p><i className="fa fa-square" aria-hidden="true" style={{color: 'blue'}} />Medium</p>
+                        } 
+                         {
+                          allTicket?.ticketIssue==="onHold out of stock" &&
+                          <p><i className="fa fa-square" aria-hidden="true" style={{color: 'yellow'}} />Low</p>
+                        } 
+                        {
+                          allTicket?.ticketIssue==="general query" &&
+                          <p><i className="fa fa-square" aria-hidden="true" style={{color: 'yellow'}} />Low</p>
+                        }
+                       
+                        <p><i className="fa fa-user" aria-hidden="true" style={{color: 'rgb(0, 174, 255)'}} />{lastUser}</p>
+                        <p><i className="fa fa-envelope-open" aria-hidden="true" style={{color: 'rgb(0, 172, 0)'}} />{allTicket?.ticketStatus}</p>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
               
               )
              
@@ -1049,6 +1732,7 @@ let pendingQuery=fetchAllTicket?.filter(users=>users?.ticketStatus==="pending");
                 lastUser = lastMessage.admin;
               }
               return(
+                value_count?.ticketView?
                 <Link to={`/viewTicket/${allTicket?._id}`} state={{allTicket}} key={index}>
 
 <div className="ticket-display">
@@ -1118,6 +1802,73 @@ let pendingQuery=fetchAllTicket?.filter(users=>users?.ticketStatus==="pending");
                 </div>
               </div>
                 </Link>
+                :
+                <div className="ticket-display">
+                <div className="row">
+                  <div className="col-8">
+                    <div className="td-box1">
+                      <div className="box1-left">
+                        <input className="check-box" type="checkbox" />
+                        <img src="https://media.discordapp.net/attachments/1069579536842379305/1107191553501450260/Logo-01.jpg?width=616&height=616" alt="" />
+                      </div>
+                      <div className="box1-right">
+                        
+                        <h6>{allTicket?.ticketIssue==="onHold out of stock" &&"Out of stock"}
+               {allTicket?.ticketIssue==="onHold artwork issue" &&"Artwork issue"}
+                {allTicket?.ticketIssue==="onHold billing issue" &&"Billing Issue"}
+                {allTicket?.ticketIssue==="returned" &&"Returned"}
+                {allTicket?.ticketIssue==="cancellation" &&"Cancellation"}
+                {allTicket?.ticketIssue==="general query" &&"General Query"}
+               </h6>  
+               
+                        <h3>{allTicket?.userName}</h3>
+                        <h4>Order ID: {allTicket?.orderId}</h4>
+                        <h5>Ticket ID: {allTicket?.ticketId}</h5>
+                       
+                        <span>
+                             {lastTimestamp && <p>{exactTime} {lastTimestamp}</p>}
+  
+                        </span>
+                         
+                        
+                      </div>
+                    </div>
+                  </div>
+                  <div className="col-4">
+                    <div className="td-box2">
+                      <div className="box-text">
+                        {
+                          allTicket?.ticketIssue==="onHold billing issue" &&
+                          <p><i className="fa fa-square" aria-hidden="true" style={{color: 'red'}} />High</p>
+                        }
+                          {
+                          allTicket?.ticketIssue==="returned" &&
+                          <p><i className="fa fa-square" aria-hidden="true" style={{color: 'blue'}} />Medium</p>
+                        } 
+                          {
+                          allTicket?.ticketIssue==="onHold artwork issue" &&
+                          <p><i className="fa fa-square" aria-hidden="true" style={{color: 'blue'}} />Medium</p>
+                        }
+                         {
+                          allTicket?.ticketIssue==="cancellation" &&
+                          <p><i className="fa fa-square" aria-hidden="true" style={{color: 'blue'}} />Medium</p>
+                        } 
+                         {
+                          allTicket?.ticketIssue==="onHold out of stock" &&
+                          <p><i className="fa fa-square" aria-hidden="true" style={{color: 'yellow'}} />Low</p>
+                        } 
+                        {
+                          allTicket?.ticketIssue==="general query" &&
+                          <p><i className="fa fa-square" aria-hidden="true" style={{color: 'yellow'}} />Low</p>
+                        }
+                       
+                        <p><i className="fa fa-user" aria-hidden="true" style={{color: 'rgb(0, 174, 255)'}} />{lastUser}</p>
+                        <p><i className="fa fa-envelope-open" aria-hidden="true" style={{color: 'rgb(0, 172, 0)'}} />{allTicket?.ticketStatus}</p>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
               
               )
              

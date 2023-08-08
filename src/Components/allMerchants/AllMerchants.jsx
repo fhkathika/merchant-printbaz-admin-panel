@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
+import { useRoleAsignData } from '../../hooks/useRoleAsignData';
 import Navigationbar from '../navigationBar/Navigationbar';
 
 const AllMerchants = () => {
@@ -10,6 +11,7 @@ const AllMerchants = () => {
   const [itemsPerPage, setItemsPerPage] = useState(30); 
   const indexOfLastItem = currentPage * itemsPerPage;
 const indexOfFirstItem = indexOfLastItem - itemsPerPage;
+const {value_count}=useRoleAsignData()
 let count=0
   useEffect(()=>{
     const getOrders = async () => {
@@ -141,103 +143,203 @@ let searchByPhoneNumber= allMerchant?.filter(Phone => Phone?.phone?.includes(fil
           {
           filterUser &&  searchByPhoneNumber?.map((merchants)=><>
            {/* <Link  key={merchants?._id} to={`/viewTicket/${merchants?._id}`} state={{merchants}}></Link> */}
-             <Link key={merchants?._id} to={`/viewClient/${merchants?._id}`} state={{merchants}}>
+            {
+              value_count?.MerchantView ?
+              <Link key={merchants?._id} to={`/viewClient/${merchants?._id}`} state={{merchants}}>
+              <div className="row client-list">
+                <div className="col-lg-2 col-sm-12">
+                  <p>{merchants?.phone}</p>
+                </div>
+                <div className="col-lg-2 col-sm-12">
+                  <p>{merchants?.name}</p>
+                </div>
+                <div className="col-lg-2 col-sm-12">
+                  <p>{merchants?.brandName}</p>
+                </div>
+                <div className="col-lg-2 col-sm-12">
+                  <p>{merchants?.email}</p>
+                </div>
+                <div className="col-lg-2 col-sm-12">
+                  <p>{merchants?.createdAt?.slice(0,10)}</p>
+                </div>
+                <div className="col-lg-2 col-sm-12">
+                  {
+                    merchants?.approval==="requiest" &&   <p className="status-btn" style={{backgroundColor:"red"}} >{merchants?.approval}</p>
+                  }
+                   {
+                    merchants?.approval==="approved" &&   <p className="status-btn"  >{merchants?.approval}</p>
+                  } 
+                   {
+                    merchants?.approval==="ban" &&   <p className="status-btn" style={{backgroundColor:"blue"}}  >{merchants?.approval}</p>
+                  }
+                
+                </div>
+              </div>
+            </Link>
+            :
             <div className="row client-list">
-              <div className="col-lg-2 col-sm-12">
-                <p>{merchants?.phone}</p>
-              </div>
-              <div className="col-lg-2 col-sm-12">
-                <p>{merchants?.name}</p>
-              </div>
-              <div className="col-lg-2 col-sm-12">
-                <p>{merchants?.brandName}</p>
-              </div>
-              <div className="col-lg-2 col-sm-12">
-                <p>{merchants?.email}</p>
-              </div>
-              <div className="col-lg-2 col-sm-12">
-                <p>{merchants?.createdAt?.slice(0,10)}</p>
-              </div>
-              <div className="col-lg-2 col-sm-12">
-                {
-                  merchants?.approval==="requiest" &&   <p className="status-btn" style={{backgroundColor:"red"}} >{merchants?.approval}</p>
-                }
-                 {
-                  merchants?.approval==="approved" &&   <p className="status-btn"  >{merchants?.approval}</p>
-                } 
-                 {
-                  merchants?.approval==="ban" &&   <p className="status-btn" style={{backgroundColor:"blue"}}  >{merchants?.approval}</p>
-                }
-              
-              </div>
+            <div className="col-lg-2 col-sm-12">
+              <p>{merchants?.phone}</p>
             </div>
-          </Link>
+            <div className="col-lg-2 col-sm-12">
+              <p>{merchants?.name}</p>
+            </div>
+            <div className="col-lg-2 col-sm-12">
+              <p>{merchants?.brandName}</p>
+            </div>
+            <div className="col-lg-2 col-sm-12">
+              <p>{merchants?.email}</p>
+            </div>
+            <div className="col-lg-2 col-sm-12">
+              <p>{merchants?.createdAt?.slice(0,10)}</p>
+            </div>
+            <div className="col-lg-2 col-sm-12">
+              {
+                merchants?.approval==="requiest" &&   <p className="status-btn" style={{backgroundColor:"red"}} >{merchants?.approval}</p>
+              }
+               {
+                merchants?.approval==="approved" &&   <p className="status-btn"  >{merchants?.approval}</p>
+              } 
+               {
+                merchants?.approval==="ban" &&   <p className="status-btn" style={{backgroundColor:"blue"}}  >{merchants?.approval}</p>
+              }
+            
+            </div>
+          </div>
+            }
+        
             </>)
           }
           {
           filterEmail &&  searchByEmail?.map((merchants)=><>
-             <Link key={merchants?._id} to={`/viewClient/${merchants?._id}`} state={{merchants}}>
-            <div className="row client-list">
-              <div className="col-lg-2 col-sm-12">
-                <p>{merchants?.phone}</p>
-              </div>
-              <div className="col-lg-2 col-sm-12">
-                <p>{merchants?.name}</p>
-              </div>
-              <div className="col-lg-2 col-sm-12">
-                <p>{merchants?.brandName}</p>
-              </div>
-              <div className="col-lg-2 col-sm-12">
-                <p>{merchants?.email}</p>
-              </div>
-              <div className="col-lg-2 col-sm-12">
-                <p>{merchants?.createdAt?.slice(0,10)}</p>
-              </div>
-              <div className="col-lg-2 col-sm-12">
-                {
-                  merchants?.approval==="requiest" &&   <p className="status-btn" style={{backgroundColor:"red"}} >{merchants?.approval}</p>
-                }
-                 {
-                  merchants?.approval==="approved" &&   <p className="status-btn"  >{merchants?.approval}</p>
-                } 
-                 {
-                  merchants?.approval==="ban" &&   <p className="status-btn" style={{backgroundColor:"blue"}}  >{merchants?.approval}</p>
-                }
-              
-              </div>
-            </div>
-          </Link>
+          {
+
+value_count?.MerchantView ?
+<Link key={merchants?._id} to={`/viewClient/${merchants?._id}`} state={{merchants}}>
+<div className="row client-list">
+  <div className="col-lg-2 col-sm-12">
+    <p>{merchants?.phone}</p>
+  </div>
+  <div className="col-lg-2 col-sm-12">
+    <p>{merchants?.name}</p>
+  </div>
+  <div className="col-lg-2 col-sm-12">
+    <p>{merchants?.brandName}</p>
+  </div>
+  <div className="col-lg-2 col-sm-12">
+    <p>{merchants?.email}</p>
+  </div>
+  <div className="col-lg-2 col-sm-12">
+    <p>{merchants?.createdAt?.slice(0,10)}</p>
+  </div>
+  <div className="col-lg-2 col-sm-12">
+    {
+      merchants?.approval==="requiest" &&   <p className="status-btn" style={{backgroundColor:"red"}} >{merchants?.approval}</p>
+    }
+     {
+      merchants?.approval==="approved" &&   <p className="status-btn"  >{merchants?.approval}</p>
+    } 
+     {
+      merchants?.approval==="ban" &&   <p className="status-btn" style={{backgroundColor:"blue"}}  >{merchants?.approval}</p>
+    }
+  
+  </div>
+</div>
+</Link>
+:
+<div className="row client-list">
+  <div className="col-lg-2 col-sm-12">
+    <p>{merchants?.phone}</p>
+  </div>
+  <div className="col-lg-2 col-sm-12">
+    <p>{merchants?.name}</p>
+  </div>
+  <div className="col-lg-2 col-sm-12">
+    <p>{merchants?.brandName}</p>
+  </div>
+  <div className="col-lg-2 col-sm-12">
+    <p>{merchants?.email}</p>
+  </div>
+  <div className="col-lg-2 col-sm-12">
+    <p>{merchants?.createdAt?.slice(0,10)}</p>
+  </div>
+  <div className="col-lg-2 col-sm-12">
+    {
+      merchants?.approval==="requiest" &&   <p className="status-btn" style={{backgroundColor:"red"}} >{merchants?.approval}</p>
+    }
+     {
+      merchants?.approval==="approved" &&   <p className="status-btn"  >{merchants?.approval}</p>
+    } 
+     {
+      merchants?.approval==="ban" &&   <p className="status-btn" style={{backgroundColor:"blue"}}  >{merchants?.approval}</p>
+    }
+  
+  </div>
+</div>
+
+          }
+            
             </>)
           }
         
           {
             filterUser==="pending" &&  pendingUsers.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt)).map(merchants=><>
-               <Link key={merchants?._id} to={`/viewClient/${merchants?._id}`} state={{merchants}}>
+              {
+
+              value_count?.MerchantView ?
+              <Link key={merchants?._id} to={`/viewClient/${merchants?._id}`} state={{merchants}}>
+              <div className="row client-list">
+                <div className="col-lg-2 col-sm-12">
+                  <p>{merchants?.phone}</p>
+                </div>
+                <div className="col-lg-2 col-sm-12">
+                  <p>{merchants?.name}</p>
+                </div>
+                <div className="col-lg-2 col-sm-12">
+                  <p>{merchants?.brandName}</p>
+                </div>
+                <div className="col-lg-2 col-sm-12">
+                  <p>{merchants?.email}</p>
+                </div>
+                <div className="col-lg-2 col-sm-12">
+                  <p>{merchants?.createdAt?.slice(0,10)}</p>
+                </div>
+                <div className="col-lg-2 col-sm-12">
+                  {
+                    merchants?.approval==="request" &&   <p className="status-btn" style={{backgroundColor:"#ff6f00",color:"black !important"}} >{merchants?.approval}</p>
+                  }
+               
+                
+                </div>
+              </div>
+            </Link>
+            :
             <div className="row client-list">
-              <div className="col-lg-2 col-sm-12">
-                <p>{merchants?.phone}</p>
+                <div className="col-lg-2 col-sm-12">
+                  <p>{merchants?.phone}</p>
+                </div>
+                <div className="col-lg-2 col-sm-12">
+                  <p>{merchants?.name}</p>
+                </div>
+                <div className="col-lg-2 col-sm-12">
+                  <p>{merchants?.brandName}</p>
+                </div>
+                <div className="col-lg-2 col-sm-12">
+                  <p>{merchants?.email}</p>
+                </div>
+                <div className="col-lg-2 col-sm-12">
+                  <p>{merchants?.createdAt?.slice(0,10)}</p>
+                </div>
+                <div className="col-lg-2 col-sm-12">
+                  {
+                    merchants?.approval==="request" &&   <p className="status-btn" style={{backgroundColor:"#ff6f00",color:"black !important"}} >{merchants?.approval}</p>
+                  }
+               
+                
+                </div>
               </div>
-              <div className="col-lg-2 col-sm-12">
-                <p>{merchants?.name}</p>
-              </div>
-              <div className="col-lg-2 col-sm-12">
-                <p>{merchants?.brandName}</p>
-              </div>
-              <div className="col-lg-2 col-sm-12">
-                <p>{merchants?.email}</p>
-              </div>
-              <div className="col-lg-2 col-sm-12">
-                <p>{merchants?.createdAt?.slice(0,10)}</p>
-              </div>
-              <div className="col-lg-2 col-sm-12">
-                {
-                  merchants?.approval==="request" &&   <p className="status-btn" style={{backgroundColor:"#ff6f00",color:"black !important"}} >{merchants?.approval}</p>
-                }
-             
-              
-              </div>
-            </div>
-          </Link>
+              } 
+           
             
             </>) 
           }
@@ -251,34 +353,63 @@ let searchByPhoneNumber= allMerchant?.filter(Phone => Phone?.phone?.includes(fil
             //  console.log("count",count);
               return(
              
-                <Link key={merchants?._id} to={`/viewClient/${merchants?._id}`} state={{merchants}}>
-                <div className="row client-list">
-                  <div className="col-lg-2 col-sm-12">
-                    <p>{merchants?.phone}</p>
-                  </div>
-                  <div className="col-lg-2 col-sm-12">
-                    <p>{merchants?.name}</p>
-                  </div>
-                  <div className="col-lg-2 col-sm-12">
-                    <p>{merchants?.brandName}</p>
-                  </div>
-                  <div className="col-lg-2 col-sm-12">
-                    <p>{merchants?.email}</p>
-                    
-                  </div>
-                  <div className="col-lg-2 col-sm-12">
-                    <p>{merchants?.createdAt?.slice(0,10)}</p>
-                  </div>
-                  <div className="col-lg-2 col-sm-12">
-                 
-                     {
-                      merchants?.approval==="approved" &&   <p className="status-btn"  >{merchants?.approval}</p>
-                    } 
-                   
-                  
-                  </div>
+              value_count?.MerchantView ?
+              <Link key={merchants?._id} to={`/viewClient/${merchants?._id}`} state={{merchants}}>
+              <div className="row client-list">
+                <div className="col-lg-2 col-sm-12">
+                  <p>{merchants?.phone}</p>
                 </div>
-              </Link>
+                <div className="col-lg-2 col-sm-12">
+                  <p>{merchants?.name}</p>
+                </div>
+                <div className="col-lg-2 col-sm-12">
+                  <p>{merchants?.brandName}</p>
+                </div>
+                <div className="col-lg-2 col-sm-12">
+                  <p>{merchants?.email}</p>
+                  
+                </div>
+                <div className="col-lg-2 col-sm-12">
+                  <p>{merchants?.createdAt?.slice(0,10)}</p>
+                </div>
+                <div className="col-lg-2 col-sm-12">
+               
+                   {
+                    merchants?.approval==="approved" &&   <p className="status-btn"  >{merchants?.approval}</p>
+                  } 
+                 
+                
+                </div>
+              </div>
+            </Link>
+            
+             :
+             <div className="row client-list">
+             <div className="col-lg-2 col-sm-12">
+               <p>{merchants?.phone}</p>
+             </div>
+             <div className="col-lg-2 col-sm-12">
+               <p>{merchants?.name}</p>
+             </div>
+             <div className="col-lg-2 col-sm-12">
+               <p>{merchants?.brandName}</p>
+             </div>
+             <div className="col-lg-2 col-sm-12">
+               <p>{merchants?.email}</p>
+               
+             </div>
+             <div className="col-lg-2 col-sm-12">
+               <p>{merchants?.createdAt?.slice(0,10)}</p>
+             </div>
+             <div className="col-lg-2 col-sm-12">
+            
+                {
+                 merchants?.approval==="approved" &&   <p className="status-btn"  >{merchants?.approval}</p>
+               } 
+              
+             
+             </div>
+           </div>
               )
              
             }
@@ -303,69 +434,131 @@ let searchByPhoneNumber= allMerchant?.filter(Phone => Phone?.phone?.includes(fil
 
             {
             filterUser==="ban" &&  bannedUsers.map(merchants=><>
-               <Link key={merchants?._id} to={`/viewClient/${merchants?._id}`} state={{merchants}}>
-            <div className="row client-list">
-              <div className="col-lg-2 col-sm-12">
-                <p>{merchants?.phone}</p>
+            {
+                  value_count?.MerchantView ?
+                  <Link key={merchants?._id} to={`/viewClient/${merchants?._id}`} state={{merchants}}>
+                  <div className="row client-list">
+                    <div className="col-lg-2 col-sm-12">
+                      <p>{merchants?.phone}</p>
+                    </div>
+                    <div className="col-lg-2 col-sm-12">
+                      <p>{merchants?.name}</p>
+                    </div>
+                    <div className="col-lg-2 col-sm-12">
+                      <p>{merchants?.brandName}</p>
+                    </div>
+                    <div className="col-lg-2 col-sm-12">
+                      <p>{merchants?.email}</p>
+                    </div>
+                    <div className="col-lg-2 col-sm-12">
+                      <p>{merchants?.createdAt?.slice(0,10)}</p>
+                    </div>
+                    <div className="col-lg-2 col-sm-12">
+                   
+                       {
+                        merchants?.approval==="ban" &&   <p className="status-btn" style={{backgroundColor:"red"}}  >{merchants?.approval}</p>
+                      }
+                    
+                    </div>
+                  </div>
+                </Link>
+                :
+                <div className="row client-list">
+                <div className="col-lg-2 col-sm-12">
+                  <p>{merchants?.phone}</p>
+                </div>
+                <div className="col-lg-2 col-sm-12">
+                  <p>{merchants?.name}</p>
+                </div>
+                <div className="col-lg-2 col-sm-12">
+                  <p>{merchants?.brandName}</p>
+                </div>
+                <div className="col-lg-2 col-sm-12">
+                  <p>{merchants?.email}</p>
+                </div>
+                <div className="col-lg-2 col-sm-12">
+                  <p>{merchants?.createdAt?.slice(0,10)}</p>
+                </div>
+                <div className="col-lg-2 col-sm-12">
+               
+                   {
+                    merchants?.approval==="ban" &&   <p className="status-btn" style={{backgroundColor:"red"}}  >{merchants?.approval}</p>
+                  }
+                
+                </div>
               </div>
-              <div className="col-lg-2 col-sm-12">
-                <p>{merchants?.name}</p>
-              </div>
-              <div className="col-lg-2 col-sm-12">
-                <p>{merchants?.brandName}</p>
-              </div>
-              <div className="col-lg-2 col-sm-12">
-                <p>{merchants?.email}</p>
-              </div>
-              <div className="col-lg-2 col-sm-12">
-                <p>{merchants?.createdAt?.slice(0,10)}</p>
-              </div>
-              <div className="col-lg-2 col-sm-12">
-             
-                 {
-                  merchants?.approval==="ban" &&   <p className="status-btn" style={{backgroundColor:"red"}}  >{merchants?.approval}</p>
-                }
+            }
               
-              </div>
-            </div>
-          </Link>
             
             </>) 
           }
           {
            filterUser==="all" && SingleEmailOneTime?.slice(indexOfFirstItem, indexOfLastItem).sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt)).map((merchants)=><>
-              
-            <Link key={merchants?._id} to={`/viewClient/${merchants?._id}`} state={{merchants}}>
-            <div className="row client-list">
-              <div className="col-lg-2 col-sm-12">
-                <p>{merchants?.phone}</p>
+              {
+                  value_count?.MerchantView ?
+                  <Link key={merchants?._id} to={`/viewClient/${merchants?._id}`} state={{merchants}}>
+                  <div className="row client-list">
+                    <div className="col-lg-2 col-sm-12">
+                      <p>{merchants?.phone}</p>
+                    </div>
+                    <div className="col-lg-2 col-sm-12">
+                      <p>{merchants?.name}</p>
+                    </div>
+                    <div className="col-lg-2 col-sm-12">
+                      <p>{merchants?.brandName}</p>
+                    </div>
+                    <div className="col-lg-2 col-sm-12">
+                      <p>{merchants?.email}</p>
+                    </div>
+                    <div className="col-lg-2 col-sm-12">
+                      <p>{merchants?.createdAt?.slice(0,10)}</p>
+                    </div>
+                    <div className="col-lg-2 col-sm-12">
+                      {
+                        merchants?.approval==="request" &&   <p className="status-btn" style={{backgroundColor:"#ff6f00"}} >{merchants?.approval}</p>
+                      }
+                       {
+                        merchants?.approval==="approved" &&   <p className="status-btn"  >{merchants?.approval}</p>
+                      } 
+                       {
+                        merchants?.approval==="ban" &&   <p className="status-btn" style={{backgroundColor:"blue"}}  >{merchants?.approval}</p>
+                      }
+                    
+                    </div>
+                  </div>
+                </Link>
+                :
+                <div className="row client-list">
+                <div className="col-lg-2 col-sm-12">
+                  <p>{merchants?.phone}</p>
+                </div>
+                <div className="col-lg-2 col-sm-12">
+                  <p>{merchants?.name}</p>
+                </div>
+                <div className="col-lg-2 col-sm-12">
+                  <p>{merchants?.brandName}</p>
+                </div>
+                <div className="col-lg-2 col-sm-12">
+                  <p>{merchants?.email}</p>
+                </div>
+                <div className="col-lg-2 col-sm-12">
+                  <p>{merchants?.createdAt?.slice(0,10)}</p>
+                </div>
+                <div className="col-lg-2 col-sm-12">
+                  {
+                    merchants?.approval==="request" &&   <p className="status-btn" style={{backgroundColor:"#ff6f00"}} >{merchants?.approval}</p>
+                  }
+                   {
+                    merchants?.approval==="approved" &&   <p className="status-btn"  >{merchants?.approval}</p>
+                  } 
+                   {
+                    merchants?.approval==="ban" &&   <p className="status-btn" style={{backgroundColor:"blue"}}  >{merchants?.approval}</p>
+                  }
+                
+                </div>
               </div>
-              <div className="col-lg-2 col-sm-12">
-                <p>{merchants?.name}</p>
-              </div>
-              <div className="col-lg-2 col-sm-12">
-                <p>{merchants?.brandName}</p>
-              </div>
-              <div className="col-lg-2 col-sm-12">
-                <p>{merchants?.email}</p>
-              </div>
-              <div className="col-lg-2 col-sm-12">
-                <p>{merchants?.createdAt?.slice(0,10)}</p>
-              </div>
-              <div className="col-lg-2 col-sm-12">
-                {
-                  merchants?.approval==="request" &&   <p className="status-btn" style={{backgroundColor:"#ff6f00"}} >{merchants?.approval}</p>
-                }
-                 {
-                  merchants?.approval==="approved" &&   <p className="status-btn"  >{merchants?.approval}</p>
-                } 
-                 {
-                  merchants?.approval==="ban" &&   <p className="status-btn" style={{backgroundColor:"blue"}}  >{merchants?.approval}</p>
-                }
-              
-              </div>
-            </div>
-          </Link>
+              }
+           
             </>)
           }
         
