@@ -1,4 +1,5 @@
-import React, { useContext } from 'react';
+import axios from 'axios';
+import React, { useContext, useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { AuthContext } from '../../authProvider/AuthProvider';
 import { useRoleAsignData } from '../../hooks/useRoleAsignData';
@@ -6,8 +7,28 @@ import { useRoleAsignData } from '../../hooks/useRoleAsignData';
 const Navigationbar = () => {
     const {adminUser,loading,loginAdminUser,currentUser}=useContext(AuthContext);
     console.log("adminUser",adminUser);
+    const[fetchAllTicket,setFetchAllTicket]=useState([])
     const {value_count}=useRoleAsignData()
+    useEffect(()=>{
+      fetchTickets();
+              // Fetch the chat log every 10 seconds
+              const intervalId = setInterval(fetchTickets, 10000);
 
+              // Clean up the interval on unmount
+              return () => clearInterval(intervalId);
+    },[])
+    const fetchTickets = async () => {
+      try {
+          // const response = await axios.get(`http://localhost:5000/allTicket`);
+        const response = await axios.get(`https://mserver.printbaz.com/allTicket`);
+        setFetchAllTicket(response?.data);
+     
+      } catch (err) {
+        console.error(err);
+      }
+    };
+    let msgCount=0;
+    console.log("msgCount",msgCount);
     return (
         <div>
               <meta charSet="UTF-8" />
@@ -155,6 +176,19 @@ const Navigationbar = () => {
                         value_count?.Ticket && 
   <li className="nav-item" key={`${value_count?._id}-Ticket`}>
   <Link className="nav-link active" aria-current="page" to="/ticket">Ticket</Link>
+  {
+   fetchAllTicket?.forEach(readMsg => {
+    //  <p>{readMsg?.ticketStatus} fgfdg</p>
+    if(readMsg?.ticketStatus === "pending"  ){
+      msgCount++
+   }
+
+  })
+   }
+   {
+     msgCount>0 &&
+     <span className='notification-badge'  >{msgCount}</span>
+   }
   </li>
                    }
                  {
