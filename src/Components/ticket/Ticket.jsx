@@ -106,10 +106,13 @@ return (
           <div className="ticket-header">
             <h1>All Tickets</h1>
           </div>
-          <div className="ticket-top-menu">
+          <div className="ticket-top-menu flex" >
             {/* <input type="checkbox" className="ttm-button" /> */}
             {/* <button className="ttm-button"><i className="fa fa-user-plus" aria-hidden="true" style={{marginRight: '5px'}} />Assign</button> */}
+            <div className="col-lg-2 col-sm-4">
             <button className="ttm-button"><i className="fa fa-check-circle" aria-hidden="true" style={{marginRight: '5px'}} />Close</button>
+            </div>
+            
             <div className="col-lg-2 col-sm-4">
                 <label htmlFor="id-filter" style={{marginBottom:"8px"}}>Order Id:</label>
                 <input type="text" id="id-filter" className="form-control" onChange={(e) =>  handleOrderIdChange(e)} />
