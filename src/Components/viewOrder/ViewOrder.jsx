@@ -1003,7 +1003,7 @@ onChange={(e) => handleInputChange(e)}
                 </div>
                 }
                 {
-                  value_count?.costOfOrder_CollectAmount &&
+                  value_count?.costOfOrder_CollectAmount && !value_count?.costOfOrder_FullDetails &&
                   <div className="bg-white p-4 shadow-sm mb-3">
                   <div className="row amu-title">
                     <div className="col-12">

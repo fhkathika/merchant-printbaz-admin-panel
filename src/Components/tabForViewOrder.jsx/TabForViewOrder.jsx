@@ -204,42 +204,45 @@ headers: {
      </div>
    </div>
    }
+     {
+       value_count?.discussionView &&
+       <div className="col-lg-12 admin-dis-post" style={{overflow:"scroll",maxHeight:"70vh"}}>
+       {
+         usersDiscussMsg?.map((msg,index)=>{
+           return(
+             <div className="dis-post pb-4"  key={index}>
+             <div>
+               <img src="https://bootdey.com/img/Content/avatar/avatar3.png" className="rounded-circle mr-1" alt="Parsha Priya" width={40} height={40} />
+               {/* <div className="text-muted small text-nowrap mt-2">{msg?.createTime}</div> */}
+             </div>
+             <div className="flex-shrink-1 rounded px-3 ml-3">
+               <div className=" font-weight-bold mb-1  block_phone "  style={{display:"flex" ,justifyContent:"cenetr",alignItems:"center"}}><p className='font_16 weight_600' style={{fontSize:"20px",fontWeight:"700"}}>{msg?.userEmail}</p>
+                <span style={{fontSize: '12px', fontWeight: 700, backgroundColor: 'rgb(255, 38, 38)', color: 'white', padding: '5px',marginLeft:"5px", borderRadius: '5px'}}>{msg?.userRole}</span>
+                <small style={{fontSize:"14px",marginLeft:"15px",color:"gray",fontWeight:"400"}}>{msg?.createTime}</small>
+                </div>
+               {msg?.content}
+             </div>
+           </div>
+           )
+         
+         })
+       }
+          <div ref={messagesEndRef} />
      
-                 <div className="col-lg-12 admin-dis-post" style={{overflow:"scroll",maxHeight:"70vh"}}>
-                   {
-                     usersDiscussMsg?.map((msg,index)=>{
-                       return(
-                         <div className="dis-post pb-4"  key={index}>
-                         <div>
-                           <img src="https://bootdey.com/img/Content/avatar/avatar3.png" className="rounded-circle mr-1" alt="Parsha Priya" width={40} height={40} />
-                           {/* <div className="text-muted small text-nowrap mt-2">{msg?.createTime}</div> */}
-                         </div>
-                         <div className="flex-shrink-1 rounded px-3 ml-3">
-                           <div className=" font-weight-bold mb-1  block_phone "  style={{display:"flex" ,justifyContent:"cenetr",alignItems:"center"}}><p className='font_16 weight_600' style={{fontSize:"20px",fontWeight:"700"}}>{msg?.userEmail}</p>
-                            <span style={{fontSize: '12px', fontWeight: 700, backgroundColor: 'rgb(255, 38, 38)', color: 'white', padding: '5px',marginLeft:"5px", borderRadius: '5px'}}>{msg?.userRole}</span>
-                            <small style={{fontSize:"14px",marginLeft:"15px",color:"gray",fontWeight:"400"}}>{msg?.createTime}</small>
-                            </div>
-                           {msg?.content}
-                         </div>
-                       </div>
-                       )
-                     
-                     })
-                   }
-                      <div ref={messagesEndRef} />
-                 
-                   {/* <div className="dis-post pb-4">
-                     <div>
-                       <img src="https://bootdey.com/img/Content/avatar/avatar3.png" className="rounded-circle mr-1" alt="Parsha Priya" width={40} height={40} />
-                       <div className="text-muted small text-nowrap mt-2">2:34 am</div>
-                     </div>
-                     <div className="flex-shrink-1 rounded px-3 ml-3">
-                       <div className="font-weight-bold mb-1" style={{fontSize: '20px', fontWeight: 700}}>Abir Ali Khan <span style={{fontSize: '12px', fontWeight: 700, backgroundColor: 'rgb(38, 139, 255)', color: 'white', padding: '5px', borderRadius: '5px'}}>Designer</span></div>
-                       In publishing and graphic design, Lorem ipsum is a placeholder text commonly used to demonstrate the visual form of a document or a typeface without relying on meaningful content. Lorem ipsum may be used as a placeholder before final copy is available.
-                     </div>
-                   </div> */}
-                
-                 </div>
+       {/* <div className="dis-post pb-4">
+         <div>
+           <img src="https://bootdey.com/img/Content/avatar/avatar3.png" className="rounded-circle mr-1" alt="Parsha Priya" width={40} height={40} />
+           <div className="text-muted small text-nowrap mt-2">2:34 am</div>
+         </div>
+         <div className="flex-shrink-1 rounded px-3 ml-3">
+           <div className="font-weight-bold mb-1" style={{fontSize: '20px', fontWeight: 700}}>Abir Ali Khan <span style={{fontSize: '12px', fontWeight: 700, backgroundColor: 'rgb(38, 139, 255)', color: 'white', padding: '5px', borderRadius: '5px'}}>Designer</span></div>
+           In publishing and graphic design, Lorem ipsum is a placeholder text commonly used to demonstrate the visual form of a document or a typeface without relying on meaningful content. Lorem ipsum may be used as a placeholder before final copy is available.
+         </div>
+       </div> */}
+    
+     </div>
+     }
+               
      </div>
     }
 

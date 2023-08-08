@@ -27,6 +27,7 @@ const OrderList = () => {
     }
     getOrders()
 },[allMerchant])
+console.log("orderAll",orderAll);
 let matchingMerchant
 //  console.log("allMerchant",allMerchant);
 let date = new Date(orderAll?.createdAt); // create a new Date object
@@ -66,6 +67,7 @@ const handleInputChange = (event, index) => {
   const { name, value } = event.target;
   setFilterOrders(value)
 }
+console.log("setFilterOrders",filterOrders);
 const handlePaymentStausInputChange = (event, index) => {
   const { name, value } = event.target;
   setFilterOrders(value)
@@ -86,10 +88,10 @@ let paidOrders=orderAll?.filter(users=>users?.paymentStatus==="paid");
 
 let unPaidOrders=orderAll?.filter(users=>users?.paymentStatus==="Unpaid");
 let searchByOrderId= orderAll?.filter(OrederId => OrederId?._id?.includes(filterOrders));
-let filterByClientPhone=orderAll?.filter(users=>users?.clientPhone===filterOrders);
+let filterByClientPhone=orderAll?.filter(users=>users?.phone===filterOrders);
 let filterByBrandName=orderAll?.filter(users=>users?.clientbrandName===filterOrders);
 // console.log("filterByBrandName",filterByBrandName);
-// console.log("filterByClientPhone",filterByClientPhone);
+console.log("filterByrecepientPhone",filterByClientPhone);
 const handleOrderIdChange = (e) => {
   const value = e.target.value;
   // console.log(value);
@@ -213,7 +215,7 @@ const actualIndexOfLastItemOfUnpaidOrders = indexOfLastItem > unPaidOrders.lengt
             </div>
             <div className="row order-filter">
               <div className="col-lg-2 col-sm-12">
-                <label htmlFor="name-filter" style={{marginBottom:"8px"}}>Client Number</label>
+                <label htmlFor="name-filter" style={{marginBottom:"8px"}}>Recipient Number</label>
                 <input type="text" id="name-filter" className="form-control"onChange={handleInputChange}  />
               </div>
               <div className="col-lg-2 col-sm-12">
