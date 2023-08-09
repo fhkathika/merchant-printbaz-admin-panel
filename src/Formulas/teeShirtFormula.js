@@ -134,24 +134,24 @@ if(printSize==="2.5 X 5" && (quantity>=1 && quantity <=9)){
     totalPrice=quantity*price50Plus_2p5X5;
         
 }
-console.log("price1to9_5X5...",price1to9_5X5);
-console.log("price10to19_5X5",price10to19_5X5);
-console.log("price20to29_5X5",price20to29_5X5);
-console.log("price30to40_5X5",price30to40_5X5);
-console.log("price41to49_5X5",price41to49_5X5);
-console.log("price50Plus_5X5",price50Plus_5X5);
-console.log("price1to9_2p5X5",price1to9_2p5X5);
-console.log("price10to19_2p5X5",price10to19_2p5X5);
-console.log("price20to29_2p5X5",price20to29_2p5X5);
-console.log("price30to40_2p5X5",price30to40_2p5X5);
-console.log("price41to49_2p5X5",price41to49_2p5X5);
-console.log("price50Plus_2p5X5",price50Plus_2p5X5);
+// console.log("price1to9_5X5...",price1to9_5X5);
+// console.log("price10to19_5X5",price10to19_5X5);
+// console.log("price20to29_5X5",price20to29_5X5);
+// console.log("price30to40_5X5",price30to40_5X5);
+// console.log("price41to49_5X5",price41to49_5X5);
+// console.log("price50Plus_5X5",price50Plus_5X5);
+// console.log("price1to9_2p5X5",price1to9_2p5X5);
+// console.log("price10to19_2p5X5",price10to19_2p5X5);
+// console.log("price20to29_2p5X5",price20to29_2p5X5);
+// console.log("price30to40_2p5X5",price30to40_2p5X5);
+// console.log("price41to49_2p5X5",price41to49_2p5X5);
+// console.log("price50Plus_2p5X5",price50Plus_2p5X5);
 
 const uPrice = totalPrice / quantity;
 let unitPrice = 0;
 if (uPrice % 1 === 0) {
   unitPrice = uPrice;
-  console.log("unitPrice", unitPrice);
+//   console.log("unitPrice", unitPrice);
 } else if (uPrice % 1 !== 0) {
   unitPrice = parseFloat(uPrice).toFixed(2);
   console.log("unitPrice floating point", unitPrice);

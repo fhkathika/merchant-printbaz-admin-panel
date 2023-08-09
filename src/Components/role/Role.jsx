@@ -56,9 +56,9 @@ const [formRoleData,setFormRoleData]=useState({
    
 
 })
-console.log("isDataSent",isDataSent);
+
 const handleItemClick = async (itemId) => {
-  console.log("Clicked item:", itemId);
+  // console.log("Clicked item:", itemId);
   setUpdateModalOpen(false)
   setUpdateDataSent(false)
   try {
@@ -148,7 +148,7 @@ const [formRoleUpdateData,setFormRoleUpdateData]=useState({
 })
 
 const [isButtonDisabled, setButtonDisabled] = useState(true);
-console.log("formRoleUpdateData",formRoleUpdateData);
+
 // Effect to update the disabled status of the button whenever formRoleData changes
 useEffect(() => {
   fetchAllRoles()
@@ -181,7 +181,7 @@ const handleUpdateModalClose = () => {
 };
     const clickCreateRole=(e)=>{
         e.preventDefault()
-        console.log("click create role");
+     
        setShowCreateRole(true)
        setGetRoleById("")
          // Trigger page reload
@@ -259,7 +259,7 @@ const handleUpdateModalClose = () => {
      
   const handleCreateRole = (e) => {
   
-    console.log("createROl;e call");
+ 
     // Making an HTTP POST request to send formRoleData to the server
     fetch("http://localhost:5000/roleFromAdminPanel", {
       method: "POST",
@@ -271,7 +271,7 @@ const handleUpdateModalClose = () => {
       .then((response) => response.json())
       .then((data) => {
         // Handle the response from the server if needed
-        console.log(data);
+      
         fetchAllRoles()
       })
       .catch((error) => {
@@ -284,7 +284,7 @@ const handleUpdateModalClose = () => {
       });
   };
   const handleUpdateRole = async (itemId) => {
-    console.log("click update button", itemId);
+  
   
     try {
       const response = await fetch(`http://localhost:5000/updateRole/${itemId}`, {
@@ -305,7 +305,7 @@ const handleUpdateModalClose = () => {
       await handleItemClick(itemId);
   
       // Handle the response from the server if needed
-      console.log(data);
+     
       fetchAllRoles();
     } catch (error) {
       // Handle errors
@@ -313,7 +313,7 @@ const handleUpdateModalClose = () => {
     }
   };
   
-  console.log("setUpdateDataSent",updateDataSent);
+ 
   // const handleDeleteItem = (event, itemId) => {
   //   event.stopPropagation();
   //   console.log("click Delete button ", itemId);
@@ -336,7 +336,7 @@ const handleDeleteModalClose=()=>{
   const handleDeleteItem =(e,id)=>{
     // e.stopPropagation();
     setDeletepopUp(true)
-    console.log("click Delete button ", id);
+ 
   
     // const proceed= window.confirm('Do you want to remove?')
     if(deletepopUp){
@@ -345,7 +345,7 @@ const handleDeleteModalClose=()=>{
       })
       .then(res => res.json())
       .then(data => {
-        console.log("data delete",data);
+      
         if(data?.deletedCount>0){
         
           // convert object into array

@@ -4,7 +4,7 @@ import { useLocation } from "react-router-dom";
 const ShippingDetail = ({getSpecificOrderById}) => {
     // const location = useLocation();
     // const viewOrder = location.state ? location?.state?.orderInfo : null;
-  console.log("getSpecificOrderById",getSpecificOrderById?._id);
+  // console.log("getSpecificOrderById",getSpecificOrderById?._id);
     return (
         <div >
           <meta charSet="UTF-8" />

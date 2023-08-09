@@ -6,7 +6,7 @@ import { useRoleAsignData } from '../../hooks/useRoleAsignData';
 
 const Navigationbar = () => {
     const {adminUser,loading,loginAdminUser,currentUser}=useContext(AuthContext);
-    console.log("adminUser",adminUser);
+    // console.log("adminUser",adminUser);
     const[fetchAllTicket,setFetchAllTicket]=useState([])
     const {value_count}=useRoleAsignData()
     useEffect(()=>{
@@ -28,7 +28,7 @@ const Navigationbar = () => {
       }
     };
     let msgCount=0;
-    console.log("msgCount",msgCount);
+    // console.log("msgCount",msgCount);
     return (
         <div>
               <meta charSet="UTF-8" />

@@ -9,12 +9,14 @@ import { useGetData } from '../../hooks/useGetData';
 import teeShirtFormula from '../../Formulas/teeShirtFormula';
 import AlertMessage from '../alert/AlertMessage';
 import OrderUpdateAlert from '../alert/OrderUpdateAlert';
+import DeleteRoleAlert from '../alert/DeleteRoleAlert';
 
 const UpdateOrder = ({ onClose,viewOrder,viewClient,getSpecificOrderById }) => {
     // console.log("viewOrder",viewOrder);
     const [selectedFile, setSelectedFile] = useState(null);
     const [previewUrl, setPreviewUrl] = useState('');
     const [updateOrderArr, setUpdateOrderArr] = useState([]);
+    const [indexNumber, setIndexNumber] = useState();
 
     // console.log("getSpecificOrderById",getSpecificOrderById);
 
@@ -86,7 +88,7 @@ if(ImagesArr){
       });
       useEffect(() => {
         console.log('Updated Order State:', formData);
-      }, [formData]);
+      }, []);
         let id = "resellerOrdersId";
        let collections = "resellerInfo";
        let idPrice = "teeShirtCampingId";
@@ -108,7 +110,10 @@ if(ImagesArr){
       const [isLoading, setIsLoading] = useState(false);
       const [recvAmount,setRecvAmount]=useState()
       const [formValid, setFormValid] = useState(false);
-    
+      const [updateDataSent, setUpdateDataSent] = useState(false);
+      const [showCreateRole, setShowCreateRole] = useState(false);
+      const [deletepopUp, setDeletepopUp] = useState(false);
+      const [deleteId, setDeleteId] = useState();
     
       const d = new Date();
         const options = { month: "long", day: "numeric", year: "numeric" };
@@ -193,22 +198,6 @@ if(ImagesArr){
               });
           }
       };
-      
-        
-
-      // const handleFileChange = (file, index) => {
-      //   const name = "file"; // Assuming the name is always "file" in this case
-      //   const files = Array.isArray(file) ? file : [file]; // Convert singleFile to an array if necessary
-        
-      //   const newOrderDetailArr = [...formData.orderDetailArr];
-      //   newOrderDetailArr[index][name] = files;
-        
-      //   setFormData({ ...formData, orderDetailArr: newOrderDetailArr });
-      //   console.log('Updated Order State:', formData);
-        
-      //   setFile(files);
-      //   console.log('File:', files); // Log the file array
-      // };
       
 
     let updatedPrintbazcost=0
@@ -503,7 +492,49 @@ if(ImagesArr){
               setIsLoading(false); // Set loading status to false
             }
           };
+          const handleDeletePopUp=(e,index)=>{
+            // e.stopPropagation();
+          e.preventDefault()
+            setDeletepopUp(true)
+            setIndexNumber(index)
+            // setDeleteId(id)
+          }
+          const handleDeleteModalClose=()=>{
+            setDeletepopUp(false)
+          }
+          const handleDeleteItem = (indexToDelete) => {
          
+            setDeletepopUp(true);
+            console.log("click Delete button ", indexToDelete);
+          
+            if (deletepopUp) {
+              // fetch(`http://localhost:5000/deleteOrderFromEditOrder/${viewOrder?._id}/${indexToDelete}`, {
+              fetch(`https://mserver.printbaz.com/deleteOrderFromEditOrder/${viewOrder?._id}/${indexToDelete}`, {
+                method: 'DELETE'
+              })
+                .then(res => res.json())
+                .then(data => {
+                  console.log("data delete", data);
+          
+                  // Uncomment and use this code to update the remainingOrders array
+                  // if (data?.success) {
+                  //   const remainingOrders = getSpecificOrderById?.orderDetailArr.filter((_, index) => index !== indexToDelete);
+                  //   setGetSpecificOrderById(prevState => ({
+                  //     ...prevState,
+                  //     orderDetailArr: remainingOrders
+                  //   }));
+                  // }
+          
+                  setDeletepopUp(false); // Close the modal here if needed
+                  getSpecificOrderById()
+                })
+                .catch(error => {
+                  console.error("Error deleting order:", error);
+                  // Handle the error
+                });
+            }
+          };
+          
           
   return (
     <>
@@ -559,7 +590,7 @@ if(ImagesArr){
                     </Form.Group>
                     <Form.Group
                       className="mb-3 Print Side w-100"
-                      controlId="wccalcPrintSide"
+                   
                     >
                       <Form.Label className="pr-2">Delivery Area</Form.Label>
                       <Form.Control
@@ -635,10 +666,19 @@ if(ImagesArr){
                  
                     {formData.orderDetailArr.map((item, index) => (
                       <>
-                       <h4 style={{textAlign:"start",color:"orange"}}>Line Item : {index+1}</h4>
+                      
+                      <div className='flex'>
+                      <h4 style={{textAlign:"start",color:"orange"}}>Line Item : {index+1}</h4>
+                      <div>
+                 <button onClick={(e)=>handleDeletePopUp(e,index)} style={{borderRadius:"5px",padding: '10px 20px',float: 'right', background: 'transparent', border: 'none', color: 'white',backgroundColor:"red", fontSize: '16px'}}><i className="fa fa-trash" aria-hidden="true" /><span style={{marginLeft:"5px"}}>Delete</span></button>
+                
+              
+                 </div>
+                      </div>
+                      
                   <Form.Group
                       className="mb-3 Print Side w-100 m-auto"
-                      controlId="wccalcPrintSide"
+                     
                     >
                       <Form.Label className="pr-2">Color</Form.Label>
                       <Form.Control
@@ -656,7 +696,7 @@ if(ImagesArr){
       
                     <Form.Group
                       className="mb-3 Print Side w-100 m-auto"
-                      controlId="wccalcPrintSide"
+                     
                     >
                       <Form.Label className="pr-2">Tee Shirt Size</Form.Label>
                       <Form.Control
@@ -676,7 +716,7 @@ if(ImagesArr){
       
                     <Form.Group
                       className="mb-3 Quantity w-100 m-auto"
-                      controlId="wccalcQuantity"
+                    
                     >
                       <Form.Label>Quantity</Form.Label>
       
@@ -694,7 +734,7 @@ if(ImagesArr){
                     </Form.Group>
                     <Form.Group
                       className="mb-3 Print Side w-100 m-auto"
-                      controlId="wccalcPrintSide"
+                   
                     >
                       <Form.Label className="pr-2">Print side</Form.Label>
                       <Form.Control
@@ -716,7 +756,7 @@ if(ImagesArr){
                      ( item.printSide==="frontSide" || item.printSide==="backSide") &&
                       <Form.Group
                       className="mb-3 Print Side w-100 m-auto"
-                      controlId="wccalcPrintSide"
+                     
                     >
                       <Form.Label className="pr-2">Print Size</Form.Label>
                       <Form.Control
@@ -743,7 +783,7 @@ if(ImagesArr){
 
 <Form.Group
                       className="mb-3 Print Side w-100 m-auto"
-                      controlId="wccalcPrintSide"
+                    
                     >
                       <Form.Label className="pr-2">Print Size front</Form.Label>
                       <Form.Control
@@ -765,7 +805,7 @@ if(ImagesArr){
                     </Form.Group>
                     <Form.Group
                     className="mb-3 Print Side w-100 m-auto"
-                    controlId="wccalcPrintSide"
+                
                   >
                     <Form.Label className="pr-2">Print Size back</Form.Label>
                     <Form.Control
@@ -790,7 +830,7 @@ if(ImagesArr){
                     }
                    
           {/* ///upload file section  */}
-          <Form.Group controlId="formFile" className="">
+          <Form.Group  className="">
   <Form.Label>Upload Main File</Form.Label>
   {item?.file?.map((singleFile, fileIndex) => {
     let fileId, filePreviewURLDrive,filePreviewURL;
@@ -877,7 +917,7 @@ if(ImagesArr){
           )}
          {/* image upload  */}
                     
-                    <Form.Group controlId="formFileImage" className="mb-3">
+                    <Form.Group  className="mb-3">
                       <Form.Label>Upload Mockup/T-Shirt Demo Picture</Form.Label>
                       {
                            item?.image?.map((singleImage,imageIndex)=>{
@@ -951,7 +991,7 @@ if(ImagesArr){
           )}
 {
   individualOrder?.brandLogo &&
-<Form.Group controlId="formBrandLogo" className="mb-3">
+<Form.Group  className="mb-3">
   <Form.Label>Upload Your Brand Logo (optional)</Form.Label>
   {  (() => {
         let fileId, brandLogoPreviewURL;
@@ -1032,6 +1072,7 @@ if(ImagesArr){
                      </>
                      ))}
                   </div>
+                
                   {/* 3rd Column */}
                   <div className="col-md-4">
                     <h3>Cost Of Order</h3>
@@ -1147,6 +1188,13 @@ if(ImagesArr){
       
               
               </Form>
+
+              {
+                    setIndexNumber && (
+                      <DeleteRoleAlert isOpen={ deletepopUp} deleteId={indexNumber} onClose={handleDeleteModalClose} onConfirm={()=>handleDeleteItem(indexNumber)} />
+                    )
+                   
+                  }
               {showAlert===true && (
           
           <OrderUpdateAlert

@@ -3,7 +3,7 @@ import { AuthContext } from '../authProvider/AuthProvider';
 
 export const useRoleAsignData = () => {
     const {adminUser,loading,loginAdminUser,currentUser}=useContext(AuthContext);
-    console.log("adminUser",adminUser);
+    // console.log("adminUser",adminUser);
 
   const value_count={}
   adminUser?.roles?.forEach(obj=>{
@@ -19,7 +19,7 @@ export const useRoleAsignData = () => {
       }
     }
   })
-  console.log("value_count from hook",value_count);
+  // console.log("value_count from hook",value_count);
   // <pre>{JSON.stringify(value_count, null, 2)}</pre>
 
     return{value_count}
