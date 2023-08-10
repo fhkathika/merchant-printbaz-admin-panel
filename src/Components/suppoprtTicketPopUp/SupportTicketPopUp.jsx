@@ -1,15 +1,18 @@
 import axios from 'axios';
 import PropTypes from 'prop-types';
-import { useEffect, useState } from 'react';
+import { useContext, useEffect, useState } from 'react';
 import "../../css/style.css"
 import AlertMessage from '../alert/AlertMessage';
 import CreateTicketAlertbox from '../createTickwtAlert/CreateTicketAlertbox';
 import { useQuill } from 'react-quilljs';
 import BlotFormatter from 'quill-blot-formatter';
 import 'quill/dist/quill.snow.css';
+import { AuthContext } from '../../authProvider/AuthProvider';
 
 const SupportTicketPopUp = ({ message,ticketId,userOrderId,onClose,fetchTickets,userEmail,userName }) => {
-  
+  const {adminUser,loading,loginAdminUser,currentUser}=useContext(AuthContext);
+  console.log("adminUser create ticket",adminUser);
+  console.log("userEmail create ticket",userEmail);
   const [chatLog, setChatLog] = useState([]);
   const [newMsg, setNewMsg] = useState('');
   const [ticketIssue, setTicketIssue] = useState('');
@@ -68,8 +71,8 @@ const SupportTicketPopUp = ({ message,ticketId,userOrderId,onClose,fetchTickets,
 
   const fetchChatLog = async () => {
       try {
-        // const response = await axios.get(`http://localhost:5000/getmessages/${ticketId}`);
-        const response = await axios.get(`https://mserver.printbaz.com/getmessages/${ticketId}`);
+        const response = await axios.get(`http://localhost:5000/getmessages/${ticketId}`);
+        // const response = await axios.get(`https://mserver.printbaz.com/getmessages/${ticketId}`);
         setChatLog(response.data);
       } catch (err) {
         console.error(err);
@@ -132,7 +135,7 @@ setTicketIssue(e.target.value)
     Array.from(selectedFiles).forEach((file)=>{
       formData.append('files',file)
     })
-    const newMessage = { ticketId: ticketId,userOrderId:userOrderId,ticketIssue:ticketIssue,ticketStatus:"open", user: 'Printbaz',unread:true, content: newMsg,userEmail:userEmail,userName:userName };
+    const newMessage = { ticketId: ticketId,userOrderId:userOrderId,ticketIssue:ticketIssue,ticketStatus:"open", user: 'Printbaz',adminUser:adminUser?.email,unread:true, content: newMsg,userEmail:userEmail,userName:userName };
 
     const chatMessage = {
       ticketId: newMessage.ticketId,  // added this line
@@ -143,6 +146,7 @@ setTicketIssue(e.target.value)
       userName: newMessage.userName,
       unread: newMessage.unread,
       admin: newMessage.user,
+      adminUser: newMessage.adminUser,
       orderId:newMessage.userOrderId,
       timestamp: new Date().toISOString(), // this won't be the exact timestamp saved in the DB
     };
@@ -154,8 +158,8 @@ setTicketIssue(e.target.value)
     setChatLog([...chatLog, chatMessage]);
     
 
-    // const response = await axios.post('http://localhost:5000/sendmessages', formData, {
-    const response = await axios.post('https://mserver.printbaz.com/sendmessages', formData, {
+    const response = await axios.post('http://localhost:5000/sendmessages', formData, {
+    // const response = await axios.post('https://mserver.printbaz.com/sendmessages', formData, {
 headers: {
   'Content-Type': 'multipart/form-data',
 },

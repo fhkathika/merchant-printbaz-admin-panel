@@ -3,12 +3,17 @@ import React, { useContext, useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { AuthContext } from '../../authProvider/AuthProvider';
 import { useRoleAsignData } from '../../hooks/useRoleAsignData';
+import 'bootstrap/dist/css/bootstrap.min.css';
+import 'bootstrap/dist/js/bootstrap.bundle.min.js'; // Import Bootstrap JavaScript
 
 const Navigationbar = () => {
     const {adminUser,loading,loginAdminUser,currentUser}=useContext(AuthContext);
     // console.log("adminUser",adminUser);
     const[fetchAllTicket,setFetchAllTicket]=useState([])
     const {value_count}=useRoleAsignData()
+    let getAdminEmail=fetchAllTicket?.filter(ticket=>ticket.adminUser===adminUser?.email)
+    console.log("getAdminEmail",getAdminEmail);
+
     useEffect(()=>{
       fetchTickets();
               // Fetch the chat log every 10 seconds
@@ -19,8 +24,8 @@ const Navigationbar = () => {
     },[])
     const fetchTickets = async () => {
       try {
-          // const response = await axios.get(`http://localhost:5000/allTicket`);
-        const response = await axios.get(`https://mserver.printbaz.com/allTicket`);
+          const response = await axios.get(`http://localhost:5000/allTicket`);
+        // const response = await axios.get(`https://mserver.printbaz.com/allTicket`);
         setFetchAllTicket(response?.data);
      
       } catch (err) {
@@ -28,7 +33,7 @@ const Navigationbar = () => {
       }
     };
     let msgCount=0;
-    // console.log("msgCount",msgCount);
+   
     return (
         <div>
               <meta charSet="UTF-8" />
@@ -68,15 +73,15 @@ const Navigationbar = () => {
               </li>
             
               <li className="nav-item dropdown">
-                <a className="nav-link dropdown-toggle" href="#" id="navbarDropdownMenuLink" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-                  Analytics
-                </a>
-                <ul className="dropdown-menu nav-dropdown-menu" aria-labelledby="navbarDropdownMenuLink">
-                  <li><a className="dropdown-item nav-dropdown-item" href="#">Merchants</a></li>
-                  <li><a className="dropdown-item nav-dropdown-item" href="#">Order</a></li>
-                  <li><a className="dropdown-item nav-dropdown-item" href="#">Transaction</a></li>
-                </ul>
-              </li>
+                  <a className="nav-link dropdown-toggle" href="#" id="navbarDropdownMenuLink" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                    Analytics
+                  </a>
+                  <ul className="dropdown-menu nav-dropdown-menu" aria-labelledby="navbarDropdownMenuLink">
+                    <li><a className="dropdown-item nav-dropdown-item" href="#">Merchants</a></li>
+                    <li><a className="dropdown-item nav-dropdown-item" href="#">Order</a></li>
+                    <li><a className="dropdown-item nav-dropdown-item" href="#">Transaction</a></li>
+                  </ul>
+                </li>
               <li className="nav-item">
               <Link className="nav-link active" aria-current="page" to="/mailBox">Mail Box</Link>
               </li>
@@ -87,9 +92,30 @@ const Navigationbar = () => {
               </li>
               <li className="nav-item">
               <Link className="nav-link active" aria-current="page" to="/ticket">Ticket</Link>
+              {
+   getAdminEmail?.forEach(readMsg => {
+    //  <p>{readMsg?.ticketStatus} fgfdg</p>
+    if(readMsg?.ticketStatus === "pending"  ){
+      msgCount++
+   }
+
+  })
+   }
+  
+   {
+     msgCount>0 &&
+     <>
+         <span className='notification-badge'  >{msgCount}</span>
+     </>
+ 
+   }
               </li>
               <li className="nav-item">
                 <Link className="nav-link active" aria-current="page" to="/filemanager">File Manager</Link>
+        
+              </li> 
+               <li className="nav-item">
+                <Link className="nav-link active" aria-current="page" to="/deliverySystem">Delivery System</Link>
         
               </li> 
                <li className="nav-item">
@@ -176,8 +202,8 @@ const Navigationbar = () => {
                         value_count?.Ticket && 
   <li className="nav-item" key={`${value_count?._id}-Ticket`}>
   <Link className="nav-link active" aria-current="page" to="/ticket">Ticket</Link>
-  {
-   fetchAllTicket?.forEach(readMsg => {
+              {
+   getAdminEmail?.forEach(readMsg => {
     //  <p>{readMsg?.ticketStatus} fgfdg</p>
     if(readMsg?.ticketStatus === "pending"  ){
       msgCount++
@@ -185,6 +211,7 @@ const Navigationbar = () => {
 
   })
    }
+  
    {
      msgCount>0 &&
      <span className='notification-badge'  >{msgCount}</span>
@@ -195,6 +222,12 @@ const Navigationbar = () => {
                           value_count?.fileManager && 
                           <li className="nav-item" key={`${value_count?._id}-fileManager`}>
                           <Link className="nav-link active" aria-current="page" to="/filemanager">File Manager</Link>
+                  
+                        </li>
+                 } {
+                          value_count?.deliverySystem && 
+                          <li className="nav-item" key={`${value_count?._id}-fileManager`}>
+                          <Link className="nav-link active" aria-current="page" to="/deliverySystem">Delivery Syatem</Link>
                   
                         </li>
                  }
