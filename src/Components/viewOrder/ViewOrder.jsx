@@ -1130,7 +1130,7 @@ return (
 </div>
 
 </div>
-      <div className="col-lg-3" style={{display:"flex",justifyContent:"center"}}>
+      <div className="col-lg-2" style={{display:"flex",justifyContent:"right"}}>
       <div className="card file">
 {
 orderDetail?.image?.map(imageUrl => {
@@ -1160,7 +1160,7 @@ return (
 }
 </div>
       </div>
-       <div className="col-lg-1">
+       <div className="col-lg-2">
        {
 orderDetail?.brandLogo &&
 <>
@@ -1177,14 +1177,19 @@ fileId = orderDetail?.brandLogo?.split("id=")[1];
 }
 // Construct the direct download link
 const downloadUrl = `https://drive.google.com/uc?export=download&id=${fileId}`;
-
+const previewURL = `https://drive.google.com/file/d/${fileId}/preview`;
 return (
 <div>
 
 
 {
 orderDetail?.brandLogo ?
-<a className="dropdown-item"  href={downloadUrl} download> Brand Logo</a>
+<div className="file-info" >
+<iframe src={previewURL}  style={{ textDecoration: "none" }} height="auto" width="auto" title="orcode"></iframe>
+<a className="dropdown-item" href={downloadUrl} download><p style={{cursor:"pointer"}} href={downloadUrl} download>download</p></a>
+
+</div>
+// * <a className="dropdown-item"  href={downloadUrl} download> Brand Logo</a> */
 :
 ""
 }
@@ -1359,6 +1364,7 @@ orderDetail?.brandLogo ?
             <UpdateOrder onClose={() => setUpdateOrder(false)}
             viewOrder={viewOrder}
             getSpecificOrderById={getSpecificOrderById}
+            setGetSpecificOrderById={setGetSpecificOrderById}
             viewClient={viewClient}/>
           }
         </div>

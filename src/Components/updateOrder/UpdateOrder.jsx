@@ -11,7 +11,7 @@ import AlertMessage from '../alert/AlertMessage';
 import OrderUpdateAlert from '../alert/OrderUpdateAlert';
 import DeleteRoleAlert from '../alert/DeleteRoleAlert';
 
-const UpdateOrder = ({ onClose,viewOrder,viewClient,getSpecificOrderById }) => {
+const UpdateOrder = ({ onClose,viewOrder,viewClient,getSpecificOrderById,setGetSpecificOrderById }) => {
     // console.log("viewOrder",viewOrder);
     const [selectedFile, setSelectedFile] = useState(null);
     const [previewUrl, setPreviewUrl] = useState('');
@@ -61,6 +61,7 @@ if(ImagesArr){
     }
 }
 
+console.log("getSpecificOrderById out side delete func",getSpecificOrderById);
    const [formData, setFormData] = useState({
         name: getSpecificOrderById?.name,
         phone: getSpecificOrderById?.phone,
@@ -72,23 +73,11 @@ if(ImagesArr){
         
            return order
            })
-          // {
-          //   color: individualOrder?.color,
-          //   teshirtSize: individualOrder?.teshirtSize,
-          //   quantity: individualOrder?.quantity,
-          //   printSide:individualOrder?.printSide,
-          //   printSize: individualOrder?.printSize,
-          //   printSizeBack:individualOrder?.printSizeBack,
-            
-          //   file: filesArr,
-          //   image: ImagesArr,
-          //   brandLogo: individualOrder?.brandLogo,
-          // },
       
       });
-      useEffect(() => {
-        console.log('Updated Order State:', formData);
-      }, []);
+   
+      console.log("orderDetailArr",formData?.orderDetailArr);
+    
         let id = "resellerOrdersId";
        let collections = "resellerInfo";
        let idPrice = "teeShirtCampingId";
@@ -515,18 +504,33 @@ if(ImagesArr){
                 .then(res => res.json())
                 .then(data => {
                   console.log("data delete", data);
-          
+                  let remainingOrders
                   // Uncomment and use this code to update the remainingOrders array
-                  // if (data?.success) {
-                  //   const remainingOrders = getSpecificOrderById?.orderDetailArr.filter((_, index) => index !== indexToDelete);
-                  //   setGetSpecificOrderById(prevState => ({
-                  //     ...prevState,
-                  //     orderDetailArr: remainingOrders
-                  //   }));
-                  // }
+                  if (data?.success) {
+                     remainingOrders = getSpecificOrderById?.orderDetailArr.filter((_, index) => index !== indexToDelete);
+                    setGetSpecificOrderById(prevState => ({
+                      ...prevState,
+                      orderDetailArr: remainingOrders
+                    }));
+                    // setFormData(remainingOrders)
+                 
+                  }
+                  setFormData({
+                    name: getSpecificOrderById?.name,
+                    phone: getSpecificOrderById?.phone,
+                    address: getSpecificOrderById?.address,
+                    instruction: getSpecificOrderById?.instruction,
+                    collectAmount: getSpecificOrderById?.collectAmount,
+                    area: getSpecificOrderById?.area,
+                    orderDetailArr:  remainingOrders?.map(order => {
+                    
+                       return order
+                       })
+                  
+                  })
           
                   setDeletepopUp(false); // Close the modal here if needed
-                  getSpecificOrderById()
+            
                 })
                 .catch(error => {
                   console.error("Error deleting order:", error);
@@ -664,13 +668,13 @@ if(ImagesArr){
                   
                     </div>
                  
-                    {formData.orderDetailArr.map((item, index) => (
+                    {formData?.orderDetailArr?.map((item, index) => (
                       <>
                       
                       <div className='flex'>
                       <h4 style={{textAlign:"start",color:"orange"}}>Line Item : {index+1}</h4>
                       <div>
-                 <button onClick={(e)=>handleDeletePopUp(e,index)} style={{borderRadius:"5px",padding: '10px 20px',float: 'right', background: 'transparent', border: 'none', color: 'white',backgroundColor:"red", fontSize: '16px'}}><i className="fa fa-trash" aria-hidden="true" /><span style={{marginLeft:"5px"}}>Delete</span></button>
+                 <button onClick={(e)=>handleDeletePopUp(e,index)} style={{borderRadius:"5px",padding: '10px 20px',float: 'right', background: 'transparent', border: 'none', color: 'red', fontSize: '18px'}}><i className="fa fa-trash" aria-hidden="true" /></button>
                 
               
                  </div>
@@ -859,39 +863,7 @@ if(ImagesArr){
         }}
         title={`file-${fileIndex}`}
       ></iframe>
-     
-    
-     
-  
-        {/* <label 
-    htmlFor={`fileInput-${fileIndex}`} 
-    style={{ 
-      position: "absolute", 
-      top: "50%", 
-      left: "50%", 
-      transform: "translate(-50%, -50%)",  
-      cursor: "pointer", 
-      width: "50%", 
-      height: "40px", 
-      display: "flex", 
-      justifyContent: "center", 
-      alignItems: "center", 
-      color: "black",
-      textAlign: "center",
-      transition: "background-color 0.2s"
-    }}
-    onMouseOver={(e) => {
-      e.target.innerHTML = "Choose file"
-      e.target.style.backgroundColor = "rgba(255,255,255,0.8)"
-    }}
-    onMouseOut={(e) => {
-      e.target.innerHTML = ""
-      e.target.style.backgroundColor = "transparent"
-    }}
-  >
-  </label> */}
-
-        <Form.Control
+      <Form.Control
           type="file"
           name="file"
           id={`fileInput-${fileIndex}`}
@@ -930,57 +902,87 @@ if(ImagesArr){
                             }
                               
                             return(
-                                <div style={{ position: "relative", marginBottom: "5px", height: "150px", width: "100%" }} key={imageIndex}>
-     <iframe
-    src={imagePreviewURL}
-    style={{
-      position: "absolute",
-      top: 0,
-      left: 0,
-      width: "100%",
-      height: "100%",
-      border: "none",
-    }}
-    title={`image-${imageIndex}`}
-  ></iframe>
-    <label 
-    htmlFor={`imageInput-${imageIndex}`} 
-    style={{ 
-      position: "absolute", 
-      top: "50%", 
-      left: "50%", 
-      transform: "translate(-50%, -50%)",  
-      cursor: "pointer", 
-      width: "50%", 
-      height: "40px", 
-      display: "flex", 
-      justifyContent: "center", 
-      alignItems: "center", 
-      color: "black",
-      textAlign: "center",
-      transition: "background-color 0.2s"
-    }}
-    onMouseOver={(e) => {
-      e.target.innerHTML = "Choose file"
-      e.target.style.backgroundColor = "rgba(255,255,255,0.8)"
-    }}
-    onMouseOut={(e) => {
-      e.target.innerHTML = ""
-      e.target.style.backgroundColor = "transparent"
-    }}
-  >
-  </label>
-                           <Form.Control
-                        type="file"
-                        id={`imageInput-${imageIndex}`}
-                        name="image"
-                        style={{ display: "none" }}
-                        onChange={(e) => handleFileChange(e, index, imageIndex)}
+                              <div style={{ marginBottom:"55px", height: "150px", width: "100%"  }} key={imageIndex} >
+      
+     
+                              <iframe
+                              src={imagePreviewURL}
+                              style={{
+                              
+                                width: "100%",
+                                height: "100%",
+                                overflow:"auto",
+                                // marginBottom:'10px',
+                              //  pointerEvents: "none",
+                                border: "none",
+                              }}
+                              title={`image-${imageIndex}`}
+                            ></iframe>
+                           
+                        
+                      
+                              <Form.Control
+                                type="file"
+                                name="image"
+                                id={`imageInput-${imageIndex}`}
+                               
+                                style={{position:"absolute",height:"45px",display:"" }}
+                                onChange={(e) => handleFileChange(e, index, imageIndex)}// Pass the correct index
+                                accept=".ai,.eps,.psd,.pdf,.svg,.png"
+                                multiple
+                              />
+                            </div>
+  //                               <div style={{ position: "relative", marginBottom: "5px", height: "150px", width: "100%" }} key={imageIndex}>
+  //    <iframe
+  //   src={imagePreviewURL}
+  //   style={{
+  //     position: "absolute",
+  //     top: 0,
+  //     left: 0,
+  //     width: "100%",
+  //     height: "100%",
+  //     border: "none",
+  //   }}
+  //   title={`image-${imageIndex}`}
+  // ></iframe>
+  //   <label 
+  //   htmlFor={`imageInput-${imageIndex}`} 
+  //   style={{ 
+  //     position: "absolute", 
+  //     top: "50%", 
+  //     left: "50%", 
+  //     transform: "translate(-50%, -50%)",  
+  //     cursor: "pointer", 
+  //     width: "50%", 
+  //     height: "40px", 
+  //     display: "flex", 
+  //     justifyContent: "center", 
+  //     alignItems: "center", 
+  //     color: "black",
+  //     textAlign: "center",
+  //     transition: "background-color 0.2s"
+  //   }}
+  //   onMouseOver={(e) => {
+  //     e.target.innerHTML = "Choose file"
+  //     e.target.style.backgroundColor = "rgba(255,255,255,0.8)"
+  //   }}
+  //   onMouseOut={(e) => {
+  //     e.target.innerHTML = ""
+  //     e.target.style.backgroundColor = "transparent"
+  //   }}
+  // >
+  // </label>
+  //                          <Form.Control
+  //                       type="file"
+  //                       id={`imageInput-${imageIndex}`}
+  //                       name="image"
+  //                       style={{ display: "none" }}
+  //                       onChange={(e) => handleFileChange(e, index, imageIndex)}
                        
-                        accept="image/*"
-                        multiple
-                      />
-                                </div>
+  //                       accept="image/*"
+  //                       multiple
+  //                     />
+  //                               </div>
                             )
                                 }
                              ) }
