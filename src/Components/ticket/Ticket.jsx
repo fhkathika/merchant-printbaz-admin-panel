@@ -11,8 +11,10 @@ const Ticket = () => {
 let searchByTicketId= fetchAllTicket?.filter(OrederId => OrederId?.ticketId?.includes(filterOrders));
 // console.log("closeQuery",closeQuery);
 const [ticketIssue, setTicketIssue] = useState( "all" );
-const {value_count}=useRoleAsignData()
-  // const [ticketStatus, setTicketStatus] = useState("");
+const {value_count}=useRoleAsignData();
+// let getAdminEmail=fetchAllTicket?.filter(ticket=>ticket.adminUser===adminUser?.email|| ticket?.ticketStatus==="pending(created by client)")
+// console.log("getAdminEmail",getAdminEmail);  
+// const [ticketStatus, setTicketStatus] = useState("");
   useEffect(() => {
     // Fetch the chat log from the server when the component mounts
    
