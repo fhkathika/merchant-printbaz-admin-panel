@@ -12,7 +12,8 @@ import OrderUpdateAlert from '../alert/OrderUpdateAlert';
 import DeleteRoleAlert from '../alert/DeleteRoleAlert';
 
 const UpdateOrder = ({ onClose,viewOrder,viewClient,getSpecificOrderById,setGetSpecificOrderById }) => {
-    // console.log("viewOrder",viewOrder);
+  console.log("getSpecificOrderById gdfgdf",getSpecificOrderById); 
+  // console.log("viewOrder",viewOrder);
     const [selectedFile, setSelectedFile] = useState(null);
     const [previewUrl, setPreviewUrl] = useState('');
     const [updateOrderArr, setUpdateOrderArr] = useState([]);
@@ -447,7 +448,7 @@ console.log("getSpecificOrderById out side delete func",getSpecificOrderById);
               formData2.append('printbazcost', printbazcost);
               formData2.append('deliveryFee', deliveryFee);
               formData2.append('recvMoney', recvMoney);
-              formData2.append('userMail', viewClient?.email);
+              formData2.append('userMail', getSpecificOrderById?.userMail);
          
               const response = await fetch(`https://mserver.printbaz.com/updateorder/${viewOrder?._id}`, {
               // const response = await fetch(`http://localhost:5000/updateorder/${viewOrder?._id}`, {
