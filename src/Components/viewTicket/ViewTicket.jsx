@@ -2,7 +2,7 @@
 
 
 import axios from 'axios';
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useContext, useEffect, useRef, useState } from 'react';
 import ReactMarkdown from 'react-markdown';
 import { Link, useLocation } from 'react-router-dom';
 import AlertMessage from '../alert/AlertMessage';
@@ -12,6 +12,7 @@ import 'quill/dist/quill.snow.css';
 import { Overlay, Tooltip } from 'react-bootstrap';
 import Navigationbar from '../navigationBar/Navigationbar';
 import { useRoleAsignData } from '../../hooks/useRoleAsignData';
+import { AuthContext } from '../../authProvider/AuthProvider';
 
 const ViewTicket = () => {
   const messagesEndRef = React.useRef(null);
@@ -29,6 +30,7 @@ const ViewTicket = () => {
     const [getUserById, setGetUserById] = useState();
     const {value_count}=useRoleAsignData()
   const target = useRef(null);
+  const {adminUser,loading,loginAdminUser,currentUser}=useContext(AuthContext);
     const [formatType, setFormatType] = useState({});
     console.log("viewTicketDetail",viewTicketDetail);
     console.log("openTextBox",openTextBox);
@@ -184,6 +186,7 @@ const ViewTicket = () => {
              userEmail:viewTicketDetail?.userEmail,
              userName:viewTicketDetail?.userName,
              userOrderId:viewTicketDetail?.orderId,
+             adminUser:adminUser?.email,
               user: 'Printbaz',
                content: newMsg };
       
@@ -196,6 +199,7 @@ const ViewTicket = () => {
             userEmail: newMessage.userEmail,
             userName: newMessage.userName,
             admin: newMessage.user,
+            adminUser: newMessage.adminUser,
             orderId:newMessage.userOrderId,
             timestamp: new Date().toISOString(), // this won't be the exact timestamp saved in the DB
           };

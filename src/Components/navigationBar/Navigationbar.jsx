@@ -11,7 +11,7 @@ const Navigationbar = () => {
     // console.log("adminUser",adminUser);
     const[fetchAllTicket,setFetchAllTicket]=useState([])
     const {value_count}=useRoleAsignData()
-    let getAdminEmail=fetchAllTicket?.filter(ticket=>ticket.adminUser===adminUser?.email)
+    let getAdminEmail=fetchAllTicket?.filter(ticket=>ticket.adminUser===adminUser?.email|| ticket?.ticketStatus==="pending(created by client)")
     console.log("getAdminEmail",getAdminEmail);
 
     useEffect(()=>{
@@ -24,8 +24,8 @@ const Navigationbar = () => {
     },[])
     const fetchTickets = async () => {
       try {
-          const response = await axios.get(`http://localhost:5000/allTicket`);
-        // const response = await axios.get(`https://mserver.printbaz.com/allTicket`);
+          // const response = await axios.get(`http://localhost:5000/allTicket`);
+        const response = await axios.get(`https://mserver.printbaz.com/allTicket`);
         setFetchAllTicket(response?.data);
      
       } catch (err) {
@@ -95,22 +95,28 @@ const Navigationbar = () => {
               {
    getAdminEmail?.forEach(readMsg => {
     //  <p>{readMsg?.ticketStatus} fgfdg</p>
-    if(readMsg?.ticketStatus === "pending"  ){
+    if(readMsg?.ticketStatus === "pending"){
+  
+      msgCount++
+   }  if(readMsg?.ticketStatus === "pending(created by client)"){
+  
       msgCount++
    }
 
   })
    }
-  
+
    {
      msgCount>0 &&
      <>
          <span className='notification-badge'  >{msgCount}</span>
+        
      </>
  
    }
               </li>
               <li className="nav-item">
+                <p>{msgCount}</p>
                 <Link className="nav-link active" aria-current="page" to="/filemanager">File Manager</Link>
         
               </li> 
@@ -202,19 +208,27 @@ const Navigationbar = () => {
                         value_count?.Ticket && 
   <li className="nav-item" key={`${value_count?._id}-Ticket`}>
   <Link className="nav-link active" aria-current="page" to="/ticket">Ticket</Link>
-              {
+  {
    getAdminEmail?.forEach(readMsg => {
     //  <p>{readMsg?.ticketStatus} fgfdg</p>
-    if(readMsg?.ticketStatus === "pending"  ){
+    if(readMsg?.ticketStatus === "pending"){
+  
+      msgCount++
+   }  if(readMsg?.ticketStatus === "pending(created by client)"){
+  
       msgCount++
    }
 
   })
    }
-  
+
    {
      msgCount>0 &&
-     <span className='notification-badge'  >{msgCount}</span>
+     <>
+         <span className='notification-badge'  >{msgCount}</span>
+        
+     </>
+ 
    }
   </li>
                    }

@@ -67,8 +67,8 @@ const UsersStoredSupportTickets = ({ message,ticketId,userOrderId,ticketIssue, o
   }, []);
   const fetchOrderIddata = async () => {
     try {
-      const response = await axios.get(`http://localhost:5000/getOrderIdmessages/${userOrderId}`);
-      // const response = await axios.get(`https://mserver.printbaz.com/getOrderIdmessages/${userOrderId}`);
+      // const response = await axios.get(`http://localhost:5000/getOrderIdmessages/${userOrderId}`);
+      const response = await axios.get(`https://mserver.printbaz.com/getOrderIdmessages/${userOrderId}`);
       setUsersStoredTickets(response.data.messages);
    
     } catch (err) {
@@ -130,8 +130,8 @@ const handleNewMessageChange = (e) => {
     setChatLog([...chatLog, chatMessage]);
     
 
-    const response = await axios.post('http://localhost:5000/sendmessages', formData, {
-    // const response = await axios.post('https://mserver.printbaz.com/sendmessages', formData, {
+    // const response = await axios.post('http://localhost:5000/sendmessages', formData, {
+    const response = await axios.post('https://mserver.printbaz.com/sendmessages', formData, {
 headers: {
   'Content-Type': 'multipart/form-data',
 },

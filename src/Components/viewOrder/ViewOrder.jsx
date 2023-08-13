@@ -24,8 +24,8 @@ const ViewOrder = () => {
   useEffect(()=>{
     const getOrderById=async()=>{
              // Fetch the updated order details
-    // await fetch(`https://mserver.printbaz.com/getorder/${id}`)
-    await fetch(`http://localhost:5000/getorder/${id}`)
+    await fetch(`https://mserver.printbaz.com/getorder/${id}`)
+    // await fetch(`http://localhost:5000/getorder/${id}`)
     .then(res=>res.json())
     .then(data => {setGetSpecificOrderById(data)
       setOrderStatus(data.orderStatus);

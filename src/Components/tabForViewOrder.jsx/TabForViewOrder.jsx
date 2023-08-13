@@ -30,8 +30,8 @@ function TabForViewOrder({orderId,email,viewClient,viewOrder,clientName}) {
 // fetch msg for support ticket 
 const fetchChatLog = async () => {
   try {
-    const response = await axios.get(`http://localhost:5000/getOrderIdmessages/${orderId}`);
-    // const response = await axios.get(`https://mserver.printbaz.com/getOrderIdmessages/${orderId}`);
+    // const response = await axios.get(`http://localhost:5000/getOrderIdmessages/${orderId}`);
+    const response = await axios.get(`https://mserver.printbaz.com/getOrderIdmessages/${orderId}`);
     setUsersTickets(response.data.messages);
     // console.log("response.data.messages",response.data.messages);
   } catch (err) {
@@ -58,8 +58,8 @@ let createTime=new Date().toLocaleString("en-US", { month: 'long', day: 'numeric
  // fetch msg for discussion msg 
  const fetchDiscussionMsg = async () => {
   try {
-    const response = await axios.get(`http://localhost:5000/getDiscussionMsg/${orderId}`);
-    // const response = await axios.get(`https://mserver.printbaz.com/getDiscussionMsg/${orderId}`);
+    // const response = await axios.get(`http://localhost:5000/getDiscussionMsg/${orderId}`);
+    const response = await axios.get(`https://mserver.printbaz.com/getDiscussionMsg/${orderId}`);
     setUsersDiscussMsg(response.data.messages);
     // console.log("response.data.messages",response.data?.messages);
   } catch (err) {
@@ -96,8 +96,8 @@ const handleSendDiscussionMessage = async (e) => {
     setChatLog([...chatLog, chatMessage]);
     
 
-    const response = await axios.post('http://localhost:5000/discussionMsg', formData, {
-    // const response = await axios.post('https://mserver.printbaz.com/discussionMsg', formData, {
+    // const response = await axios.post('http://localhost:5000/discussionMsg', formData, {
+    const response = await axios.post('https://mserver.printbaz.com/discussionMsg', formData, {
 headers: {
   'Content-Type': 'multipart/form-data',
 },
@@ -127,8 +127,8 @@ headers: {
  
   const fetchAllTicketData = async () => {
     try {
-      const response = await axios.get('http://localhost:5000/allTicket');
-      // const response = await axios.get('https://mserver.printbaz.com/allTicket');
+      // const response = await axios.get('http://localhost:5000/allTicket');
+      const response = await axios.get('https://mserver.printbaz.com/allTicket');
       setFetchAllTicket(response.data);
    
     } catch (err) {

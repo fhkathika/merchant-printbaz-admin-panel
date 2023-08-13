@@ -71,8 +71,8 @@ const SupportTicketPopUp = ({ message,ticketId,userOrderId,onClose,fetchTickets,
 
   const fetchChatLog = async () => {
       try {
-        const response = await axios.get(`http://localhost:5000/getmessages/${ticketId}`);
-        // const response = await axios.get(`https://mserver.printbaz.com/getmessages/${ticketId}`);
+        // const response = await axios.get(`http://localhost:5000/getmessages/${ticketId}`);
+        const response = await axios.get(`https://mserver.printbaz.com/getmessages/${ticketId}`);
         setChatLog(response.data);
       } catch (err) {
         console.error(err);
@@ -158,8 +158,8 @@ setTicketIssue(e.target.value)
     setChatLog([...chatLog, chatMessage]);
     
 
-    const response = await axios.post('http://localhost:5000/sendmessages', formData, {
-    // const response = await axios.post('https://mserver.printbaz.com/sendmessages', formData, {
+    // const response = await axios.post('http://localhost:5000/sendmessages', formData, {
+    const response = await axios.post('https://mserver.printbaz.com/sendmessages', formData, {
 headers: {
   'Content-Type': 'multipart/form-data',
 },

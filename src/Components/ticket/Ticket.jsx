@@ -21,8 +21,8 @@ const {value_count}=useRoleAsignData()
 
   const fetchOrderIddata = async () => {
     try {
-      const response = await axios.get('http://localhost:5000/allTicket');
-      // const response = await axios.get('https://mserver.printbaz.com/allTicket');
+      // const response = await axios.get('http://localhost:5000/allTicket');
+      const response = await axios.get('https://mserver.printbaz.com/allTicket');
       setFetchAllTicket(response.data);
    
     } catch (err) {
@@ -79,7 +79,7 @@ let generalQuery=fetchAllTicket?.filter(users=>users?.ticketIssue==="general que
 let closeQuery=fetchAllTicket?.filter(users=>users?.ticketStatus==="close");
 let repliedQuery=fetchAllTicket?.filter(users=>users?.ticketStatus==="replied");
 let openQuery=fetchAllTicket?.filter(users=>users?.ticketStatus==="open");
-let pendingQuery=fetchAllTicket?.filter(users=>users?.ticketStatus==="pending");
+let pendingQuery=fetchAllTicket?.filter(users=>users?.ticketStatus==="pending"||users?.ticketStatus==="pending(created by client)" );
 
 console.log("searchByTicketId",searchByTicketId);
 const handleOrderIdChange = (e) => {
@@ -110,7 +110,7 @@ return (
             {/* <input type="checkbox" className="ttm-button" /> */}
             {/* <button className="ttm-button"><i className="fa fa-user-plus" aria-hidden="true" style={{marginRight: '5px'}} />Assign</button> */}
             <div className="col-lg-2 col-sm-4">
-            <button className="ttm-button"><i className="fa fa-check-circle" aria-hidden="true" style={{marginRight: '5px'}} />Close</button>
+            <button className="ttm-button"><i className="fa fa-check-circle" aria-hidden="true" style={{marginRight: '5px',marginTop:"8px"}} />Close</button>
             </div>
             
             <div className="col-lg-2 col-sm-4">
@@ -121,6 +121,78 @@ return (
                 <label htmlFor="id-filter" style={{marginBottom:"8px"}}>Ticket Id:</label>
                 <input type="text" id="id-filter" className="form-control" onChange={(e) =>  handleOrderIdChange(e)} />
               </div>
+           
+        
+            <div className="col-lg-2 col-sm-2">
+             
+            <label htmlFor="id-filter" style={{marginBottom:"8px"}}>Ticket Issue:</label>
+                      <select
+                          id="status-filter"
+                          // className="status-btn"
+
+                          
+                          style={{
+                            border: "1px solid #d1d1d1",
+                            padding: "8px",
+                            marginRight:'20px',
+                            width:"100%",
+                            background:"none"
+                            
+                          }}
+                          name="ticketIssue"
+                          value={ticketIssue}
+                          required
+                          onChange={ (e)=>handleInputTicketIssueChange(e)}
+                        >
+                     
+                     <option value="all">All</option>
+                      <option value="onHold artwork issue">Artwork Issue</option>
+                      <option value="onHold billing issue"> Billing Issue</option>
+                     <option value="onHold out of stock">Out of Stock</option>
+                     <option value="returned">Returned</option>
+                     <option value="cancellation">Cancellation</option>
+                     <option value="general query">General Query</option>
+                        </select>
+                    
+                      
+            </div>
+            
+            <div className="col-lg-2 col-sm-2">
+             
+           
+            <label htmlFor="id-filter" style={{marginBottom:"8px"}}>Ticket Status:</label>
+                      <select
+                          id="status-filter"
+                          // className="status-btn"
+
+                          
+                          style={{
+                            border: "1px solid #d1d1d1",
+                            padding: "8px",
+                            marginRight:'20px',
+                            width:"100%",
+                            background:"none"
+                            
+                          }}
+                          name="ticketIssue"
+                          value={ticketIssue}
+                          required
+                          onChange={ (e)=>handleInputTicketStatusChange(e)}
+                        >
+                     
+                     <option value="">select status</option>
+                      <option value="close">Close</option>
+                     <option value="replied">Replied </option>
+                     <option value="pending">Pending </option>
+                     <option value="open">Open</option>
+                        </select>
+                    
+                      
+            </div>
+
+       
+     
+      
             {/* <button className="ttm-button"><i className="fa fa-trash" aria-hidden="true" style={{marginRight: '5px'}} />Delete</button> */}
             {/* <div className="dropdown sort-by">
               <button className="btn dropdown-toggle ttm-button" type="button" id="dropdownMenuButton1" data-bs-toggle="dropdown" aria-expanded="false">
@@ -139,7 +211,7 @@ return (
         </div>
       </div>
       <div className="row">
-        <div className="col-10">
+        <div className="col-12">
         {
            filterOrders && searchByOrderId?.map((allTicket,index)=>{ 
               let lastTimestamp = null;
@@ -188,7 +260,7 @@ return (
                   </div>
                   <div className='col-1 '>
                 {
-                 allTicket?.ticketStatus==="pending" &&
+                ( allTicket?.ticketStatus==="pending" || allTicket?.ticketStatus==="pending(created by client)") &&
 
                    <span  className='notification-badge-individual'>New Message</span> 
               
@@ -351,7 +423,8 @@ return (
                   </div>
                   <div className='col-1 '>
                 {
-                 allTicket?.ticketStatus==="pending" &&
+                ( allTicket?.ticketStatus==="pending" ||
+                 allTicket?.ticketStatus==="pending(created by client)") &&
 
                    <span  className='notification-badge-individual'>New Message</span> 
               
@@ -520,7 +593,8 @@ return (
                   </div>
                   <div className='col-1 '>
                 {
-                 allTicket?.ticketStatus==="pending" &&
+                   ( allTicket?.ticketStatus==="pending" ||
+                   allTicket?.ticketStatus==="pending(created by client)") &&
 
                    <span  className='notification-badge-individual'>New Message</span> 
               
@@ -1914,7 +1988,7 @@ return (
                          } )
           }    
            {
-            ticketIssue==="pending" &&  pendingQuery?.sort((a, b) => {
+            (ticketIssue==="pending" ||  ticketIssue ==="pending(created by client)")  &&  pendingQuery?.sort((a, b) => {
               // Sort by lastTimestamp in descending order
               const timestampA = new Date(a.messages[a.messages.length - 1].timestamp);
               const timestampB = new Date(b.messages[b.messages.length - 1].timestamp);
@@ -1966,7 +2040,7 @@ return (
                   </div>
                   <div className='col-1 '>
                 {
-                 allTicket?.ticketStatus==="pending" &&
+                ( allTicket?.ticketStatus==="pending" || allTicket?.ticketStatus==="pending(created by client)") &&
 
                    <span  className='notification-badge-individual'>New Message</span> 
               
@@ -2243,78 +2317,7 @@ return (
           } 
         
         </div>
-        <div className="col-2">
-          <div className="filter-section">
-          
-            <div className="dropdown filter-dropdown">
-             
-            
-                      <select
-                          id="status-filter"
-                          // className="status-btn"
-
-                          
-                          style={{
-                            border: "1px solid #d1d1d1",
-                            padding: "8px",
-                            marginRight:'20px',
-                            width:"100%",
-                            background:"none"
-                            
-                          }}
-                          name="ticketIssue"
-                          value={ticketIssue}
-                          required
-                          onChange={ (e)=>handleInputTicketIssueChange(e)}
-                        >
-                     
-                     <option value="all">All</option>
-                      <option value="onHold artwork issue">Artwork Issue</option>
-                      <option value="onHold billing issue"> Billing Issue</option>
-                     <option value="onHold out of stock">Out of Stock</option>
-                     <option value="returned">Returned</option>
-                     <option value="cancellation">Cancellation</option>
-                     <option value="general query">General Query</option>
-                        </select>
-                    
-                      
-            </div>
-            
-            <div className="dropdown filter-dropdown">
-             
-            
-                      <select
-                          id="status-filter"
-                          // className="status-btn"
-
-                          
-                          style={{
-                            border: "1px solid #d1d1d1",
-                            padding: "8px",
-                            marginRight:'20px',
-                            width:"100%",
-                            background:"none"
-                            
-                          }}
-                          name="ticketIssue"
-                          value={ticketIssue}
-                          required
-                          onChange={ (e)=>handleInputTicketStatusChange(e)}
-                        >
-                     
-                     <option value="">select status</option>
-                      <option value="close">Close</option>
-                     <option value="replied">Replied </option>
-                     <option value="pending">Pending </option>
-                     <option value="open">Open</option>
-                        </select>
-                    
-                      
-            </div>
-
-       
-          </div>
-        </div>
+    
       </div>
     </section>
   </div>
