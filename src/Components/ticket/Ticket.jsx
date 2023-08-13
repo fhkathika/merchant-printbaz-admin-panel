@@ -1,10 +1,12 @@
 import axios from 'axios';
-import React, { useEffect, useState } from 'react';
+import React, { useContext, useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
+import { AuthContext } from '../../authProvider/AuthProvider';
 import { useRoleAsignData } from '../../hooks/useRoleAsignData';
 import Navigationbar from '../navigationBar/Navigationbar';
 
 const Ticket = () => {
+  const {adminUser,loading,loginAdminUser,currentUser}=useContext(AuthContext);
   const[fetchAllTicket,setFetchAllTicket]=useState([])
   const [filterOrders,setFilterOrders]=useState('');
   let searchByOrderId= fetchAllTicket?.filter(OrederId => OrederId?.orderId?.includes(filterOrders));
@@ -12,8 +14,10 @@ let searchByTicketId= fetchAllTicket?.filter(OrederId => OrederId?.ticketId?.inc
 // console.log("closeQuery",closeQuery);
 const [ticketIssue, setTicketIssue] = useState( "all" );
 const {value_count}=useRoleAsignData();
-// let getAdminEmail=fetchAllTicket?.filter(ticket=>ticket.adminUser===adminUser?.email|| ticket?.ticketStatus==="pending(created by client)")
-// console.log("getAdminEmail",getAdminEmail);  
+let newMsg=0
+let getAdminEmail=fetchAllTicket?.filter(ticket=>ticket.adminUser===adminUser?.email|| ticket?.ticketStatus==="pending(created by client)")
+console.log("adminUser?.email",adminUser?.email);
+console.log("getAdminEmail user email",getAdminEmail[0]?.adminUser);  
 // const [ticketStatus, setTicketStatus] = useState("");
   useEffect(() => {
     // Fetch the chat log from the server when the component mounts
@@ -264,7 +268,7 @@ return (
                 {
                 ( allTicket?.ticketStatus==="pending" || allTicket?.ticketStatus==="pending(created by client)") &&
 
-                   <span  className='notification-badge-individual'>New Message</span> 
+                   <span  className='notification-badge-individual'>New Message test</span> 
               
                  
                }
@@ -428,7 +432,7 @@ return (
                 ( allTicket?.ticketStatus==="pending" ||
                  allTicket?.ticketStatus==="pending(created by client)") &&
 
-                   <span  className='notification-badge-individual'>New Message</span> 
+                   <span  className='notification-badge-individual'>New Message 2</span> 
               
                  
                }
@@ -595,13 +599,35 @@ return (
                   </div>
                   <div className='col-1 '>
                 {
-                   ( allTicket?.ticketStatus==="pending" ||
-                   allTicket?.ticketStatus==="pending(created by client)") &&
-
-                   <span  className='notification-badge-individual'>New Message</span> 
+                
+      
+                  getAdminEmail?.forEach(readMsg => 
               
+                   ( readMsg?.adminUser=== adminUser?.email) && ( readMsg?.ticketStatus==="pending" ||
+               readMsg?.ticketStatus==="pending(created by client)") &&
+               <span  className='notification-badge-individual'>New Message 3</span> 
+                   
+          
                  
+                    )
+                 
+           
                }
+         
+            {/* {
+   getAdminEmail?.forEach(readMsg => {
+    //  <p>{readMsg?.ticketStatus} fgfdg</p>
+    if(readMsg?.ticketStatus === "pending"){
+  
+      <span key={index} className='notification-badge-individual'>New Message {index + 1}</span>
+   }  if(readMsg?.ticketStatus === "pending(created by client)"){
+  
+    <span key={index} className='notification-badge-individual'>New Message {index + 1}</span>
+   }
+
+  })
+   } */}
+ 
              
                 </div>
                   <div className="col-4 ">
@@ -2044,7 +2070,7 @@ return (
                 {
                 ( allTicket?.ticketStatus==="pending" || allTicket?.ticketStatus==="pending(created by client)") &&
 
-                   <span  className='notification-badge-individual'>New Message</span> 
+                   <span  className='notification-badge-individual'>New Message 4</span> 
               
                  
                }
