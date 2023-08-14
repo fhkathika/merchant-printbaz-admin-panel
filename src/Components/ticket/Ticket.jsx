@@ -273,6 +273,9 @@ return (
                   {shouldShowNotification && (
                 <span className='notification-badge-individual'>New Message</span>
               )}
+               {allTicket?.ticketStatus === "pending(created by client)" && (
+                <span className='notification-badge-individual'>New Message</span>
+              )}
              
                 </div>
                   <div className="col-4 ">
@@ -437,6 +440,9 @@ return (
                   {shouldShowNotification && (
                 <span className='notification-badge-individual'>New Message</span>
               )}
+               {allTicket?.ticketStatus === "pending(created by client)" && (
+                <span className='notification-badge-individual'>New Message</span>
+              )}
              
                 </div>
                   <div className="col-4 ">
@@ -565,10 +571,15 @@ return (
               }
                     // Define the filter condition
       const shouldShowNotification =
-      (allTicket?.ticketStatus === "pending" ||
-        allTicket?.ticketStatus === "pending(created by client)") &&
+      allTicket?.ticketStatus === "pending"  &&
       // allTicket.adminUser === adminUser?.email;
-      allTicket?.uniqueAdminEmails?.includes(adminUser?.email);
+      allTicket?.uniqueAdminEmails?.includes(adminUser?.email); 
+
+      //   const shouldShowNotificationCreateByClient =
+     
+      //   allTicket?.ticketStatus === "pending(created by client)" &&
+      // // allTicket.adminUser === adminUser?.email;
+      // allTicket?.uniqueAdminEmails?.includes(adminUser?.email);
               return(
                 value_count?.ticketView?
                 <Link to={`/viewTicket/${allTicket?._id}`} state={{allTicket}} key={index}>
@@ -607,6 +618,10 @@ return (
                   <div className='col-1 '>
                 
                   {shouldShowNotification && (
+                <span className='notification-badge-individual'>New Message</span>
+              )}  
+              
+               {allTicket?.ticketStatus === "pending(created by client)" && (
                 <span className='notification-badge-individual'>New Message</span>
               )}
        
@@ -2071,6 +2086,9 @@ return (
                   </div>
                   <div className='col-1 '>
                   {shouldShowNotification && (
+                <span className='notification-badge-individual'>New Message</span>
+              )}
+               {allTicket?.ticketStatus === "pending(created by client)" && (
                 <span className='notification-badge-individual'>New Message</span>
               )}
              

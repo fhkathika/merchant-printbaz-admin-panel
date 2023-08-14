@@ -11,6 +11,7 @@ import { AuthContext } from '../../authProvider/AuthProvider';
 
 const SupportTicketPopUp = ({ message,ticketId,userOrderId,onClose,fetchTickets,userEmail,userName }) => {
   const {adminUser,loading,loginAdminUser,currentUser}=useContext(AuthContext);
+  const [uniqueAdminEmails, setUniqueAdminEmails] = useState(new Set());
   console.log("adminUser create ticket",adminUser);
   console.log("userEmail create ticket",userEmail);
   const [chatLog, setChatLog] = useState([]);
@@ -136,6 +137,8 @@ setTicketIssue(e.target.value)
       formData.append('files',file)
     })
     const newMessage = { ticketId: ticketId,userOrderId:userOrderId,ticketIssue:ticketIssue,ticketStatus:"open", user: 'Printbaz',adminUser:adminUser?.email,unread:true, content: newMsg,userEmail:userEmail,userName:userName };
+  // Add the adminUser email to the uniqueAdminEmails set
+  setUniqueAdminEmails((prevEmails) => new Set([...prevEmails, newMessage.adminUser]));
 
     const chatMessage = {
       ticketId: newMessage.ticketId,  // added this line
@@ -146,7 +149,10 @@ setTicketIssue(e.target.value)
       userName: newMessage.userName,
       unread: newMessage.unread,
       admin: newMessage.user,
-      adminUser: newMessage.adminUser,
+        // Add the adminUser email to the uniqueAdminEmails set
+        adminUser:newMessage.adminUser,
+
+      // adminUser: newMessage.adminUser,
       orderId:newMessage.userOrderId,
       timestamp: new Date().toISOString(), // this won't be the exact timestamp saved in the DB
     };
@@ -158,8 +164,8 @@ setTicketIssue(e.target.value)
     setChatLog([...chatLog, chatMessage]);
     
 
-    // const response = await axios.post('http://localhost:5000/sendmessages', formData, {
-    const response = await axios.post('https://mserver.printbaz.com/sendmessages', formData, {
+    const response = await axios.post('http://localhost:5000/sendmessages', formData, {
+    // const response = await axios.post('https://mserver.printbaz.com/sendmessages', formData, {
 headers: {
   'Content-Type': 'multipart/form-data',
 },
