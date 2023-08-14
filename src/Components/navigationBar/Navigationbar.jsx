@@ -11,8 +11,8 @@ const Navigationbar = () => {
     // console.log("adminUser",adminUser);
     const[fetchAllTicket,setFetchAllTicket]=useState([])
     const {value_count}=useRoleAsignData()
-    let getAdminEmail=fetchAllTicket?.filter(ticket=>ticket.adminUser===adminUser?.email|| ticket?.ticketStatus==="pending(created by client)")
-    console.log("getAdminEmail",getAdminEmail);
+    let getAdminEmail=fetchAllTicket?.filter(ticket=>ticket.uniqueAdminEmails?.includes(adminUser?.email)|| ticket?.ticketStatus==="pending(created by client)")
+    console.log("getAdminEmail navigation bar",getAdminEmail);
 
     useEffect(()=>{
       fetchTickets();

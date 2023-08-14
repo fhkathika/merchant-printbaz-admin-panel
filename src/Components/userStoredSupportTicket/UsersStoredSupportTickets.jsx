@@ -7,6 +7,7 @@ import { useQuill } from 'react-quilljs';
 import BlotFormatter from 'quill-blot-formatter';
 import 'quill/dist/quill.snow.css';
 import { AuthContext } from '../../authProvider/AuthProvider';
+import useAdminEmails from '../../hooks/useAdminEmails';
 const UsersStoredSupportTickets = ({ message,ticketId,userOrderId,ticketIssue, onClose,userEmail,userName }) => {
   const {adminUser,loading,loginAdminUser,currentUser}=useContext(AuthContext);
   console.log("adminUser reply ticket",adminUser);
@@ -17,6 +18,8 @@ const UsersStoredSupportTickets = ({ message,ticketId,userOrderId,ticketIssue, o
   const [openTextBox, setOpenTextBox] = useState(false);
   const [selectedFiles, setSelectedFiles] = useState([]);
   const [showAlert, setShowAlert] = useState(false);
+  // const {uniqueAdminEmails,setUniqueAdminEmails}=useAdminEmails()
+  // console.log("uniqueAdminEmails from stored Support ticket",uniqueAdminEmails);
   // const [ticketIssue, setTicketIssue] = useState('');
  
   const { quill, quillRef, Quill } = useQuill({
@@ -107,6 +110,9 @@ const handleNewMessageChange = (e) => {
     Array.from(selectedFiles).forEach((file)=>{
       formData.append('files',file)
     })
+      // Add the adminUser email to the uniqueAdminEmails set
+      // setUniqueAdminEmails((prevEmails) => new Set([...prevEmails, newMessage.adminUser]));
+
     const newMessage = { ticketId: ticketId,userOrderId:userOrderId,ticketIssue:ticketIssue,ticketStatus:"replied", user: 'Printbaz',adminUser:adminUser?.email, content: newMsg,userEmail:userEmail,userName:userName,unread:true };
 
     const chatMessage = {

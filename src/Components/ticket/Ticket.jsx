@@ -15,9 +15,8 @@ let searchByTicketId= fetchAllTicket?.filter(OrederId => OrederId?.ticketId?.inc
 const [ticketIssue, setTicketIssue] = useState( "all" );
 const {value_count}=useRoleAsignData();
 let newMsg=0
-let getAdminEmail=fetchAllTicket?.filter(ticket=>ticket.adminUser===adminUser?.email|| ticket?.ticketStatus==="pending(created by client)")
-console.log("adminUser?.email",adminUser?.email);
-console.log("getAdminEmail user email",getAdminEmail[0]?.adminUser);  
+let getAdminEmail=fetchAllTicket?.filter(ticket=>ticket.adminUser===adminUser?.email &&  (ticket?.ticketStatus==="pending(created by client)" || ticket?.ticketStatus==="pending"))
+console.log("adminUser?.email",adminUser?.email); 
 // const [ticketStatus, setTicketStatus] = useState("");
   useEffect(() => {
     // Fetch the chat log from the server when the component mounts
@@ -229,6 +228,12 @@ return (
                 exactTime=timeSince((new Date(lastTimestamp)))
                 lastUser = lastMessage.admin;
               }
+               // Define the filter condition
+      const shouldShowNotification =
+      (allTicket?.ticketStatus === "pending" ||
+        allTicket?.ticketStatus === "pending(created by client)") &&
+      allTicket.adminUser === adminUser?.email;
+
               return(
                 value_count?.ticketView?
                 <Link to={`/viewTicket/${allTicket?._id}`} state={{allTicket}} key={index}>
@@ -265,13 +270,9 @@ return (
                     </div>
                   </div>
                   <div className='col-1 '>
-                {
-                ( allTicket?.ticketStatus==="pending" || allTicket?.ticketStatus==="pending(created by client)") &&
-
-                   <span  className='notification-badge-individual'>New Message test</span> 
-              
-                 
-               }
+                  {shouldShowNotification && (
+                <span className='notification-badge-individual'>New Message</span>
+              )}
              
                 </div>
                   <div className="col-4 ">
@@ -392,6 +393,11 @@ return (
                 exactTime=timeSince((new Date(lastTimestamp)))
                 lastUser = lastMessage.admin;
               }
+               // Define the filter condition
+      const shouldShowNotification =
+      (allTicket?.ticketStatus === "pending" ||
+        allTicket?.ticketStatus === "pending(created by client)") &&
+      allTicket.adminUser === adminUser?.email;
               return(
                 value_count?.ticketView?
                 <Link to={`/viewTicket/${allTicket?._id}`} state={{allTicket}} key={index}>
@@ -428,14 +434,9 @@ return (
                     </div>
                   </div>
                   <div className='col-1 '>
-                {
-                ( allTicket?.ticketStatus==="pending" ||
-                 allTicket?.ticketStatus==="pending(created by client)") &&
-
-                   <span  className='notification-badge-individual'>New Message 2</span> 
-              
-                 
-               }
+                  {shouldShowNotification && (
+                <span className='notification-badge-individual'>New Message</span>
+              )}
              
                 </div>
                   <div className="col-4 ">
@@ -562,6 +563,12 @@ return (
                 exactTime=timeSince((new Date(lastTimestamp)))
                 lastUser = lastMessage.admin;
               }
+                    // Define the filter condition
+      const shouldShowNotification =
+      (allTicket?.ticketStatus === "pending" ||
+        allTicket?.ticketStatus === "pending(created by client)") &&
+      // allTicket.adminUser === adminUser?.email;
+      allTicket?.uniqueAdminEmails?.includes(adminUser?.email);
               return(
                 value_count?.ticketView?
                 <Link to={`/viewTicket/${allTicket?._id}`} state={{allTicket}} key={index}>
@@ -598,21 +605,11 @@ return (
                     </div>
                   </div>
                   <div className='col-1 '>
-                {
                 
-      
-                  getAdminEmail?.forEach(readMsg => 
-              
-                   ( readMsg?.adminUser=== adminUser?.email) && ( readMsg?.ticketStatus==="pending" ||
-               readMsg?.ticketStatus==="pending(created by client)") &&
-               <span  className='notification-badge-individual'>New Message 3</span> 
-                   
-          
-                 
-                    )
-                 
-           
-               }
+                  {shouldShowNotification && (
+                <span className='notification-badge-individual'>New Message</span>
+              )}
+       
          
             {/* {
    getAdminEmail?.forEach(readMsg => {
@@ -2031,6 +2028,12 @@ return (
                 exactTime=timeSince((new Date(lastTimestamp)))
                 lastUser = lastMessage.admin;
               }
+                // Define the filter condition
+      const shouldShowNotification =
+      (allTicket?.ticketStatus === "pending" ||
+        allTicket?.ticketStatus === "pending(created by client)") &&
+      allTicket.adminUser === adminUser?.email;
+
               return(
                 value_count?.ticketView?
                 <Link to={`/viewTicket/${allTicket?._id}`} state={{allTicket}} key={index}>
@@ -2067,13 +2070,9 @@ return (
                     </div>
                   </div>
                   <div className='col-1 '>
-                {
-                ( allTicket?.ticketStatus==="pending" || allTicket?.ticketStatus==="pending(created by client)") &&
-
-                   <span  className='notification-badge-individual'>New Message 4</span> 
-              
-                 
-               }
+                  {shouldShowNotification && (
+                <span className='notification-badge-individual'>New Message</span>
+              )}
              
                 </div>
                   <div className="col-4">
