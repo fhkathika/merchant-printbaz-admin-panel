@@ -4,7 +4,7 @@
 import axios from 'axios';
 import React, { useContext, useEffect, useRef, useState } from 'react';
 import ReactMarkdown from 'react-markdown';
-import { Link, useLocation } from 'react-router-dom';
+import { Link, unstable_HistoryRouter, useLocation, useNavigate } from 'react-router-dom';
 import AlertMessage from '../alert/AlertMessage';
 import { useQuill } from 'react-quilljs';
 import BlotFormatter from 'quill-blot-formatter';
@@ -264,7 +264,11 @@ const ViewTicket = () => {
         }
         return Math.floor(seconds) + " seconds ago";
       }
-     
+      const navigate = useNavigate();
+
+      const handleBack = () => {
+        navigate('/ticket');
+      }
     return (
     <div>
     <meta charSet="UTF-8" />
@@ -285,10 +289,9 @@ const ViewTicket = () => {
           </div>
           <div className="ticket-top-menu">
            
-           {
-             (openTextBox!==true  && ticketStatus!=="close") && 
-             <button className="ttm-button" onClick={()=>setOpenTextBox(true)}><i className="fa fa-reply" aria-hidden="true" style={{marginRight: '5px'}} />Reply</button>
-           }
+      
+             <button onClick={handleBack} className="ttm-button" ><i className="fa fa-reply" aria-hidden="true" style={{marginRight: '5px'}} />Back</button>
+           
                
              <button className="ttm-button" onClick={closeTicket}><i className="fa fa-check-circle" aria-hidden="true" style={{marginRight: '5px'}} />Close</button>
             {/* <button className="ttm-button"><i className="fa fa-trash" aria-hidden="true" style={{marginRight: '5px'}} />Delete</button> */}
