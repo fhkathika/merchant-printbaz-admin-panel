@@ -1,15 +1,46 @@
-import React from 'react';
+import React, { useState } from 'react';
 import useGetMongoData from '../../hooks/useGetMongoData';
+import AddDeliveryList from '../alert/AddDeliveryList';
+import OrderUpdateAlert from '../alert/OrderUpdateAlert';
 import Navigationbar from '../navigationBar/Navigationbar';
 
 const DeliverySystem = () => {
   const {orderAll}=useGetMongoData()
+  const [showAlert, setShowAlert] = useState(false);
   const totalCollectAmount=0;
+  const [startDate,setStartDate]=useState(null);
 //  orderAll?.forEach(total=>
 //   totalCollectAmount=+total?.collectAmount
   
 //     )
+const handleAddDeliveryPopUp=()=>{
+  console.log("click delivery system popup",showAlert);
+  setShowAlert(true)
+}
+const handleChangeStartDate=(date)=>{
+  console.log("date",date);
+  setStartDate(date)
+}
+const filerByOrderDate = orderAll.filter(order => {
+  const date = new Date(order?.createdAt);
+  const orderDate = date;
+  
+   if (startDate) {
+    // return orderDate >= new Date(startDate) && orderDate <= new Date(endDate);
+    const start = new Date(startDate);
+    // const end = new Date(endDate);
+    // end.setDate(end.getDate() + 1); // Adjust the end date to the next day
+    return orderDate >= start ;
+  } 
+  //  else if (startDate && !endDate) {
+  //   const start = new Date(startDate);
+  //   const end = new Date(startDate);
+  //   end.setDate(end.getDate() + 1); // Set the end date to the next day
+  //   return orderDate >= start && orderDate < end;
+  // }
 
+  return false;
+});
     return (
         <div>
           <meta charSet="UTF-8" />
@@ -85,82 +116,12 @@ const DeliverySystem = () => {
                     </table>
                   </div>
                   <div className="panel-button">
-                    <button id="button">Update</button>
+                    <button id="button" onClick={handleAddDeliveryPopUp}>Update</button>
                     <button style={{float: 'right'}}>View More</button>
                   </div>
-                  <div id="overlay" />
-                  <div id="popup">
-                    <div className="popupcontrols">
-                      <span id="popupclose">X</span>
-                    </div>
-                    <div className="popupcontent">
-                      <div className="row">
-                        <div className="col-12">
-                          <div className="popup-title-01">
-                            <h2>Delivery List Update</h2>
-                          </div>
-                        </div>
-                      </div>
-                      <div className="row">
-                        <div className="col-2">
-                          <div className="popup-title-02">
-                            <h3>Date</h3>
-                          </div>
-                        </div>
-                        <div className="col-2">
-                          <div className="popup-title-02">
-                            <h3>Order ID</h3>
-                          </div>
-                        </div>
-                        <div className="col-2">
-                          <div className="popup-title-02">
-                            <h3>Cash Collection Amount
-                            </h3>
-                          </div>
-                        </div>
-                        <div className="col-2">
-                          <div className="popup-title-02">
-                            <h3>Delivery Fee</h3>
-                          </div>
-                        </div>
-                        <div className="col-2">
-                          <div className="popup-title-02">
-                            <h3>Delivery Status</h3>
-                          </div>
-                        </div>
-                        <div className="col-2">
-                          <div className="popup-title-02">
-                            <h3>Cash Collected by the courier</h3>
-                          </div>
-                        </div>
-                      </div>
-                      <div className="row">
-                        <div className="col-2">
-                          <input type="date" required style={{border: '1px solid #ececec', width: '75%', height: '50px', padding: '5px'}} />
-                        </div>
-                        <div className="col-2">
-                          <input type="text" required style={{border: '1px solid #ececec', width: '75%', height: '50px', padding: '5px'}} />
-                        </div>
-                        <div className="col-2">
-                          <input type="text" required style={{border: '1px solid #ececec', width: '75%', height: '50px', padding: '5px'}} />
-                        </div>
-                        <div className="col-2">
-                          <input type="text" required style={{border: '1px solid #ececec', width: '75%', height: '50px', padding: '5px'}} />
-                        </div>
-                        <div className="col-2">
-                          <button style={{marginTop: '0px', padding: '10px 10px', borderRadius: '5px', backgroundColor: '#4caf50', color: '#fff !important', fontWeight: 'bold', border: 'none'}}>Delivery</button>
-                        </div>
-                        <div className="col-2">
-                          <input type="text" required style={{border: '1px solid #ececec', width: '75%', height: '50px', padding: '5px'}} />
-                        </div>
-                      </div>
-                      <div className="row">
-                        <div className="col-12">
-                          <button style={{marginTop: '30px'}}>Submit</button>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
+                
+                
+                
                 </div>
               </div>
             </div>
@@ -191,8 +152,8 @@ const DeliverySystem = () => {
                     <button style={{float: 'right'}}>View More</button>
                   </div>
                   <div id="overlay" />
-                  <div id="popup">
-                    <div className="popupcontrols">
+                  <div id="popup" className='alert-overlay'>
+                    <div  className="alert-box">
                       <span id="popupclose">X</span>
                     </div>
                     <div className="popupcontent">
@@ -266,6 +227,23 @@ const DeliverySystem = () => {
                 </div>
               </div>
             </div>
+            {showAlert===true && (
+          
+          <AddDeliveryList
+          showAlert={showAlert}
+          orderAll={orderAll}
+          message="Your order has been updated successfully."
+          onClose={() => setShowAlert(false)}
+       
+          
+          
+          />
+          
+          
+          )
+          
+          
+          }
           </section>
         </div>
       );
