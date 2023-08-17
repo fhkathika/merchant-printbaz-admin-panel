@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import useGetMongoData from '../../hooks/useGetMongoData';
 import AddDeliveryList from '../alert/AddDeliveryList';
 import OrderUpdateAlert from '../alert/OrderUpdateAlert';
@@ -9,6 +9,37 @@ const DeliverySystem = () => {
   const [showAlert, setShowAlert] = useState(false);
   const totalCollectAmount=0;
   const [startDate,setStartDate]=useState(null);
+  // const [findOrderById, setFindOrderById] = useState();
+    // const [searchByOrderId, setSearchByOrderId] = useState();
+    const[ collectAmount,setCollectAmount]=useState()
+
+    let searchByOrderId
+    const handleInputOrderId = (e, idx) => {
+      const newRows = [...rows];
+      newRows[idx].orderId = e.target.value;
+      const order = orderAll?.find(order => order?._id?.includes(newRows[idx].orderId));
+      newRows[idx].searchByOrderId = order || {};
+      setRows(newRows);
+    }
+    
+    
+   
+  // const returnValue=Number(searchByOrderId?.printbazcost)+Number(searchByOrderId?.deliveryFee)
+  const handleInputColAmount = (e, idx) => {
+    const newRows = [...rows];
+    newRows[idx].cashCollectNyCourier = e.target.value;
+    setRows(newRows);
+  }
+  
+  const [rows, setRows] = useState([
+    { date: '', orderId:'', collectAmount: '', deliveryFee: '', orderStatus: '', cashCollectNyCourier:collectAmount, returnValue: 0 }
+  ]);
+  console.log("searchByOrderId sdfsf",rows);
+  // useEffect(() => {
+  //   const order = orderAll?.find(order => order?._id?.includes(findOrderById));
+  //   setSearchByOrderId(order);
+  // }, [findOrderById]);
+
 //  orderAll?.forEach(total=>
 //   totalCollectAmount=+total?.collectAmount
   
@@ -17,30 +48,45 @@ const handleAddDeliveryPopUp=()=>{
   console.log("click delivery system popup",showAlert);
   setShowAlert(true)
 }
-const handleChangeStartDate=(date)=>{
-  console.log("date",date);
-  setStartDate(date)
-}
-const filerByOrderDate = orderAll.filter(order => {
-  const date = new Date(order?.createdAt);
-  const orderDate = date;
+const handleChangeStartDate = (date, idx) => {
+  // Copy the current rows array
+  const newRows = [...rows];
   
-   if (startDate) {
-    // return orderDate >= new Date(startDate) && orderDate <= new Date(endDate);
-    const start = new Date(startDate);
-    // const end = new Date(endDate);
-    // end.setDate(end.getDate() + 1); // Adjust the end date to the next day
-    return orderDate >= start ;
-  } 
-  //  else if (startDate && !endDate) {
-  //   const start = new Date(startDate);
-  //   const end = new Date(startDate);
-  //   end.setDate(end.getDate() + 1); // Set the end date to the next day
-  //   return orderDate >= start && orderDate < end;
-  // }
+  // Update the date property of the relevant row
+  newRows[idx].date = date;
+  
+  // Update the rows state with the new array
+  setRows(newRows);
+}
 
-  return false;
-});
+// const handleInputOrderId=(e, index)=>{
+//   const value=e.target.value
+//   console.log("order Id",value);
+//   setFindOrderById(value)
+// }
+
+
+
+// const filerByOrderDate = orderAll.filter(order => {
+//   const date = new Date(order?.createdAt);
+//   const orderDate = date;
+  
+//    if (startDate) {
+//     // return orderDate >= new Date(startDate) && orderDate <= new Date(endDate);
+//     const start = new Date(startDate);
+//     // const end = new Date(endDate);
+//     // end.setDate(end.getDate() + 1); // Adjust the end date to the next day
+//     return orderDate >= start ;
+//   } 
+//   //  else if (startDate && !endDate) {
+//   //   const start = new Date(startDate);
+//   //   const end = new Date(startDate);
+//   //   end.setDate(end.getDate() + 1); // Set the end date to the next day
+//   //   return orderDate >= start && orderDate < end;
+//   // }
+
+//   return false;
+// });
     return (
         <div>
           <meta charSet="UTF-8" />
@@ -230,8 +276,17 @@ const filerByOrderDate = orderAll.filter(order => {
             {showAlert===true && (
           
           <AddDeliveryList
+          rows={rows}
+          // returnValue={returnValue}
+          setRows={setRows}
+          collectAmount={collectAmount}
+          setCollectAmount={setCollectAmount}
+          handleInputColAmount={handleInputColAmount}
+          searchByOrderId={searchByOrderId}
+          handleInputOrderId={handleInputOrderId}
+          handleChangeStartDate={handleChangeStartDate}
           showAlert={showAlert}
-          orderAll={orderAll}
+          startDate={startDate}
           message="Your order has been updated successfully."
           onClose={() => setShowAlert(false)}
        

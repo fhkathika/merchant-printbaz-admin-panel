@@ -237,8 +237,8 @@ const actualIndexOfLastItemOfUnpaidOrders = indexOfLastItem > unPaidOrders.lengt
              
               <div className="col-lg-1 col-sm-12">
                   <label htmlFor="startDate" className="form-label">Start Date</label>
-                  <DatePicker className='form-control' selected={startDate} onChange={handleChangeStartDate} selectsStart startDate={startDate} endDate={endDate} />
-                 
+
+                                   <DatePicker className='form-control' selected={startDate} onChange={handleChangeStartDate} selectsStart startDate={startDate} endDate={endDate} />
                 
                   </div>   
                    <div className="col-lg-1 col-sm-12">
