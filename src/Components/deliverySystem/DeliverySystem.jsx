@@ -1,4 +1,6 @@
 import React, { useEffect, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
+import useGetDeliveryList from '../../hooks/useGetDeliveryList';
 import useGetMongoData from '../../hooks/useGetMongoData';
 import AddDeliveryList from '../alert/AddDeliveryList';
 import OrderUpdateAlert from '../alert/OrderUpdateAlert';
@@ -6,13 +8,19 @@ import Navigationbar from '../navigationBar/Navigationbar';
 
 const DeliverySystem = () => {
   const {orderAll}=useGetMongoData()
+  const {deliveryAll}=useGetDeliveryList()
   const [showAlert, setShowAlert] = useState(false);
-  const totalCollectAmount=0;
+  const totalCollectAmount = deliveryAll?.reduce((acc, curr) => acc +parseFloat (curr.collectAmount || 0), 0);
+  const totalDeliveryAmount = deliveryAll?.reduce((acc, curr) => acc + parseFloat(curr.deliveryFee || 0), 0);
+  const totalCollectAmountByCourier = deliveryAll?.reduce((acc, curr) => acc + parseFloat(curr.cashCollectNyCourier || 0), 0);
+  const totalReturnAmount = deliveryAll?.reduce((acc, curr) => acc + parseFloat(curr.returnValue || 0), 0);
+
   const [startDate,setStartDate]=useState(null);
   // const [findOrderById, setFindOrderById] = useState();
     // const [searchByOrderId, setSearchByOrderId] = useState();
     const[ collectAmount,setCollectAmount]=useState()
-
+const navigate=useNavigate()
+    console.log("deliveryAll",deliveryAll);
     let searchByOrderId
     const handleInputOrderId = (e, idx) => {
       const newRows = [...rows];
@@ -22,7 +30,10 @@ const DeliverySystem = () => {
       setRows(newRows);
     }
     
-    
+    let formattedDate;
+
+
+console.log("formattedDate",formattedDate);
    
   const returnValue=Number(searchByOrderId?.printbazcost)+Number(searchByOrderId?.deliveryFee)
   const handleInputColAmount = (e, idx) => {
@@ -96,6 +107,10 @@ const handleChangeStartDate = (date, idx) => {
 
 //   return false;
 // });
+
+const gotoAllDeliveries=()=>{
+  navigate("/alldeliveries")
+}
     return (
         <div>
           <meta charSet="UTF-8" />
@@ -143,36 +158,48 @@ const handleChangeStartDate = (date, idx) => {
                           <th>Delivery Fee</th>
                           <th>Delivery Status</th>
                           <th>Cash Collected by the courier</th>
+                          <th>Return Value</th>
                         </tr>
                       </thead>
                       <tbody>
                      
-                     {
-                       orderAll?.slice(0,4).map((list,index)=>
-                            <tr className="info">
-                          <td>{list?.statusDate}</td>
-                          <td>{list?._id}</td>
-                          <td>{list?.collectAmount} TK</td>
-                          <td>{list?.deliveryFee} TK</td>
-                          <td><p className="status-btn">{list?.orderStatus}</p></td>
-                          <td>{list?.collectAmount} TK</td>
-                        </tr>
-                       )
-                     }
+                      {
+   deliveryAll?.slice(0,4).map((list, index) => {
+       let date = new Date(list?.date); 
+       let options = { year: 'numeric', month: 'long', day: 'numeric' }; 
+       let formattedDate = date.toLocaleDateString('en-US', options); 
+
+       return (
+           <tr className="info">
+               <td>{formattedDate}</td>
+               <td>{list?._id}</td>
+               <td>{list?.collectAmount} TK</td>
+               <td>{list?.deliveryFee} TK</td>
+               <td><p className="status-btn">{list?.orderStatus}</p></td>
+               <td>{list?.collectAmount} TK</td>
+               <td style={{color:"red"}}>{list?.returnValue} TK</td>
+           </tr>
+       );
+   })
+   
+}
+
+
                         <tr className="info">
                           <td style={{fontWeight: 700}}>Total</td>
                           <td style={{fontWeight: 700}} />
-                          <td style={{fontWeight: 700}}>1800 TK</td>
-                          <td style={{fontWeight: 700}}>280 TK</td>
+                          <td style={{fontWeight: 700}}>{totalCollectAmount} TK</td>
+                          <td style={{fontWeight: 700}}>{totalDeliveryAmount} TK</td>
                           <td style={{fontWeight: 700}} />
-                          <td style={{fontWeight: 700}}>1800 TK</td>
+                          <td style={{fontWeight: 700}}>{totalCollectAmountByCourier} TK</td>
+                          <td style={{fontWeight: 700}}>{totalReturnAmount} TK</td>
                         </tr>
                       </tbody>
                     </table>
                   </div>
                   <div className="panel-button">
-                    <button id="button" onClick={handleAddDeliveryPopUp}>Update</button>
-                    <button style={{float: 'right'}}>View More</button>
+                    <button id="button" onClick={handleAddDeliveryPopUp}>Add Delivery</button>
+                    <button onClick={gotoAllDeliveries} style={{float: 'right'}}>View More</button>
                   </div>
                 
                 

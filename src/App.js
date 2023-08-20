@@ -17,6 +17,7 @@ import PrivateRoute from './routes/PrivateRoute';
 import Register from './Components/registerAdminPage/Register';
 import Role from './Components/role/Role';
 import DeliverySystem from './Components/deliverySystem/DeliverySystem';
+import AllDeliveryList from './Components/allDeliveries/AllDeliveryList';
 function App() {
   return (
     <div className="">
@@ -32,6 +33,7 @@ function App() {
        <Route path="/viewOrder/:id"element={<PrivateRoute><ViewOrder /> </PrivateRoute>} />
       <Route path="/viewTicket/:id"element={<PrivateRoute><ViewTicket/> </PrivateRoute>} />
       <Route path="/deliverySystem"element={<PrivateRoute><DeliverySystem/> </PrivateRoute>} />
+      <Route path="/alldeliveries"element={<PrivateRoute><AllDeliveryList/> </PrivateRoute>} />
        <Route path="/invitaionPage"element={<SendInvitationPage/> } />
        <Route path="/login" element={<LoginPage/>} />
        <Route path="/role" element={<Role/>} />

@@ -3,9 +3,12 @@ import { Button, Overlay, Tooltip } from "react-bootstrap";
 import useGetMongoData from "../../hooks/useGetMongoData";
 import DatePicker from 'react-datepicker';
 import 'react-datepicker/dist/react-datepicker.css';
+import AlertMessage from "./AlertMessage";
+import DeliveryListAddedAlert from "./DeliveryListAddedAlert";
 const AddDeliveryList = ({ showAlert,onClose,startDate,returnValue,handleReturnValue,handleInputColAmount,collectAmount,setCollectAmount,setRows,rows,handleChangeStartDate,handleInputOrderId,searchByOrderId}) => {
 
   const [show, setShow] = useState(false);
+  const [delSuccessAlert, setDelSuccessAlert] = useState(false);
 
   const target = useRef(null);
   if (!showAlert) return null;
@@ -26,21 +29,45 @@ const removeField = (index) => {
 const handleSubmitDeliveryList = (e) => {
   e.preventDefault();
   
-  // Your data is already in `rows`, so you can send it to the server or do whatever you wish with it
-  console.log("rows,rows",rows);
+  // Optional: Data Validation before sending
+  // if (!isValid(rows)) {
+  //   alert('Invalid data');
+  //   return;
+  // }
   
-  // Example: Send data to server
-  // fetch('/submit-endpoint', {
-  //   method: 'POST',
-  //   headers: {
-  //     'Content-Type': 'application/json'
-  //   },
-  //   body: JSON.stringify(rows)
-  // })
-  // .then(response => response.json())
-  // .then(data => console.log(data))
-  // .catch(error => console.error('Error:', error));
+  // Set a loading state if you have one.
+  // setLoading(true);
+
+  fetch('http://localhost:5000/submitDeliveryList', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json'
+    },
+    body: JSON.stringify(rows)
+  })
+  .then(response => {
+    if (!response.ok) {
+      throw new Error(`Server responded with a ${response.status} status.`);
+    }
+    setDelSuccessAlert(true)
+    return response.json();
+  })
+  .then(data => {
+    console.log(data);
+    // Optionally provide feedback to user
+    // alert('Data submitted successfully!');
+  })
+  .catch(error => {
+    console.error('Error:', error);
+    // Optionally provide feedback to user
+    // alert('An error occurred.');
+  })
+  .finally(() => {
+    // Clear loading state if you have one.
+    // setLoading(false);
+  });
 };
+
 
   return (
       <div>
@@ -113,7 +140,10 @@ const handleSubmitDeliveryList = (e) => {
                         rows?.map((row,index)=>{ 
                        console.log("printbaz cost", row?.searchByOrderId?.printbazcost)
                     let returnAmount=Number(row?.searchByOrderId?.printbazcost)+Number(row?.searchByOrderId?.deliveryFee)
-                  if ( row?.searchByOrderId?.orderStatus === "returned") {
+                  row.collectAmount=row?.searchByOrderId?.collectAmount
+                  row.orderStatus=row?.searchByOrderId?.orderStatus
+                  row.deliveryFee=row?.searchByOrderId?.deliveryFee
+                    if ( row?.searchByOrderId?.orderStatus === "returned") {
                     row.returnValue=returnAmount
                   }
                   else{
@@ -240,9 +270,19 @@ const handleSubmitDeliveryList = (e) => {
                     </div>
                     </form>
                   
-               
+         
                  
       </div>
+        {
+             delSuccessAlert===true &&
+<DeliveryListAddedAlert
+message="Delivery List added Successfully" 
+setDelSuccessAlert={setDelSuccessAlert}
+delSuccessAlert={delSuccessAlert}
+onClose={onClose}
+
+/>
+           }    
     </div>
       </div>
    
