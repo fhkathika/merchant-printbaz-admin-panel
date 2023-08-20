@@ -238,9 +238,9 @@ const Navigationbar = () => {
                           <Link className="nav-link active" aria-current="page" to="/filemanager">File Manager</Link>
                   
                         </li>
-                 } {
-                          value_count?.deliverySystem && 
-                          <li className="nav-item" key={`${value_count?._id}-fileManager`}>
+                 } 
+                 {value_count?.deliverySystem && 
+                          <li className="nav-item" key={`${value_count?._id}-deliverySystem`}>
                           <Link className="nav-link active" aria-current="page" to="/deliverySystem">Delivery Syatem</Link>
                   
                         </li>

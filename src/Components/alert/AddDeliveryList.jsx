@@ -3,37 +3,45 @@ import { Button, Overlay, Tooltip } from "react-bootstrap";
 import useGetMongoData from "../../hooks/useGetMongoData";
 import DatePicker from 'react-datepicker';
 import 'react-datepicker/dist/react-datepicker.css';
-const AddDeliveryList = ({ showAlert,onClose,startDate,returnValue,handleInputColAmount,collectAmount,setCollectAmount,setRows,rows,handleChangeStartDate,handleInputOrderId,searchByOrderId}) => {
+const AddDeliveryList = ({ showAlert,onClose,startDate,returnValue,handleReturnValue,handleInputColAmount,collectAmount,setCollectAmount,setRows,rows,handleChangeStartDate,handleInputOrderId,searchByOrderId}) => {
 
   const [show, setShow] = useState(false);
 
   const target = useRef(null);
   if (!showAlert) return null;
  console.log(("rows",rows));
+// const addField = () => {
+//   setRows([...rows, { date: '', orderId: "", collectAmount: "", deliveryFee: "", orderStatus: "", cashCollectNyCourier: "", returnValue: "" }]);
+// };
+
 const addField = () => {
-  setRows([...rows, { date: '', orderId: "", collectAmount: "", deliveryFee: "", orderStatus: "", cashCollectNyCourier: "", returnValue: "" }]);
+  setRows(prevRows => [...prevRows,{returnValue:Number(searchByOrderId?.printbazcost)+Number(searchByOrderId?.deliveryFee)}]);
 };
-  
+
 // remove field
 const removeField = (index) => {
 
 };
-// const addDeliveryList=async()=>{
-//   try{
-//     const response = await
-//     //  fetch("https://mserver.printbaz.com/submitorder",  //add this when upload  in main server 
-//      fetch("http://localhost:5000/submitorder", //add this when work local server
-     
-//      {
-//       method: "POST",
-//       body: rows,
-//     });
-//   }
-//   catch(err){
-//     console.error(err)
-//   }
 
-// }
+const handleSubmitDeliveryList = (e) => {
+  e.preventDefault();
+  
+  // Your data is already in `rows`, so you can send it to the server or do whatever you wish with it
+  console.log("rows,rows",rows);
+  
+  // Example: Send data to server
+  // fetch('/submit-endpoint', {
+  //   method: 'POST',
+  //   headers: {
+  //     'Content-Type': 'application/json'
+  //   },
+  //   body: JSON.stringify(rows)
+  // })
+  // .then(response => response.json())
+  // .then(data => console.log(data))
+  // .catch(error => console.error('Error:', error));
+};
+
   return (
       <div>
  <div className="alert-overlay" >
@@ -42,7 +50,7 @@ const removeField = (index) => {
                     <div >
                       <span id="popupclose" onClick={onClose}>X</span>
                     </div>
-                    <form >
+                    <form onSubmit={handleSubmitDeliveryList}>
                     <div className="popupcontent">
                       <div className="row ">
                         <div className="">
@@ -105,7 +113,13 @@ const removeField = (index) => {
                         rows?.map((row,index)=>{ 
                        console.log("printbaz cost", row?.searchByOrderId?.printbazcost)
                     let returnAmount=Number(row?.searchByOrderId?.printbazcost)+Number(row?.searchByOrderId?.deliveryFee)
-                      
+                  if ( row?.searchByOrderId?.orderStatus === "returned") {
+                    row.returnValue=returnAmount
+                  }
+                  else{
+                    row.returnValue=0
+                  }
+                    
                           const copyOrderId = (index) => {
                             // Copy collectAmount into cashCollectNyCourier of the specific row
                             const newRows = [...rows];
@@ -181,9 +195,6 @@ const removeField = (index) => {
   }
 </div>
 
-                          
-                         
-                          
                                   <Overlay target={target.current} show={show} placement="right">
           {(props) => (
             <Tooltip id="overlay-example" {...props}>
@@ -192,12 +203,30 @@ const removeField = (index) => {
           )}
         </Overlay>
                         <div className="col-2">
-  {
-    row?.searchByOrderId?.orderStatus==="returned" ?
-   <input type="text" id={`returnValue-${index}`} required style={{border: '1px solid #ececec', width: '75%', height: '50px', padding: '5px',textAlign:"center",color:"red"}}  value={returnAmount} readOnly/>
-   :
-  <input type="text" id={`returnValue-${index}`} required style={{border: '1px solid #ececec', width: '75%', height: '50px', padding: '5px',textAlign:"center",color:"red"}} value="0" readOnly />
-  }
+                        {
+  row?.searchByOrderId?.orderStatus === "returned" ?
+  <input 
+    type="text"  
+    id={`returnValue-${index}`}   
+    onChange={(e) => { 
+      console.log("Inline e.target.value", e.target.value);
+      handleReturnValue(e, index);
+    }}
+    required 
+    style={{border: '1px solid #ececec', width: '75%', height: '50px', padding: '5px', textAlign: "center", color: "red"}}  
+    value={returnAmount}
+  />
+  :
+  <input 
+    type="text" 
+    id={`returnValue-${index}`} 
+    onChange={(e) => handleReturnValue(e, index)} 
+    required 
+    style={{border: '1px solid #ececec', width: '75%', height: '50px', padding: '5px', textAlign: "center", color: "red"}} 
+    value="0"  
+  />
+}
+
                           </div>
                         </div>
                         )})

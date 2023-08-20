@@ -24,15 +24,24 @@ const DeliverySystem = () => {
     
     
    
-  // const returnValue=Number(searchByOrderId?.printbazcost)+Number(searchByOrderId?.deliveryFee)
+  const returnValue=Number(searchByOrderId?.printbazcost)+Number(searchByOrderId?.deliveryFee)
   const handleInputColAmount = (e, idx) => {
     const newRows = [...rows];
     newRows[idx].cashCollectNyCourier = e.target.value;
     setRows(newRows);
   }
+  const handleReturnValue = (e, idx) => {
+    const newRows = [...rows];
+    
+    // Here, e.target.value represents the updated value of the returnAmount input field.
+    newRows[idx].returnAmount = e.target.value;
+    
+    setRows(newRows);
+  }
+  
   
   const [rows, setRows] = useState([
-    { date: '', orderId:'', collectAmount: '', deliveryFee: '', orderStatus: '', cashCollectNyCourier:collectAmount, returnValue: 0 }
+    { date: '', orderId:'', collectAmount: '', deliveryFee: '', orderStatus: '', cashCollectNyCourier:collectAmount, returnValue:0 }
   ]);
   console.log("searchByOrderId sdfsf",rows);
   // useEffect(() => {
@@ -282,6 +291,7 @@ const handleChangeStartDate = (date, idx) => {
           collectAmount={collectAmount}
           setCollectAmount={setCollectAmount}
           handleInputColAmount={handleInputColAmount}
+          handleReturnValue={handleReturnValue}
           searchByOrderId={searchByOrderId}
           handleInputOrderId={handleInputOrderId}
           handleChangeStartDate={handleChangeStartDate}
