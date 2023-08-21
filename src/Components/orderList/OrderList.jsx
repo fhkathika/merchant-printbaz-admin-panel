@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { Link } from 'react-router-dom';
+import { Link,useLocation } from 'react-router-dom';
 import useGetMongoData from '../../hooks/useGetMongoData';
 import DatePicker from 'react-datepicker';
 import 'react-datepicker/dist/react-datepicker.css';
@@ -18,6 +18,12 @@ const OrderList = () => {
   const [endDate,setEndDate]=useState(null);
   const indexOfLastItem = currentPage * itemsPerPage;
   const indexOfFirstItem = indexOfLastItem - itemsPerPage;
+  const location = useLocation();
+  const [previousPath, setPreviousPath] = useState('');
+  useEffect(() => {
+    // Update the previousPath state when the location changes
+    setPreviousPath(location.pathname);
+  }, [location.pathname]);
   useEffect(()=>{
     const getOrders = async () => {
      await fetch('https://mserver.printbaz.com/alluser') //for main site
@@ -250,13 +256,13 @@ const actualIndexOfLastItemOfUnpaidOrders = indexOfLastItem > unPaidOrders.lengt
               <div className="col-lg-2 col-sm-12">
                 <label htmlFor="status-filter" style={{marginBottom:"8px"}}>Status:</label>
                 <select id="status-filter"  className="form-control" onChange={(e) =>  handleInputChange(e)}>
-                  <option   value="all">all</option>
+                  <option   value="all">All</option>
                   <option value="Pending">Pending</option>
-                  <option value="confirmed">Confirmed</option>
                   <option value="on hold artwork issue">On hold -  Artwork issue</option>
                   <option value="on hold billing issue">On hold - Billing Issue</option>
                   <option value="on hold out of stock">On hold - Out of Stock</option>
                   <option value="Approved">Approved</option>
+                  <option value="confirmed">Confirmed</option>
                   <option value="in-production">In Production</option>
                   <option value="out for delivery">Out for delivery</option>
                  <option value="delivered">Delivered</option>
@@ -397,7 +403,7 @@ const actualIndexOfLastItemOfUnpaidOrders = indexOfLastItem > unPaidOrders.lengt
                   <h4>Payment</h4>
                 </div>
                 <div className="col-lg-2 col-sm-12">
-                  <h4>Amount</h4>
+                  <h4>Printbaz Cost</h4>
                 </div>
                 <div className="col-lg-1 col-sm-12">
                   <h4>Status</h4>
@@ -406,10 +412,10 @@ const actualIndexOfLastItemOfUnpaidOrders = indexOfLastItem > unPaidOrders.lengt
               {
                    filerByOrderDate.map((orders,index)=>{ 
                     matchingMerchant = allMerchant.find(merchant => merchant?.email === orders?.userMail)
-                   let  totalPrintBazCostWithDeliveryFee=Number(orders?.printbazcost) + Number(orders?.deliveryFee)
+                   let  totalPrintBazCostWithoutDeliveryFee=Number(orders?.printbazcost)
                     return (
                       value_count?.OrderView ?
-                      <Link to={`/viewOrder/${orders?._id}`} state={{orders,matchingMerchant}} key={index}>
+                      <Link to={`/viewOrder/${orders?._id}`} state={{orders,previousPath,matchingMerchant}} key={index}>
                       <div key={orders?._id} className="row client-list">
                         <div className="col-lg-2 col-sm-12">
                          {/* Display the corresponding allMerchant name */}
@@ -429,7 +435,7 @@ const actualIndexOfLastItemOfUnpaidOrders = indexOfLastItem > unPaidOrders.lengt
                           <p className="p-status-btn">{orders?.paymentStatus}</p>
                         </div>
                         <div className="col-lg-2 col-sm-12">
-                          <p>{totalPrintBazCostWithDeliveryFee} TK</p>
+                          <p>{totalPrintBazCostWithoutDeliveryFee} TK</p>
                         </div>
                         <div className="col-lg-1 col-sm-12">
                           <p className="" style={{backgroundColor:getViewClientColor(orders?.orderStatus)}}>{orders?.orderStatus}</p>
@@ -462,7 +468,7 @@ const actualIndexOfLastItemOfUnpaidOrders = indexOfLastItem > unPaidOrders.lengt
                       <p className="p-status-btn">{orders?.paymentStatus}</p>
                     </div>
                     <div className="col-lg-2 col-sm-12">
-                      <p>{totalPrintBazCostWithDeliveryFee} TK</p>
+                      <p>{totalPrintBazCostWithoutDeliveryFee} TK</p>
                     </div>
                     <div className="col-lg-1 col-sm-12">
                       <p className="" style={{backgroundColor:getViewClientColor(orders?.orderStatus)}}>{orders?.orderStatus}</p>
@@ -483,10 +489,10 @@ const actualIndexOfLastItemOfUnpaidOrders = indexOfLastItem > unPaidOrders.lengt
                {
                    filterByBrandName.map((orders,index)=>{ 
                     matchingMerchant = allMerchant.find(merchant => merchant?.email === orders?.userMail)
-                   let  totalPrintBazCostWithDeliveryFee=Number(orders?.printbazcost) + Number(orders?.deliveryFee)
+                   let  totalPrintBazCostWithoutDeliveryFee=Number(orders?.printbazcost)
                     return (
                       value_count?.OrderView ?
-                      <Link to={`/viewOrder/${orders?._id}`} state={{orders,matchingMerchant}} key={index}>
+                      <Link to={`/viewOrder/${orders?._id}`} state={{orders,previousPath,matchingMerchant}} key={index}>
                       <div key={orders?._id} className="row client-list">
                         <div className="col-lg-2 col-sm-12">
                          {/* Display the corresponding allMerchant name */}
@@ -506,7 +512,7 @@ const actualIndexOfLastItemOfUnpaidOrders = indexOfLastItem > unPaidOrders.lengt
                           <p className="p-status-btn">{orders?.paymentStatus}</p>
                         </div>
                         <div className="col-lg-2 col-sm-12">
-                          <p>{totalPrintBazCostWithDeliveryFee} TK</p>
+                          <p>{totalPrintBazCostWithoutDeliveryFee} TK</p>
                         </div>
                         <div className="col-lg-1 col-sm-12">
                           <p className="" style={{backgroundColor:getViewClientColor(orders?.orderStatus)}}>{orders?.orderStatus}</p>
@@ -539,7 +545,7 @@ const actualIndexOfLastItemOfUnpaidOrders = indexOfLastItem > unPaidOrders.lengt
                           <p className="p-status-btn">{orders?.paymentStatus}</p>
                         </div>
                         <div className="col-lg-2 col-sm-12">
-                          <p>{totalPrintBazCostWithDeliveryFee} TK</p>
+                          <p>{totalPrintBazCostWithoutDeliveryFee} TK</p>
                         </div>
                         <div className="col-lg-1 col-sm-12">
                           <p className="" style={{backgroundColor:getViewClientColor(orders?.orderStatus)}}>{orders?.orderStatus}</p>
@@ -561,7 +567,7 @@ const actualIndexOfLastItemOfUnpaidOrders = indexOfLastItem > unPaidOrders.lengt
                    filterOrders && filterByClientPhone?.map((orders,index)=>{ 
                    const matchingMerchantOrders = orderAll?.filter(merchantOrder => merchantOrder?.userMail === orders?.email)
                   //  console.log("matchingMerchantOrders",matchingMerchantOrders);
-                   let  totalPrintBazCostWithDeliveryFee=Number(orders?.printbazcost) + Number(orders?.deliveryFee)
+                   let  totalPrintBazCostWithoutDeliveryFee=Number(orders?.printbazcost)
                     return (
                       value_count?.OrderView ?
                       <Link to={`/viewOrder/${orders?._id}`} state={{orders,matchingMerchantOrders}} key={index}>
@@ -585,7 +591,7 @@ const actualIndexOfLastItemOfUnpaidOrders = indexOfLastItem > unPaidOrders.lengt
                           <p className="p-status-btn">{orders?.paymentStatus}</p>
                         </div>
                         <div className="col-lg-2 col-sm-12">
-                          <p>{totalPrintBazCostWithDeliveryFee} TK</p>
+                          <p>{totalPrintBazCostWithoutDeliveryFee} TK</p>
                         </div>
                         <div className="col-lg-1 col-sm-12">
                           <p className="" style={{backgroundColor:getViewClientColor(orders?.orderStatus)}}>{orders?.orderStatus}</p>
@@ -614,7 +620,7 @@ const actualIndexOfLastItemOfUnpaidOrders = indexOfLastItem > unPaidOrders.lengt
                       <p className="p-status-btn">{orders?.paymentStatus}</p>
                     </div>
                     <div className="col-lg-2 col-sm-12">
-                      <p>{totalPrintBazCostWithDeliveryFee} TK</p>
+                      <p>{totalPrintBazCostWithoutDeliveryFee} TK</p>
                     </div>
                     <div className="col-lg-1 col-sm-12">
                       <p className="" style={{backgroundColor:getViewClientColor(orders?.orderStatus)}}>{orders?.orderStatus}</p>
@@ -631,10 +637,10 @@ const actualIndexOfLastItemOfUnpaidOrders = indexOfLastItem > unPaidOrders.lengt
                    filterOrders && searchByOrderId
                    ?.map((orders,index)=>{ 
                     matchingMerchant = allMerchant.find(merchant => merchant?.email === orders?.userMail)
-                   let  totalPrintBazCostWithDeliveryFee=Number(orders?.printbazcost) + Number(orders?.deliveryFee)
+                   let  totalPrintBazCostWithoutDeliveryFee=Number(orders?.printbazcost)
                     return (
                       value_count?.OrderView ?
-                      <Link to={`/viewOrder/${orders?._id}`} state={{orders,matchingMerchant}} key={index}>
+                      <Link to={`/viewOrder/${orders?._id}`} state={{orders,previousPath,matchingMerchant}} key={index}>
                       <div key={orders?._id} className="row client-list">
                         <div className="col-lg-2 col-sm-12">
                          {/* Display the corresponding allMerchant name */}
@@ -654,7 +660,7 @@ const actualIndexOfLastItemOfUnpaidOrders = indexOfLastItem > unPaidOrders.lengt
                           <p className="p-status-btn">{orders?.paymentStatus}</p>
                         </div>
                         <div className="col-lg-2 col-sm-12">
-                          <p>{totalPrintBazCostWithDeliveryFee} TK</p>
+                          <p>{totalPrintBazCostWithoutDeliveryFee} TK</p>
                         </div>
                         <div className="col-lg-1 col-sm-12">
                           <p className="" style={{backgroundColor:getViewClientColor(orders?.orderStatus)}}>{orders?.orderStatus}</p>
@@ -682,7 +688,7 @@ const actualIndexOfLastItemOfUnpaidOrders = indexOfLastItem > unPaidOrders.lengt
                       <p className="p-status-btn">{orders?.paymentStatus}</p>
                     </div>
                     <div className="col-lg-2 col-sm-12">
-                      <p>{totalPrintBazCostWithDeliveryFee} TK</p>
+                      <p>{totalPrintBazCostWithoutDeliveryFee} TK</p>
                     </div>
                     <div className="col-lg-1 col-sm-12">
                       <p className="" style={{backgroundColor:getViewClientColor(orders?.orderStatus)}}>{orders?.orderStatus}</p>
@@ -701,10 +707,10 @@ const actualIndexOfLastItemOfUnpaidOrders = indexOfLastItem > unPaidOrders.lengt
               .sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt))
                    .map((orders,index)=>{ 
                     matchingMerchant = allMerchant.find(merchant => merchant?.email === orders?.userMail)
-                   let  totalPrintBazCostWithDeliveryFee=Number(orders?.printbazcost) + Number(orders?.deliveryFee)
+                   let  totalPrintBazCostWithoutDeliveryFee=Number(orders?.printbazcost)
                     return (
                       value_count?.OrderView ?
-                      <Link to={`/viewOrder/${orders?._id}`} state={{orders,matchingMerchant}} key={index}>
+                      <Link to={`/viewOrder/${orders?._id}`} state={{orders,previousPath,matchingMerchant}} key={index}>
                       <div key={orders?._id} className="row client-list">
                         <div className="col-lg-2 col-sm-12">
                          {/* Display the corresponding allMerchant name */}
@@ -724,7 +730,7 @@ const actualIndexOfLastItemOfUnpaidOrders = indexOfLastItem > unPaidOrders.lengt
                           <p className="p-status-btn">{orders?.paymentStatus}</p>
                         </div>
                         <div className="col-lg-2 col-sm-12">
-                          <p>{totalPrintBazCostWithDeliveryFee} TK</p>
+                          <p>{totalPrintBazCostWithoutDeliveryFee} TK</p>
                         </div>
                         <div className="col-lg-1 col-sm-12">
                           <p className="" style={{backgroundColor:getViewClientColor(orders?.orderStatus)}}>{orders?.orderStatus}</p>
@@ -757,7 +763,7 @@ const actualIndexOfLastItemOfUnpaidOrders = indexOfLastItem > unPaidOrders.lengt
                       <p className="p-status-btn">{orders?.paymentStatus}</p>
                     </div>
                     <div className="col-lg-2 col-sm-12">
-                      <p>{totalPrintBazCostWithDeliveryFee} TK</p>
+                      <p>{totalPrintBazCostWithoutDeliveryFee} TK</p>
                     </div>
                     <div className="col-lg-1 col-sm-12">
                       <p className="" style={{backgroundColor:getViewClientColor(orders?.orderStatus)}}>{orders?.orderStatus}</p>
@@ -781,10 +787,10 @@ const actualIndexOfLastItemOfUnpaidOrders = indexOfLastItem > unPaidOrders.lengt
               .sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt))
                    .map((orders,index)=>{ 
                     matchingMerchant = allMerchant.find(merchant => merchant?.email === orders?.userMail)
-                   let  totalPrintBazCostWithDeliveryFee=Number(orders?.printbazcost) + Number(orders?.deliveryFee)
+                   let  totalPrintBazCostWithoutDeliveryFee=Number(orders?.printbazcost)
                     return (
                       value_count?.OrderView ?
-                      <Link to={`/viewOrder/${orders?._id}`} state={{orders,matchingMerchant}} key={index}>
+                      <Link to={`/viewOrder/${orders?._id}`} state={{orders,previousPath,matchingMerchant}} key={index}>
                       <div key={orders?._id} className="row client-list">
                         <div className="col-lg-2 col-sm-12">
                          {/* Display the corresponding allMerchant name */}
@@ -804,7 +810,7 @@ const actualIndexOfLastItemOfUnpaidOrders = indexOfLastItem > unPaidOrders.lengt
                           <p className="p-status-btn">{orders?.paymentStatus}</p>
                         </div>
                         <div className="col-lg-2 col-sm-12">
-                          <p>{totalPrintBazCostWithDeliveryFee} TK</p>
+                          <p>{totalPrintBazCostWithoutDeliveryFee} TK</p>
                         </div>
                         <div className="col-lg-1 col-sm-12">
                           <p className="status-btn" style={{    backgroundColor: getViewClientColor(
@@ -839,7 +845,7 @@ const actualIndexOfLastItemOfUnpaidOrders = indexOfLastItem > unPaidOrders.lengt
                       <p className="p-status-btn">{orders?.paymentStatus}</p>
                     </div>
                     <div className="col-lg-2 col-sm-12">
-                      <p>{totalPrintBazCostWithDeliveryFee} TK</p>
+                      <p>{totalPrintBazCostWithoutDeliveryFee} TK</p>
                     </div>
                     <div className="col-lg-1 col-sm-12">
                       <p className="status-btn" style={{    backgroundColor: getViewClientColor(
@@ -864,10 +870,10 @@ const actualIndexOfLastItemOfUnpaidOrders = indexOfLastItem > unPaidOrders.lengt
               .sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt))
               .map((orders,index)=>{ 
                 matchingMerchant = allMerchant.find(merchant => merchant?.email === orders?.userMail)
-            let  totalPrintBazCostWithDeliveryFee=Number(orders?.printbazcost) + Number(orders?.deliveryFee)
+            let  totalPrintBazCostWithoutDeliveryFee=Number(orders?.printbazcost)
                  return (
                   value_count?.OrderView ?
-                  <Link to={`/viewOrder/${orders?._id}`} state={{orders,matchingMerchant}} key={index}>
+                  <Link to={`/viewOrder/${orders?._id}`} state={{orders,previousPath,matchingMerchant}} key={index}>
                   <div key={orders?._id} className="row client-list">
                     <div className="col-lg-2 col-sm-12">
                      {/* Display the corresponding allMerchant name */}
@@ -887,7 +893,7 @@ const actualIndexOfLastItemOfUnpaidOrders = indexOfLastItem > unPaidOrders.lengt
                       <p className="p-status-btn">{orders?.paymentStatus}</p>
                     </div>
                     <div className="col-lg-2 col-sm-12">
-                      <p> {totalPrintBazCostWithDeliveryFee} TK</p>
+                      <p> {totalPrintBazCostWithoutDeliveryFee} TK</p>
                     </div>
                     <div className="col-lg-1 col-sm-12">
                       <p className="status-btn" style={{backgroundColor:getViewClientColor(orders?.orderStatus)}}>{orders?.orderStatus}</p>
@@ -921,7 +927,7 @@ const actualIndexOfLastItemOfUnpaidOrders = indexOfLastItem > unPaidOrders.lengt
                   <p className="p-status-btn">{orders?.paymentStatus}</p>
                 </div>
                 <div className="col-lg-2 col-sm-12">
-                  <p> {totalPrintBazCostWithDeliveryFee} TK</p>
+                  <p> {totalPrintBazCostWithoutDeliveryFee} TK</p>
                 </div>
                 <div className="col-lg-1 col-sm-12">
                   <p className="status-btn" style={{backgroundColor:getViewClientColor(orders?.orderStatus)}}>{orders?.orderStatus}</p>
@@ -945,10 +951,10 @@ const actualIndexOfLastItemOfUnpaidOrders = indexOfLastItem > unPaidOrders.lengt
               .sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt))
               .sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt)).map((orders,index)=>{ 
                 matchingMerchant = allMerchant.find(merchant => merchant?.email === orders?.userMail)
-               let  totalPrintBazCostWithDeliveryFee=Number(orders?.printbazcost) + Number(orders?.deliveryFee)
+               let  totalPrintBazCostWithoutDeliveryFee=Number(orders?.printbazcost)
                 return (
                   value_count?.OrderView ?
-                  <Link to={`/viewOrder/${orders?._id}`} state={{orders,matchingMerchant}} key={index}>
+                  <Link to={`/viewOrder/${orders?._id}`} state={{orders,previousPath,matchingMerchant}} key={index}>
                   <div key={orders?._id} className="row client-list">
                     <div className="col-lg-2 col-sm-12">
                      {/* Display the corresponding allMerchant name */}
@@ -968,7 +974,7 @@ const actualIndexOfLastItemOfUnpaidOrders = indexOfLastItem > unPaidOrders.lengt
                       <p className="p-status-btn">{orders?.paymentStatus}</p>
                     </div>
                     <div className="col-lg-2 col-sm-12">
-                      <p>{totalPrintBazCostWithDeliveryFee} TK</p>
+                      <p>{totalPrintBazCostWithoutDeliveryFee} TK</p>
                     </div>
                     <div className="col-lg-1 col-sm-12">
                       <p className="status-btn" style={{    backgroundColor: getViewClientColor(
@@ -1003,7 +1009,7 @@ const actualIndexOfLastItemOfUnpaidOrders = indexOfLastItem > unPaidOrders.lengt
                   <p className="p-status-btn">{orders?.paymentStatus}</p>
                 </div>
                 <div className="col-lg-2 col-sm-12">
-                  <p>{totalPrintBazCostWithDeliveryFee} TK</p>
+                  <p>{totalPrintBazCostWithoutDeliveryFee} TK</p>
                 </div>
                 <div className="col-lg-1 col-sm-12">
                   <p className="status-btn" style={{    backgroundColor: getViewClientColor(
@@ -1030,10 +1036,10 @@ const actualIndexOfLastItemOfUnpaidOrders = indexOfLastItem > unPaidOrders.lengt
               .sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt))
               .map((orders,index)=>{ 
                 matchingMerchant = allMerchant.find(merchant => merchant?.email === orders?.userMail)
-               let  totalPrintBazCostWithDeliveryFee=Number(orders?.printbazcost) + Number(orders?.deliveryFee)
+               let  totalPrintBazCostWithoutDeliveryFee=Number(orders?.printbazcost)
                 return (
                   value_count?.OrderView ?
-                  <Link to={`/viewOrder/${orders?._id}`} state={{orders,matchingMerchant}} key={index}>
+                  <Link to={`/viewOrder/${orders?._id}`} state={{orders,previousPath,matchingMerchant}} key={index}>
                   <div key={orders?._id} className="row client-list">
                     <div className="col-lg-2 col-sm-12">
                      {/* Display the corresponding allMerchant name */}
@@ -1053,7 +1059,7 @@ const actualIndexOfLastItemOfUnpaidOrders = indexOfLastItem > unPaidOrders.lengt
                       <p className="p-status-btn">{orders?.paymentStatus}</p>
                     </div>
                     <div className="col-lg-2 col-sm-12">
-                      <p>{totalPrintBazCostWithDeliveryFee} TK</p>
+                      <p>{totalPrintBazCostWithoutDeliveryFee} TK</p>
                     </div>
                     <div className="col-lg-1 col-sm-12">
                       <p className="status-btn" style={{    backgroundColor: getViewClientColor(
@@ -1088,7 +1094,7 @@ const actualIndexOfLastItemOfUnpaidOrders = indexOfLastItem > unPaidOrders.lengt
                   <p className="p-status-btn">{orders?.paymentStatus}</p>
                 </div>
                 <div className="col-lg-2 col-sm-12">
-                  <p>{totalPrintBazCostWithDeliveryFee} TK</p>
+                  <p>{totalPrintBazCostWithoutDeliveryFee} TK</p>
                 </div>
                 <div className="col-lg-1 col-sm-12">
                   <p className="status-btn" style={{    backgroundColor: getViewClientColor(
@@ -1116,10 +1122,10 @@ const actualIndexOfLastItemOfUnpaidOrders = indexOfLastItem > unPaidOrders.lengt
               .sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt))
               .map((orders,index)=>{ 
                 matchingMerchant = allMerchant.find(merchant => merchant?.email === orders?.userMail)
-               let  totalPrintBazCostWithDeliveryFee=Number(orders?.printbazcost) + Number(orders?.deliveryFee)
+               let  totalPrintBazCostWithoutDeliveryFee=Number(orders?.printbazcost)
                 return (
                   value_count?.OrderView ?
-                  <Link to={`/viewOrder/${orders?._id}`} state={{orders,matchingMerchant}} key={index}>
+                  <Link to={`/viewOrder/${orders?._id}`} state={{orders,previousPath,matchingMerchant}} key={index}>
                   <div key={orders?._id} className="row client-list">
                     <div className="col-lg-2 col-sm-12">
                      {/* Display the corresponding allMerchant name */}
@@ -1139,7 +1145,7 @@ const actualIndexOfLastItemOfUnpaidOrders = indexOfLastItem > unPaidOrders.lengt
                       <p className="p-status-btn">{orders?.paymentStatus}</p>
                     </div>
                     <div className="col-lg-2 col-sm-12">
-                      <p>{totalPrintBazCostWithDeliveryFee} TK</p>
+                      <p>{totalPrintBazCostWithoutDeliveryFee} TK</p>
                     </div>
                     <div className="col-lg-1 col-sm-12">
                       <p className="status-btn" style={{    backgroundColor: getViewClientColor(
@@ -1174,7 +1180,7 @@ const actualIndexOfLastItemOfUnpaidOrders = indexOfLastItem > unPaidOrders.lengt
                   <p className="p-status-btn">{orders?.paymentStatus}</p>
                 </div>
                 <div className="col-lg-2 col-sm-12">
-                  <p>{totalPrintBazCostWithDeliveryFee} TK</p>
+                  <p>{totalPrintBazCostWithoutDeliveryFee} TK</p>
                 </div>
                 <div className="col-lg-1 col-sm-12">
                   <p className="status-btn" style={{    backgroundColor: getViewClientColor(
@@ -1201,10 +1207,10 @@ const actualIndexOfLastItemOfUnpaidOrders = indexOfLastItem > unPaidOrders.lengt
               .sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt))
               .map((orders,index)=>{ 
                 matchingMerchant = allMerchant.find(merchant => merchant?.email === orders?.userMail)
-               let  totalPrintBazCostWithDeliveryFee=Number(orders?.printbazcost) + Number(orders?.deliveryFee)
+               let  totalPrintBazCostWithoutDeliveryFee=Number(orders?.printbazcost)
                 return (
                   value_count?.OrderView ?
-                  <Link to={`/viewOrder/${orders?._id}`} state={{orders,matchingMerchant}} key={index}>
+                  <Link to={`/viewOrder/${orders?._id}`} state={{orders,previousPath,matchingMerchant}} key={index}>
                   <div key={orders?._id} className="row client-list">
                     <div className="col-lg-2 col-sm-12">
                      {/* Display the corresponding allMerchant name */}
@@ -1224,7 +1230,7 @@ const actualIndexOfLastItemOfUnpaidOrders = indexOfLastItem > unPaidOrders.lengt
                       <p className="p-status-btn">{orders?.paymentStatus}</p>
                     </div>
                     <div className="col-lg-2 col-sm-12">
-                      <p>{totalPrintBazCostWithDeliveryFee} TK</p>
+                      <p>{totalPrintBazCostWithoutDeliveryFee} TK</p>
                     </div>
                     <div className="col-lg-1 col-sm-12">
                       <p className="status-btn" style={{    backgroundColor: getViewClientColor(
@@ -1259,7 +1265,7 @@ const actualIndexOfLastItemOfUnpaidOrders = indexOfLastItem > unPaidOrders.lengt
                   <p className="p-status-btn">{orders?.paymentStatus}</p>
                 </div>
                 <div className="col-lg-2 col-sm-12">
-                  <p>{totalPrintBazCostWithDeliveryFee} TK</p>
+                  <p>{totalPrintBazCostWithoutDeliveryFee} TK</p>
                 </div>
                 <div className="col-lg-1 col-sm-12">
                   <p className="status-btn" style={{    backgroundColor: getViewClientColor(
@@ -1286,10 +1292,10 @@ const actualIndexOfLastItemOfUnpaidOrders = indexOfLastItem > unPaidOrders.lengt
               .sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt))
               .map((orders,index)=>{ 
                 matchingMerchant = allMerchant.find(merchant => merchant?.email === orders?.userMail)
-               let  totalPrintBazCostWithDeliveryFee=Number(orders?.printbazcost) + Number(orders?.deliveryFee)
+               let  totalPrintBazCostWithoutDeliveryFee=Number(orders?.printbazcost)
                 return (
                   value_count?.OrderView ?
-                  <Link to={`/viewOrder/${orders?._id}`} state={{orders,matchingMerchant}} key={index}>
+                  <Link to={`/viewOrder/${orders?._id}`} state={{orders,previousPath,matchingMerchant}} key={index}>
                   <div key={orders?._id} className="row client-list">
                     <div className="col-lg-2 col-sm-12">
                      {/* Display the corresponding allMerchant name */}
@@ -1309,7 +1315,7 @@ const actualIndexOfLastItemOfUnpaidOrders = indexOfLastItem > unPaidOrders.lengt
                       <p className="p-status-btn">{orders?.paymentStatus}</p>
                     </div>
                     <div className="col-lg-2 col-sm-12">
-                      <p>{totalPrintBazCostWithDeliveryFee} TK</p>
+                      <p>{totalPrintBazCostWithoutDeliveryFee} TK</p>
                     </div>
                     <div className="col-lg-1 col-sm-12">
                       <p className="status-btn" style={{    backgroundColor: getViewClientColor(
@@ -1344,7 +1350,7 @@ const actualIndexOfLastItemOfUnpaidOrders = indexOfLastItem > unPaidOrders.lengt
                   <p className="p-status-btn">{orders?.paymentStatus}</p>
                 </div>
                 <div className="col-lg-2 col-sm-12">
-                  <p>{totalPrintBazCostWithDeliveryFee} TK</p>
+                  <p>{totalPrintBazCostWithoutDeliveryFee} TK</p>
                 </div>
                 <div className="col-lg-1 col-sm-12">
                   <p className="status-btn" style={{    backgroundColor: getViewClientColor(
@@ -1371,10 +1377,10 @@ const actualIndexOfLastItemOfUnpaidOrders = indexOfLastItem > unPaidOrders.lengt
               .sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt))
               .map((orders,index)=>{ 
                 matchingMerchant = allMerchant.find(merchant => merchant?.email === orders?.userMail)
-               let  totalPrintBazCostWithDeliveryFee=Number(orders?.printbazcost) + Number(orders?.deliveryFee)
+               let  totalPrintBazCostWithoutDeliveryFee=Number(orders?.printbazcost)
                 return (
                   value_count?.OrderView ?
-                  <Link to={`/viewOrder/${orders?._id}`} state={{orders,matchingMerchant}} key={index}>
+                  <Link to={`/viewOrder/${orders?._id}`} state={{orders,previousPath,matchingMerchant}} key={index}>
                   <div key={orders?._id} className="row client-list">
                     <div className="col-lg-2 col-sm-12">
                      {/* Display the corresponding allMerchant name */}
@@ -1394,7 +1400,7 @@ const actualIndexOfLastItemOfUnpaidOrders = indexOfLastItem > unPaidOrders.lengt
                       <p className="p-status-btn">{orders?.paymentStatus}</p>
                     </div>
                     <div className="col-lg-2 col-sm-12">
-                      <p>{totalPrintBazCostWithDeliveryFee} TK</p>
+                      <p>{totalPrintBazCostWithoutDeliveryFee} TK</p>
                     </div>
                     <div className="col-lg-1 col-sm-12">
                       <p className="status-btn" style={{    backgroundColor: getViewClientColor(
@@ -1429,7 +1435,7 @@ const actualIndexOfLastItemOfUnpaidOrders = indexOfLastItem > unPaidOrders.lengt
                   <p className="p-status-btn">{orders?.paymentStatus}</p>
                 </div>
                 <div className="col-lg-2 col-sm-12">
-                  <p>{totalPrintBazCostWithDeliveryFee} TK</p>
+                  <p>{totalPrintBazCostWithoutDeliveryFee} TK</p>
                 </div>
                 <div className="col-lg-1 col-sm-12">
                   <p className="status-btn" style={{    backgroundColor: getViewClientColor(
@@ -1456,10 +1462,10 @@ const actualIndexOfLastItemOfUnpaidOrders = indexOfLastItem > unPaidOrders.lengt
               .sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt))
               .map((orders,index)=>{ 
                 matchingMerchant = allMerchant.find(merchant => merchant?.email === orders?.userMail)
-               let  totalPrintBazCostWithDeliveryFee=Number(orders?.printbazcost) + Number(orders?.deliveryFee)
+               let  totalPrintBazCostWithoutDeliveryFee=Number(orders?.printbazcost)
                 return (
                   value_count?.OrderView ?
-                  <Link to={`/viewOrder/${orders?._id}`} state={{orders,matchingMerchant}} key={index}>
+                  <Link to={`/viewOrder/${orders?._id}`} state={{orders,previousPath,matchingMerchant}} key={index}>
                   <div key={orders?._id} className="row client-list">
                     <div className="col-lg-2 col-sm-12">
                      {/* Display the corresponding allMerchant name */}
@@ -1479,7 +1485,7 @@ const actualIndexOfLastItemOfUnpaidOrders = indexOfLastItem > unPaidOrders.lengt
                       <p className="p-status-btn">{orders?.paymentStatus}</p>
                     </div>
                     <div className="col-lg-2 col-sm-12">
-                      <p>{totalPrintBazCostWithDeliveryFee} TK</p>
+                      <p>{totalPrintBazCostWithoutDeliveryFee} TK</p>
                     </div>
                     <div className="col-lg-1 col-sm-12">
                       <p className="status-btn" style={{    backgroundColor: getViewClientColor(
@@ -1515,7 +1521,7 @@ const actualIndexOfLastItemOfUnpaidOrders = indexOfLastItem > unPaidOrders.lengt
                   <p className="p-status-btn">{orders?.paymentStatus}</p>
                 </div>
                 <div className="col-lg-2 col-sm-12">
-                  <p>{totalPrintBazCostWithDeliveryFee} TK</p>
+                  <p>{totalPrintBazCostWithoutDeliveryFee} TK</p>
                 </div>
                 <div className="col-lg-1 col-sm-12">
                   <p className="status-btn" style={{    backgroundColor: getViewClientColor(
@@ -1543,10 +1549,10 @@ const actualIndexOfLastItemOfUnpaidOrders = indexOfLastItem > unPaidOrders.lengt
               .sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt))
               .map((orders,index)=>{ 
                 matchingMerchant = allMerchant.find(merchant => merchant?.email === orders?.userMail)
-               let  totalPrintBazCostWithDeliveryFee=Number(orders?.printbazcost) + Number(orders?.deliveryFee)
+               let  totalPrintBazCostWithoutDeliveryFee=Number(orders?.printbazcost)
                 return (
                   value_count?.OrderView ?
-                  <Link to={`/viewOrder/${orders?._id}`} state={{orders,matchingMerchant}} key={index}>
+                  <Link to={`/viewOrder/${orders?._id}`} state={{orders,previousPath,matchingMerchant}} key={index}>
                   <div key={orders?._id} className="row client-list">
                     <div className="col-lg-2 col-sm-12">
                      {/* Display the corresponding allMerchant name */}
@@ -1566,7 +1572,7 @@ const actualIndexOfLastItemOfUnpaidOrders = indexOfLastItem > unPaidOrders.lengt
                       <p className="p-status-btn">{orders?.paymentStatus}</p>
                     </div>
                     <div className="col-lg-2 col-sm-12">
-                      <p>{totalPrintBazCostWithDeliveryFee} TK</p>
+                      <p>{totalPrintBazCostWithoutDeliveryFee} TK</p>
                     </div>
                     <div className="col-lg-1 col-sm-12">
                       <p className="status-btn" style={{    backgroundColor: getViewClientColor(
@@ -1601,7 +1607,7 @@ const actualIndexOfLastItemOfUnpaidOrders = indexOfLastItem > unPaidOrders.lengt
                   <p className="p-status-btn">{orders?.paymentStatus}</p>
                 </div>
                 <div className="col-lg-2 col-sm-12">
-                  <p>{totalPrintBazCostWithDeliveryFee} TK</p>
+                  <p>{totalPrintBazCostWithoutDeliveryFee} TK</p>
                 </div>
                 <div className="col-lg-1 col-sm-12">
                   <p className="status-btn" style={{    backgroundColor: getViewClientColor(
@@ -1628,10 +1634,10 @@ const actualIndexOfLastItemOfUnpaidOrders = indexOfLastItem > unPaidOrders.lengt
               .sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt))
               .map((orders,index)=>{ 
                 matchingMerchant = allMerchant.find(merchant => merchant?.email === orders?.userMail)
-               let  totalPrintBazCostWithDeliveryFee=Number(orders?.printbazcost) + Number(orders?.deliveryFee)
+               let  totalPrintBazCostWithoutDeliveryFee=Number(orders?.printbazcost)
                 return (
                   value_count?.OrderView ?
-                  <Link to={`/viewOrder/${orders?._id}`} state={{orders,matchingMerchant}} key={index}>
+                  <Link to={`/viewOrder/${orders?._id}`} state={{orders,previousPath,matchingMerchant}} key={index}>
                   <div key={orders?._id} className="row client-list">
                     <div className="col-lg-2 col-sm-12">
                      {/* Display the corresponding allMerchant name */}
@@ -1651,7 +1657,7 @@ const actualIndexOfLastItemOfUnpaidOrders = indexOfLastItem > unPaidOrders.lengt
                       <p className="p-status-btn">{orders?.paymentStatus}</p>
                     </div>
                     <div className="col-lg-2 col-sm-12">
-                      <p>{totalPrintBazCostWithDeliveryFee} TK</p>
+                      <p>{totalPrintBazCostWithoutDeliveryFee} TK</p>
                     </div>
                     <div className="col-lg-1 col-sm-12">
                       <p className="status-btn" style={{    backgroundColor: getViewClientColor(
@@ -1686,7 +1692,7 @@ const actualIndexOfLastItemOfUnpaidOrders = indexOfLastItem > unPaidOrders.lengt
                   <p className="p-status-btn">{orders?.paymentStatus}</p>
                 </div>
                 <div className="col-lg-2 col-sm-12">
-                  <p>{totalPrintBazCostWithDeliveryFee} TK</p>
+                  <p>{totalPrintBazCostWithoutDeliveryFee} TK</p>
                 </div>
                 <div className="col-lg-1 col-sm-12">
                   <p className="status-btn" style={{    backgroundColor: getViewClientColor(
@@ -1713,10 +1719,10 @@ const actualIndexOfLastItemOfUnpaidOrders = indexOfLastItem > unPaidOrders.lengt
               .sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt))
               .map((orders,index)=>{ 
                 matchingMerchant = allMerchant.find(merchant => merchant?.email === orders?.userMail)
-                let  totalPrintBazCostWithDeliveryFee=Number(orders?.printbazcost) + Number(orders?.deliveryFee)
+                let  totalPrintBazCostWithoutDeliveryFee=Number(orders?.printbazcost)
                 return (
                   value_count?.OrderView ?
-                  <Link to={`/viewOrder/${orders?._id}`} state={{orders,matchingMerchant}} key={index}>
+                  <Link to={`/viewOrder/${orders?._id}`} state={{orders,previousPath,matchingMerchant}} key={index}>
                   <div key={orders?._id} className="row client-list">
                     <div className="col-lg-2 col-sm-12">
                      {/* Display the corresponding allMerchant name */}
@@ -1736,7 +1742,7 @@ const actualIndexOfLastItemOfUnpaidOrders = indexOfLastItem > unPaidOrders.lengt
                       <p className="p-status-btn">{orders?.paymentStatus}</p>
                     </div>
                     <div className="col-lg-2 col-sm-12">
-                      <p>{totalPrintBazCostWithDeliveryFee} TK</p>
+                      <p>{totalPrintBazCostWithoutDeliveryFee} TK</p>
                     </div>
                     <div className="col-lg-1 col-sm-12">
                       <p className="status-btn" style={{    backgroundColor: getViewClientColor(
@@ -1771,7 +1777,7 @@ const actualIndexOfLastItemOfUnpaidOrders = indexOfLastItem > unPaidOrders.lengt
                   <p className="p-status-btn">{orders?.paymentStatus}</p>
                 </div>
                 <div className="col-lg-2 col-sm-12">
-                  <p>{totalPrintBazCostWithDeliveryFee} TK</p>
+                  <p>{totalPrintBazCostWithoutDeliveryFee} TK</p>
                 </div>
                 <div className="col-lg-1 col-sm-12">
                   <p className="status-btn" style={{    backgroundColor: getViewClientColor(
@@ -1798,10 +1804,10 @@ const actualIndexOfLastItemOfUnpaidOrders = indexOfLastItem > unPaidOrders.lengt
               .sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt))
               .map((orders,index)=>{ 
                 matchingMerchant = allMerchant.find(merchant => merchant?.email === orders?.userMail)
-                let  totalPrintBazCostWithDeliveryFee=Number(orders?.printbazcost) + Number(orders?.deliveryFee)
+                let  totalPrintBazCostWithoutDeliveryFee=Number(orders?.printbazcost)
                 return (
                   value_count?.OrderView ?
-                  <Link to={`/viewOrder/${orders?._id}`} state={{orders,matchingMerchant}} key={index}>
+                  <Link to={`/viewOrder/${orders?._id}`} state={{orders,previousPath,matchingMerchant}} key={index}>
                   <div key={orders?._id} className="row client-list">
                     <div className="col-lg-2 col-sm-12">
                      {/* Display the corresponding allMerchant name */}
@@ -1821,7 +1827,7 @@ const actualIndexOfLastItemOfUnpaidOrders = indexOfLastItem > unPaidOrders.lengt
                       <p className="p-status-btn">{orders?.paymentStatus}</p>
                     </div>
                     <div className="col-lg-2 col-sm-12">
-                      <p>{totalPrintBazCostWithDeliveryFee} TK</p>
+                      <p>{totalPrintBazCostWithoutDeliveryFee} TK</p>
                     </div>
                     <div className="col-lg-1 col-sm-12">
                       <p className="status-btn" style={{    backgroundColor: getViewClientColor(
@@ -1856,7 +1862,7 @@ const actualIndexOfLastItemOfUnpaidOrders = indexOfLastItem > unPaidOrders.lengt
                   <p className="p-status-btn">{orders?.paymentStatus}</p>
                 </div>
                 <div className="col-lg-2 col-sm-12">
-                  <p>{totalPrintBazCostWithDeliveryFee} TK</p>
+                  <p>{totalPrintBazCostWithoutDeliveryFee} TK</p>
                 </div>
                 <div className="col-lg-1 col-sm-12">
                   <p className="status-btn" style={{    backgroundColor: getViewClientColor(

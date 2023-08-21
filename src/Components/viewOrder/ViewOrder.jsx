@@ -1,5 +1,5 @@
 import React, { useState,useRef, useEffect } from 'react';
-import { Link, useLocation } from 'react-router-dom';
+import { Link, useLocation, useNavigate } from 'react-router-dom';
 import TabForViewOrder from '../tabForViewOrder.jsx/TabForViewOrder';
 import Overlay from 'react-bootstrap/Overlay';
 import Tooltip from 'react-bootstrap/Tooltip';
@@ -12,15 +12,26 @@ import { useParams } from "react-router-dom";
 import ShippingDetail from '../shippingDetail/ShippingDetail';
 import { jsPDF } from "jspdf";
 import html2canvas from "html2canvas";
+import { useHistory } from 'react-router-dom';
 import ReactDOMServer from 'react-dom/server';
 import { useRoleAsignData } from '../../hooks/useRoleAsignData';
 const ViewOrder = () => {
   let { id } = useParams();
   const location = useLocation();
+  const [previousPath, setPreviousPath] = useState('');
+  const navigate = useNavigate();
+
   const [getSpecificOrderById, setGetSpecificOrderById] = useState();
   const viewOrder = location.state ? location?.state?.orders : null;
+  const previousPathLocation = location.state ? location?.state?.previousPath : null;
   const viewClient = location.state?.matchingMerchant;
   const {value_count}=useRoleAsignData()
+  const handleBack = () => {
+    console.log("back btn");
+    navigate(previousPathLocation); // Go back to the previous page
+  };
+
+  console.log("previousPathLocation",previousPathLocation);
   useEffect(()=>{
     const getOrderById=async()=>{
              // Fetch the updated order details
@@ -35,6 +46,8 @@ const ViewOrder = () => {
     
          }
          getOrderById()
+          // Update the previousPath state when the location changes
+ 
         },[getSpecificOrderById])
       
   const [orderStatus, setOrderStatus] = useState();
@@ -225,8 +238,11 @@ const ViewOrder = () => {
             <div className="row">
               {/* <div className="col-lg-12 col-sm-12 flex"> */}
                 <div className="view-client-title my-3 col-lg-10 col-sm-10">
-                  <Link to="/orderList"><span style={{fontSize: '30px'}}>
-                      &lt; </span> View Order Details</Link>
+                  {/* <Link to="/orderList"><span style={{fontSize: '30px'}}>
+                      &lt; </span> View Order Details</Link> */}
+                      <span onClick={handleBack} style={{ fontSize: '30px', cursor: 'pointer' }}>
+      &lt; Back
+    </span>
                 </div> 
                 <div className='d-flex  align_center col-lg- col-sm-2 '>
                 <div className="view-client-title " style={{marginRight:"10px"}}>

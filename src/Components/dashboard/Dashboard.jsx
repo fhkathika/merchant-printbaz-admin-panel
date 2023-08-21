@@ -1,10 +1,83 @@
-import React, { useContext } from 'react';
+import React, { useContext ,useState,useEffect} from 'react';
 import ApexCharts from 'apexcharts'
-import { Link } from 'react-router-dom';
+import { Link,useLocation } from 'react-router-dom';
 import { AuthContext } from '../../authProvider/AuthProvider';
 import Navigationbar from '../navigationBar/Navigationbar';
+import useGetMongoData from '../../hooks/useGetMongoData';
+import useGetDeliveryList from '../../hooks/useGetDeliveryList';
+import useGetPendingOrders from '../../hooks/useGetPendingOrders';
+import Row from 'react-bootstrap/Row';
+import Col from 'react-bootstrap/Col';
 const Dashboard = () => {
   const {adminUser,loading,loginAdminUser,currentUser}=useContext(AuthContext);
+  const { orderAll } = useGetMongoData();
+  const {deliveryAll}=useGetDeliveryList()
+  const location = useLocation();
+  const [previousPath, setPreviousPath] = useState('');
+  const {pendingOrdersAll,
+    error,
+    currentPage,
+    totalPages,setCurrentPage}=useGetPendingOrders()
+    const goToNextPage = () => {
+      if (currentPage < totalPages) {
+        setCurrentPage(prevPage => prevPage + 1);
+      }
+    };
+  
+    const goToPreviousPage = () => {
+      if (currentPage > 1) {
+        setCurrentPage(prevPage => prevPage - 1);
+      }
+    };
+    useEffect(() => {
+      // Update the previousPath state when the location changes
+      setPreviousPath(location.pathname);
+    }, [location.pathname]);
+    // if (loading) return <div>Loading...</div>;
+    // if (error) return <div>Error loading orders.</div>;
+  
+  let LatestPendingOrders = orderAll
+    ?.filter(users => users?.orderStatus === "Pending")
+    .sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt)); // This sorts in descending order
+
+  let pendingOrders = orderAll?.filter(users => users?.orderStatus === "Pending");
+
+let approvedOrders=orderAll?.filter(users=>users?.orderStatus==="Approved");
+let confirmedOrders=orderAll?.filter(users=>users?.orderStatus==="confirmed");
+let onHoldArtworkIssueOrders=orderAll?.filter(users=>users?.orderStatus==="on hold artwork issue");
+let onHoldBillingIssueOrders=orderAll?.filter(users=>users?.orderStatus==="on hold billing issue");
+let onHoldOutOfStockOrders=orderAll?.filter(users=>users?.orderStatus==="on hold out of stock");
+let inProductionOrders=orderAll?.filter(users=>users?.orderStatus==="in-production");
+let outForDeliveryOrders=orderAll?.filter(users=>users?.orderStatus==="out for delivery");
+let deliveredOrders=orderAll?.filter(users=>users?.orderStatus==="delivered");
+let paymentReleaseddOrders=orderAll?.filter(users=>users?.orderStatus==="paymentReleased");
+let cancelOrders=orderAll?.filter(users=>users?.orderStatus==="cancel");
+let returnOrders=orderAll?.filter(users=>users?.orderStatus==="returned");
+
+let countPendingOrders = pendingOrders?.length || 0;
+let countapprovedOrders = approvedOrders?.length || 0;
+let countconfirmedOrders = confirmedOrders?.length || 0;
+let countonHoldArtworkIssueOrders = onHoldArtworkIssueOrders?.length || 0;
+let countonHoldBillingIssueOrders = onHoldBillingIssueOrders?.length || 0;
+let countonHoldOutOfStockOrders = onHoldOutOfStockOrders?.length || 0;
+let countinProductionOrders = inProductionOrders?.length || 0;
+let countoutForDeliveryOrders = outForDeliveryOrders?.length || 0;
+let countdeliveredOrders = deliveredOrders?.length || 0;
+let countpaymentReleaseddOrders = paymentReleaseddOrders?.length || 0;
+let countcancelOrders = cancelOrders?.length || 0;
+let countreturnOrders = returnOrders?.length || 0;
+const totalpendingPBazCost = pendingOrders?.reduce((acc, curr) => acc +parseFloat (curr.printbazcost || 0), 0);
+const totalapprovedPBazCost = approvedOrders?.reduce((acc, curr) => acc +parseFloat (curr.printbazcost || 0), 0);
+const totalconfirmedPBazCost = confirmedOrders?.reduce((acc, curr) => acc +parseFloat (curr.printbazcost || 0), 0);
+const totalonHoldArtworkIssuePBazCost = onHoldArtworkIssueOrders?.reduce((acc, curr) => acc +parseFloat (curr.printbazcost || 0), 0);
+const totalonHoldBillingIssuePBazCost = onHoldBillingIssueOrders?.reduce((acc, curr) => acc +parseFloat (curr.printbazcost || 0), 0);
+const totalonHoldOutOfStockPBazCost = onHoldOutOfStockOrders?.reduce((acc, curr) => acc +parseFloat (curr.printbazcost || 0), 0);
+const totalinProductionPBazCost = inProductionOrders?.reduce((acc, curr) => acc +parseFloat (curr.printbazcost || 0), 0);
+const totaloutForDeliveryPBazCost = outForDeliveryOrders?.reduce((acc, curr) => acc +parseFloat (curr.printbazcost || 0), 0);
+const totaldeliveredPBazCost = deliveredOrders?.reduce((acc, curr) => acc +parseFloat (curr.printbazcost || 0), 0);
+const totalpaymentReleasedPBazCost = paymentReleaseddOrders?.reduce((acc, curr) => acc +parseFloat (curr.printbazcost || 0), 0);
+const totalcancelPBazCost = cancelOrders?.reduce((acc, curr) => acc +parseFloat (curr.printbazcost || 0), 0);
+const totalreturnPBazCost = returnOrders?.reduce((acc, curr) => acc +parseFloat (curr.printbazcost || 0), 0);
     return (
         <div>
         <meta charSet="UTF-8" />
@@ -21,61 +94,279 @@ const Dashboard = () => {
      <Navigationbar/>
         <div className="dashboard-container">
           <div className="dashboard-body">
+           
+         
             <div className="row">
-              <div className="col-md-12">
-                <div className="alert alert-warning m-b-lg" role="alert">
-                  Data has been updated 23 min ago.
-                </div>
-              </div>
-            </div>
-            <div className="row">
-              <div className="col-md-4">
-                <div className="card stat-card">
+              <div className="col-md-3">
+               
+                <div className="card stat-card"  style={{height:"152px"}}>
+                <div className="" style={{display:"flex",justifyContent:"space-between",alignItem:"center"}}>
                   <div className="card-body">
-                    <h5 className="card-title">New Merchant</h5>
-                    <h2 className="float-right">1000</h2>
-                    <p>From last week</p>
-                    <div className="progress" style={{height: '10px'}}>
-                      <div className="progress-bar bg-warning" role="progressbar" style={{width: '45%'}} aria-valuenow={45} aria-valuemin={0} aria-valuemax={100} />
+                    <h5 className="">Total Pending Orders</h5>
+                    <h2 className="float-right">{totalpendingPBazCost} TK</h2>
                     </div>
-                  </div>
-                </div>
-              </div>
-              <div className="col-md-4">
-                <div className="card stat-card">
-                  <div className="card-body">
-                    <h5 className="card-title">Orders</h5>
-                    <h2 className="float-right">500</h2>
-                    <p>Orders in Progress</p>
-                    <div className="progress" style={{height: '10px'}}>
-                      <div className="progress-bar bg-info" role="progressbar" style={{width: '60%'}} aria-valuenow={60} aria-valuemin={0} aria-valuemax={100} />
+                
+                  <div className="card-body" style={{display:"flex",justifyContent:"center"}}>
+                   
+                    <h4 className="float-right" style={{marginLeft:"40px",marginTop:"2px"}}>{countPendingOrders}</h4>
                     </div>
-                  </div>
-                </div>
-              </div>
-              <div className="col-md-4">
-                <div className="card stat-card">
-                  <div className="card-body">
-                    <h5 className="card-title">Monthly Profit</h5>
-                    <h2 className="float-right">1,00000.0TK</h2>
-                    <p>For last 30 days</p>
-                    <div className="progress" style={{height: '10px'}}>
-                      <div className="progress-bar bg-success" role="progressbar" style={{width: '45%'}} aria-valuenow={45} aria-valuemin={0} aria-valuemax={100} />
                     </div>
+                  <div>
+                  
                   </div>
                 </div>
-              </div>
-            </div>
-            <div className="row">
-              <div className="col-md-12">
-                <div className="card">
+               
+              
+
+              </div>  
+               <div className="col-md-3">
+               
+                <div className="card stat-card" style={{height:"152px"}}>
+                <div className="" style={{display:"flex",justifyContent:"space-between",alignItem:"center"}}>
                   <div className="card-body">
-                    <h5 className="card-title">Earnings</h5>
-                    <div id="earnings" />
+                    <h5 className="">Total On Hold Artwork Issue Orders</h5>
+                    <h2 className="float-right">{totalonHoldArtworkIssuePBazCost} TK</h2>
+                    </div>
+                
+                  <div className="card-body" style={{display:"flex",justifyContent:"center"}}>
+                   
+                    <h4 className="float-right" style={{marginLeft:"40px",marginTop:"2px"}}>{countonHoldArtworkIssueOrders}</h4>
+                    </div>
+                    </div>
+                  <div>
+                  
                   </div>
                 </div>
+               
+              
+
+              </div>   <div className="col-md-3">
+               
+                <div className="card stat-card" style={{height:"152px"}}>
+                <div className="" style={{display:"flex",justifyContent:"space-between",alignItem:"center"}}>
+                  <div className="card-body">
+                    <h5 className="">Total On Hold Billing Issue Orders</h5>
+                    <h2 className="float-right">{totalonHoldBillingIssuePBazCost} TK</h2>
+                    </div>
+                
+                  <div className="card-body" style={{display:"flex",justifyContent:"center"}}>
+                   
+                    <h4 className="float-right" style={{marginLeft:"40px",marginTop:"2px"}}>{countonHoldBillingIssueOrders}</h4>
+                    </div>
+                    </div>
+                  <div>
+                  
+                  </div>
+                </div>
+               
+              
+
               </div>
+                 <div className="col-md-3">
+               
+                <div className="card stat-card" style={{height:"152px"}}>
+                <div className="" style={{display:"flex",justifyContent:"space-between",alignItem:"center"}}>
+                  <div className="card-body">
+                    <h5 className="">Total On Hold Out Of Stock Orders</h5>
+                    <h2 className="float-right">{totalonHoldOutOfStockPBazCost} TK</h2>
+                    </div>
+                
+                  <div className="card-body" style={{display:"flex",justifyContent:"center"}}>
+                   
+                    <h4 className="float-right" style={{marginLeft:"40px",marginTop:"2px"}}>{countonHoldOutOfStockOrders}</h4>
+                    </div>
+                    </div>
+                  <div>
+                  
+                  </div>
+                </div>
+               
+              
+
+              </div>
+                <div className="col-md-3">
+               
+                <div className="card stat-card" style={{height:"152px"}}>
+                <div className="" style={{display:"flex",justifyContent:"space-between",alignItem:"center"}}>
+                  <div className="card-body">
+                    <h5 className="">Total Approved Orders</h5>
+                    <h2 className="float-right">{totalapprovedPBazCost} TK</h2>
+                    </div>
+                
+                  <div className="card-body" style={{display:"flex",justifyContent:"center"}}>
+                   
+                    <h4 className="float-right" style={{marginLeft:"40px",marginTop:"2px"}}>{countapprovedOrders}</h4>
+                    </div>
+                    </div>
+                  <div>
+                  
+                  </div>
+                </div>
+               
+              
+
+              </div>  
+              <div className="col-md-3">
+               
+                <div className="card stat-card" style={{height:"152px"}}>
+                <div className="" style={{display:"flex",justifyContent:"space-between",alignItem:"center"}}>
+                  <div className="card-body">
+                    <h5 className="">Total Confirmed Orders</h5>
+                    <h2 className="float-right">{totalconfirmedPBazCost} TK</h2>
+                    </div>
+                
+                  <div className="card-body" style={{display:"flex",justifyContent:"center"}}>
+                   
+                    <h4 className="float-right" style={{marginLeft:"40px",marginTop:"2px"}}>{countconfirmedOrders}</h4>
+                    </div>
+                    </div>
+                  <div>
+                  
+                  </div>
+                </div>
+               
+              
+
+              </div>  <div className="col-md-3">
+               
+                <div className="card stat-card" style={{height:"152px"}}>
+                <div className="" style={{display:"flex",justifyContent:"space-between",alignItem:"center"}}>
+                  <div className="card-body">
+                    <h5 className="">Total In Production Orders</h5>
+                    <h2 className="float-right">{totalinProductionPBazCost} TK</h2>
+                    </div>
+                
+                  <div className="card-body" style={{display:"flex",justifyContent:"center"}}>
+                   
+                    <h4 className="float-right" style={{marginLeft:"40px",marginTop:"2px"}}>{countinProductionOrders}</h4>
+                    </div>
+                    </div>
+                  <div>
+                  
+                  </div>
+                </div>
+               
+              
+
+              </div>
+                <div className="col-md-3">
+               
+                <div className="card stat-card" style={{height:"152px"}}>
+                <div className="" style={{display:"flex",justifyContent:"space-between",alignItem:"center"}}>
+                  <div className="card-body">
+                    <h5 className="">Total Out For Delivery orders</h5>
+                    <h2 className="float-right">{totaloutForDeliveryPBazCost} TK</h2>
+                    </div>
+                
+                  <div className="card-body" style={{display:"flex",justifyContent:"center"}}>
+                   
+                    <h4 className="float-right" style={{marginLeft:"40px",marginTop:"2px"}}>{countoutForDeliveryOrders}</h4>
+                    </div>
+                    </div>
+                  <div>
+                  
+                  </div>
+                </div>
+               
+              
+
+              </div>
+             <div className="col-md-3">
+               
+                <div className="card stat-card" style={{height:"152px"}}>
+                <div className="" style={{display:"flex",justifyContent:"space-between",alignItem:"center"}}>
+                  <div className="card-body">
+                    <h5 className="">Total Delivered Orders</h5>
+                    <h2 className="float-right">{totaldeliveredPBazCost} TK</h2>
+                    </div>
+                
+                  <div className="card-body" style={{display:"flex",justifyContent:"center"}}>
+                   
+                    <h4 className="float-right" style={{marginLeft:"40px",marginTop:"2px"}}>{countdeliveredOrders}</h4>
+                    </div>
+                    </div>
+                  <div>
+                  
+                  </div>
+                </div>
+               
+              
+
+              </div>
+             <div className="col-md-3">
+               
+                <div className="card stat-card" style={{height:"152px"}}>
+                <div className="" style={{display:"flex",justifyContent:"space-between",alignItem:"center"}}>
+                  <div className="card-body">
+                    <h5 className="">Total Payment Released Orders</h5>
+                    <h2 className="float-right">{totalpaymentReleasedPBazCost} TK</h2>
+                    </div>
+                
+                  <div className="card-body" style={{display:"flex",justifyContent:"center"}}>
+                   
+                    <h4 className="float-right" style={{marginLeft:"40px",marginTop:"2px"}}>{countpaymentReleaseddOrders}</h4>
+                    </div>
+                    </div>
+                  <div>
+                  
+                  </div>
+                </div>
+               
+              
+
+              </div>
+             <div className="col-md-3">
+               
+                <div className="card stat-card" style={{height:"152px"}}>
+                <div className="" style={{display:"flex",justifyContent:"space-between",alignItem:"center"}}>
+                  <div className="card-body">
+                    <h5 className="">Total Returned Orders</h5>
+                    <h2 className="float-right">{totalreturnPBazCost} TK</h2>
+                    </div>
+                
+                  <div className="card-body" style={{display:"flex",justifyContent:"center"}}>
+                   
+                    <h4 className="float-right" style={{marginLeft:"40px",marginTop:"2px"}}>{countreturnOrders}</h4>
+                    </div>
+                    </div>
+                  <div>
+                  
+                  </div>
+                </div>
+               
+              
+
+              </div>
+             <div className="col-md-3">
+               
+                <div className="card stat-card" style={{height:"152px"}}>
+                <div className="" style={{display:"flex",justifyContent:"space-between",alignItem:"center"}}>
+                  <div className="card-body">
+                    <h5 className="">Total Canceled Orders</h5>
+                    <h2 className="float-right">{totalcancelPBazCost} TK</h2>
+                    </div>
+                
+                  <div className="card-body" style={{display:"flex",justifyContent:"center"}}>
+                   
+                    <h4 className="float-right" style={{marginLeft:"40px",marginTop:"2px"}}>{countcancelOrders}</h4>
+                    </div>
+                    </div>
+                  <div>
+                  
+                  </div>
+                </div>
+               
+              
+
+              </div>
+          
             </div>
+             {/* Pagination controls */}
+      <div className="pagination-controls" style={{ display: "flex", justifyContent: "flex-end",alignItems:"center",marginBottom:"10px" }}>
+        <button style={{marginRight:"10px",padding:"3px",color:"black",borderRadius:"5px"}} onClick={goToPreviousPage} disabled={currentPage === 1}>Previous</button>
+        <span style={{marginRight:"10px"}}>Page {currentPage} of {totalPages}</span>
+        <button style={{marginRight:"10px",padding:"3px",color:"black",borderRadius:"5px"}} onClick={goToNextPage} disabled={currentPage === totalPages}>Next</button>
+      </div>
             <div className="row">
               <div className="col-md-12">
                 <div className="card">
@@ -101,236 +392,56 @@ const Dashboard = () => {
                         <h4>Status</h4>
                       </div>
                     </div>
-                    <div className="row client-list">
-                      <div className="col-lg-2 col-sm-12">
-                        <p>Abir Ali Khan</p>
-                      </div>
-                      <div className="col-lg-2 col-sm-12">
-                        <p>1684051962640</p>
-                      </div>
-                      <div className="col-lg-3 col-sm-12">
-                        <p>Abir Ali Khan</p>
-                        <p>Tara Medical Center, Mirpur 11, Dhaka, Bangladesh</p>
-                        <p>01956821703</p>
-                      </div>
-                      <div className="col-lg-2 col-sm-12">
-                        <p className="p-status-btn">Paid</p>
-                      </div>
-                      <div className="col-lg-2 col-sm-12">
-                        <p>137.2 TK</p>
-                      </div>
-                      <div className="col-lg-1 col-sm-12">
-                        <p className="status-btn">Delivery</p>
-                        <p style={{fontSize: '14px'}}>05 May 2023</p>
-                      </div>
-                    </div>   
-                    <div className="row client-list">
-                      <div className="col-lg-2 col-sm-12">
-                        <p>Abir Ali Khan</p>
-                      </div>
-                      <div className="col-lg-2 col-sm-12">
-                        <p>1684051962640</p>
-                      </div>
-                      <div className="col-lg-3 col-sm-12">
-                        <p>Abir Ali Khan</p>
-                        <p>Tara Medical Center, Mirpur 11, Dhaka, Bangladesh</p>
-                        <p>01956821703</p>
-                      </div>
-                      <div className="col-lg-2 col-sm-12">
-                        <p className="p-status-btn">Paid</p>
-                      </div>
-                      <div className="col-lg-2 col-sm-12">
-                        <p>137.2 TK</p>
-                      </div>
-                      <div className="col-lg-1 col-sm-12">
-                        <p className="status-btn">Delivery</p>
-                        <p style={{fontSize: '14px'}}>05 May 2023</p>
-                      </div>
-                    </div> 
-                    <div className="row client-list">
-                      <div className="col-lg-2 col-sm-12">
-                        <p>Abir Ali Khan</p>
-                      </div>
-                      <div className="col-lg-2 col-sm-12">
-                        <p>1684051962640</p>
-                      </div>
-                      <div className="col-lg-3 col-sm-12">
-                        <p>Abir Ali Khan</p>
-                        <p>Tara Medical Center, Mirpur 11, Dhaka, Bangladesh</p>
-                        <p>01956821703</p>
-                      </div>
-                      <div className="col-lg-2 col-sm-12">
-                        <p className="p-status-btn">Paid</p>
-                      </div>
-                      <div className="col-lg-2 col-sm-12">
-                        <p>137.2 TK</p>
-                      </div>
-                      <div className="col-lg-1 col-sm-12">
-                        <p className="status-btn">Delivery</p>
-                        <p style={{fontSize: '14px'}}>05 May 2023</p>
-                      </div>
-                    </div> 
-                    <div className="row client-list">
-                      <div className="col-lg-2 col-sm-12">
-                        <p>Abir Ali Khan</p>
-                      </div>
-                      <div className="col-lg-2 col-sm-12">
-                        <p>1684051962640</p>
-                      </div>
-                      <div className="col-lg-3 col-sm-12">
-                        <p>Abir Ali Khan</p>
-                        <p>Tara Medical Center, Mirpur 11, Dhaka, Bangladesh</p>
-                        <p>01956821703</p>
-                      </div>
-                      <div className="col-lg-2 col-sm-12">
-                        <p className="p-status-btn">Paid</p>
-                      </div>
-                      <div className="col-lg-2 col-sm-12">
-                        <p>137.2 TK</p>
-                      </div>
-                      <div className="col-lg-1 col-sm-12">
-                        <p className="status-btn">Delivery</p>
-                        <p style={{fontSize: '14px'}}>05 May 2023</p>
-                      </div>
-                    </div> 
-                    <div className="row client-list">
-                      <div className="col-lg-2 col-sm-12">
-                        <p>Abir Ali Khan</p>
-                      </div>
-                      <div className="col-lg-2 col-sm-12">
-                        <p>1684051962640</p>
-                      </div>
-                      <div className="col-lg-3 col-sm-12">
-                        <p>Abir Ali Khan</p>
-                        <p>Tara Medical Center, Mirpur 11, Dhaka, Bangladesh</p>
-                        <p>01956821703</p>
-                      </div>
-                      <div className="col-lg-2 col-sm-12">
-                        <p className="p-status-btn">Paid</p>
-                      </div>
-                      <div className="col-lg-2 col-sm-12">
-                        <p>137.2 TK</p>
-                      </div>
-                      <div className="col-lg-1 col-sm-12">
-                        <p className="status-btn">Delivery</p>
-                        <p style={{fontSize: '14px'}}>05 May 2023</p>
-                      </div>
-                    </div> 
-                    <div className="row client-list">
-                      <div className="col-lg-2 col-sm-12">
-                        <p>Abir Ali Khan</p>
-                      </div>
-                      <div className="col-lg-2 col-sm-12">
-                        <p>1684051962640</p>
-                      </div>
-                      <div className="col-lg-3 col-sm-12">
-                        <p>Abir Ali Khan</p>
-                        <p>Tara Medical Center, Mirpur 11, Dhaka, Bangladesh</p>
-                        <p>01956821703</p>
-                      </div>
-                      <div className="col-lg-2 col-sm-12">
-                        <p className="p-status-btn">Paid</p>
-                      </div>
-                      <div className="col-lg-2 col-sm-12">
-                        <p>137.2 TK</p>
-                      </div>
-                      <div className="col-lg-1 col-sm-12">
-                        <p className="status-btn">Delivery</p>
-                        <p style={{fontSize: '14px'}}>05 May 2023</p>
-                      </div>
-                    </div> 
-                    <div className="row client-list">
-                      <div className="col-lg-2 col-sm-12">
-                        <p>Abir Ali Khan</p>
-                      </div>
-                      <div className="col-lg-2 col-sm-12">
-                        <p>1684051962640</p>
-                      </div>
-                      <div className="col-lg-3 col-sm-12">
-                        <p>Abir Ali Khan</p>
-                        <p>Tara Medical Center, Mirpur 11, Dhaka, Bangladesh</p>
-                        <p>01956821703</p>
-                      </div>
-                      <div className="col-lg-2 col-sm-12">
-                        <p className="p-status-btn">Paid</p>
-                      </div>
-                      <div className="col-lg-2 col-sm-12">
-                        <p>137.2 TK</p>
-                      </div>
-                      <div className="col-lg-1 col-sm-12">
-                        <p className="status-btn">Delivery</p>
-                        <p style={{fontSize: '14px'}}>05 May 2023</p>
-                      </div>
-                    </div> 
-                    <div className="row client-list">
-                      <div className="col-lg-2 col-sm-12">
-                        <p>Abir Ali Khan</p>
-                      </div>
-                      <div className="col-lg-2 col-sm-12">
-                        <p>1684051962640</p>
-                      </div>
-                      <div className="col-lg-3 col-sm-12">
-                        <p>Abir Ali Khan</p>
-                        <p>Tara Medical Center, Mirpur 11, Dhaka, Bangladesh</p>
-                        <p>01956821703</p>
-                      </div>
-                      <div className="col-lg-2 col-sm-12">
-                        <p className="p-status-btn">Paid</p>
-                      </div>
-                      <div className="col-lg-2 col-sm-12">
-                        <p>137.2 TK</p>
-                      </div>
-                      <div className="col-lg-1 col-sm-12">
-                        <p className="status-btn">Delivery</p>
-                        <p style={{fontSize: '14px'}}>05 May 2023</p>
-                      </div>
-                    </div> 
-                    <div className="row client-list">
-                      <div className="col-lg-2 col-sm-12">
-                        <p>Abir Ali Khan</p>
-                      </div>
-                      <div className="col-lg-2 col-sm-12">
-                        <p>1684051962640</p>
-                      </div>
-                      <div className="col-lg-3 col-sm-12">
-                        <p>Abir Ali Khan</p>
-                        <p>Tara Medical Center, Mirpur 11, Dhaka, Bangladesh</p>
-                        <p>01956821703</p>
-                      </div>
-                      <div className="col-lg-2 col-sm-12">
-                        <p className="p-status-btn">Paid</p>
-                      </div>
-                      <div className="col-lg-2 col-sm-12">
-                        <p>137.2 TK</p>
-                      </div>
-                      <div className="col-lg-1 col-sm-12">
-                        <p className="status-btn">Delivery</p>
-                        <p style={{fontSize: '14px'}}>05 May 2023</p>
-                      </div>
-                    </div> 
-                    <div className="row client-list">
-                      <div className="col-lg-2 col-sm-12">
-                        <p>Abir Ali Khan</p>
-                      </div>
-                      <div className="col-lg-2 col-sm-12">
-                        <p>1684051962640</p>
-                      </div>
-                      <div className="col-lg-3 col-sm-12">
-                        <p>Abir Ali Khan</p>
-                        <p>Tara Medical Center, Mirpur 11, Dhaka, Bangladesh</p>
-                        <p>01956821703</p>
-                      </div>
-                      <div className="col-lg-2 col-sm-12">
-                        <p className="p-status-btn">Paid</p>
-                      </div>
-                      <div className="col-lg-2 col-sm-12">
-                        <p>137.2 TK</p>
-                      </div>
-                      <div className="col-lg-1 col-sm-12">
-                        <p className="status-btn">Delivery</p>
-                        <p style={{fontSize: '14px'}}>05 May 2023</p>
-                      </div>
-                    </div> 
+                    {
+                          
+                            pendingOrdersAll?.map((pendingOrders,index)=>{ 
+                            let createDate = new Date(pendingOrders?.createdAt); 
+                            let updateDate = new Date(pendingOrders?.updatedAt); 
+                            let options = { year: 'numeric', month: 'long', day: 'numeric' }; 
+                            let UpdatedformattedDate = updateDate.toLocaleDateString('en-US', options); 
+                            let creatededformattedDate = createDate.toLocaleDateString('en-US', options); 
+                     return(
+                      <Link to={`/viewOrder/${pendingOrders?._id}`} state={{pendingOrders,previousPath}} key={index}>
+
+                      <div className="row client-list">
+                                        
+                                             
+                                        <div className="col-lg-2 col-sm-12">
+                                        <p>{pendingOrders?.clientName}</p>
+                                      </div>
+                                      <div className="col-lg-2 col-sm-12">
+                                        <p>{pendingOrders?._id}</p>
+                                      </div>
+                                      <div className="col-lg-3 col-sm-12">
+                                        <p>{pendingOrders?.name}</p>
+                                        <p>{pendingOrders?.address}</p>
+                                        <p>{pendingOrders?.phone}</p>
+                                      </div>
+                                      <div className="col-lg-2 col-sm-12">
+                                        <p className="p-status-btn">{pendingOrders?.paymentStatus}</p>
+                                      </div>
+                                      <div className="col-lg-2 col-sm-12">
+                                        <p>{pendingOrders?.printbazcost} TK</p>
+                                      </div>
+                                      <div className="col-lg-1 col-sm-12">
+                                        <p className="status-btn">{pendingOrders?.orderStatus}</p>
+                                        <p style={{fontSize: '14px'}}> Updated at: {UpdatedformattedDate}</p>
+                                        <p style={{fontSize: '14px'}}>Created at: {creatededformattedDate}</p>
+                                      </div>
+                                      
+                                      
+                                      
+                                    
+                                  
+                                  </div>   
+                                                  </Link> 
+                     )
+      
+                            }) 
+                    }
+                 
+                   
+                    
                   </div>
                 </div>
               </div>
