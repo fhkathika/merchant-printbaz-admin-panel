@@ -6,8 +6,11 @@ import Navigationbar from '../navigationBar/Navigationbar';
 import useGetMongoData from '../../hooks/useGetMongoData';
 import useGetDeliveryList from '../../hooks/useGetDeliveryList';
 import useGetPendingOrders from '../../hooks/useGetPendingOrders';
+import Button from 'react-bootstrap/Button';
+import * as XLSX from 'xlsx';
 import Row from 'react-bootstrap/Row';
 import Col from 'react-bootstrap/Col';
+import GetOrdersXl from '../GetOrdersXl';
 const Dashboard = () => {
   const {adminUser,loading,loginAdminUser,currentUser}=useContext(AuthContext);
   const { orderAll } = useGetMongoData();
@@ -41,7 +44,6 @@ const Dashboard = () => {
     .sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt)); // This sorts in descending order
 
   let pendingOrders = orderAll?.filter(users => users?.orderStatus === "Pending");
-
 let approvedOrders=orderAll?.filter(users=>users?.orderStatus==="Approved");
 let confirmedOrders=orderAll?.filter(users=>users?.orderStatus==="confirmed");
 let onHoldArtworkIssueOrders=orderAll?.filter(users=>users?.orderStatus==="on hold artwork issue");
@@ -66,19 +68,57 @@ let countdeliveredOrders = deliveredOrders?.length || 0;
 let countpaymentReleaseddOrders = paymentReleaseddOrders?.length || 0;
 let countcancelOrders = cancelOrders?.length || 0;
 let countreturnOrders = returnOrders?.length || 0;
-const totalpendingPBazCost = pendingOrders?.reduce((acc, curr) => acc +parseFloat (curr.printbazcost || 0), 0);
-const totalapprovedPBazCost = approvedOrders?.reduce((acc, curr) => acc +parseFloat (curr.printbazcost || 0), 0);
-const totalconfirmedPBazCost = confirmedOrders?.reduce((acc, curr) => acc +parseFloat (curr.printbazcost || 0), 0);
-const totalonHoldArtworkIssuePBazCost = onHoldArtworkIssueOrders?.reduce((acc, curr) => acc +parseFloat (curr.printbazcost || 0), 0);
-const totalonHoldBillingIssuePBazCost = onHoldBillingIssueOrders?.reduce((acc, curr) => acc +parseFloat (curr.printbazcost || 0), 0);
-const totalonHoldOutOfStockPBazCost = onHoldOutOfStockOrders?.reduce((acc, curr) => acc +parseFloat (curr.printbazcost || 0), 0);
-const totalinProductionPBazCost = inProductionOrders?.reduce((acc, curr) => acc +parseFloat (curr.printbazcost || 0), 0);
-const totaloutForDeliveryPBazCost = outForDeliveryOrders?.reduce((acc, curr) => acc +parseFloat (curr.printbazcost || 0), 0);
-const totaldeliveredPBazCost = deliveredOrders?.reduce((acc, curr) => acc +parseFloat (curr.printbazcost || 0), 0);
-const totalpaymentReleasedPBazCost = paymentReleaseddOrders?.reduce((acc, curr) => acc +parseFloat (curr.printbazcost || 0), 0);
-const totalcancelPBazCost = cancelOrders?.reduce((acc, curr) => acc +parseFloat (curr.printbazcost || 0), 0);
-const totalreturnPBazCost = returnOrders?.reduce((acc, curr) => acc +parseFloat (curr.printbazcost || 0), 0);
-    return (
+let countODROrders = countoutForDeliveryOrders+countreturnOrders+countdeliveredOrders;
+const totalpendingPBazCost = pendingOrders?.reduce((acc, curr) => acc +parseFloat (curr.printbazcost || 0)+parseInt(curr.deliveryFee), 0);
+const totalapprovedPBazCost = approvedOrders?.reduce((acc, curr) => acc +parseFloat (curr.printbazcost || 0)+parseInt(curr.deliveryFee), 0);
+const totalconfirmedPBazCost = confirmedOrders?.reduce((acc, curr) => acc +parseFloat (curr.printbazcost || 0)+parseInt(curr.deliveryFee), 0);
+const totalonHoldArtworkIssuePBazCost = onHoldArtworkIssueOrders?.reduce((acc, curr) => acc +parseFloat (curr.printbazcost || 0)+parseInt(curr.deliveryFee), 0);
+const totalonHoldBillingIssuePBazCost = onHoldBillingIssueOrders?.reduce((acc, curr) => acc +parseFloat (curr.printbazcost || 0)+parseInt(curr.deliveryFee), 0);
+const totalonHoldOutOfStockPBazCost = onHoldOutOfStockOrders?.reduce((acc, curr) => acc +parseFloat (curr.printbazcost || 0)+parseInt(curr.deliveryFee), 0);
+const totalinProductionPBazCost = inProductionOrders?.reduce((acc, curr) => acc +parseFloat (curr.printbazcost || 0)+parseInt(curr.deliveryFee), 0);
+const totaloutForDeliveryPBazCost = outForDeliveryOrders?.reduce((acc, curr) => acc +parseFloat (curr.printbazcost || 0)+parseInt(curr.deliveryFee), 0);
+const totaldeliveredPBazCost = deliveredOrders?.reduce((acc, curr) => acc +parseFloat (curr.printbazcost || 0)+parseInt(curr.deliveryFee), 0);
+const totalpaymentReleasedPBazCost = paymentReleaseddOrders?.reduce((acc, curr) => acc +parseFloat (curr.printbazcost || 0)+parseInt(curr.deliveryFee), 0);
+const totalcancelPBazCost = cancelOrders?.reduce((acc, curr) => acc +parseFloat (curr.printbazcost || 0)+parseInt(curr.deliveryFee), 0);
+const totalreturnPBazCost = returnOrders?.reduce((acc, curr) => acc +parseFloat (curr.printbazcost || 0)+parseInt(curr.deliveryFee), 0);
+const TotalODR= Number(totaldeliveredPBazCost+totaloutForDeliveryPBazCost+totalreturnPBazCost)
+
+
+
+const downloadInfIntoXl = () => {
+  console.log("downloadInfIntoXl");
+    const shippingDetailElement = document.getElementById('order-detail');
+
+    // Assume the element contains a table. 
+    // If not, you'll need to extract and format the data appropriately for Excel.
+    const table = shippingDetailElement.querySelector('table');
+
+    // Convert the table to a Workbook object
+    const wb = XLSX.utils.table_to_book(table);
+
+    // Write the workbook to a blob
+    const wbout = XLSX.write(wb, { bookType: 'xlsx', bookSST: true, type: 'array' });
+
+    // Trigger a download
+    const blob = new Blob([wbout], { type: 'application/octet-stream' });
+    const url = window.URL.createObjectURL(blob);
+
+    const a = document.createElement('a');
+    a.style.display = 'none';
+    a.href = url;
+    a.download = 'ShippingDetail.xlsx';
+
+    document.body.appendChild(a);
+    a.click();
+
+    // Cleanup
+    window.URL.revokeObjectURL(url);
+    document.body.removeChild(a);
+}
+
+// Note: This approach assumes that the shipping details are in a table format inside the 'shipping-detail' element.
+
+return (
         <div>
         <meta charSet="UTF-8" />
         <meta httpEquiv="X-UA-Compatible" content="IE=edge" />
@@ -101,7 +141,7 @@ const totalreturnPBazCost = returnOrders?.reduce((acc, curr) => acc +parseFloat 
                
                 <div className="card stat-card"  style={{height:"152px"}}>
                 <div className="" style={{display:"flex",justifyContent:"space-between",alignItem:"center"}}>
-                  <div className="card-body">
+                  <div className="card-body pb-0">
                     <h5 className="">Total Pending Orders</h5>
                     <h2 className="float-right">{totalpendingPBazCost} TK</h2>
                     </div>
@@ -111,8 +151,13 @@ const totalreturnPBazCost = returnOrders?.reduce((acc, curr) => acc +parseFloat 
                     <h4 className="float-right" style={{marginLeft:"40px",marginTop:"2px"}}>{countPendingOrders}</h4>
                     </div>
                     </div>
-                  <div>
-                  
+                  <div  style={{display:"flex",justifyContent:"flex-end",padding:"0px 40px"}}>
+                   
+                    <span onClick={downloadInfIntoXl}><img style={{width:"25px",hight:"25px"}} src="/images/download.png" alt='download'/></span>
+                <div id="order-detail"style={{position: 'absolute', left: '-10000px', top: '-10000px'}}>
+                <GetOrdersXl filterOrders={pendingOrders}/>
+            </div> 
+              
                   </div>
                 </div>
                
@@ -358,9 +403,42 @@ const totalreturnPBazCost = returnOrders?.reduce((acc, curr) => acc +parseFloat 
                
               
 
+              </div> 
+              <div className="col-md-3">
+               
+              
+               
+                <div className="card stat-card"  style={{height:"152px"}}>
+                <div className="" style={{display:"flex",justifyContent:"space-between",alignItem:"center"}}>
+                  <div className="card-body pb-0">
+                    <h5 className="">Total ODR</h5>
+                    <h2 className="float-right">{TotalODR} TK</h2>
+                    </div>
+                
+                  <div className="card-body" style={{display:"flex",justifyContent:"center"}}>
+                   
+                    <h4 className="float-right" style={{marginLeft:"40px",marginTop:"2px"}}>{countODROrders}</h4>
+                    </div>
+                    </div>
+                  <div  style={{display:"flex",justifyContent:"flex-end",padding:"0px 40px"}}>
+                   
+                    <span onClick={downloadInfIntoXl}><img style={{width:"25px",hight:"25px"}} src="/images/download.png" alt='download'/></span>
+                <div id="order-detail"style={{position: 'absolute', left: '-10000px', top: '-10000px'}}>
+                <GetOrdersXl 
+                filterOutFOrDelivOrders1={outForDeliveryOrders}
+                filterDelivOrders2={deliveredOrders}
+                filterReturnedOrders3={returnOrders}
+/>
+            </div> 
+              
+                  </div>
+                </div>
+
               </div>
           
             </div>
+
+          
    
             <div className="row">
               <div className="col-md-12">
