@@ -83,7 +83,7 @@ const totalcancelPBazCost = cancelOrders?.reduce((acc, curr) => acc +parseFloat 
 const totalreturnPBazCost = returnOrders?.reduce((acc, curr) => acc +parseFloat (curr.printbazcost || 0)+parseInt(curr.deliveryFee), 0);
 const TotalODR= Number(totaldeliveredPBazCost+totaloutForDeliveryPBazCost+totalreturnPBazCost)
 
-
+console.log("outForDeliveryOrders",outForDeliveryOrders);
 
 const downloadInfIntoXl = () => {
   console.log("downloadInfIntoXl");
@@ -151,14 +151,14 @@ return (
                     <h4 className="float-right" style={{marginLeft:"40px",marginTop:"2px"}}>{countPendingOrders}</h4>
                     </div>
                     </div>
-                  <div  style={{display:"flex",justifyContent:"flex-end",padding:"0px 40px"}}>
+                  {/* <div  style={{display:"flex",justifyContent:"flex-end",padding:"0px 40px"}}>
                    
                     <span onClick={downloadInfIntoXl}><img style={{width:"25px",hight:"25px"}} src="/images/download.png" alt='download'/></span>
                 <div id="order-detail"style={{position: 'absolute', left: '-10000px', top: '-10000px'}}>
                 <GetOrdersXl filterOrders={pendingOrders}/>
             </div> 
               
-                  </div>
+                  </div> */}
                 </div>
                
               

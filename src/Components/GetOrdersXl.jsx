@@ -56,6 +56,56 @@ function GetOrdersXl({filterOutFOrDelivOrders1,
                 </tr>
                   )
               
+          } {
+              
+            filterDelivOrders2?.map(pending=>
+                  <tr>
+           
+           <td>{pending?._id}</td>
+         
+           <td>{pending?.clientbrandName}</td>
+                  <td>{pending?.clientName}</td>
+                  <td>{pending?.clientPhone}</td>
+                  <td>{pending?.userMail}</td>
+                  <td>{pending?.name}</td>
+                  <td>{pending?.address}</td>
+                  <td>{pending?.phone}</td>
+                  <td>{pending?.printbazcost}</td>
+                  <td>{pending?.deliveryFee}</td>
+                  <td>{pending?.collectAmount}</td>
+                  <td>{pending?.recvMoney}</td>
+                  <td>{pending?.orderStatus}</td>
+                  <td>{pending?.paymentStatus}</td>
+                  <td>{pending?.createdAt}</td>
+                  <td>{pending?.updatedAt}</td>
+                </tr>
+                  )
+              
+          } {
+              
+            filterReturnedOrders3?.map(pending=>
+                  <tr>
+           
+           <td>{pending?._id}</td>
+         
+           <td>{pending?.clientbrandName}</td>
+                  <td>{pending?.clientName}</td>
+                  <td>{pending?.clientPhone}</td>
+                  <td>{pending?.userMail}</td>
+                  <td>{pending?.name}</td>
+                  <td>{pending?.address}</td>
+                  <td>{pending?.phone}</td>
+                  <td>{pending?.printbazcost}</td>
+                  <td>{pending?.deliveryFee}</td>
+                  <td>{pending?.collectAmount}</td>
+                  <td>{pending?.recvMoney}</td>
+                  <td>{pending?.orderStatus}</td>
+                  <td>{pending?.paymentStatus}</td>
+                  <td>{pending?.createdAt}</td>
+                  <td>{pending?.updatedAt}</td>
+                </tr>
+                  )
+              
           }
         
         
