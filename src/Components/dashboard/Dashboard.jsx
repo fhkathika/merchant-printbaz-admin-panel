@@ -361,17 +361,22 @@ const totalreturnPBazCost = returnOrders?.reduce((acc, curr) => acc +parseFloat 
               </div>
           
             </div>
-             {/* Pagination controls */}
+   
+            <div className="row">
+              <div className="col-md-12">
+                <div className="card">
+                  <div className="card-body">
+                    <div className="flex">
+                    <h5 className="">Last Orders</h5>
+                              {/* Pagination controls */}
       <div className="pagination-controls" style={{ display: "flex", justifyContent: "flex-end",alignItems:"center",marginBottom:"10px" }}>
         <button style={{marginRight:"10px",padding:"3px",color:"black",borderRadius:"5px"}} onClick={goToPreviousPage} disabled={currentPage === 1}>Previous</button>
         <span style={{marginRight:"10px"}}>Page {currentPage} of {totalPages}</span>
         <button style={{marginRight:"10px",padding:"3px",color:"black",borderRadius:"5px"}} onClick={goToNextPage} disabled={currentPage === totalPages}>Next</button>
       </div>
-            <div className="row">
-              <div className="col-md-12">
-                <div className="card">
-                  <div className="card-body">
-                    <h5 className="card-title">Last Orders</h5>
+                    </div>
+                    <hr />
+                    
                     <div className="row" style={{marginBottom: '30px'}}>
                       <div className="col-lg-2 col-sm-12">
                         <h4>Name</h4>
