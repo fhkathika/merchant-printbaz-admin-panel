@@ -18,6 +18,7 @@ import Register from './Components/registerAdminPage/Register';
 import Role from './Components/role/Role';
 import DeliverySystem from './Components/deliverySystem/DeliverySystem';
 import AllDeliveryList from './Components/allDeliveries/AllDeliveryList';
+import Analytics from './Components/analytics/Analytics';
 function App() {
   return (
     <div className="">
@@ -37,6 +38,7 @@ function App() {
        <Route path="/invitaionPage"element={<SendInvitationPage/> } />
        <Route path="/login" element={<LoginPage/>} />
        <Route path="/role" element={<Role/>} />
+       <Route path="/analytics" element={<Analytics/>} />
        <Route
   path="/registerAdminPage"
   element={

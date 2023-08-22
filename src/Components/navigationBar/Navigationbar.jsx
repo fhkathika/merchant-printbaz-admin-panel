@@ -183,9 +183,7 @@ const Navigationbar = () => {
                  {
                     value_count?.analytics && 
                     <li className="nav-item dropdown" key={`${value_count?._id}-analytics`}>
-                    <a className="nav-link dropdown-toggle" href="#" id="navbarDropdownMenuLink" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-                      Analytics
-                    </a>
+                   <Link className="nav-link active" aria-current="page" to="/analytics">Analytics</Link>
                   
                   </li>
                  }
