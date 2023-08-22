@@ -1,9 +1,8 @@
 
 import Table from 'react-bootstrap/Table';
 
-function GetOrdersXl({filterOutFOrDelivOrders1,
-  filterDelivOrders2,
-  filterReturnedOrders3}) {
+function GetOrdersXl({orderList=[]}) {
+  console.log("object",orderList);
   return (
     <div>
     
@@ -32,9 +31,10 @@ function GetOrdersXl({filterOutFOrDelivOrders1,
         </thead>
         <tbody>
           {
-              
-              filterOutFOrDelivOrders1?.map(pending=>
-                  <tr>
+              orderList?.flatMap(orders=>(
+
+                orders?.map(pending=>
+                  <tr  key={pending?._id}>
            
            <td>{pending?._id}</td>
          
@@ -55,58 +55,10 @@ function GetOrdersXl({filterOutFOrDelivOrders1,
                   <td>{pending?.updatedAt}</td>
                 </tr>
                   )
+              ))
+            
               
-          } {
-              
-            filterDelivOrders2?.map(pending=>
-                  <tr>
-           
-           <td>{pending?._id}</td>
-         
-           <td>{pending?.clientbrandName}</td>
-                  <td>{pending?.clientName}</td>
-                  <td>{pending?.clientPhone}</td>
-                  <td>{pending?.userMail}</td>
-                  <td>{pending?.name}</td>
-                  <td>{pending?.address}</td>
-                  <td>{pending?.phone}</td>
-                  <td>{pending?.printbazcost}</td>
-                  <td>{pending?.deliveryFee}</td>
-                  <td>{pending?.collectAmount}</td>
-                  <td>{pending?.recvMoney}</td>
-                  <td>{pending?.orderStatus}</td>
-                  <td>{pending?.paymentStatus}</td>
-                  <td>{pending?.createdAt}</td>
-                  <td>{pending?.updatedAt}</td>
-                </tr>
-                  )
-              
-          } {
-              
-            filterReturnedOrders3?.map(pending=>
-                  <tr>
-           
-           <td>{pending?._id}</td>
-         
-           <td>{pending?.clientbrandName}</td>
-                  <td>{pending?.clientName}</td>
-                  <td>{pending?.clientPhone}</td>
-                  <td>{pending?.userMail}</td>
-                  <td>{pending?.name}</td>
-                  <td>{pending?.address}</td>
-                  <td>{pending?.phone}</td>
-                  <td>{pending?.printbazcost}</td>
-                  <td>{pending?.deliveryFee}</td>
-                  <td>{pending?.collectAmount}</td>
-                  <td>{pending?.recvMoney}</td>
-                  <td>{pending?.orderStatus}</td>
-                  <td>{pending?.paymentStatus}</td>
-                  <td>{pending?.createdAt}</td>
-                  <td>{pending?.updatedAt}</td>
-                </tr>
-                  )
-              
-          }
+          } 
         
         
         </tbody>
