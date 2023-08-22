@@ -55,7 +55,69 @@ let deliveredOrders=orderAll?.filter(users=>users?.orderStatus==="delivered");
 let paymentReleaseddOrders=orderAll?.filter(users=>users?.orderStatus==="paymentReleased");
 let cancelOrders=orderAll?.filter(users=>users?.orderStatus==="cancel");
 let returnOrders=orderAll?.filter(users=>users?.orderStatus==="returned");
+// filter  sum of total quantity tshirt
+const tShirtQuantityForOutFOrDelivery= outForDeliveryOrders?.reduce((sum, order) => {
+  return sum + (order?.orderDetailArr?.reduce((innerSum, item) => innerSum + parseInt(item.quantity || 0), 0));
+}, 0);
+const tShirtQuantityForDeliveredOrders= deliveredOrders?.reduce((sum, order) => {
+  return sum + (order?.orderDetailArr?.reduce((innerSum, item) => innerSum + parseInt(item.quantity || 0), 0));
+}, 0);
+const tShirtQuantityForReturnOrders= returnOrders?.reduce((sum, order) => {
+  return sum + (order?.orderDetailArr?.reduce((innerSum, item) => innerSum + parseInt(item.quantity || 0), 0));
+}, 0);
 
+const colorQuantitiesForReturn = returnOrders?.reduce((acc, order) => {
+  return (order?.orderDetailArr || []).reduce((innerAcc, item) => {
+      if (item.color === "white") {
+          innerAcc.white += parseInt(item.quantity || 0);
+      } else if (item.color === "black") {
+          innerAcc.black += parseInt(item.quantity || 0);
+      }
+      return innerAcc;
+  }, acc);
+}, { white: 0, black: 0 });
+const colorQuantitiesForOutForDelivery = outForDeliveryOrders?.reduce((acc, order) => {
+  return (order?.orderDetailArr || []).reduce((innerAcc, item) => {
+      if (item.color === "white") {
+          innerAcc.white += parseInt(item.quantity || 0);
+      } else if (item.color === "black") {
+          innerAcc.black += parseInt(item.quantity || 0);
+      }
+      return innerAcc;
+  }, acc);
+}, { white: 0, black: 0 });
+const colorQuantitiesForDelivered = deliveredOrders?.reduce((acc, order) => {
+  return (order?.orderDetailArr || []).reduce((innerAcc, item) => {
+      if (item.color === "white") {
+          innerAcc.white += parseInt(item.quantity || 0);
+      } else if (item.color === "black") {
+          innerAcc.black += parseInt(item.quantity || 0);
+      }
+      return innerAcc;
+  }, acc);
+}, { white: 0, black: 0 });
+
+const whiteQuantity = (colorQuantitiesForReturn?.white)+(colorQuantitiesForOutForDelivery?.white)+(colorQuantitiesForDelivered?.white) || 0;
+const blackQuantity = (colorQuantitiesForReturn?.black)+(colorQuantitiesForOutForDelivery?.black)+(colorQuantitiesForDelivered?.black) || 0;
+const whiteQuantityReturn = (colorQuantitiesForReturn?.white)|| 0;
+const whiteQuantityOutForDelivery = (colorQuantitiesForOutForDelivery?.white) || 0;
+const whiteQuantityDelivered = (colorQuantitiesForDelivered?.white) || 0;
+const blackQuantityReturn = (colorQuantitiesForReturn?.black)|| 0;
+const blackQuantityOutForDelivery = (colorQuantitiesForOutForDelivery?.black) || 0;
+const blackQuantityDelivered = (colorQuantitiesForDelivered?.black) || 0;
+//  const blackQuantity = colorQuantities?.black || 0;
+
+console.log("whiteQuantityReturn",whiteQuantityReturn);
+console.log("whiteQuantityOutForDelivery",whiteQuantityOutForDelivery);
+console.log("whiteQuantityDelivered",whiteQuantityDelivered);
+
+console.log("blackQuantityReturn",blackQuantityReturn);
+console.log("blackQuantityOutForDelivery",blackQuantityOutForDelivery);
+console.log("blackQuantityDelivered",blackQuantityDelivered);
+
+console.log("whiteQuantity",whiteQuantity);
+
+let countTotalTshirtDispatched=tShirtQuantityForOutFOrDelivery+tShirtQuantityForDeliveredOrders+tShirtQuantityForReturnOrders
 let countPendingOrders = pendingOrders?.length || 0;
 let countapprovedOrders = approvedOrders?.length || 0;
 let countconfirmedOrders = confirmedOrders?.length || 0;
@@ -544,7 +606,68 @@ return (
                   </div>
                 </div>
 
-              </div>
+              </div> 
+           
+              <div className="col-md-3">
+               
+               <div className="card stat-card" style={{height:"152px"}}>
+               <div className="" style={{display:"flex",justifyContent:"space-between",alignItem:"center"}}>
+                 <div className="card-body ">
+                 <h5 className="">Total T-Shirt Dispatched</h5>
+                    <h5 className="float-right">White - {whiteQuantity}</h5>
+                    <h5 className="float-right">Black - {blackQuantity}</h5>
+                   </div>
+               <div>
+               <div className="card-body" style={{display:"flex",justifyContent:"center",height:"50%"}}>
+                  
+                  <h4 className="float-right" style={{marginLeft:"40px",marginTop:"2px"}}>{countTotalTshirtDispatched}</h4>
+                  </div>
+               <div  style={{display:"flex",justifyContent:"flex-end",padding:"0px 20px",marginTop:"35px"}}>
+                  
+                  <span onClick={downloadInfIntoXl} data-order-id="order-detail-totalTShirt"><img style={{width:"25px",hight:"25px"}} src="/images/download.png" alt='download'/></span>
+              <div id="order-detail-totalTShirt"style={{position: 'absolute', left: '-10000px', top: '-10000px'}}>
+              <GetOrdersXl orderList={[onHoldArtworkIssueOrders]}/>
+          </div> 
+            
+                </div>
+               </div>
+              
+                   </div>
+                  
+               </div>
+              
+             
+
+             </div> 
+             {/* <div className="col-md-3">
+               
+               <div className="card stat-card" style={{height:"152px"}}>
+               <div className="" style={{display:"flex",justifyContent:"space-between",alignItem:"center"}}>
+                 <div className="card-body ">
+                 <h5 className="">Best Merchants</h5>
+                   </div>
+               <div>
+               <div className="card-body" style={{display:"flex",justifyContent:"center",height:"50%"}}>
+                  
+                  <h4 className="float-right" style={{marginLeft:"40px",marginTop:"2px"}}>{countTotalTshirtDispatched}</h4>
+                  </div>
+               <div  style={{display:"flex",justifyContent:"flex-end",padding:"0px 20px",marginTop:"35px"}}>
+                  
+                  <span onClick={downloadInfIntoXl} data-order-id="order-detail-totalTShirt"><img style={{width:"25px",hight:"25px"}} src="/images/download.png" alt='download'/></span>
+              <div id="order-detail-totalTShirt"style={{position: 'absolute', left: '-10000px', top: '-10000px'}}>
+              <GetOrdersXl orderList={[onHoldArtworkIssueOrders]}/>
+          </div> 
+            
+                </div>
+               </div>
+              
+                   </div>
+                  
+               </div>
+              
+             
+
+             </div> */}
           
             </div>
 
