@@ -208,7 +208,7 @@ const ViewOrder = () => {
     link.click();
   }
   const copyOrderId = () => {
-    navigator.clipboard.writeText(viewOrder?._id);
+    navigator.clipboard.writeText(getSpecificOrderById?._id);
     
     setShow(true)
     // console.log("viewOrder?._id",viewOrder?._id);
