@@ -25,15 +25,20 @@ const navigate=useNavigate()
     const handleInputOrderId = (e, idx) => {
       const newRows = [...rows];
       newRows[idx].orderId = e.target.value;
+      console.log(" newRows[idx].orderId", newRows[idx].orderId);
       const order = orderAll?.find(order => order?._id?.includes(newRows[idx].orderId));
+      console.log("orders from d system pop up",order);
       newRows[idx].searchByOrderId = order || {};
       setRows(newRows);
+    }  
+      const handleEmailChange = (e, idx) => {
+      const newRows = [...rows];
+      newRows[idx].deliveryFeeForAdmin = e.target.value;
+      console.log(" newRows[idx].deliveryFeeForAdmin", newRows[idx].deliveryFeeForAdmin);
+ 
     }
     
-    let formattedDate;
-
-
-console.log("formattedDate",formattedDate);
+ 
    
   const returnValue=Number(searchByOrderId?.printbazcost)+Number(searchByOrderId?.deliveryFee)
   const handleInputColAmount = (e, idx) => {
@@ -52,7 +57,7 @@ console.log("formattedDate",formattedDate);
   
   
   const [rows, setRows] = useState([
-    { date: '', orderId:'', collectAmount: '', deliveryFee: '', orderStatus: '', cashCollectNyCourier:collectAmount, returnValue:0 }
+    { statusDate: '', orderId:'', collectAmount: '', deliveryFeeForAdmin: '', orderStatus: '', cashCollectNyCourier:collectAmount, returnValue:0 }
   ]);
   console.log("searchByOrderId sdfsf",rows);
   // useEffect(() => {
@@ -171,7 +176,7 @@ const gotoAllDeliveries=()=>{
 
        return (
            <tr className="info">
-               <td>{formattedDate}</td>
+               <td>{list?.searchByOrderId?.statusDate}</td>
                <td>{list?._id}</td>
                <td>{list?.collectAmount} TK</td>
                <td>{list?.deliveryFee} TK</td>
@@ -321,6 +326,7 @@ const gotoAllDeliveries=()=>{
           handleReturnValue={handleReturnValue}
           searchByOrderId={searchByOrderId}
           handleInputOrderId={handleInputOrderId}
+          handleEmailChange={handleEmailChange}
           handleChangeStartDate={handleChangeStartDate}
           showAlert={showAlert}
           startDate={startDate}

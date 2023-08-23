@@ -5,7 +5,7 @@ import DatePicker from 'react-datepicker';
 import 'react-datepicker/dist/react-datepicker.css';
 import AlertMessage from "./AlertMessage";
 import DeliveryListAddedAlert from "./DeliveryListAddedAlert";
-const AddDeliveryList = ({ showAlert,onClose,startDate,returnValue,handleReturnValue,handleInputColAmount,collectAmount,setCollectAmount,setRows,rows,handleChangeStartDate,handleInputOrderId,searchByOrderId}) => {
+const AddDeliveryList = ({ showAlert,onClose,startDate,returnValue,handleReturnValue,handleInputColAmount,collectAmount,setCollectAmount,setRows,rows,handleChangeStartDate,handleInputOrderId,searchByOrderId,handleEmailChange}) => {
 
   const [show, setShow] = useState(false);
   const [delSuccessAlert, setDelSuccessAlert] = useState(false);
@@ -22,9 +22,10 @@ const addField = () => {
 };
 
 // remove field
-const removeField = (index) => {
-
+const removeField = (indexToRemove) => {
+  setRows(prevRows => prevRows.filter((_, index) => index !== indexToRemove));
 };
+
 
 const handleSubmitDeliveryList = (e) => {
   e.preventDefault();
@@ -100,7 +101,7 @@ const handleSubmitDeliveryList = (e) => {
                       </div>
                       
                       <div className="row">
-                        <div className="col-1">
+                        <div className="col-2">
                           <div className="popup-title-02">
                             <p >Date</p>
                           </div>
@@ -116,7 +117,7 @@ const handleSubmitDeliveryList = (e) => {
                             </p>
                           </div>
                         </div>
-                        <div className="col-2">
+                        <div className="col-1">
                           <div className="popup-title-02">
                             <p >Delivery Fee</p>
                           </div>
@@ -124,6 +125,10 @@ const handleSubmitDeliveryList = (e) => {
                         <div className="col-1">
                           <div className="popup-title-02">
                             <p >Delivery Status</p>
+                          </div>
+                        </div><div className="col-1">
+                          <div className="popup-title-02">
+                            <p >Assign To</p>
                           </div>
                         </div>
                         <div className="col-2">
@@ -138,7 +143,7 @@ const handleSubmitDeliveryList = (e) => {
                       </div>
                       {
                         rows?.map((row,index)=>{ 
-                       console.log("printbaz cost", row?.searchByOrderId?.printbazcost)
+                       console.log("row?.searchByOrderId?.statusDate", row?.searchByOrderId?.statusDate)
                     let returnAmount=Number(row?.searchByOrderId?.printbazcost)+Number(row?.searchByOrderId?.deliveryFee)
                   row.collectAmount=row?.searchByOrderId?.collectAmount
                   row.orderStatus=row?.searchByOrderId?.orderStatus
@@ -165,12 +170,15 @@ const handleSubmitDeliveryList = (e) => {
                           
                           return( 
                           <div className="row">
-                          <div className="col-lg-1 col-sm-12" >
+                          {/* <div className="col-lg-1 col-sm-12" >
                             
                           <DatePicker
             selected={row?.date}
             onChange={(date) => handleChangeStartDate(date, index)}
           />
+                          </div> */}
+                          <div className="col-2">
+                            <input type="text"  required id={`statusDate-${index}`} style={{border: '1px solid #ececec', width: '75%', height: '50px', padding: '5px',textAlign:"center"}} value={row?.searchByOrderId?.statusDate} readOnly />
                           </div>
                           <div className="col-2">
                           <input type="text" required id={`orderId-${index}`} style={{border: '1px solid #ececec', width: '100%', height: '50px', padding: '5px'}} className="form-control" value={row?.orderId}  onChange={(e) =>  handleInputOrderId(e,index)} />
@@ -178,8 +186,12 @@ const handleSubmitDeliveryList = (e) => {
                           <div className="col-2">
                             <input type="text" required id={`colectAmount-${index}`} style={{border: '1px solid #ececec', width: '75%', height: '50px', padding: '5px',textAlign:"center"}} value={row?.searchByOrderId?.collectAmount}   readOnly/>
                           </div>
-                          <div className="col-2">
-                            <input type="text" required id={`deliveryFee-${index}`} style={{border: '1px solid #ececec', width: '75%', height: '50px', padding: '5px',textAlign:"center"}} value={row?.searchByOrderId?.deliveryFee} readOnly />
+                          <div className="col-1">
+                            <input type="text" required id={`deliveryFeeForAdmin-${index}`} style={{border: '1px solid #ececec', width: '75%', height: '50px', padding: '5px',textAlign:"center"}} value={row?.deliveryFeeForAdmin} onChange={(e) =>  handleEmailChange(e,index)} />
+                          </div>
+                          <div className="col-1">
+                          <input type="text" required id={`orderStatus-${index}`} style={{marginTop: '0px', padding: '10px 10px', borderRadius: '5px', backgroundColor: '#4caf50', color: '#fff', fontWeight: 'bold', border: 'none'}} value={row?.searchByOrderId?.orderStatus} readOnly />
+                          
                           </div>
                           <div className="col-1">
                           <input type="text" required id={`orderStatus-${index}`} style={{marginTop: '0px', padding: '10px 10px', borderRadius: '5px', backgroundColor: '#4caf50', color: '#fff', fontWeight: 'bold', border: 'none'}} value={row?.searchByOrderId?.orderStatus} readOnly />

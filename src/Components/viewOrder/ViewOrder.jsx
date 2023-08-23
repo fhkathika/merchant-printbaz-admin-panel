@@ -35,12 +35,13 @@ const ViewOrder = () => {
   useEffect(()=>{
     const getOrderById=async()=>{
              // Fetch the updated order details
-    await fetch(`https://mserver.printbaz.com/getorder/${id}`)
-    // await fetch(`http://localhost:5000/getorder/${id}`)
+    // await fetch(`https://mserver.printbaz.com/getorder/${id}`)
+    await fetch(`http://localhost:5000/getorder/${id}`)
     .then(res=>res.json())
     .then(data => {setGetSpecificOrderById(data)
       setOrderStatus(data.orderStatus);
       setPaymentStatus(data.paymentStatus);
+      setDeliverAssign(data?.deliveryAssignTo);
     })
       
     
@@ -52,9 +53,11 @@ const ViewOrder = () => {
       
   const [orderStatus, setOrderStatus] = useState();
   const [paymentStatus, setPaymentStatus] = useState();
+  const [deliverAssign, setDeliverAssign] = useState();
   const [updateOrder, setUpdateOrder] = useState(false);
   const [show, setShow] = useState(false);
   const target = useRef(null);
+  console.log("deliverAssign",deliverAssign);
   let date = new Date(getSpecificOrderById?.createdAt); // create a new Date object
 
   let options = {month: 'long', day: 'numeric', year: 'numeric', hour: 'numeric', minute: 'numeric'  }; // options for toLocaleDateString
@@ -130,6 +133,40 @@ const ViewOrder = () => {
       // Handle error here
     }
   };
+  const handleDeliverAssignChange = async (e) => {
+    const status = e.target.value; // the new status
+  console.log("status",status);
+
+    //   await fetch(`http://localhost:5000/update-approval/${viewClient?._id}`, { //for testing site
+    try {
+      const response = await fetch(
+        
+        // `https://mserver.printbaz.com/updatePaymentStatus/${id}`,
+      `http://localhost:5000/deliveryAssignTo/${id}`,
+        {
+          method: "PUT",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({ deliveryAssignTo: status }),
+        }
+      );
+  
+      if (response.ok) {
+        // Update the approval status in the viewClient object
+        setDeliverAssign(status);
+  
+        // console.log("Success:", getSpecificOrderById);
+        // Update your state or perform any other necessary operations with the updated viewClient object
+      } else {
+        console.error("status Error:", response);
+        // Handle error here
+      }
+    } catch (error) {
+      console.error("Error:", error.message);
+      // Handle error here
+    }
+  };
   const handleUpdatePopUp=(e)=>{
     e.preventDefault()
 
@@ -154,6 +191,8 @@ const ViewOrder = () => {
         pdf.save("ShippingDetail.pdf");
     });
 }
+
+
   const getViewClientColor = (status) => {
     if (status === "Pending") {
       return "Orange";
@@ -245,6 +284,66 @@ const ViewOrder = () => {
     </span>
                 </div> 
                 <div className='d-flex  align_center col-lg- col-sm-2 '>
+              
+                        <div style={{display:""}}>
+                          
+                            <select
+                            id="status-filter"
+                            className="status-btn"
+                            style={{
+                              border: "none",
+                              padding: "8px",
+                            
+                              marginRight:'20px',
+                              marginBottom:"5px",
+                              backgroundColor: getViewClientColor(
+                                deliverAssign
+                              ),
+                            }}
+                            onChange={(e) => handleDeliverAssignChange(e)}
+                          >
+                           {
+                             deliverAssign?
+                             <option value>{deliverAssign}</option>
+                             :
+                             <option value>No service</option>
+                           }
+                             
+                            <option value="pathao"> Pathao</option>
+                            <option value="delivery tiger">Delivery Tiger</option>
+                        
+                        
+  
+                         
+  
+  
+  {deliverAssign === "pathao" && (
+                              <>
+                                {/* <option value="paid">Paid</option> */}
+                                <option value="delivery tiger">Delivery Tiger</option>
+                             
+                              </>
+                            )}
+  
+  {paymentStatus === "delivery tiger" && (
+                              <>
+                              <option value="pathao">Pathao</option>
+                              {/* <option value="Unpaid">Unpaid</option> */}
+                             
+                                
+                              </>
+                            )}
+                          </select>
+                        
+                          
+                     
+                     
+                     
+                        </div>
+                        
+                       
+               
+
                 <div className="view-client-title " style={{marginRight:"10px"}}>
             <Button variant="warning" onClick={downloadShippingDetail}><span><img style={{width:"23px",hight:"20px"}} src="/images/download.png" alt='download'/></span>Shipping Detail</Button>
             <div id="shipping-detail" style={{position: 'absolute', left: '-10000px', top: '-10000px'}}>
@@ -252,6 +351,8 @@ const ViewOrder = () => {
             </div>
           
         </div>
+
+ 
                 {
                   value_count?.edit_Order &&
                   <div className="view-client-title my-3  " >
