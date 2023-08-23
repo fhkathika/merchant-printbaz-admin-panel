@@ -13,9 +13,11 @@ import Row from 'react-bootstrap/Row';
 import Col from 'react-bootstrap/Col';
 import GetOrdersXl from '../GetOrdersXl';
 import GetTotalTshirtDispatched from '../GetTotalTshirtDispatched';
+import useGetAllTickets from '../../hooks/useGetAllTickets';
 const Analytics = () => {
   const {adminUser,loading,loginAdminUser,currentUser}=useContext(AuthContext);
   const { orderAll } = useGetMongoData();
+  const {fetchAllTicket}=useGetAllTickets()
   const {deliveryAll}=useGetDeliveryList()
   const location = useLocation();
   const [previousPath, setPreviousPath] = useState('');
@@ -103,6 +105,9 @@ let deliveredOrders=orderAll?.filter(users=>users?.orderStatus==="delivered");
 let paymentReleaseddOrders=orderAll?.filter(users=>users?.orderStatus==="paymentReleased");
 let cancelOrders=orderAll?.filter(users=>users?.orderStatus==="cancel");
 let returnOrders=orderAll?.filter(users=>users?.orderStatus==="returned");
+let pendingTickets=fetchAllTicket?.filter(ticket=>ticket?.ticketStatus==="pending");
+let repliedTickets=fetchAllTicket?.filter(ticket=>ticket?.ticketStatus==="replied");
+let openTickets=fetchAllTicket?.filter(ticket=>ticket?.ticketStatus==="open");
 // filter  sum of total quantity tshirt
 const tShirtQuantityForOutFOrDelivery= outForDeliveryOrders?.reduce((sum, order) => {
   return sum + (order?.orderDetailArr?.reduce((innerSum, item) => innerSum + parseInt(item.quantity || 0), 0));
@@ -113,7 +118,7 @@ const tShirtQuantityForDeliveredOrders= deliveredOrders?.reduce((sum, order) => 
 const tShirtQuantityForReturnOrders= returnOrders?.reduce((sum, order) => {
   return sum + (order?.orderDetailArr?.reduce((innerSum, item) => innerSum + parseInt(item.quantity || 0), 0));
 }, 0);
-
+//  Return  black ,white tshirt count
 const colorQuantitiesForReturn = returnOrders?.reduce((acc, order) => {
   return (order?.orderDetailArr || []).reduce((innerAcc, item) => {
       if (item.color === "white") {
@@ -124,6 +129,7 @@ const colorQuantitiesForReturn = returnOrders?.reduce((acc, order) => {
       return innerAcc;
   }, acc);
 }, { white: 0, black: 0 });
+//  OutForDelivery  black ,white tshirt count
 const colorQuantitiesForOutForDelivery = outForDeliveryOrders?.reduce((acc, order) => {
   return (order?.orderDetailArr || []).reduce((innerAcc, item) => {
       if (item.color === "white") {
@@ -134,6 +140,7 @@ const colorQuantitiesForOutForDelivery = outForDeliveryOrders?.reduce((acc, orde
       return innerAcc;
   }, acc);
 }, { white: 0, black: 0 });
+//  Delivered  black ,white tshirt count
 const colorQuantitiesForDelivered = deliveredOrders?.reduce((acc, order) => {
   return (order?.orderDetailArr || []).reduce((innerAcc, item) => {
       if (item.color === "white") {
@@ -144,12 +151,31 @@ const colorQuantitiesForDelivered = deliveredOrders?.reduce((acc, order) => {
       return innerAcc;
   }, acc);
 }, { white: 0, black: 0 });
+// in production black ,white tshirt count 
+const sizeCountsForInProduction = inProductionOrders?.reduce((acc, order) => {
+  return (order?.orderDetailArr || []).reduce((innerAcc, item) => {
+    if (item.color === "black") {
+      // Initialize the size object for black if it doesn't exist
+      if (!innerAcc.black[item.teshirtSize]) {
+        innerAcc.black[item.teshirtSize] = 0;
+      }
+      innerAcc.black[item.teshirtSize] += parseInt(item.quantity || 0);
+    } else if (item.color === "white") {
+      // Initialize the size object for white if it doesn't exist
+      if (!innerAcc.white[item.teshirtSize]) {
+        innerAcc.white[item.teshirtSize] = 0;
+      }
+      innerAcc.white[item.teshirtSize] += parseInt(item.quantity || 0);
+    }
+    return innerAcc;
+  }, acc);
+}, { white: {}, black: {} });
+
 
 const whiteQuantity = (colorQuantitiesForReturn?.white)+(colorQuantitiesForOutForDelivery?.white)+(colorQuantitiesForDelivered?.white) || 0;
 const blackQuantity = (colorQuantitiesForReturn?.black)+(colorQuantitiesForOutForDelivery?.black)+(colorQuantitiesForDelivered?.black) || 0;
 
 
-console.log("whiteQuantity",whiteQuantity);
 
 let countTotalTshirtDispatched=tShirtQuantityForOutFOrDelivery+tShirtQuantityForDeliveredOrders+tShirtQuantityForReturnOrders
 let countPendingOrders = pendingOrders?.length || 0;
@@ -164,6 +190,9 @@ let countdeliveredOrders = deliveredOrders?.length || 0;
 let countpaymentReleaseddOrders = paymentReleaseddOrders?.length || 0;
 let countcancelOrders = cancelOrders?.length || 0;
 let countreturnOrders = returnOrders?.length || 0;
+let countpendingTickets = pendingTickets?.length || 0;
+let countrepliedTickets = repliedTickets?.length || 0;
+let countopenTickets = openTickets?.length || 0;
 let countODROrders = countoutForDeliveryOrders+countreturnOrders+countdeliveredOrders;
 const totalpendingPBazCost = pendingOrders?.reduce((acc, curr) => acc +parseFloat (curr.printbazcost || 0)+parseInt(curr.deliveryFee), 0);
 const totalapprovedPBazCost = approvedOrders?.reduce((acc, curr) => acc +parseFloat (curr.printbazcost || 0)+parseInt(curr.deliveryFee), 0);
@@ -680,7 +709,7 @@ return (
                  <ul>
     {topMerchants.map((merchant, index) => (
         <li key={merchant.name}>
-            {merchant.name} - Delivered Orders: {merchant.deliveredCount}
+            {merchant.name} - {merchant.deliveredCount}
         </li>
     ))}
 </ul>
@@ -707,8 +736,192 @@ return (
               
              
 
-             </div> 
+             </div>  
+             <div className="col-md-3">
+               
+               <div className="card stat-card" style={{height:"152px"}}>
+               <div className="" style={{display:"flex",justifyContent:"space-between",alignItem:"center"}}>
+                 <div className="card-body ">
+                 <h5 className="">White T-shirt Needed</h5>
+                 <div style={{display:"flex"}}>
+<div>
+<p className="float-right">M  - {sizeCountsForInProduction.white?.m?sizeCountsForInProduction.white?.m:0}</p>
+                    <p className="float-right">L  -  {sizeCountsForInProduction.white?.L?sizeCountsForInProduction.white?.L:0}</p>
+</div>
+<div style={{marginLeft:"20px"}}>
+<p className="float-right"> XL - {sizeCountsForInProduction.white?.XL?sizeCountsForInProduction.white?.XL:0}</p>
+                    <p className="float-right"> XXL  -  {sizeCountsForInProduction.white?.XXL?sizeCountsForInProduction.white?.XXL:0}</p>
+</div>
+                 </div>
+                  
+                   
+                   </div>
+               <div>
+               <div className="card-body" style={{display:"flex",justifyContent:"center",height:"50%"}}>
+                  
+                  {/* <h4 className="float-right" style={{marginLeft:"40px",marginTop:"2px"}}>{countTotalTshirtDispatched}</h4> */}
+                  </div>
+               <div  style={{display:"flex",justifyContent:"flex-end",padding:"0px 20px",marginTop:"35px"}}>
+                  
+                  {/* <span style={{cursor:"pointer"}} onClick={downloadInfIntoXl} data-order-id="order-detail-totalTShirt"><img style={{width:"25px",hight:"25px"}} src="/images/download.png" alt='download'/></span> */}
+              <div id="order-detail-totalTShirt"style={{position: 'absolute', left: '-10000px', top: '-10000px'}}>
+              <GetTotalTshirtDispatched countTotalTshirtDispatched={countTotalTshirtDispatched} whiteQuantity={whiteQuantity} blackQuantity={blackQuantity}/>
+          </div> 
+            
+                </div>
+               </div>
+              
+                   </div>
+                  
+               </div>
+              
              
+
+             </div>
+              <div className="col-md-3">
+               
+               <div className="card stat-card" style={{height:"152px"}}>
+               <div className="" style={{display:"flex",justifyContent:"space-between",alignItem:"center"}}>
+                 <div className="card-body ">
+                 <h5 className="">Black T-shirt Needed</h5>
+                 <div style={{display:"flex"}}>
+<div>
+
+<p className="float-right">M  - {sizeCountsForInProduction.black?.m?sizeCountsForInProduction.black?.m:0}</p>
+                    <p className="float-right">L  -  {sizeCountsForInProduction.black?.L?sizeCountsForInProduction.black?.L:0}</p>
+</div>
+<div style={{marginLeft:"20px"}}>
+<p className="float-right"> XL - {sizeCountsForInProduction.black?.XL?sizeCountsForInProduction.black?.XL:0}</p>
+                    <p className="float-right"> XXL  -  {sizeCountsForInProduction.black?.XXL?sizeCountsForInProduction.black?.XXL:0}</p>
+</div>
+                 </div>
+                  
+                   
+                   </div>
+               <div>
+               <div className="card-body" style={{display:"flex",justifyContent:"center",height:"50%"}}>
+                  
+                  {/* <h4 className="float-right" style={{marginLeft:"40px",marginTop:"2px"}}>{countTotalTshirtDispatched}</h4> */}
+                  </div>
+               <div  style={{display:"flex",justifyContent:"flex-end",padding:"0px 20px",marginTop:"35px"}}>
+                  
+                  {/* <span style={{cursor:"pointer"}} onClick={downloadInfIntoXl} data-order-id="order-detail-totalTShirt"><img style={{width:"25px",hight:"25px"}} src="/images/download.png" alt='download'/></span> */}
+              <div id="order-detail-totalTShirt"style={{position: 'absolute', left: '-10000px', top: '-10000px'}}>
+              <GetTotalTshirtDispatched countTotalTshirtDispatched={countTotalTshirtDispatched} whiteQuantity={whiteQuantity} blackQuantity={blackQuantity}/>
+          </div> 
+            
+                </div>
+               </div>
+              
+                   </div>
+                  
+               </div>
+              
+             
+
+             </div>
+
+             <div className="col-md-3">
+               
+               <div className="card stat-card" style={{height:"152px"}}>
+               <div className="" style={{display:"flex",justifyContent:"space-between",alignItem:"center"}}>
+                 <div className="card-body">
+                   <h5 className="">Total Pending Tickets</h5>
+                   {/* <h2 className="float-right">{totaldeliveredPBazCost} TK</h2> */}
+                   </div>
+               <div>
+<div className="card-body" style={{display:"flex",justifyContent:"center"}}>
+                  
+                   <h4 className="float-right" style={{marginLeft:"40px",marginTop:"2px"}}>{countpendingTickets}</h4>
+                   </div>
+
+                   <div  style={{display:"flex",justifyContent:"flex-end",padding:"0px 20px",marginTop:"35px"}}>
+              
+              {/* <span style={{cursor:"pointer"}} onClick={downloadInfIntoXl} data-order-id="order-detail-delivered"><img style={{width:"25px",hight:"25px"}} src="/images/download.png" alt='download'/></span> */}
+          <div id="order-detail-delivered"style={{position: 'absolute', left: '-10000px', top: '-10000px'}}>
+          <GetOrdersXl orderList={[deliveredOrders]}/>
+      </div> 
+        
+            </div>
+               </div>
+                
+                   </div>
+                 <div>
+                 
+                 </div>
+               </div>
+              
+             
+
+             </div>
+              <div className="col-md-3">
+               
+               <div className="card stat-card" style={{height:"152px"}}>
+               <div className="" style={{display:"flex",justifyContent:"space-between",alignItem:"center"}}>
+                 <div className="card-body">
+                   <h5 className="">Total Replied Tickets</h5>
+                   {/* <h2 className="float-right">{totaldeliveredPBazCost} TK</h2> */}
+                   </div>
+               <div>
+<div className="card-body" style={{display:"flex",justifyContent:"center"}}>
+                  
+                   <h4 className="float-right" style={{marginLeft:"40px",marginTop:"2px"}}>{countrepliedTickets}</h4>
+                   </div>
+
+                   <div  style={{display:"flex",justifyContent:"flex-end",padding:"0px 20px",marginTop:"35px"}}>
+              
+              {/* <span style={{cursor:"pointer"}} onClick={downloadInfIntoXl} data-order-id="order-detail-delivered"><img style={{width:"25px",hight:"25px"}} src="/images/download.png" alt='download'/></span> */}
+          <div id="order-detail-delivered"style={{position: 'absolute', left: '-10000px', top: '-10000px'}}>
+          <GetOrdersXl orderList={[deliveredOrders]}/>
+      </div> 
+        
+            </div>
+               </div>
+                
+                   </div>
+                 <div>
+                 
+                 </div>
+               </div>
+              
+             
+
+             </div>
+             <div className="col-md-3">
+               
+               <div className="card stat-card" style={{height:"152px"}}>
+               <div className="" style={{display:"flex",justifyContent:"space-between",alignItem:"center"}}>
+                 <div className="card-body">
+                   <h5 className="">Total Open Tickets</h5>
+                   {/* <h2 className="float-right">{totaldeliveredPBazCost} TK</h2> */}
+                   </div>
+               <div>
+<div className="card-body" style={{display:"flex",justifyContent:"center"}}>
+                  
+                   <h4 className="float-right" style={{marginLeft:"40px",marginTop:"2px"}}>{countopenTickets}</h4>
+                   </div>
+
+                   <div  style={{display:"flex",justifyContent:"flex-end",padding:"0px 20px",marginTop:"35px"}}>
+              
+              {/* <span style={{cursor:"pointer"}} onClick={downloadInfIntoXl} data-order-id="order-detail-delivered"><img style={{width:"25px",hight:"25px"}} src="/images/download.png" alt='download'/></span> */}
+          <div id="order-detail-delivered"style={{position: 'absolute', left: '-10000px', top: '-10000px'}}>
+          <GetOrdersXl orderList={[deliveredOrders]}/>
+      </div> 
+        
+            </div>
+               </div>
+                
+                   </div>
+                 <div>
+                 
+                 </div>
+               </div>
+              
+             
+
+             </div>
+            
+            
             </div>
 
           
