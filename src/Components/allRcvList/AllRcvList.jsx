@@ -1,32 +1,24 @@
+
 import React, { useState } from 'react';
 import { Button } from 'react-bootstrap';
 import { useNavigate } from 'react-router-dom';
 import useGetDeliveryList from '../../hooks/useGetDeliveryList';
 import Navigationbar from '../navigationBar/Navigationbar';
 import DatePicker from 'react-datepicker';
-const AllDeliveryList = () => {
+import useGetRcvList from '../../hooks/useGetRcvList';
+const AllRcvList = () => {
     const {deliveryAll}=useGetDeliveryList()
-    const totalCollectAmount = deliveryAll?.reduce((acc, curr) => acc +parseFloat (curr.collectAmount || 0), 0);
-    const totalDeliveryAmount = deliveryAll?.reduce((acc, curr) => acc + parseFloat(curr.deliveryFee || 0), 0);
-    const totalCollectAmountByCourier = deliveryAll?.reduce((acc, curr) => acc + parseFloat(curr.cashCollectNyCourier || 0), 0);
-    const totalReturnAmount = deliveryAll?.reduce((acc, curr) => acc + parseFloat(curr.returnValue || 0), 0);
-   
+    const {rcvAll}=useGetRcvList()
+    const totalRcvAmount = rcvAll?.slice(0, 4).reduce((acc, rcvAmount) => {
+        return Number(acc + (rcvAmount?.receievedAmount || 0));
+      }, 0);
     const [filterOrdersId,setFilterOrdersId]=useState();
     
     const [startDate,setStartDate]=useState(null);
     const [endDate,setEndDate]=useState(null);
-      //  calculate the total sum of printbazRcv
-const totalPrintbazRcv = deliveryAll?.reduce((acc, list) => {
-  let amount = 0;
-  if (list?.orderStatus === "returned") {
-      amount = 0 - (list?.deliveryFeeForAdmin);
-  } else {
-      amount = (list?.collectAmount) - (list?.deliveryFeeForAdmin);
-  }
-  return acc + amount;
-}, 0); 
+    
    
-    const filteredDelivery = deliveryAll?.filter(delivery => {
+    const filteredRcv = rcvAll?.filter(delivery => {
       // Convert the date strings to Date objects for comparison
       const deliveryDate = new Date(delivery.date);
       const start = new Date(startDate);
@@ -139,95 +131,57 @@ const totalPrintbazRcv = deliveryAll?.reduce((acc, list) => {
                     <tr>
                           <th>Date</th>
                           <th>Order ID</th>
-                          <th>Cash Collection Amount</th>
-                          <th>Delivery Assign To</th>
-                          <th>Delivery Fee</th>
-                          <th>Delivery Status</th>
-                          <th>Printbaz Receivable</th>
-                          <th>Payment Status</th>
-                          <th>Return Value</th>
+                          <th>Received Amount</th>
+                        
                         </tr>
                     </thead>
                     <tbody>
                    
                     {
-filteredDelivery ?
+filteredRcv ?
 
+filteredRcv?.map(rcvAmount=>{
+    let date = new Date(rcvAmount?.date); 
+    let options = { year: 'numeric', month: 'long', day: 'numeric' }; 
+    let formattedDate = date.toLocaleDateString('en-US', options); 
 
-  filteredDelivery?.map((list, index) => {
-      let date = new Date(list?.date); 
-      let options = { year: 'numeric', month: 'long', day: 'numeric' }; 
-      let formattedDate = date.toLocaleDateString('en-US', options); 
-      let printbazRcv=0
-      if(list?.orderStatus==="returned"){
-        printbazRcv=0-(list?.deliveryFeeForAdmin)
-      }
-      else{
-       printbazRcv=(list?.collectAmount)-(list?.deliveryFeeForAdmin)
-      }
+    return(
+      <tr className="info">
+      <td>{formattedDate}</td>
+      <td>{rcvAmount?._id}</td>
+      <td>{rcvAmount?.receievedAmount} TK</td>
+    </tr>
+    )
+  }
    
-   
-      return (
-          <tr className="info">
-              <td>{list?.searchByOrderId?.statusDate}</td>
-             <td>{list?._id}</td>
-              <td>{list?.collectAmount} TK</td>
-              <td>{list?.searchByOrderId?.deliveryAssignTo}</td>
-              <td>{list?.deliveryFeeForAdmin}TK</td>
-              <td><p className="status-btn">{list?.orderStatus}</p></td>
-              <td>{printbazRcv} TK</td>
-              <td > <p className="status-btn" > {list?.searchByOrderId?.paymentStatus}</p> </td>
-              <td style={{color:"red"}}>{list?.returnValue} TK</td>
-          </tr>
-      );
-  })
-  
-
+    )
  :
 
  
-  deliveryAll?.map((list, index) => {
-      let date = new Date(list?.date); 
+    rcvAll?.map(rcvAmount=>{
+      let date = new Date(rcvAmount?.date); 
       let options = { year: 'numeric', month: 'long', day: 'numeric' }; 
       let formattedDate = date.toLocaleDateString('en-US', options); 
-      let printbazRcv=0
-      if(list?.orderStatus==="returned"){
-        printbazRcv=0-(list?.deliveryFeeForAdmin)
-      }
-      else{
-       printbazRcv=(list?.collectAmount)-(list?.deliveryFeeForAdmin)
-      }
-   
-   
-      return (
-          <tr className="info">
-              <td>{list?.searchByOrderId?.statusDate}</td>
-             <td>{list?._id}</td>
-              <td>{list?.collectAmount} TK</td>
-              <td>{list?.searchByOrderId?.deliveryAssignTo}</td>
-              <td>{list?.deliveryFeeForAdmin}TK</td>
-              <td><p className="status-btn">{list?.orderStatus}</p></td>
-              <td>{printbazRcv} TK</td>
-              <td > <p className="status-btn" > {list?.searchByOrderId?.paymentStatus}</p> </td>
-              <td style={{color:"red"}}>{list?.returnValue} TK</td>
-          </tr>
-      );
-  })
-  
 
+      return(
+        <tr className="info">
+        <td>{formattedDate}</td>
+        <td>{rcvAmount?._id}</td>
+        <td>{rcvAmount?.receievedAmount} TK</td>
+      </tr>
+      )
+    }
+     
+      )
+  
 }
 
 
                       <tr className="info">
                         <td style={{fontWeight: 700}}>Total</td>
                         <td style={{fontWeight: 700}} />
-                        <td style={{fontWeight: 700}}>{totalCollectAmount} TK</td>
-                        <td style={{fontWeight: 700}} />
-                        <td style={{fontWeight: 700}}>{totalDeliveryAmount} TK</td>
-                        <td style={{fontWeight: 700}} />
-                        <td style={{fontWeight: 700}}>{totalPrintbazRcv} TK</td>
-                        <td style={{fontWeight: 700}} />
-                        <td style={{fontWeight: 700}}>{totalReturnAmount} TK</td>
+                        <td style={{fontWeight: 700}}>{totalRcvAmount} TK</td>
+                     
                       </tr>
                     </tbody>
                   </table>
@@ -246,4 +200,4 @@ filteredDelivery ?
     );
 };
 
-export default AllDeliveryList;
+export default AllRcvList;

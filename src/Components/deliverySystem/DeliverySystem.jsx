@@ -2,19 +2,56 @@ import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import useGetDeliveryList from '../../hooks/useGetDeliveryList';
 import useGetMongoData from '../../hooks/useGetMongoData';
+import useGetRcvList from '../../hooks/useGetRcvList';
 import AddDeliveryList from '../alert/AddDeliveryList';
+import AddRecevedList from '../alert/AddRecevedList';
 import OrderUpdateAlert from '../alert/OrderUpdateAlert';
 import Navigationbar from '../navigationBar/Navigationbar';
 
 const DeliverySystem = () => {
   const {orderAll}=useGetMongoData()
   const {deliveryAll}=useGetDeliveryList()
+  const {rcvAll}=useGetRcvList()
   const [showAlert, setShowAlert] = useState(false);
+  const [showAlertRecvAmount, setShowAlertRecvAmount] = useState(false);
   const totalCollectAmount = deliveryAll?.reduce((acc, curr) => acc +parseFloat (curr.collectAmount || 0), 0);
   const totalDeliveryAmount = deliveryAll?.reduce((acc, curr) => acc + parseFloat(curr.deliveryFee || 0), 0);
   const totalCollectAmountByCourier = deliveryAll?.reduce((acc, curr) => acc + parseFloat(curr.cashCollectNyCourier || 0), 0);
+ 
   const totalReturnAmount = deliveryAll?.reduce((acc, curr) => acc + parseFloat(curr.returnValue || 0), 0);
 
+  //  calculate the total sum of printbazRcv
+const totalPrintbazRcv = deliveryAll?.reduce((acc, list) => {
+  let amount = 0;
+  if (list?.orderStatus === "returned") {
+      amount = 0 - (list?.deliveryFeeForAdmin);
+  } else {
+      amount = (list?.collectAmount) - (list?.deliveryFeeForAdmin);
+  }
+  return acc + amount;
+}, 0); 
+
+// First, calculate the total sum of received amount
+const totalRcvAmount = rcvAll?.slice(0, 4).reduce((acc, rcvAmount) => {
+  return Number(acc + (rcvAmount?.receievedAmount || 0));
+}, 0);
+
+const totalReceivable= deliveryAll?.reduce((acc, list) => {
+  if (list?.searchByOrderId?.paymentStatus === "paid") {
+      // Skip this value and continue with the accumulation
+      return acc;
+  }
+
+  let amount = 0;
+  if (list?.orderStatus === "returned") {
+      amount = 0 - (list?.deliveryFeeForAdmin);
+  } else {
+      amount = (list?.collectAmount) - (list?.deliveryFeeForAdmin);
+  }
+
+  return acc + amount;
+}, 0);
+console.log("totalRcvAmount",totalRcvAmount);
   const [startDate,setStartDate]=useState(null);
   // const [findOrderById, setFindOrderById] = useState();
     // const [searchByOrderId, setSearchByOrderId] = useState();
@@ -73,6 +110,10 @@ const handleAddDeliveryPopUp=()=>{
   console.log("click delivery system popup",showAlert);
   setShowAlert(true)
 }
+const handleAddReceiePopUp=()=>{
+
+  setShowAlertRecvAmount(true)
+}
 const handleChangeStartDate = (date, idx) => {
   // Copy the current rows array
   const newRows = [...rows];
@@ -116,6 +157,9 @@ const handleChangeStartDate = (date, idx) => {
 const gotoAllDeliveries=()=>{
   navigate("/alldeliveries")
 }
+const gotoAllRcvAmount=()=>{
+  navigate("/allRcvMoney")
+}
     return (
         <div>
           <meta charSet="UTF-8" />
@@ -140,7 +184,7 @@ const gotoAllDeliveries=()=>{
                   <div className="statistic-box">
                     <h3>Amount Receivable</h3>
                     <div className="counter-number pull-right">
-                      <span className="count-number">11,350</span>
+                      <span className="count-number">{totalReceivable}</span>
                       <span className="slight" style={{fontWeight: 'bolder'}}>৳</span>
                     </div>
                   </div>
@@ -160,28 +204,40 @@ const gotoAllDeliveries=()=>{
                           <th>Date</th>
                           <th>Order ID</th>
                           <th>Cash Collection Amount</th>
+                          <th>Delivery Assign To</th>
                           <th>Delivery Fee</th>
                           <th>Delivery Status</th>
-                          <th>Cash Collected by the courier</th>
+                          <th>Printbaz Receivable</th>
+                          <th>Payment Status</th>
                           <th>Return Value</th>
                         </tr>
                       </thead>
                       <tbody>
                      
                       {
-   deliveryAll?.slice(0,4).map((list, index) => {
+   deliveryAll?.slice(0,5).map((list, index) => {
        let date = new Date(list?.date); 
        let options = { year: 'numeric', month: 'long', day: 'numeric' }; 
        let formattedDate = date.toLocaleDateString('en-US', options); 
-
+       let printbazRcv=0
+       if(list?.orderStatus==="returned"){
+         printbazRcv=0-(list?.deliveryFeeForAdmin)
+       }
+       else{
+        printbazRcv=(list?.collectAmount)-(list?.deliveryFeeForAdmin)
+       }
+    
+    
        return (
            <tr className="info">
                <td>{list?.searchByOrderId?.statusDate}</td>
-               <td>{list?._id}</td>
+              <td>{list?._id}</td>
                <td>{list?.collectAmount} TK</td>
-               <td>{list?.deliveryFee} TK</td>
+               <td>{list?.searchByOrderId?.deliveryAssignTo}</td>
+               <td>{list?.deliveryFeeForAdmin}TK</td>
                <td><p className="status-btn">{list?.orderStatus}</p></td>
-               <td>{list?.collectAmount} TK</td>
+               <td>{printbazRcv} TK</td>
+               <td > <p className="status-btn" > {list?.searchByOrderId?.paymentStatus}</p> </td>
                <td style={{color:"red"}}>{list?.returnValue} TK</td>
            </tr>
        );
@@ -194,9 +250,11 @@ const gotoAllDeliveries=()=>{
                           <td style={{fontWeight: 700}}>Total</td>
                           <td style={{fontWeight: 700}} />
                           <td style={{fontWeight: 700}}>{totalCollectAmount} TK</td>
+                          <td style={{fontWeight: 700}} />
                           <td style={{fontWeight: 700}}>{totalDeliveryAmount} TK</td>
                           <td style={{fontWeight: 700}} />
-                          <td style={{fontWeight: 700}}>{totalCollectAmountByCourier} TK</td>
+                          <td style={{fontWeight: 700}}>{totalPrintbazRcv} TK</td>
+                          <td style={{fontWeight: 700}} />
                           <td style={{fontWeight: 700}}>{totalReturnAmount} TK</td>
                         </tr>
                       </tbody>
@@ -212,7 +270,7 @@ const gotoAllDeliveries=()=>{
                 </div>
               </div>
             </div>
-            <div className="row input-bar-01">
+            {/* <div className="row input-bar-01">
               <div className="col-xs-12 col-sm-12 col-md-12 col-lg-12">
                 <div className="lobipanel">
                   <div className="panel-title">
@@ -223,97 +281,46 @@ const gotoAllDeliveries=()=>{
                       <thead>
                         <tr>
                           <th>Date</th>
+                          <th>Order Id</th>
                           <th>Received Amount</th>
                         </tr>
                       </thead>
                       <tbody>
-                        <tr className="info">
-                          <td>15th June 2023 - 5.00 AM</td>
-                          <td>2000 TK</td>
+                        {
+                          rcvAll?.slice(0,4).map(rcvAmount=>{
+                            let date = new Date(rcvAmount?.date); 
+                            let options = { year: 'numeric', month: 'long', day: 'numeric' }; 
+                            let formattedDate = date.toLocaleDateString('en-US', options); 
+                     
+                            return(
+                              <tr className="info">
+                              <td>{formattedDate}</td>
+                              <td>{rcvAmount?._id}</td>
+                              <td>{rcvAmount?.receievedAmount} TK</td>
+                            </tr>
+                            )
+                          }
+                           
+                            )
+                        }
+
+<tr className="info">
+                          <td style={{fontWeight: 700}}>Total</td>
+                          <td style={{fontWeight: 700}} />
+                           <td style={{fontWeight: 700}}>{totalRcvAmount} TK</td>
                         </tr>
+                       
                       </tbody>
                     </table>
                   </div>
                   <div className="panel-button">
-                    <button id="button">Update</button>
-                    <button style={{float: 'right'}}>View More</button>
+                    <button id="button" onClick={handleAddReceiePopUp}>Add Received Payment List</button>
+                    <button style={{float: 'right'}} onClick={gotoAllRcvAmount}>View More</button>
                   </div>
-                  <div id="overlay" />
-                  <div id="popup" className='alert-overlay'>
-                    <div  className="alert-box">
-                      <span id="popupclose">X</span>
-                    </div>
-                    <div className="popupcontent">
-                      <div className="row">
-                        <div className="col-12">
-                          <div className="popup-title-01">
-                            <h2>Delivery List Update</h2>
-                          </div>
-                        </div>
-                      </div>
-                      <div className="row">
-                        <div className="col-2">
-                          <div className="popup-title-02">
-                            <h3>Date</h3>
-                          </div>
-                        </div>
-                        <div className="col-2">
-                          <div className="popup-title-02">
-                            <h3>Order ID</h3>
-                          </div>
-                        </div>
-                        <div className="col-2">
-                          <div className="popup-title-02">
-                            <h3>Cash Collection Amount
-                            </h3>
-                          </div>
-                        </div>
-                        <div className="col-2">
-                          <div className="popup-title-02">
-                            <h3>Delivery Fee</h3>
-                          </div>
-                        </div>
-                        <div className="col-2">
-                          <div className="popup-title-02">
-                            <h3>Delivery Status</h3>
-                          </div>
-                        </div>
-                        <div className="col-2">
-                          <div className="popup-title-02">
-                            <h3>Cash Collected by the courier</h3>
-                          </div>
-                        </div>
-                      </div>
-                      <div className="row">
-                        <div className="col-2">
-                          <input type="date" required style={{border: '1px solid #ececec', height: '50px', padding: '5px'}} />
-                        </div>
-                        <div className="col-2">
-                          <input type="text" required style={{border: '1px solid #ececec', height: '50px', padding: '5px'}} />
-                        </div>
-                        <div className="col-2">
-                          <input type="text" required style={{border: '1px solid #ececec', height: '50px', padding: '5px'}} />
-                        </div>
-                        <div className="col-2">
-                          <input type="text" required style={{border: '1px solid #ececec', height: '50px', padding: '5px'}} />
-                        </div>
-                        <div className="col-2">
-                          <button style={{marginTop: '0px', padding: '10px 10px', borderRadius: '5px', backgroundColor: '#4caf50', color: '#fff !important', fontWeight: 'bold', border: 'none'}}>Delivery</button>
-                        </div>
-                        <div className="col-2">
-                          <input type="text" required style={{border: '1px solid #ececec', height: '50px', padding: '5px'}} />
-                        </div>
-                      </div>
-                      <div className="row">
-                        <div className="col-12">
-                          <button style={{marginTop: '30px'}}>Submit</button>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
+                
                 </div>
               </div>
-            </div>
+            </div> */}
             {showAlert===true && (
           
           <AddDeliveryList
@@ -330,8 +337,30 @@ const gotoAllDeliveries=()=>{
           handleChangeStartDate={handleChangeStartDate}
           showAlert={showAlert}
           startDate={startDate}
-          message="Your order has been updated successfully."
+          message="Your delivery list has been updated successfully."
           onClose={() => setShowAlert(false)}
+       
+          
+          
+          />
+          
+          
+          )
+          
+          
+          } 
+            {showAlertRecvAmount===true && (
+          
+          <AddRecevedList
+       
+          // returnValue={returnValue}
+         
+          searchByOrderId={searchByOrderId}
+         
+          showAlertRecvAmount={showAlertRecvAmount}
+          startDate={startDate}
+          message="Your receieved list has been updated successfully."
+          onClose={() => setShowAlertRecvAmount(false)}
        
           
           

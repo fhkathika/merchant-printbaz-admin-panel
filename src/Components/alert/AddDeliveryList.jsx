@@ -122,28 +122,31 @@ const handleSubmitDeliveryList = (e) => {
                             <p >Delivery Fee</p>
                           </div>
                         </div>
-                        <div className="col-1">
+                         <div className="col-1">
                           <div className="popup-title-02">
-                            <p >Delivery Status</p>
+                            <p >Paymnet Status</p>
                           </div>
-                        </div><div className="col-1">
+                        </div>
+                        <div className="col-1">
                           <div className="popup-title-02">
                             <p >Assign To</p>
                           </div>
                         </div>
-                        <div className="col-2">
+                        <div className="col-1">
                           <div className="popup-title-02">
-                            <p >Cash Collected by the courier</p>
+                            <p >Delivery Status</p>
                           </div>
-                        </div>  <div className="col-2">
-                          <div className="popup-title-02">
-                            <p >Returned Value</p>
+                        </div>
+                       
+                        <div className="col-2" >
+                          <div className="popup-title-02" >
+                            <p>Returned Value</p>
                           </div>
                         </div>
                       </div>
                       {
                         rows?.map((row,index)=>{ 
-                       console.log("row?.searchByOrderId?.statusDate", row?.searchByOrderId?.statusDate)
+                       console.log("row?.searchByOrderId?.statusDate", row)
                     let returnAmount=Number(row?.searchByOrderId?.printbazcost)+Number(row?.searchByOrderId?.deliveryFee)
                   row.collectAmount=row?.searchByOrderId?.collectAmount
                   row.orderStatus=row?.searchByOrderId?.orderStatus
@@ -187,63 +190,23 @@ const handleSubmitDeliveryList = (e) => {
                             <input type="text" required id={`colectAmount-${index}`} style={{border: '1px solid #ececec', width: '75%', height: '50px', padding: '5px',textAlign:"center"}} value={row?.searchByOrderId?.collectAmount}   readOnly/>
                           </div>
                           <div className="col-1">
-                            <input type="text" required id={`deliveryFeeForAdmin-${index}`} style={{border: '1px solid #ececec', width: '75%', height: '50px', padding: '5px',textAlign:"center"}} value={row?.deliveryFeeForAdmin} onChange={(e) =>  handleEmailChange(e,index)} />
+                            <input type="text" required id={`deliveryFeeForAdmin-${index}`} style={{width:"auto",border: '1px solid #ececec', width: '75%', height: '50px', padding: '5px',textAlign:"center"}} value={row?.deliveryFeeForAdmin} onChange={(e) =>  handleEmailChange(e,index)} />
+                          </div> 
+                           <div className="col-1">
+                            <input type="text" required id={`paymnetStatus-${index}`} style={{width:"auto",border: '1px solid #ececec', width: '75%', height: '50px', padding: '5px',textAlign:"center",backgroundColor: '#4caf50',color:"#fff"}} value={row?.searchByOrderId?.paymentStatus} onChange={(e) =>  handleEmailChange(e,index)} />
                           </div>
-                          <div className="col-1">
-                          <input type="text" required id={`orderStatus-${index}`} style={{marginTop: '0px', padding: '10px 10px', borderRadius: '5px', backgroundColor: '#4caf50', color: '#fff', fontWeight: 'bold', border: 'none'}} value={row?.searchByOrderId?.orderStatus} readOnly />
+                          <div className="col-1" style={{color:'1px solid red'}}>
+                          <input type="text" required id={`deliveryAssignTo-${index}`} style={{marginTop: '0px', padding: '10px 10px', borderRadius: '5px', backgroundColor: '#4caf50', color: '#fff', fontWeight: 'bold', border: 'none'}} value={row?.searchByOrderId?.deliveryAssignTo} readOnly />
                           
                           </div>
                           <div className="col-1">
                           <input type="text" required id={`orderStatus-${index}`} style={{marginTop: '0px', padding: '10px 10px', borderRadius: '5px', backgroundColor: '#4caf50', color: '#fff', fontWeight: 'bold', border: 'none'}} value={row?.searchByOrderId?.orderStatus} readOnly />
                           
                           </div>
+                         
                           
                             
-                          <div className="col-2">
-  { 
-    searchByOrderId?.orderStatus === "returned" ? 
-    (
-      <>
-        <input 
-          type="text"
-          id={`cashCollectNyCourier-${index}`} 
-          required 
-          style={{border: '1px solid #ececec', width: '75%', height: '50px', padding: '5px', textAlign: "center"}} 
-          value="0" 
-          readOnly 
-        />
-        {/* You can keep the copy button, or remove this part if not needed when order is returned */}
-        <span style={{cursor: "pointer", padding: "5px", fontSize: "16px"}} ref={target} onClick={() => copyOrderId(index)}>
-          <i className="fa fa-copy ml-2 mt-1 text-green cursor-pointer text-sm"></i>
-        </span>
-      </>
-    ) 
-    : 
-    (
-      <>
-        <input 
-          type="number" 
-          id={`cashCollectNyCourier-${index}`} 
-          required  
-          value={rows[index].cashCollectNyCourier} 
-          onChange={(e) => handleInputColAmount(e, index)} 
-          style={{border: '1px solid #ececec', width: '75%', height: '50px', padding: '5px', textAlign: "center"}} 
-        />
-        <span style={{cursor: "pointer", padding: "5px", fontSize: "16px"}} ref={target} onClick={() => copyOrderId(index)}>
-          <i className="fa fa-copy ml-2 mt-1 text-green cursor-pointer text-sm"></i>
-        </span>
-      </>
-    ) 
-  }
-</div>
-
-                                  <Overlay target={target.current} show={show} placement="right">
-          {(props) => (
-            <Tooltip id="overlay-example" {...props}>
-             copied!
-            </Tooltip>
-          )}
-        </Overlay>
+   
                         <div className="col-2">
                         {
   row?.searchByOrderId?.orderStatus === "returned" ?
