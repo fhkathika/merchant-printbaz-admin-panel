@@ -14,10 +14,18 @@ const OrderList = () => {
   const [filterOrders,setFilterOrders]=useState('all');
   const [currentPage, setCurrentPage] = useState(1);
   const [itemsPerPage, setItemsPerPage] = useState(20); 
-  const [startDate,setStartDate]=useState(null);
-  const [endDate,setEndDate]=useState(null);
+
   const indexOfLastItem = currentPage * itemsPerPage;
   const indexOfFirstItem = indexOfLastItem - itemsPerPage;
+
+  const [filterStatus, setFilterStatus] = useState('all');
+  const [filterPaymentStatus, setFilterPaymentStatus] = useState('');
+  const [filterOrderId, setFilterOrderId] = useState('');
+  const [startDate, setStartDate] = useState(null);
+  const [endDate, setEndDate] = useState(null);
+  const [filterName, setFilterName] = useState('');
+  const [filterBrand, setFilterBrand] = useState('');
+
   const location = useLocation();
   const [previousPath, setPreviousPath] = useState('');
   useEffect(() => {
@@ -33,7 +41,38 @@ const OrderList = () => {
     }
     getOrders()
 },[allMerchant])
-console.log("orderAll",orderAll);
+
+const handleInputChange = (event) => {
+  const { id, value } = event.target;
+  switch (id) {
+    case 'status-filter':
+      setFilterStatus(value);
+      break; 
+       case 'paymentStatus-filter':
+      setFilterPaymentStatus(value);
+      break;
+    case 'id-filter':
+      setFilterOrderId(value);
+      break;
+      case 'name-filter':
+  setFilterName(value);
+  break; 
+   case 'brand-filter':
+  setFilterBrand(value);
+  break;
+    // ...other cases
+    default:
+      break;
+  }
+};
+
+const handleChangeStartDate = (date) => {
+  setStartDate(date);
+};
+
+const handleChangeEndDate = (date) => {
+  setEndDate(date);
+};
 let matchingMerchant
 //  console.log("allMerchant",allMerchant);
 let date = new Date(orderAll?.createdAt); // create a new Date object
@@ -68,16 +107,80 @@ function timeSince(date) {
   }
   return Math.floor(seconds) + " seconds ago";
 }
-// console.log("formattedDate",formattedDate);
-const handleInputChange = (event, index) => {
-  const { name, value } = event.target;
-  setFilterOrders(value)
-}
-console.log("setFilterOrders",filterOrders);
+
 const handlePaymentStausInputChange = (event, index) => {
   const { name, value } = event.target;
   setFilterOrders(value)
 }
+console.log("orderAll",orderAll);
+const applyFilters = () => {
+  return orderAll.filter((order) => {
+    // Filter by status
+    if (filterStatus !== 'all' && order.orderStatus !== filterStatus) {
+      return false;
+    }
+
+    // Filter by payment status
+    if (filterPaymentStatus && order.paymentStatus !== filterPaymentStatus) {
+      return false;
+    }
+
+    // Filter by order ID
+    if (filterOrderId && !order._id.includes(filterOrderId)) {
+      return false;
+    }
+
+   
+        // Date comparison
+    const userDate = new Date(order.createdAt);
+    // Reset time to 00:00:00 to compare just the date
+    userDate.setHours(0, 0, 0, 0);
+
+    if (startDate && endDate) {
+      // Both start and end dates are selected
+      const start = new Date(startDate);
+      start.setHours(0, 0, 0, 0);
+    
+      const end = new Date(endDate);
+      end.setHours(23, 59, 59, 999); // Set to end of day
+    
+      if (userDate < start || userDate > end) return false;
+    
+    } else if (startDate) {
+      // Only start date is selected
+      const start = new Date(startDate);
+      start.setHours(0, 0, 0, 0);
+    
+      const end = new Date(startDate);
+      end.setHours(23, 59, 59, 999); // Set to end of day
+    
+      if (userDate < start || userDate > end) return false;
+    
+    } else if (endDate) {
+      // Only end date is selected
+      const end = new Date(endDate);
+      end.setHours(23, 59, 59, 999); // Set to end of day
+    
+      if (userDate > end) return false;
+    }
+    
+    // Filter by recipient name
+    if (filterName && !order.name.includes(filterName)) {
+      return false;
+    }
+
+    // Filter by brand
+    if (filterBrand && (!order?.clientbrandName || !order.clientbrandName.includes(filterBrand))) {
+      return false;
+  }
+  
+
+    return true;
+  });
+};
+
+const orderMap=applyFilters()
+
 let pendingOrders=orderAll?.filter(users=>users?.orderStatus==="Pending");
 let approvedOrders=orderAll?.filter(users=>users?.orderStatus==="Approved");
 let  confirmedOrders=orderAll?.filter(users=>users?.orderStatus==="confirmed");
@@ -98,11 +201,11 @@ let filterByClientPhone=orderAll?.filter(users=>users?.phone===filterOrders);
 let filterByBrandName=orderAll?.filter(users=>users?.clientbrandName===filterOrders);
 // console.log("filterByBrandName",filterByBrandName);
 console.log("filterByrecepientPhone",filterByClientPhone);
-const handleOrderIdChange = (e) => {
-  const value = e.target.value;
-  // console.log(value);
-  setFilterOrders(value);
-}
+// const handleOrderIdChange = (e) => {
+//   const value = e.target.value;
+//   // console.log(value);
+//   setFilterOrders(value);
+// }
 const getViewClientColor = (status) => {
   if (status === "Pending") {
     return "Orange";
@@ -150,22 +253,8 @@ const getViewClientColor = (status) => {
   // you can add more conditions here or just return a default color
   // return "defaultColor";
 };
-// start date Handler 
-const handleChangeStartDate=(date)=>{
-  setStartDate(date)
-  setFilterOrders('')
-}
-const handleChangeEndDate=(date)=>{
-  setEndDate(date)
-  setFilterOrders('')
-}
-// const filerByOrderDate=orderAll.filter(order=>{
-//   const date=new Date(order?.createdAt)
-//   const orderDate=date
- 
-//   return orderDate>=new Date(startDate) && orderDate<=new Date(endDate)
-// })
-// console.log("filerByOrderDate",filerByOrderDate);
+
+
 const filerByOrderDate = orderAll.filter(order => {
   const date = new Date(order?.createdAt);
   const orderDate = date;
@@ -226,16 +315,16 @@ const actualIndexOfLastItemOfUnpaidOrders = indexOfLastItem > unPaidOrders.lengt
               </div>
               <div className="col-lg-2 col-sm-12">
                 <label htmlFor="id-filter" style={{marginBottom:"8px"}}>Order Id:</label>
-                <input type="text" id="id-filter" className="form-control" onChange={(e) =>  handleOrderIdChange(e)} />
+                <input type="text" id="id-filter" className="form-control" onChange={handleInputChange} />
               </div>
               <div className="col-lg-2 col-sm-12">
                 <label htmlFor="brand-filter" style={{marginBottom:"8px"}}>Brand Name</label>
-                <input type="text" id="brand-filter" onChange={ handleInputChange} className="form-control" />
+                <input type="text" id="brand-filter" onChange={(e) =>  handleInputChange(e)}  className="form-control" />
               </div>
               <div className="col-lg-2 col-sm-12">
-                <label htmlFor="status-filter" style={{marginBottom:"8px"}}>Payment:</label>
-                <select id="status-filter" className="form-control" onChange={(e)=>handlePaymentStausInputChange(e)}>
-                  <option value>None</option>
+                <label htmlFor="paymentStatus-filter" style={{marginBottom:"8px"}}>Payment:</label>
+                <select id="paymentStatus-filter" className="form-control" onChange={(e) =>  handleInputChange(e)}>
+                  <option value=''>none</option>
                   <option value="Unpaid">Unpaid</option>
                   <option value="paid">Paid</option>
                 </select>
@@ -409,463 +498,10 @@ const actualIndexOfLastItemOfUnpaidOrders = indexOfLastItem > unPaidOrders.lengt
                   <h4>Status</h4>
                 </div>
               </div>
+           
               {
-                   filerByOrderDate.map((orders,index)=>{ 
-                    matchingMerchant = allMerchant.find(merchant => merchant?.email === orders?.userMail)
-                   let  totalPrintBazCostWithoutDeliveryFee=Number(orders?.collectAmount)
-                    return (
-                      value_count?.OrderView ?
-                      <Link to={`/viewOrder/${orders?._id}`} state={{orders,previousPath,matchingMerchant}} key={index}>
-                      <div key={orders?._id} className="row client-list">
-                        <div className="col-lg-2 col-sm-12">
-                         {/* Display the corresponding allMerchant name */}
-                         <p>{orders?.clientName}</p>
-              {/* {index < allMerchant.length && <p>{allMerchant[index]?.name}</p>} */}
-                       
-                        </div>
-                        <div className="col-lg-2 col-sm-12">
-                          <p>{orders?._id}</p>
-                        </div>
-                        <div className="col-lg-3 col-sm-12">
-                          <p>{orders?.name}</p>
-                          <p>{orders?.address}</p>
-                          <p>{orders?.phone}</p>
-                        </div>
-                        <div className="col-lg-2 col-sm-12">
-                          <p className="p-status-btn">{orders?.paymentStatus}</p>
-                        </div>
-                        <div className="col-lg-2 col-sm-12">
-                          <p>{totalPrintBazCostWithoutDeliveryFee} TK</p>
-                        </div>
-                        <div className="col-lg-1 col-sm-12">
-                          <p className="" style={{backgroundColor:getViewClientColor(orders?.orderStatus)}}>{orders?.orderStatus}</p>
-                          {/* <p style={{fontSize: '14px'}}>{formattedDate}</p> */}
-                          <p style={{fontSize: '14px'}}> created at: {new Date(orders?.createdAt).toLocaleDateString('en-US', options)}</p>
-                      {
-                        orders?.statusDate  && 
-                        <p style={{fontSize: '14px'}}> uppdated at: {new Date(orders?.statusDate).toLocaleDateString('en-US', options)}</p>
-                      }
-                        </div>
-                      </div>
-                    </Link>
-                    :
-                    <div key={orders?._id} className="row client-list">
-                    <div className="col-lg-2 col-sm-12">
-                     {/* Display the corresponding allMerchant name */}
-                     <p>{orders?.clientName}</p>
-          {/* {index < allMerchant.length && <p>{allMerchant[index]?.name}</p>} */}
-                   
-                    </div>
-                    <div className="col-lg-2 col-sm-12">
-                      <p>{orders?._id}</p>
-                    </div>
-                    <div className="col-lg-3 col-sm-12">
-                      <p>{orders?.name}</p>
-                      <p>{orders?.address}</p>
-                      <p>{orders?.phone}</p>
-                    </div>
-                    <div className="col-lg-2 col-sm-12">
-                      <p className="p-status-btn">{orders?.paymentStatus}</p>
-                    </div>
-                    <div className="col-lg-2 col-sm-12">
-                      <p>{totalPrintBazCostWithoutDeliveryFee} TK</p>
-                    </div>
-                    <div className="col-lg-1 col-sm-12">
-                      <p className="" style={{backgroundColor:getViewClientColor(orders?.orderStatus)}}>{orders?.orderStatus}</p>
-                      {/* <p style={{fontSize: '14px'}}>{formattedDate}</p> */}
-                      <p style={{fontSize: '14px'}}> created at: {new Date(orders?.createdAt).toLocaleDateString('en-US', options)}</p>
-                  {
-                    orders?.statusDate  && 
-                    <p style={{fontSize: '14px'}}> uppdated at: {new Date(orders?.statusDate).toLocaleDateString('en-US', options)}</p>
-                  }
-                    </div>
-                  </div>
-                   
-                   )
-                    }
-                      )
-              }  
-              {/* filter bny brand name   */}
-               {
-                   filterByBrandName.map((orders,index)=>{ 
-                    matchingMerchant = allMerchant.find(merchant => merchant?.email === orders?.userMail)
-                   let  totalPrintBazCostWithoutDeliveryFee=Number(orders?.collectAmount)
-                    return (
-                      value_count?.OrderView ?
-                      <Link to={`/viewOrder/${orders?._id}`} state={{orders,previousPath,matchingMerchant}} key={index}>
-                      <div key={orders?._id} className="row client-list">
-                        <div className="col-lg-2 col-sm-12">
-                         {/* Display the corresponding allMerchant name */}
-                         <p>{orders?.clientName}</p>
-              {/* {index < allMerchant.length && <p>{allMerchant[index]?.name}</p>} */}
-                       
-                        </div>
-                        <div className="col-lg-2 col-sm-12">
-                          <p>{orders?._id}</p>
-                        </div>
-                        <div className="col-lg-3 col-sm-12">
-                          <p>{orders?.name}</p>
-                          <p>{orders?.address}</p>
-                          <p>{orders?.phone}</p>
-                        </div>
-                        <div className="col-lg-2 col-sm-12">
-                          <p className="p-status-btn">{orders?.paymentStatus}</p>
-                        </div>
-                        <div className="col-lg-2 col-sm-12">
-                          <p>{totalPrintBazCostWithoutDeliveryFee} TK</p>
-                        </div>
-                        <div className="col-lg-1 col-sm-12">
-                          <p className="" style={{backgroundColor:getViewClientColor(orders?.orderStatus)}}>{orders?.orderStatus}</p>
-                          {/* <p style={{fontSize: '14px'}}>{formattedDate}</p> */}
-                          <p style={{fontSize: '14px'}}> created at: {new Date(orders?.createdAt).toLocaleDateString('en-US', options)}</p>
-                      {
-                        orders?.statusDate  && 
-                        <p style={{fontSize: '14px'}}> uppdated at: {new Date(orders?.statusDate).toLocaleDateString('en-US', options)}</p>
-                      }
-                        </div>
-                      </div>
-                    </Link>
-                    :
-                    <div key={orders?._id} className="row client-list">
-                        <div className="col-lg-2 col-sm-12">
-                         {/* Display the corresponding allMerchant name */}
-                         <p>{orders?.clientName}</p>
-              {/* {index < allMerchant.length && <p>{allMerchant[index]?.name}</p>} */}
-                       
-                        </div>
-                        <div className="col-lg-2 col-sm-12">
-                          <p>{orders?._id}</p>
-                        </div>
-                        <div className="col-lg-3 col-sm-12">
-                          <p>{orders?.name}</p>
-                          <p>{orders?.address}</p>
-                          <p>{orders?.phone}</p>
-                        </div>
-                        <div className="col-lg-2 col-sm-12">
-                          <p className="p-status-btn">{orders?.paymentStatus}</p>
-                        </div>
-                        <div className="col-lg-2 col-sm-12">
-                          <p>{totalPrintBazCostWithoutDeliveryFee} TK</p>
-                        </div>
-                        <div className="col-lg-1 col-sm-12">
-                          <p className="" style={{backgroundColor:getViewClientColor(orders?.orderStatus)}}>{orders?.orderStatus}</p>
-                          {/* <p style={{fontSize: '14px'}}>{formattedDate}</p> */}
-                          <p style={{fontSize: '14px'}}> created at: {new Date(orders?.createdAt).toLocaleDateString('en-US', options)}</p>
-                      {
-                        orders?.statusDate  && 
-                        <p style={{fontSize: '14px'}}> uppdated at: {new Date(orders?.statusDate).toLocaleDateString('en-US', options)}</p>
-                      }
-                        </div>
-                      </div>
-                   
-                   )
-                    }
-                      )
-              }   
-              {/* filter by clinet number  */}
-              {
-                   filterOrders && filterByClientPhone?.map((orders,index)=>{ 
-                   const matchingMerchantOrders = orderAll?.filter(merchantOrder => merchantOrder?.userMail === orders?.email)
-                  //  console.log("matchingMerchantOrders",matchingMerchantOrders);
-                   let  totalPrintBazCostWithoutDeliveryFee=Number(orders?.collectAmount)
-                    return (
-                      value_count?.OrderView ?
-                      <Link to={`/viewOrder/${orders?._id}`} state={{orders,matchingMerchantOrders}} key={index}>
-                      <div key={matchingMerchantOrders?._id} className="row client-list">
-                        <div className="col-lg-2 col-sm-12">
-                        
-                         <p>{orders?.clientName}</p>
-              
-                       
-                        </div>
-                     
-                        <div className="col-lg-2 col-sm-12">
-                          <p>{orders?._id}</p>
-                        </div>
-                        <div className="col-lg-3 col-sm-12">
-                          <p>{orders?.name}</p>
-                          <p>{orders?.address}</p>
-                          <p>{orders?.phone}</p>
-                        </div>
-                        <div className="col-lg-2 col-sm-12">
-                          <p className="p-status-btn">{orders?.paymentStatus}</p>
-                        </div>
-                        <div className="col-lg-2 col-sm-12">
-                          <p>{totalPrintBazCostWithoutDeliveryFee} TK</p>
-                        </div>
-                        <div className="col-lg-1 col-sm-12">
-                          <p className="" style={{backgroundColor:getViewClientColor(orders?.orderStatus)}}>{orders?.orderStatus}</p>
-                          <p style={{fontSize: '14px'}}>{formattedDate}</p>
-                        </div>
-                      </div>
-                    </Link>
-                    :
-                    <div key={matchingMerchantOrders?._id} className="row client-list">
-                    <div className="col-lg-2 col-sm-12">
-                    
-                     <p>{orders?.clientName}</p>
-          
-                   
-                    </div>
-                 
-                    <div className="col-lg-2 col-sm-12">
-                      <p>{orders?._id}</p>
-                    </div>
-                    <div className="col-lg-3 col-sm-12">
-                      <p>{orders?.name}</p>
-                      <p>{orders?.address}</p>
-                      <p>{orders?.phone}</p>
-                    </div>
-                    <div className="col-lg-2 col-sm-12">
-                      <p className="p-status-btn">{orders?.paymentStatus}</p>
-                    </div>
-                    <div className="col-lg-2 col-sm-12">
-                      <p>{totalPrintBazCostWithoutDeliveryFee} TK</p>
-                    </div>
-                    <div className="col-lg-1 col-sm-12">
-                      <p className="" style={{backgroundColor:getViewClientColor(orders?.orderStatus)}}>{orders?.orderStatus}</p>
-                      <p style={{fontSize: '14px'}}>{formattedDate}</p>
-                    </div>
-                  </div>
-                   
-                   )
-                    }
-                      )
-              } 
-
-              {
-                   filterOrders && searchByOrderId
-                   ?.map((orders,index)=>{ 
-                    matchingMerchant = allMerchant.find(merchant => merchant?.email === orders?.userMail)
-                   let  totalPrintBazCostWithoutDeliveryFee=Number(orders?.collectAmount)
-                    return (
-                      value_count?.OrderView ?
-                      <Link to={`/viewOrder/${orders?._id}`} state={{orders,previousPath,matchingMerchant}} key={index}>
-                      <div key={orders?._id} className="row client-list">
-                        <div className="col-lg-2 col-sm-12">
-                         {/* Display the corresponding allMerchant name */}
-                         <p>{orders?.clientName}</p>
-              {/* {index < allMerchant.length && <p>{allMerchant[index]?.name}</p>} */}
-                       
-                        </div>
-                        <div className="col-lg-2 col-sm-12">
-                          <p>{orders?._id}</p>
-                        </div>
-                        <div className="col-lg-3 col-sm-12">
-                          <p>{orders?.name}</p>
-                          <p>{orders?.address}</p>
-                          <p>{orders?.phone}</p>
-                        </div>
-                        <div className="col-lg-2 col-sm-12">
-                          <p className="p-status-btn">{orders?.paymentStatus}</p>
-                        </div>
-                        <div className="col-lg-2 col-sm-12">
-                          <p>{totalPrintBazCostWithoutDeliveryFee} TK</p>
-                        </div>
-                        <div className="col-lg-1 col-sm-12">
-                          <p className="" style={{backgroundColor:getViewClientColor(orders?.orderStatus)}}>{orders?.orderStatus}</p>
-                          <p style={{fontSize: '14px'}}>{formattedDate}</p>
-                        </div>
-                      </div>
-                    </Link>
-                    :
-                    <div key={orders?._id} className="row client-list">
-                    <div className="col-lg-2 col-sm-12">
-                     {/* Display the corresponding allMerchant name */}
-                     <p>{orders?.clientName}</p>
-          {/* {index < allMerchant.length && <p>{allMerchant[index]?.name}</p>} */}
-                   
-                    </div>
-                    <div className="col-lg-2 col-sm-12">
-                      <p>{orders?._id}</p>
-                    </div>
-                    <div className="col-lg-3 col-sm-12">
-                      <p>{orders?.name}</p>
-                      <p>{orders?.address}</p>
-                      <p>{orders?.phone}</p>
-                    </div>
-                    <div className="col-lg-2 col-sm-12">
-                      <p className="p-status-btn">{orders?.paymentStatus}</p>
-                    </div>
-                    <div className="col-lg-2 col-sm-12">
-                      <p>{totalPrintBazCostWithoutDeliveryFee} TK</p>
-                    </div>
-                    <div className="col-lg-1 col-sm-12">
-                      <p className="" style={{backgroundColor:getViewClientColor(orders?.orderStatus)}}>{orders?.orderStatus}</p>
-                      <p style={{fontSize: '14px'}}>{formattedDate}</p>
-                    </div>
-                  </div>
-                   
-                   )
-                    }
-                      )
-              } 
-                 {
-                   filterOrders==="paid" && paidOrders
-                   ?.slice(indexOfFirstItem, indexOfLastItem)
-              .sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt))
-              .sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt))
-                   .map((orders,index)=>{ 
-                    matchingMerchant = allMerchant.find(merchant => merchant?.email === orders?.userMail)
-                   let  totalPrintBazCostWithoutDeliveryFee=Number(orders?.collectAmount)
-                    return (
-                      value_count?.OrderView ?
-                      <Link to={`/viewOrder/${orders?._id}`} state={{orders,previousPath,matchingMerchant}} key={index}>
-                      <div key={orders?._id} className="row client-list">
-                        <div className="col-lg-2 col-sm-12">
-                         {/* Display the corresponding allMerchant name */}
-                         <p>{orders?.clientName}</p>
-              {/* {index < allMerchant.length && <p>{allMerchant[index]?.name}</p>} */}
-                       
-                        </div>
-                        <div className="col-lg-2 col-sm-12">
-                          <p>{orders?._id}</p>
-                        </div>
-                        <div className="col-lg-3 col-sm-12">
-                          <p>{orders?.name}</p>
-                          <p>{orders?.address}</p>
-                          <p>{orders?.phone}</p>
-                        </div>
-                        <div className="col-lg-2 col-sm-12">
-                          <p className="p-status-btn">{orders?.paymentStatus}</p>
-                        </div>
-                        <div className="col-lg-2 col-sm-12">
-                          <p>{totalPrintBazCostWithoutDeliveryFee} TK</p>
-                        </div>
-                        <div className="col-lg-1 col-sm-12">
-                          <p className="" style={{backgroundColor:getViewClientColor(orders?.orderStatus)}}>{orders?.orderStatus}</p>
-                          {/* <p style={{fontSize: '14px'}}>{formattedDate}</p> */}
-                          <p style={{fontSize: '14px'}}> created at: {new Date(orders?.createdAt).toLocaleDateString('en-US', options)}</p>
-                      {
-                        orders?.statusDate  && 
-                        <p style={{fontSize: '14px'}}> uppdated at: {new Date(orders?.statusDate).toLocaleDateString('en-US', options)}</p>
-                      }
-                        </div>
-                      </div>
-                    </Link>
-                    :
-                    <div key={orders?._id} className="row client-list">
-                    <div className="col-lg-2 col-sm-12">
-                     {/* Display the corresponding allMerchant name */}
-                     <p>{orders?.clientName}</p>
-          {/* {index < allMerchant.length && <p>{allMerchant[index]?.name}</p>} */}
-                   
-                    </div>
-                    <div className="col-lg-2 col-sm-12">
-                      <p>{orders?._id}</p>
-                    </div>
-                    <div className="col-lg-3 col-sm-12">
-                      <p>{orders?.name}</p>
-                      <p>{orders?.address}</p>
-                      <p>{orders?.phone}</p>
-                    </div>
-                    <div className="col-lg-2 col-sm-12">
-                      <p className="p-status-btn">{orders?.paymentStatus}</p>
-                    </div>
-                    <div className="col-lg-2 col-sm-12">
-                      <p>{totalPrintBazCostWithoutDeliveryFee} TK</p>
-                    </div>
-                    <div className="col-lg-1 col-sm-12">
-                      <p className="" style={{backgroundColor:getViewClientColor(orders?.orderStatus)}}>{orders?.orderStatus}</p>
-                      {/* <p style={{fontSize: '14px'}}>{formattedDate}</p> */}
-                      <p style={{fontSize: '14px'}}> created at: {new Date(orders?.createdAt).toLocaleDateString('en-US', options)}</p>
-                  {
-                    orders?.statusDate  && 
-                    <p style={{fontSize: '14px'}}> uppdated at: {new Date(orders?.statusDate).toLocaleDateString('en-US', options)}</p>
-                  }
-                    </div>
-                  </div>
-                   
-                   )
-                    }
-                      )
-              } 
-                {
-                   filterOrders==="Unpaid" && unPaidOrders
-                   ?.slice(indexOfFirstItem, indexOfLastItem)
-              .sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt))
-              .sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt))
-                   .map((orders,index)=>{ 
-                    matchingMerchant = allMerchant.find(merchant => merchant?.email === orders?.userMail)
-                   let  totalPrintBazCostWithoutDeliveryFee=Number(orders?.collectAmount)
-                    return (
-                      value_count?.OrderView ?
-                      <Link to={`/viewOrder/${orders?._id}`} state={{orders,previousPath,matchingMerchant}} key={index}>
-                      <div key={orders?._id} className="row client-list">
-                        <div className="col-lg-2 col-sm-12">
-                         {/* Display the corresponding allMerchant name */}
-                         <p>{orders?.clientName}</p>
-              {/* {index < allMerchant.length && <p>{allMerchant[index]?.name}</p>} */}
-                       
-                        </div>
-                        <div className="col-lg-2 col-sm-12">
-                          <p>{orders?._id}</p>
-                        </div>
-                        <div className="col-lg-3 col-sm-12">
-                          <p>{orders?.name}</p>
-                          <p>{orders?.address}</p>
-                          <p>{orders?.phone}</p>
-                        </div>
-                        <div className="col-lg-2 col-sm-12">
-                          <p className="p-status-btn">{orders?.paymentStatus}</p>
-                        </div>
-                        <div className="col-lg-2 col-sm-12">
-                          <p>{totalPrintBazCostWithoutDeliveryFee} TK</p>
-                        </div>
-                        <div className="col-lg-1 col-sm-12">
-                          <p className="status-btn" style={{    backgroundColor: getViewClientColor(
-                                orders?.orderStatus
-                                )}}>{orders?.orderStatus}</p>
-                                  <p style={{fontSize: '14px'}}> created at: {new Date(orders?.createdAt).toLocaleDateString('en-US', options)}</p>
-                      {
-                        orders?.statusDate  && 
-                        <p style={{fontSize: '14px'}}> uppdated at: {new Date(orders?.statusDate).toLocaleDateString('en-US', options)}</p>
-                      }
-                          {/* <p style={{fontSize: '14px'}}>{formattedDate}</p> */}
-                        </div>
-                      </div>
-                    </Link>
-                    :
-                    <div key={orders?._id} className="row client-list">
-                    <div className="col-lg-2 col-sm-12">
-                     {/* Display the corresponding allMerchant name */}
-                     <p>{orders?.clientName}</p>
-          {/* {index < allMerchant.length && <p>{allMerchant[index]?.name}</p>} */}
-                   
-                    </div>
-                    <div className="col-lg-2 col-sm-12">
-                      <p>{orders?._id}</p>
-                    </div>
-                    <div className="col-lg-3 col-sm-12">
-                      <p>{orders?.name}</p>
-                      <p>{orders?.address}</p>
-                      <p>{orders?.phone}</p>
-                    </div>
-                    <div className="col-lg-2 col-sm-12">
-                      <p className="p-status-btn">{orders?.paymentStatus}</p>
-                    </div>
-                    <div className="col-lg-2 col-sm-12">
-                      <p>{totalPrintBazCostWithoutDeliveryFee} TK</p>
-                    </div>
-                    <div className="col-lg-1 col-sm-12">
-                      <p className="status-btn" style={{    backgroundColor: getViewClientColor(
-                            orders?.orderStatus
-                            )}}>{orders?.orderStatus}</p>
-                              <p style={{fontSize: '14px'}}> created at: {new Date(orders?.createdAt).toLocaleDateString('en-US', options)}</p>
-                  {
-                    orders?.statusDate  && 
-                    <p style={{fontSize: '14px'}}> uppdated at: {new Date(orders?.statusDate).toLocaleDateString('en-US', options)}</p>
-                  }
-                      {/* <p style={{fontSize: '14px'}}>{formattedDate}</p> */}
-                    </div>
-                  </div>
-                   
-                   )
-                    }
-                      )
-              }
-              {
-              filterOrders==="all" && orderAll?.slice(indexOfFirstItem, indexOfLastItem)
+              orderMap
+              ?.slice(indexOfFirstItem, indexOfLastItem)
               .sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt))
               .sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt))
               .map((orders,index)=>{ 
@@ -945,944 +581,8 @@ const actualIndexOfLastItemOfUnpaidOrders = indexOfLastItem > unPaidOrders.lengt
                 }
                   )
                
-              }  
-              {
-              filterOrders==="Pending" && pendingOrders?.slice(indexOfFirstItem, indexOfLastItem)
-              .sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt))
-              .sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt)).map((orders,index)=>{ 
-                matchingMerchant = allMerchant.find(merchant => merchant?.email === orders?.userMail)
-               let  totalPrintBazCostWithoutDeliveryFee=Number(orders?.collectAmount)
-                return (
-                  value_count?.OrderView ?
-                  <Link to={`/viewOrder/${orders?._id}`} state={{orders,previousPath,matchingMerchant}} key={index}>
-                  <div key={orders?._id} className="row client-list">
-                    <div className="col-lg-2 col-sm-12">
-                     {/* Display the corresponding allMerchant name */}
-                     <p>{orders?.clientName}</p>
-          {/* {index < allMerchant.length && <p>{allMerchant[index]?.name}</p>} */}
-                   
-                    </div>
-                    <div className="col-lg-2 col-sm-12">
-                      <p>{orders?._id}</p>
-                    </div>
-                    <div className="col-lg-3 col-sm-12">
-                      <p>{orders?.name}</p>
-                      <p>{orders?.address}</p>
-                      <p>{orders?.phone}</p>
-                    </div>
-                    <div className="col-lg-2 col-sm-12">
-                      <p className="p-status-btn">{orders?.paymentStatus}</p>
-                    </div>
-                    <div className="col-lg-2 col-sm-12">
-                      <p>{totalPrintBazCostWithoutDeliveryFee} TK</p>
-                    </div>
-                    <div className="col-lg-1 col-sm-12">
-                      <p className="status-btn" style={{    backgroundColor: getViewClientColor(
-                            orders?.orderStatus
-                            ),}}>{orders?.orderStatus}</p>
-                               <p style={{fontSize: '14px'}}> created at: {new Date(orders?.createdAt).toLocaleDateString('en-US', options)}</p>
-                      {
-                        orders?.statusDate  && 
-                        <p style={{fontSize: '14px'}}> uppdated at: {new Date(orders?.statusDate).toLocaleDateString('en-US', options)}</p>
-                      }
-                      {/* <p style={{fontSize: '14px'}}>{formattedDate}</p> */}
-                    </div>
-                  </div>
-                </Link>
-                :
-                <div key={orders?._id} className="row client-list">
-                <div className="col-lg-2 col-sm-12">
-                 {/* Display the corresponding allMerchant name */}
-                 <p>{orders?.clientName}</p>
-      {/* {index < allMerchant.length && <p>{allMerchant[index]?.name}</p>} */}
-               
-                </div>
-                <div className="col-lg-2 col-sm-12">
-                  <p>{orders?._id}</p>
-                </div>
-                <div className="col-lg-3 col-sm-12">
-                  <p>{orders?.name}</p>
-                  <p>{orders?.address}</p>
-                  <p>{orders?.phone}</p>
-                </div>
-                <div className="col-lg-2 col-sm-12">
-                  <p className="p-status-btn">{orders?.paymentStatus}</p>
-                </div>
-                <div className="col-lg-2 col-sm-12">
-                  <p>{totalPrintBazCostWithoutDeliveryFee} TK</p>
-                </div>
-                <div className="col-lg-1 col-sm-12">
-                  <p className="status-btn" style={{    backgroundColor: getViewClientColor(
-                        orders?.orderStatus
-                        ),}}>{orders?.orderStatus}</p>
-                           <p style={{fontSize: '14px'}}> created at: {new Date(orders?.createdAt).toLocaleDateString('en-US', options)}</p>
-                  {
-                    orders?.statusDate  && 
-                    <p style={{fontSize: '14px'}}> uppdated at: {new Date(orders?.statusDate).toLocaleDateString('en-US', options)}</p>
-                  }
-                  {/* <p style={{fontSize: '14px'}}>{formattedDate}</p> */}
-                </div>
-              </div>
-               
-               )
-                }
-                  )
-               
               } 
-                {
-              filterOrders==="Approved" && approvedOrders
-              ?.slice(indexOfFirstItem, indexOfLastItem)
-              .sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt))
-              .sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt))
-              .map((orders,index)=>{ 
-                matchingMerchant = allMerchant.find(merchant => merchant?.email === orders?.userMail)
-               let  totalPrintBazCostWithoutDeliveryFee=Number(orders?.collectAmount)
-                return (
-                  value_count?.OrderView ?
-                  <Link to={`/viewOrder/${orders?._id}`} state={{orders,previousPath,matchingMerchant}} key={index}>
-                  <div key={orders?._id} className="row client-list">
-                    <div className="col-lg-2 col-sm-12">
-                     {/* Display the corresponding allMerchant name */}
-                     <p>{orders?.clientName}</p>
-          {/* {index < allMerchant.length && <p>{allMerchant[index]?.name}</p>} */}
-                   
-                    </div>
-                    <div className="col-lg-2 col-sm-12">
-                      <p>{orders?._id}</p>
-                    </div>
-                    <div className="col-lg-3 col-sm-12">
-                      <p>{orders?.name}</p>
-                      <p>{orders?.address}</p>
-                      <p>{orders?.phone}</p>
-                    </div>
-                    <div className="col-lg-2 col-sm-12">
-                      <p className="p-status-btn">{orders?.paymentStatus}</p>
-                    </div>
-                    <div className="col-lg-2 col-sm-12">
-                      <p>{totalPrintBazCostWithoutDeliveryFee} TK</p>
-                    </div>
-                    <div className="col-lg-1 col-sm-12">
-                      <p className="status-btn" style={{    backgroundColor: getViewClientColor(
-                            orders?.orderStatus
-                            ),}}>{orders?.orderStatus}</p>
-                             <p style={{fontSize: '14px'}}> created at: {new Date(orders?.createdAt).toLocaleDateString('en-US', options)}</p>
-                      {
-                        orders?.statusDate  && 
-                        <p style={{fontSize: '14px'}}> uppdated at: {new Date(orders?.statusDate).toLocaleDateString('en-US', options)}</p>
-                      }
-                      {/* <p style={{fontSize: '14px'}}>{formattedDate}</p> */}
-                    </div>
-                  </div>
-                </Link>
-                :
-                 <div key={orders?._id} className="row client-list">
-                <div className="col-lg-2 col-sm-12">
-                 {/* Display the corresponding allMerchant name */}
-                 <p>{orders?.clientName}</p>
-      {/* {index < allMerchant.length && <p>{allMerchant[index]?.name}</p>} */}
-               
-                </div>
-                <div className="col-lg-2 col-sm-12">
-                  <p>{orders?._id}</p>
-                </div>
-                <div className="col-lg-3 col-sm-12">
-                  <p>{orders?.name}</p>
-                  <p>{orders?.address}</p>
-                  <p>{orders?.phone}</p>
-                </div>
-                <div className="col-lg-2 col-sm-12">
-                  <p className="p-status-btn">{orders?.paymentStatus}</p>
-                </div>
-                <div className="col-lg-2 col-sm-12">
-                  <p>{totalPrintBazCostWithoutDeliveryFee} TK</p>
-                </div>
-                <div className="col-lg-1 col-sm-12">
-                  <p className="status-btn" style={{    backgroundColor: getViewClientColor(
-                        orders?.orderStatus
-                        ),}}>{orders?.orderStatus}</p>
-                         <p style={{fontSize: '14px'}}> created at: {new Date(orders?.createdAt).toLocaleDateString('en-US', options)}</p>
-                  {
-                    orders?.statusDate  && 
-                    <p style={{fontSize: '14px'}}> uppdated at: {new Date(orders?.statusDate).toLocaleDateString('en-US', options)}</p>
-                  }
-                  {/* <p style={{fontSize: '14px'}}>{formattedDate}</p> */}
-                </div>
-              </div>
-               
-               )
-                }
-                  )
-               
-              }
-              
-                {
-              filterOrders==="confirmed" &&  confirmedOrders
-              ?.slice(indexOfFirstItem, indexOfLastItem)
-              .sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt))
-              .sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt))
-              .map((orders,index)=>{ 
-                matchingMerchant = allMerchant.find(merchant => merchant?.email === orders?.userMail)
-               let  totalPrintBazCostWithoutDeliveryFee=Number(orders?.collectAmount)
-                return (
-                  value_count?.OrderView ?
-                  <Link to={`/viewOrder/${orders?._id}`} state={{orders,previousPath,matchingMerchant}} key={index}>
-                  <div key={orders?._id} className="row client-list">
-                    <div className="col-lg-2 col-sm-12">
-                     {/* Display the corresponding allMerchant name */}
-                     <p>{orders?.clientName}</p>
-          {/* {index < allMerchant.length && <p>{allMerchant[index]?.name}</p>} */}
-                   
-                    </div>
-                    <div className="col-lg-2 col-sm-12">
-                      <p>{orders?._id}</p>
-                    </div>
-                    <div className="col-lg-3 col-sm-12">
-                      <p>{orders?.name}</p>
-                      <p>{orders?.address}</p>
-                      <p>{orders?.phone}</p>
-                    </div>
-                    <div className="col-lg-2 col-sm-12">
-                      <p className="p-status-btn">{orders?.paymentStatus}</p>
-                    </div>
-                    <div className="col-lg-2 col-sm-12">
-                      <p>{totalPrintBazCostWithoutDeliveryFee} TK</p>
-                    </div>
-                    <div className="col-lg-1 col-sm-12">
-                      <p className="status-btn" style={{    backgroundColor: getViewClientColor(
-                            orders?.orderStatus
-                            ),}}>{orders?.orderStatus}</p>
-                               <p style={{fontSize: '14px'}}> created at: {new Date(orders?.createdAt).toLocaleDateString('en-US', options)}</p>
-                      {
-                        orders?.statusDate  && 
-                        <p style={{fontSize: '14px'}}> uppdated at: {new Date(orders?.statusDate).toLocaleDateString('en-US', options)}</p>
-                      }
-                      {/* <p style={{fontSize: '14px'}}>{formattedDate}</p> */}
-                    </div>
-                  </div>
-                </Link>
-                :
-                <div key={orders?._id} className="row client-list">
-                <div className="col-lg-2 col-sm-12">
-                 {/* Display the corresponding allMerchant name */}
-                 <p>{orders?.clientName}</p>
-      {/* {index < allMerchant.length && <p>{allMerchant[index]?.name}</p>} */}
-               
-                </div>
-                <div className="col-lg-2 col-sm-12">
-                  <p>{orders?._id}</p>
-                </div>
-                <div className="col-lg-3 col-sm-12">
-                  <p>{orders?.name}</p>
-                  <p>{orders?.address}</p>
-                  <p>{orders?.phone}</p>
-                </div>
-                <div className="col-lg-2 col-sm-12">
-                  <p className="p-status-btn">{orders?.paymentStatus}</p>
-                </div>
-                <div className="col-lg-2 col-sm-12">
-                  <p>{totalPrintBazCostWithoutDeliveryFee} TK</p>
-                </div>
-                <div className="col-lg-1 col-sm-12">
-                  <p className="status-btn" style={{    backgroundColor: getViewClientColor(
-                        orders?.orderStatus
-                        ),}}>{orders?.orderStatus}</p>
-                           <p style={{fontSize: '14px'}}> created at: {new Date(orders?.createdAt).toLocaleDateString('en-US', options)}</p>
-                  {
-                    orders?.statusDate  && 
-                    <p style={{fontSize: '14px'}}> uppdated at: {new Date(orders?.statusDate).toLocaleDateString('en-US', options)}</p>
-                  }
-                  {/* <p style={{fontSize: '14px'}}>{formattedDate}</p> */}
-                </div>
-              </div>
-               
-               )
-                }
-                  )
-               
-              }  
-                {
-              filterOrders==="in-production" && inProductionOrders
-              ?.slice(indexOfFirstItem, indexOfLastItem)
-              .sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt))
-              .sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt))
-              .map((orders,index)=>{ 
-                matchingMerchant = allMerchant.find(merchant => merchant?.email === orders?.userMail)
-               let  totalPrintBazCostWithoutDeliveryFee=Number(orders?.collectAmount)
-                return (
-                  value_count?.OrderView ?
-                  <Link to={`/viewOrder/${orders?._id}`} state={{orders,previousPath,matchingMerchant}} key={index}>
-                  <div key={orders?._id} className="row client-list">
-                    <div className="col-lg-2 col-sm-12">
-                     {/* Display the corresponding allMerchant name */}
-                     <p>{orders?.clientName}</p>
-          {/* {index < allMerchant.length && <p>{allMerchant[index]?.name}</p>} */}
-                   
-                    </div>
-                    <div className="col-lg-2 col-sm-12">
-                      <p>{orders?._id}</p>
-                    </div>
-                    <div className="col-lg-3 col-sm-12">
-                      <p>{orders?.name}</p>
-                      <p>{orders?.address}</p>
-                      <p>{orders?.phone}</p>
-                    </div>
-                    <div className="col-lg-2 col-sm-12">
-                      <p className="p-status-btn">{orders?.paymentStatus}</p>
-                    </div>
-                    <div className="col-lg-2 col-sm-12">
-                      <p>{totalPrintBazCostWithoutDeliveryFee} TK</p>
-                    </div>
-                    <div className="col-lg-1 col-sm-12">
-                      <p className="status-btn" style={{    backgroundColor: getViewClientColor(
-                            orders?.orderStatus
-                            ),}}>{orders?.orderStatus}</p>
-                               <p style={{fontSize: '14px'}}> created at: {new Date(orders?.createdAt).toLocaleDateString('en-US', options)}</p>
-                      {
-                        orders?.statusDate  && 
-                        <p style={{fontSize: '14px'}}> uppdated at: {new Date(orders?.statusDate).toLocaleDateString('en-US', options)}</p>
-                      }
-                      {/* <p style={{fontSize: '14px'}}>{formattedDate}</p> */}
-                    </div>
-                  </div>
-                </Link>
-                :
-                <div key={orders?._id} className="row client-list">
-                <div className="col-lg-2 col-sm-12">
-                 {/* Display the corresponding allMerchant name */}
-                 <p>{orders?.clientName}</p>
-      {/* {index < allMerchant.length && <p>{allMerchant[index]?.name}</p>} */}
-               
-                </div>
-                <div className="col-lg-2 col-sm-12">
-                  <p>{orders?._id}</p>
-                </div>
-                <div className="col-lg-3 col-sm-12">
-                  <p>{orders?.name}</p>
-                  <p>{orders?.address}</p>
-                  <p>{orders?.phone}</p>
-                </div>
-                <div className="col-lg-2 col-sm-12">
-                  <p className="p-status-btn">{orders?.paymentStatus}</p>
-                </div>
-                <div className="col-lg-2 col-sm-12">
-                  <p>{totalPrintBazCostWithoutDeliveryFee} TK</p>
-                </div>
-                <div className="col-lg-1 col-sm-12">
-                  <p className="status-btn" style={{    backgroundColor: getViewClientColor(
-                        orders?.orderStatus
-                        ),}}>{orders?.orderStatus}</p>
-                           <p style={{fontSize: '14px'}}> created at: {new Date(orders?.createdAt).toLocaleDateString('en-US', options)}</p>
-                  {
-                    orders?.statusDate  && 
-                    <p style={{fontSize: '14px'}}> uppdated at: {new Date(orders?.statusDate).toLocaleDateString('en-US', options)}</p>
-                  }
-                  {/* <p style={{fontSize: '14px'}}>{formattedDate}</p> */}
-                </div>
-              </div>
-               
-               )
-                }
-                  )
-               
-              }
-              {
-              filterOrders==="out for delivery" && outForDeliveryOrders
-              ?.slice(indexOfFirstItem, indexOfLastItem)
-              .sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt))
-              .sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt))
-              .map((orders,index)=>{ 
-                matchingMerchant = allMerchant.find(merchant => merchant?.email === orders?.userMail)
-               let  totalPrintBazCostWithoutDeliveryFee=Number(orders?.collectAmount)
-                return (
-                  value_count?.OrderView ?
-                  <Link to={`/viewOrder/${orders?._id}`} state={{orders,previousPath,matchingMerchant}} key={index}>
-                  <div key={orders?._id} className="row client-list">
-                    <div className="col-lg-2 col-sm-12">
-                     {/* Display the corresponding allMerchant name */}
-                     <p>{orders?.clientName}</p>
-          {/* {index < allMerchant.length && <p>{allMerchant[index]?.name}</p>} */}
-                   
-                    </div>
-                    <div className="col-lg-2 col-sm-12">
-                      <p>{orders?._id}</p>
-                    </div>
-                    <div className="col-lg-3 col-sm-12">
-                      <p>{orders?.name}</p>
-                      <p>{orders?.address}</p>
-                      <p>{orders?.phone}</p>
-                    </div>
-                    <div className="col-lg-2 col-sm-12">
-                      <p className="p-status-btn">{orders?.paymentStatus}</p>
-                    </div>
-                    <div className="col-lg-2 col-sm-12">
-                      <p>{totalPrintBazCostWithoutDeliveryFee} TK</p>
-                    </div>
-                    <div className="col-lg-1 col-sm-12">
-                      <p className="status-btn" style={{    backgroundColor: getViewClientColor(
-                            orders?.orderStatus
-                            ),}}>{orders?.orderStatus}</p>
-                               <p style={{fontSize: '14px'}}> created at: {new Date(orders?.createdAt).toLocaleDateString('en-US', options)}</p>
-                      {
-                        orders?.statusDate  && 
-                        <p style={{fontSize: '14px'}}> uppdated at: {new Date(orders?.statusDate).toLocaleDateString('en-US', options)}</p>
-                      }
-                      {/* <p style={{fontSize: '14px'}}>{formattedDate}</p> */}
-                    </div>
-                  </div>
-                </Link>
-                :
-                <div key={orders?._id} className="row client-list">
-                <div className="col-lg-2 col-sm-12">
-                 {/* Display the corresponding allMerchant name */}
-                 <p>{orders?.clientName}</p>
-      {/* {index < allMerchant.length && <p>{allMerchant[index]?.name}</p>} */}
-               
-                </div>
-                <div className="col-lg-2 col-sm-12">
-                  <p>{orders?._id}</p>
-                </div>
-                <div className="col-lg-3 col-sm-12">
-                  <p>{orders?.name}</p>
-                  <p>{orders?.address}</p>
-                  <p>{orders?.phone}</p>
-                </div>
-                <div className="col-lg-2 col-sm-12">
-                  <p className="p-status-btn">{orders?.paymentStatus}</p>
-                </div>
-                <div className="col-lg-2 col-sm-12">
-                  <p>{totalPrintBazCostWithoutDeliveryFee} TK</p>
-                </div>
-                <div className="col-lg-1 col-sm-12">
-                  <p className="status-btn" style={{    backgroundColor: getViewClientColor(
-                        orders?.orderStatus
-                        ),}}>{orders?.orderStatus}</p>
-                           <p style={{fontSize: '14px'}}> created at: {new Date(orders?.createdAt).toLocaleDateString('en-US', options)}</p>
-                  {
-                    orders?.statusDate  && 
-                    <p style={{fontSize: '14px'}}> uppdated at: {new Date(orders?.statusDate).toLocaleDateString('en-US', options)}</p>
-                  }
-                  {/* <p style={{fontSize: '14px'}}>{formattedDate}</p> */}
-                </div>
-              </div>
-               
-               )
-                }
-                  )
-               
-              }  
-                {
-              filterOrders==="delivered" && deliveredOrders
-              ?.slice(indexOfFirstItem, indexOfLastItem)
-              .sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt))
-              .sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt))
-              .map((orders,index)=>{ 
-                matchingMerchant = allMerchant.find(merchant => merchant?.email === orders?.userMail)
-               let  totalPrintBazCostWithoutDeliveryFee=Number(orders?.collectAmount)
-                return (
-                  value_count?.OrderView ?
-                  <Link to={`/viewOrder/${orders?._id}`} state={{orders,previousPath,matchingMerchant}} key={index}>
-                  <div key={orders?._id} className="row client-list">
-                    <div className="col-lg-2 col-sm-12">
-                     {/* Display the corresponding allMerchant name */}
-                     <p>{orders?.clientName}</p>
-          {/* {index < allMerchant.length && <p>{allMerchant[index]?.name}</p>} */}
-                   
-                    </div>
-                    <div className="col-lg-2 col-sm-12">
-                      <p>{orders?._id}</p>
-                    </div>
-                    <div className="col-lg-3 col-sm-12">
-                      <p>{orders?.name}</p>
-                      <p>{orders?.address}</p>
-                      <p>{orders?.phone}</p>
-                    </div>
-                    <div className="col-lg-2 col-sm-12">
-                      <p className="p-status-btn">{orders?.paymentStatus}</p>
-                    </div>
-                    <div className="col-lg-2 col-sm-12">
-                      <p>{totalPrintBazCostWithoutDeliveryFee} TK</p>
-                    </div>
-                    <div className="col-lg-1 col-sm-12">
-                      <p className="status-btn" style={{    backgroundColor: getViewClientColor(
-                            orders?.orderStatus
-                            ),}}>{orders?.orderStatus}</p>
-                               <p style={{fontSize: '14px'}}> created at: {new Date(orders?.createdAt).toLocaleDateString('en-US', options)}</p>
-                      {
-                        orders?.statusDate  && 
-                        <p style={{fontSize: '14px'}}> uppdated at: {new Date(orders?.statusDate).toLocaleDateString('en-US', options)}</p>
-                      }
-                      {/* <p style={{fontSize: '14px'}}>{formattedDate}</p> */}
-                    </div>
-                  </div>
-                </Link>
-                :
-                <div key={orders?._id} className="row client-list">
-                <div className="col-lg-2 col-sm-12">
-                 {/* Display the corresponding allMerchant name */}
-                 <p>{orders?.clientName}</p>
-      {/* {index < allMerchant.length && <p>{allMerchant[index]?.name}</p>} */}
-               
-                </div>
-                <div className="col-lg-2 col-sm-12">
-                  <p>{orders?._id}</p>
-                </div>
-                <div className="col-lg-3 col-sm-12">
-                  <p>{orders?.name}</p>
-                  <p>{orders?.address}</p>
-                  <p>{orders?.phone}</p>
-                </div>
-                <div className="col-lg-2 col-sm-12">
-                  <p className="p-status-btn">{orders?.paymentStatus}</p>
-                </div>
-                <div className="col-lg-2 col-sm-12">
-                  <p>{totalPrintBazCostWithoutDeliveryFee} TK</p>
-                </div>
-                <div className="col-lg-1 col-sm-12">
-                  <p className="status-btn" style={{    backgroundColor: getViewClientColor(
-                        orders?.orderStatus
-                        ),}}>{orders?.orderStatus}</p>
-                           <p style={{fontSize: '14px'}}> created at: {new Date(orders?.createdAt).toLocaleDateString('en-US', options)}</p>
-                  {
-                    orders?.statusDate  && 
-                    <p style={{fontSize: '14px'}}> uppdated at: {new Date(orders?.statusDate).toLocaleDateString('en-US', options)}</p>
-                  }
-                  {/* <p style={{fontSize: '14px'}}>{formattedDate}</p> */}
-                </div>
-              </div>
-               
-               )
-                }
-                  )
-               
-              }
-              {
-              filterOrders==="on hold artwork issue" && onHoldArtworkIssueOrders
-              ?.slice(indexOfFirstItem, indexOfLastItem)
-              .sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt))
-              .sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt))
-              .map((orders,index)=>{ 
-                matchingMerchant = allMerchant.find(merchant => merchant?.email === orders?.userMail)
-               let  totalPrintBazCostWithoutDeliveryFee=Number(orders?.collectAmount)
-                return (
-                  value_count?.OrderView ?
-                  <Link to={`/viewOrder/${orders?._id}`} state={{orders,previousPath,matchingMerchant}} key={index}>
-                  <div key={orders?._id} className="row client-list">
-                    <div className="col-lg-2 col-sm-12">
-                     {/* Display the corresponding allMerchant name */}
-                     <p>{orders?.clientName}</p>
-          {/* {index < allMerchant.length && <p>{allMerchant[index]?.name}</p>} */}
-                   
-                    </div>
-                    <div className="col-lg-2 col-sm-12">
-                      <p>{orders?._id}</p>
-                    </div>
-                    <div className="col-lg-3 col-sm-12">
-                      <p>{orders?.name}</p>
-                      <p>{orders?.address}</p>
-                      <p>{orders?.phone}</p>
-                    </div>
-                    <div className="col-lg-2 col-sm-12">
-                      <p className="p-status-btn">{orders?.paymentStatus}</p>
-                    </div>
-                    <div className="col-lg-2 col-sm-12">
-                      <p>{totalPrintBazCostWithoutDeliveryFee} TK</p>
-                    </div>
-                    <div className="col-lg-1 col-sm-12">
-                      <p className="status-btn" style={{    backgroundColor: getViewClientColor(
-                            orders?.orderStatus
-                            )}}>{orders?.orderStatus}</p>
-                              <p style={{fontSize: '14px'}}> created at: {new Date(orders?.createdAt).toLocaleDateString('en-US', options)}</p>
-                      {
-                        orders?.statusDate  && 
-                        <p style={{fontSize: '14px'}}> uppdated at: {new Date(orders?.statusDate).toLocaleDateString('en-US', options)}</p>
-                      }
-
-                      {/* <p style={{fontSize: '14px'}}>{formattedDate}</p> */}
-                    </div>
-                  </div>
-                </Link>
-                :
-                <div key={orders?._id} className="row client-list">
-                <div className="col-lg-2 col-sm-12">
-                 {/* Display the corresponding allMerchant name */}
-                 <p>{orders?.clientName}</p>
-      {/* {index < allMerchant.length && <p>{allMerchant[index]?.name}</p>} */}
-               
-                </div>
-                <div className="col-lg-2 col-sm-12">
-                  <p>{orders?._id}</p>
-                </div>
-                <div className="col-lg-3 col-sm-12">
-                  <p>{orders?.name}</p>
-                  <p>{orders?.address}</p>
-                  <p>{orders?.phone}</p>
-                </div>
-                <div className="col-lg-2 col-sm-12">
-                  <p className="p-status-btn">{orders?.paymentStatus}</p>
-                </div>
-                <div className="col-lg-2 col-sm-12">
-                  <p>{totalPrintBazCostWithoutDeliveryFee} TK</p>
-                </div>
-                <div className="col-lg-1 col-sm-12">
-                  <p className="status-btn" style={{    backgroundColor: getViewClientColor(
-                        orders?.orderStatus
-                        )}}>{orders?.orderStatus}</p>
-                          <p style={{fontSize: '14px'}}> created at: {new Date(orders?.createdAt).toLocaleDateString('en-US', options)}</p>
-                  {
-                    orders?.statusDate  && 
-                    <p style={{fontSize: '14px'}}> uppdated at: {new Date(orders?.statusDate).toLocaleDateString('en-US', options)}</p>
-                  }
-
-                  {/* <p style={{fontSize: '14px'}}>{formattedDate}</p> */}
-                </div>
-              </div>
-               
-               )
-                }
-                  )
-               
-              }
-             {
-              filterOrders==="on hold billing issue" && onHoldBillingIssueOrders
-              ?.slice(indexOfFirstItem, indexOfLastItem)
-              .sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt))
-              .sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt))
-              .map((orders,index)=>{ 
-                matchingMerchant = allMerchant.find(merchant => merchant?.email === orders?.userMail)
-               let  totalPrintBazCostWithoutDeliveryFee=Number(orders?.collectAmount)
-                return (
-                  value_count?.OrderView ?
-                  <Link to={`/viewOrder/${orders?._id}`} state={{orders,previousPath,matchingMerchant}} key={index}>
-                  <div key={orders?._id} className="row client-list">
-                    <div className="col-lg-2 col-sm-12">
-                     {/* Display the corresponding allMerchant name */}
-                     <p>{orders?.clientName}</p>
-          {/* {index < allMerchant.length && <p>{allMerchant[index]?.name}</p>} */}
-                   
-                    </div>
-                    <div className="col-lg-2 col-sm-12">
-                      <p>{orders?._id}</p>
-                    </div>
-                    <div className="col-lg-3 col-sm-12">
-                      <p>{orders?.name}</p>
-                      <p>{orders?.address}</p>
-                      <p>{orders?.phone}</p>
-                    </div>
-                    <div className="col-lg-2 col-sm-12">
-                      <p className="p-status-btn">{orders?.paymentStatus}</p>
-                    </div>
-                    <div className="col-lg-2 col-sm-12">
-                      <p>{totalPrintBazCostWithoutDeliveryFee} TK</p>
-                    </div>
-                    <div className="col-lg-1 col-sm-12">
-                      <p className="status-btn" style={{    backgroundColor: getViewClientColor(
-                            orders?.orderStatus
-                            )}}>{orders?.orderStatus}</p>
-                              <p style={{fontSize: '14px'}}> created at: {new Date(orders?.createdAt).toLocaleDateString('en-US', options)}</p>
-                      {
-                        orders?.statusDate  && 
-                        <p style={{fontSize: '14px'}}> uppdated at: {new Date(orders?.statusDate).toLocaleDateString('en-US', options)}</p>
-                      }
-                      {/* <p style={{fontSize: '14px'}}>{formattedDate}</p> */}
-                    </div>
-                  </div>
-                </Link>
-                :
-                <div key={orders?._id} className="row client-list">
-                <div className="col-lg-2 col-sm-12">
-                 {/* Display the corresponding allMerchant name */}
-                 <p>{orders?.clientName}</p>
-      {/* {index < allMerchant.length && <p>{allMerchant[index]?.name}</p>} */}
-               
-                </div>
-                <div className="col-lg-2 col-sm-12">
-                  <p>{orders?._id}</p>
-                </div>
-                <div className="col-lg-3 col-sm-12">
-                  <p>{orders?.name}</p>
-                  <p>{orders?.address}</p>
-                  <p>{orders?.phone}</p>
-                </div>
-                <div className="col-lg-2 col-sm-12">
-                  <p className="p-status-btn">{orders?.paymentStatus}</p>
-                </div>
-                <div className="col-lg-2 col-sm-12">
-                  <p>{totalPrintBazCostWithoutDeliveryFee} TK</p>
-                </div>
-                <div className="col-lg-1 col-sm-12">
-                  <p className="status-btn" style={{    backgroundColor: getViewClientColor(
-                        orders?.orderStatus
-                        )}}>{orders?.orderStatus}</p>
-                          <p style={{fontSize: '14px'}}> created at: {new Date(orders?.createdAt).toLocaleDateString('en-US', options)}</p>
-                  {
-                    orders?.statusDate  && 
-                    <p style={{fontSize: '14px'}}> uppdated at: {new Date(orders?.statusDate).toLocaleDateString('en-US', options)}</p>
-                  }
-                  {/* <p style={{fontSize: '14px'}}>{formattedDate}</p> */}
-                </div>
-              </div>
-               
-               )
-                }
-                  )
-               
-              } 
-                {
-              filterOrders==="on hold out of stock" && onHoldOutOfStockOrders
-              ?.slice(indexOfFirstItem, indexOfLastItem)
-              .sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt))
-              .sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt))
-              .map((orders,index)=>{ 
-                matchingMerchant = allMerchant.find(merchant => merchant?.email === orders?.userMail)
-               let  totalPrintBazCostWithoutDeliveryFee=Number(orders?.collectAmount)
-                return (
-                  value_count?.OrderView ?
-                  <Link to={`/viewOrder/${orders?._id}`} state={{orders,previousPath,matchingMerchant}} key={index}>
-                  <div key={orders?._id} className="row client-list">
-                    <div className="col-lg-2 col-sm-12">
-                     {/* Display the corresponding allMerchant name */}
-                     <p>{orders?.clientName}</p>
-          {/* {index < allMerchant.length && <p>{allMerchant[index]?.name}</p>} */}
-                   
-                    </div>
-                    <div className="col-lg-2 col-sm-12">
-                      <p>{orders?._id}</p>
-                    </div>
-                    <div className="col-lg-3 col-sm-12">
-                      <p>{orders?.name}</p>
-                      <p>{orders?.address}</p>
-                      <p>{orders?.phone}</p>
-                    </div>
-                    <div className="col-lg-2 col-sm-12">
-                      <p className="p-status-btn">{orders?.paymentStatus}</p>
-                    </div>
-                    <div className="col-lg-2 col-sm-12">
-                      <p>{totalPrintBazCostWithoutDeliveryFee} TK</p>
-                    </div>
-                    <div className="col-lg-1 col-sm-12">
-                      <p className="status-btn" style={{    backgroundColor: getViewClientColor(
-                            orders?.orderStatus
-                            ),}}>{orders?.orderStatus}</p>
-                              <p style={{fontSize: '14px'}}> created at: {new Date(orders?.createdAt).toLocaleDateString('en-US', options)}</p>
-                      {
-                        orders?.statusDate  && 
-                        <p style={{fontSize: '14px'}}> uppdated at: {new Date(orders?.statusDate).toLocaleDateString('en-US', options)}</p>
-                      }
-                      {/* <p style={{fontSize: '14px'}}>{formattedDate}</p> */}
-                    </div>
-                  </div>
-                </Link>
-                :
-                <div key={orders?._id} className="row client-list">
-                <div className="col-lg-2 col-sm-12">
-                 {/* Display the corresponding allMerchant name */}
-                 <p>{orders?.clientName}</p>
-      {/* {index < allMerchant.length && <p>{allMerchant[index]?.name}</p>} */}
-               
-                </div>
-                <div className="col-lg-2 col-sm-12">
-                  <p>{orders?._id}</p>
-                </div>
-                <div className="col-lg-3 col-sm-12">
-                  <p>{orders?.name}</p>
-                  <p>{orders?.address}</p>
-                  <p>{orders?.phone}</p>
-                </div>
-                <div className="col-lg-2 col-sm-12">
-                  <p className="p-status-btn">{orders?.paymentStatus}</p>
-                </div>
-                <div className="col-lg-2 col-sm-12">
-                  <p>{totalPrintBazCostWithoutDeliveryFee} TK</p>
-                </div>
-                <div className="col-lg-1 col-sm-12">
-                  <p className="status-btn" style={{    backgroundColor: getViewClientColor(
-                        orders?.orderStatus
-                        ),}}>{orders?.orderStatus}</p>
-                          <p style={{fontSize: '14px'}}> created at: {new Date(orders?.createdAt).toLocaleDateString('en-US', options)}</p>
-                  {
-                    orders?.statusDate  && 
-                    <p style={{fontSize: '14px'}}> uppdated at: {new Date(orders?.statusDate).toLocaleDateString('en-US', options)}</p>
-                  }
-                  {/* <p style={{fontSize: '14px'}}>{formattedDate}</p> */}
-                </div>
-              </div>
-               
-               )
-                }
-                  )
-               
-              }  
-               {
-              filterOrders==="cancel" && cancelOrders
-              ?.slice(indexOfFirstItem, indexOfLastItem)
-              .sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt))
-              .sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt))
-              .map((orders,index)=>{ 
-                matchingMerchant = allMerchant.find(merchant => merchant?.email === orders?.userMail)
-                let  totalPrintBazCostWithoutDeliveryFee=Number(orders?.collectAmount)
-                return (
-                  value_count?.OrderView ?
-                  <Link to={`/viewOrder/${orders?._id}`} state={{orders,previousPath,matchingMerchant}} key={index}>
-                  <div key={orders?._id} className="row client-list">
-                    <div className="col-lg-2 col-sm-12">
-                     {/* Display the corresponding allMerchant name */}
-                     <p>{orders?.clientName}</p>
-          {/* {index < allMerchant.length && <p>{allMerchant[index]?.name}</p>} */}
-                   
-                    </div>
-                    <div className="col-lg-2 col-sm-12">
-                      <p>{orders?._id}</p>
-                    </div>
-                    <div className="col-lg-3 col-sm-12">
-                      <p>{orders?.name}</p>
-                      <p>{orders?.address}</p>
-                      <p>{orders?.phone}</p>
-                    </div>
-                    <div className="col-lg-2 col-sm-12">
-                      <p className="p-status-btn">{orders?.paymentStatus}</p>
-                    </div>
-                    <div className="col-lg-2 col-sm-12">
-                      <p>{totalPrintBazCostWithoutDeliveryFee} TK</p>
-                    </div>
-                    <div className="col-lg-1 col-sm-12">
-                      <p className="status-btn" style={{    backgroundColor: getViewClientColor(
-                            orders?.orderStatus
-                            ),}}>{orders?.orderStatus}</p>
-                              <p style={{fontSize: '14px'}}> created at: {new Date(orders?.createdAt).toLocaleDateString('en-US', options)}</p>
-                      {
-                        orders?.statusDate  && 
-                        <p style={{fontSize: '14px'}}> uppdated at: {new Date(orders?.statusDate).toLocaleDateString('en-US', options)}</p>
-                      }
-                      {/* <p style={{fontSize: '14px'}}>{formattedDate}</p> */}
-                    </div>
-                  </div>
-                </Link>
-                :
-                <div key={orders?._id} className="row client-list">
-                <div className="col-lg-2 col-sm-12">
-                 {/* Display the corresponding allMerchant name */}
-                 <p>{orders?.clientName}</p>
-      {/* {index < allMerchant.length && <p>{allMerchant[index]?.name}</p>} */}
-               
-                </div>
-                <div className="col-lg-2 col-sm-12">
-                  <p>{orders?._id}</p>
-                </div>
-                <div className="col-lg-3 col-sm-12">
-                  <p>{orders?.name}</p>
-                  <p>{orders?.address}</p>
-                  <p>{orders?.phone}</p>
-                </div>
-                <div className="col-lg-2 col-sm-12">
-                  <p className="p-status-btn">{orders?.paymentStatus}</p>
-                </div>
-                <div className="col-lg-2 col-sm-12">
-                  <p>{totalPrintBazCostWithoutDeliveryFee} TK</p>
-                </div>
-                <div className="col-lg-1 col-sm-12">
-                  <p className="status-btn" style={{    backgroundColor: getViewClientColor(
-                        orders?.orderStatus
-                        ),}}>{orders?.orderStatus}</p>
-                          <p style={{fontSize: '14px'}}> created at: {new Date(orders?.createdAt).toLocaleDateString('en-US', options)}</p>
-                  {
-                    orders?.statusDate  && 
-                    <p style={{fontSize: '14px'}}> uppdated at: {new Date(orders?.statusDate).toLocaleDateString('en-US', options)}</p>
-                  }
-                  {/* <p style={{fontSize: '14px'}}>{formattedDate}</p> */}
-                </div>
-              </div>
-               
-               )
-                }
-                  )
-               
-              }
-               {
-              filterOrders==="returned" && returnOrders
-              ?.slice(indexOfFirstItem, indexOfLastItem)
-              .sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt))
-              .sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt))
-              .map((orders,index)=>{ 
-                matchingMerchant = allMerchant.find(merchant => merchant?.email === orders?.userMail)
-                let  totalPrintBazCostWithoutDeliveryFee=Number(orders?.collectAmount)
-                return (
-                  value_count?.OrderView ?
-                  <Link to={`/viewOrder/${orders?._id}`} state={{orders,previousPath,matchingMerchant}} key={index}>
-                  <div key={orders?._id} className="row client-list">
-                    <div className="col-lg-2 col-sm-12">
-                     {/* Display the corresponding allMerchant name */}
-                     <p>{orders?.clientName}</p>
-          {/* {index < allMerchant.length && <p>{allMerchant[index]?.name}</p>} */}
-                   
-                    </div>
-                    <div className="col-lg-2 col-sm-12">
-                      <p>{orders?._id}</p>
-                    </div>
-                    <div className="col-lg-3 col-sm-12">
-                      <p>{orders?.name}</p>
-                      <p>{orders?.address}</p>
-                      <p>{orders?.phone}</p>
-                    </div>
-                    <div className="col-lg-2 col-sm-12">
-                      <p className="p-status-btn">{orders?.paymentStatus}</p>
-                    </div>
-                    <div className="col-lg-2 col-sm-12">
-                      <p>{totalPrintBazCostWithoutDeliveryFee} TK</p>
-                    </div>
-                    <div className="col-lg-1 col-sm-12">
-                      <p className="status-btn" style={{    backgroundColor: getViewClientColor(
-                            orders?.orderStatus
-                            ),}}>{orders?.orderStatus}</p>
-                              <p style={{fontSize: '14px'}}> created at: {new Date(orders?.createdAt).toLocaleDateString('en-US', options)}</p>
-                      {
-                        orders?.statusDate  && 
-                        <p style={{fontSize: '14px'}}> uppdated at: {new Date(orders?.statusDate).toLocaleDateString('en-US', options)}</p>
-                      }
-                      {/* <p style={{fontSize: '14px'}}>{formattedDate}</p> */}
-                    </div>
-                  </div>
-                </Link>
-                :
-                <div key={orders?._id} className="row client-list">
-                <div className="col-lg-2 col-sm-12">
-                 {/* Display the corresponding allMerchant name */}
-                 <p>{orders?.clientName}</p>
-      {/* {index < allMerchant.length && <p>{allMerchant[index]?.name}</p>} */}
-               
-                </div>
-                <div className="col-lg-2 col-sm-12">
-                  <p>{orders?._id}</p>
-                </div>
-                <div className="col-lg-3 col-sm-12">
-                  <p>{orders?.name}</p>
-                  <p>{orders?.address}</p>
-                  <p>{orders?.phone}</p>
-                </div>
-                <div className="col-lg-2 col-sm-12">
-                  <p className="p-status-btn">{orders?.paymentStatus}</p>
-                </div>
-                <div className="col-lg-2 col-sm-12">
-                  <p>{totalPrintBazCostWithoutDeliveryFee} TK</p>
-                </div>
-                <div className="col-lg-1 col-sm-12">
-                  <p className="status-btn" style={{    backgroundColor: getViewClientColor(
-                        orders?.orderStatus
-                        ),}}>{orders?.orderStatus}</p>
-                          <p style={{fontSize: '14px'}}> created at: {new Date(orders?.createdAt).toLocaleDateString('en-US', options)}</p>
-                  {
-                    orders?.statusDate  && 
-                    <p style={{fontSize: '14px'}}> uppdated at: {new Date(orders?.statusDate).toLocaleDateString('en-US', options)}</p>
-                  }
-                  {/* <p style={{fontSize: '14px'}}>{formattedDate}</p> */}
-                </div>
-              </div>
-               
-               )
-                }
-                  )
-               
-              }
-          
+           
              
             </div>
           </div>

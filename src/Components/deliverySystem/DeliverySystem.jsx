@@ -231,7 +231,8 @@ const gotoAllRcvAmount=()=>{
        return (
            <tr className="info">
                <td>{list?.searchByOrderId?.statusDate}</td>
-              <td>{list?._id}</td>
+              <td><a href={`/viewOrder/${list?.orderId}`} target="_blank" rel="noreferrer">{list?.orderId}</a>
+              </td>
                <td>{list?.collectAmount} TK</td>
                <td>{list?.searchByOrderId?.deliveryAssignTo}</td>
                <td>{list?.deliveryFeeForAdmin}TK</td>

@@ -107,8 +107,8 @@ const ViewOrder = () => {
     try {
       const response = await fetch(
         
-        `https://mserver.printbaz.com/updatePaymentStatus/${id}`,
-      // `http://localhost:5000/updatePaymentStatus/${id}`,
+        // `https://mserver.printbaz.com/updatePaymentStatus/${id}`,
+      `http://localhost:5000/updatePaymentStatus/${id}`,
         {
           method: "PUT",
           headers: {

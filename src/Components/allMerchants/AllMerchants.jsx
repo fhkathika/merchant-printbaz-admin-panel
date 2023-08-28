@@ -1,18 +1,31 @@
 import React, { useEffect, useState } from 'react';
+import { useLocation, useHistory, useNavigate } from 'react-router-dom';
 import { Link } from 'react-router-dom';
 import { useRoleAsignData } from '../../hooks/useRoleAsignData';
 import Navigationbar from '../navigationBar/Navigationbar';
-
+import DatePicker from 'react-datepicker';
+import queryString from 'query-string';
 const AllMerchants = () => {
+  const navigate = useNavigate();
+  const location = useLocation();
   const [allMerchant,setAllMerchant]=useState([])
-  const [filterUser,setFilterUsers]=useState('all')
-  const [filterEmail,setFilterEmail]=useState('')
+
+  const [filterUser, setFilterUser] = useState('all');
+  const [filterEmail, setFilterEmail] = useState('');
+  const [filterContact, setFilterContact] = useState('');
+  const [startDate, setStartDate] = useState(null);
+  const [endDate, setEndDate] = useState(null);
+  const [filterName, setFilterName] = useState('');
+  const [filterBrand, setFilterBrand] = useState('');
+
   const [currentPage, setCurrentPage] = useState(1);
   const [itemsPerPage, setItemsPerPage] = useState(30); 
   const indexOfLastItem = currentPage * itemsPerPage;
 const indexOfFirstItem = indexOfLastItem - itemsPerPage;
 const {value_count}=useRoleAsignData()
 let count=0
+
+
   useEffect(()=>{
     const getOrders = async () => {
      await fetch('https://mserver.printbaz.com/alluser') //for main site
@@ -22,22 +35,37 @@ let count=0
     }
     getOrders()
 },[allMerchant])
-const handleInputChange = (event, index) => {
-  const { name, value } = event.target;
-  setFilterUsers(value)
-}
-const handleEmailChange = (e) => {
-  const value = e.target.value;
-  // console.log(value);
-  setFilterEmail(value);
-}
+const handleInputChange = (event) => {
+  const { id, value } = event.target;
+  switch (id) {
+    case 'status-filter':
+      setFilterUser(value);
+      break;
+    case 'email-filter':
+      setFilterEmail(value);
+      break;
+    case 'id-filter':
+      setFilterContact(value);
+      break;
+      case 'name-filter':
+  setFilterName(value);
+  break; 
+   case 'brand-filter':
+  setFilterBrand(value);
+  break;
+    // ...other cases
+    default:
+      break;
+  }
+};
 
-// console.log("filterEmail",filterEmail);
-let pendingUsers=allMerchant?.filter(users=>users?.approval==="request");
-let approvedUsers=allMerchant?.filter(users=>users?.approval==="approved");
-let bannedUsers=allMerchant?.filter(users=>users?.approval==="ban");
-let searchByEmail = allMerchant?.filter(userEmail => userEmail?.email.includes(filterEmail));
+const handleChangeStartDate = (date) => {
+  setStartDate(date);
+};
 
+const handleChangeEndDate = (date) => {
+  setEndDate(date);
+};
 let SingleEmailOneTime = allMerchant.reduce((acc, current) => {
   const x = acc.find(item => item.email === current.email);
   if (!x) {
@@ -46,6 +74,34 @@ let SingleEmailOneTime = allMerchant.reduce((acc, current) => {
       return acc;
   }
 }, []);
+const getFilteredUsers = () => {
+  return SingleEmailOneTime.filter(user => {
+    if (filterUser !== 'all' && user.approval !== filterUser) return false;
+    if (filterEmail && user.email.indexOf(filterEmail) === -1) return false;
+    if (filterContact && user.phone.indexOf(filterContact) === -1) return false;
+    if (filterName && user.name.indexOf(filterName) === -1) return false;
+    if (filterBrand && user.brandName.indexOf(filterBrand) === -1) return false;
+
+    const userDate = new Date(user.createdAt);
+    const userSimpleDate = `${userDate.getFullYear()}-${userDate.getMonth() + 1}-${userDate.getDate()}`;
+
+    if (startDate && endDate) {
+      // Both start and end dates are selected
+      if (userDate < startDate || userDate > endDate) return false;
+    } else if (startDate) {
+      // Only start date is selected
+      if (userDate.toDateString() !== startDate.toDateString()) return false;
+    } else if (endDate) {
+      // Only end date is selected
+      if (userDate.toDateString() !== endDate.toDateString()) return false;
+    }
+
+    return true;
+  });
+};
+
+const filteredUsers = getFilteredUsers();
+
 const actualIndexOfLastItem = indexOfLastItem > SingleEmailOneTime.length ? SingleEmailOneTime.length : indexOfLastItem;
 let formattedDate;
 allMerchant?.map(merchant=>{
@@ -56,16 +112,8 @@ allMerchant?.map(merchant=>{
   return(formattedDate)
 
 })
-// console.log("formattedDate",formattedDate);
-// console.log("SingleEmailOneTime",SingleEmailOneTime);
 
-const handleContactChange=(e)=>{
-  const value = e.target.value;
-  // console.log(value);
-  setFilterUsers(value);
-}
-let searchByPhoneNumber= allMerchant?.filter(Phone => Phone?.phone?.includes(filterUser));
-    return (
+return (
         <div>
         <meta charSet="UTF-8" />
         <meta httpEquiv="X-UA-Compatible" content="IE=edge" />
@@ -83,24 +131,35 @@ let searchByPhoneNumber= allMerchant?.filter(Phone => Phone?.phone?.includes(fil
           <div className="row client-filter">
             <div className="col-lg-2 col-sm-12">
               <label htmlFor="id-filter">Contact number:</label>
-              <input type="text" id="id-filter" className="form-control"  onChange={(e) =>  handleContactChange(e)} />
+              <input type="text" id="id-filter" className="form-control"  onChange={(e) =>  handleInputChange(e)} />
             </div>
             <div className="col-lg-2 col-sm-12">
               <label htmlFor="name-filter">Name:</label>
-              <input type="text" id="name-filter" className="form-control" />
+              <input type="text" id="name-filter" className="form-control" onChange={e => handleInputChange(e)} />
+
             </div>
             <div className="col-lg-2 col-sm-12">
               <label htmlFor="brand-filter">Brand Name:</label>
-              <input type="text" id="brand-filter" className="form-control" />
+              <input type="text" id="brand-filter" className="form-control" onChange={(e) =>  handleInputChange(e)} />
             </div>
             <div className="col-lg-2 col-sm-12">
               <label htmlFor="email-filter">Email:</label>
-              <input type="email" id="email-filter" className="form-control"  onChange={(e) =>  handleEmailChange(e)}/>
+              <input type="email" id="email-filter" className="form-control"  onChange={(e) =>  handleInputChange(e)}/>
             </div>
-            <div className="col-lg-2 col-sm-12">
-              <label htmlFor="date-filter">Date:</label>
-              <input type="date" id="date-filter" className="form-control" />
+            <div className="col-lg-1 col-sm-12">
+              <label htmlFor="date-filter" >Start Date:</label>
+              <div>
+              <DatePicker className='form-control' selected={startDate} onChange={handleChangeStartDate} selectsStart startDate={startDate} endDate={endDate} />
+              </div>
+             
             </div>
+            <div className="col-lg-1 col-sm-12">
+               <label  htmlFor="endDate" >End Date</label>
+               <div>
+               <DatePicker className='form-control' selected={endDate} onChange={handleChangeEndDate} selectsEnd startDate={startDate} endDate={endDate} minDate={startDate} />
+               </div>
+               
+               </div>
             <div className="col-lg-2 col-sm-12">
               <label htmlFor="status-filter">Status:</label>
               <select id="status-filter" className="form-control"   onChange={(e) =>  handleInputChange(e)}>
@@ -141,8 +200,9 @@ let searchByPhoneNumber= allMerchant?.filter(Phone => Phone?.phone?.includes(fil
          
 
           {
-          filterUser &&  searchByPhoneNumber?.map((merchants)=><>
+          filteredUsers?.slice(indexOfFirstItem, indexOfLastItem).sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt))?.map((merchants)=><>
            {/* <Link  key={merchants?._id} to={`/viewTicket/${merchants?._id}`} state={{merchants}}></Link> */}
+          
             {
               value_count?.MerchantView ?
               <Link key={merchants?._id} to={`/viewClient/${merchants?._id}`} state={{merchants}}>
@@ -210,358 +270,9 @@ let searchByPhoneNumber= allMerchant?.filter(Phone => Phone?.phone?.includes(fil
         
             </>)
           }
-          {
-          filterEmail &&  searchByEmail?.map((merchants)=><>
-          {
-
-value_count?.MerchantView ?
-<Link key={merchants?._id} to={`/viewClient/${merchants?._id}`} state={{merchants}}>
-<div className="row client-list">
-  <div className="col-lg-2 col-sm-12">
-    <p>{merchants?.phone}</p>
-  </div>
-  <div className="col-lg-2 col-sm-12">
-    <p>{merchants?.name}</p>
-  </div>
-  <div className="col-lg-2 col-sm-12">
-    <p>{merchants?.brandName}</p>
-  </div>
-  <div className="col-lg-2 col-sm-12">
-    <p>{merchants?.email}</p>
-  </div>
-  <div className="col-lg-2 col-sm-12">
-    <p>{merchants?.createdAt?.slice(0,10)}</p>
-  </div>
-  <div className="col-lg-2 col-sm-12">
-    {
-      merchants?.approval==="requiest" &&   <p className="status-btn" style={{backgroundColor:"red"}} >{merchants?.approval}</p>
-    }
-     {
-      merchants?.approval==="approved" &&   <p className="status-btn"  >{merchants?.approval}</p>
-    } 
-     {
-      merchants?.approval==="ban" &&   <p className="status-btn" style={{backgroundColor:"blue"}}  >{merchants?.approval}</p>
-    }
-  
-  </div>
-</div>
-</Link>
-:
-<div className="row client-list">
-  <div className="col-lg-2 col-sm-12">
-    <p>{merchants?.phone}</p>
-  </div>
-  <div className="col-lg-2 col-sm-12">
-    <p>{merchants?.name}</p>
-  </div>
-  <div className="col-lg-2 col-sm-12">
-    <p>{merchants?.brandName}</p>
-  </div>
-  <div className="col-lg-2 col-sm-12">
-    <p>{merchants?.email}</p>
-  </div>
-  <div className="col-lg-2 col-sm-12">
-    <p>{merchants?.createdAt?.slice(0,10)}</p>
-  </div>
-  <div className="col-lg-2 col-sm-12">
-    {
-      merchants?.approval==="requiest" &&   <p className="status-btn" style={{backgroundColor:"red"}} >{merchants?.approval}</p>
-    }
-     {
-      merchants?.approval==="approved" &&   <p className="status-btn"  >{merchants?.approval}</p>
-    } 
-     {
-      merchants?.approval==="ban" &&   <p className="status-btn" style={{backgroundColor:"blue"}}  >{merchants?.approval}</p>
-    }
-  
-  </div>
-</div>
-
-          }
-            
-            </>)
-          }
+       
         
-          {
-            filterUser==="pending" &&  pendingUsers.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt)).map(merchants=><>
-              {
-
-              value_count?.MerchantView ?
-              <Link key={merchants?._id} to={`/viewClient/${merchants?._id}`} state={{merchants}}>
-              <div className="row client-list">
-                <div className="col-lg-2 col-sm-12">
-                  <p>{merchants?.phone}</p>
-                </div>
-                <div className="col-lg-2 col-sm-12">
-                  <p>{merchants?.name}</p>
-                </div>
-                <div className="col-lg-2 col-sm-12">
-                  <p>{merchants?.brandName}</p>
-                </div>
-                <div className="col-lg-2 col-sm-12">
-                  <p>{merchants?.email}</p>
-                </div>
-                <div className="col-lg-2 col-sm-12">
-                  <p>{merchants?.createdAt?.slice(0,10)}</p>
-                </div>
-                <div className="col-lg-2 col-sm-12">
-                  {
-                    merchants?.approval==="request" &&   <p className="status-btn" style={{backgroundColor:"#ff6f00",color:"black !important"}} >{merchants?.approval}</p>
-                  }
-               
-                
-                </div>
-              </div>
-            </Link>
-            :
-            <div className="row client-list">
-                <div className="col-lg-2 col-sm-12">
-                  <p>{merchants?.phone}</p>
-                </div>
-                <div className="col-lg-2 col-sm-12">
-                  <p>{merchants?.name}</p>
-                </div>
-                <div className="col-lg-2 col-sm-12">
-                  <p>{merchants?.brandName}</p>
-                </div>
-                <div className="col-lg-2 col-sm-12">
-                  <p>{merchants?.email}</p>
-                </div>
-                <div className="col-lg-2 col-sm-12">
-                  <p>{merchants?.createdAt?.slice(0,10)}</p>
-                </div>
-                <div className="col-lg-2 col-sm-12">
-                  {
-                    merchants?.approval==="request" &&   <p className="status-btn" style={{backgroundColor:"#ff6f00",color:"black !important"}} >{merchants?.approval}</p>
-                  }
-               
-                
-                </div>
-              </div>
-              } 
-           
-            
-            </>) 
-          }
-          
-              {
-            filterUser==="approved" &&  approvedUsers.map(merchants=>{
-              
-              if(merchants?.email){
-                count++
-              }
-            //  console.log("count",count);
-              return(
-             
-              value_count?.MerchantView ?
-              <Link key={merchants?._id} to={`/viewClient/${merchants?._id}`} state={{merchants}}>
-              <div className="row client-list">
-                <div className="col-lg-2 col-sm-12">
-                  <p>{merchants?.phone}</p>
-                </div>
-                <div className="col-lg-2 col-sm-12">
-                  <p>{merchants?.name}</p>
-                </div>
-                <div className="col-lg-2 col-sm-12">
-                  <p>{merchants?.brandName}</p>
-                </div>
-                <div className="col-lg-2 col-sm-12">
-                  <p>{merchants?.email}</p>
-                  
-                </div>
-                <div className="col-lg-2 col-sm-12">
-                  <p>{merchants?.createdAt?.slice(0,10)}</p>
-                </div>
-                <div className="col-lg-2 col-sm-12">
-               
-                   {
-                    merchants?.approval==="approved" &&   <p className="status-btn"  >{merchants?.approval}</p>
-                  } 
-                 
-                
-                </div>
-              </div>
-            </Link>
-            
-             :
-             <div className="row client-list">
-             <div className="col-lg-2 col-sm-12">
-               <p>{merchants?.phone}</p>
-             </div>
-             <div className="col-lg-2 col-sm-12">
-               <p>{merchants?.name}</p>
-             </div>
-             <div className="col-lg-2 col-sm-12">
-               <p>{merchants?.brandName}</p>
-             </div>
-             <div className="col-lg-2 col-sm-12">
-               <p>{merchants?.email}</p>
-               
-             </div>
-             <div className="col-lg-2 col-sm-12">
-               <p>{merchants?.createdAt?.slice(0,10)}</p>
-             </div>
-             <div className="col-lg-2 col-sm-12">
-            
-                {
-                 merchants?.approval==="approved" &&   <p className="status-btn"  >{merchants?.approval}</p>
-               } 
-              
-             
-             </div>
-           </div>
-              )
-             
-            }
-             
-            
-            ) 
-          }  
-
-{/* {
-  filterUser==="approved" && 
-  [...new Set(approvedUsers.map(user => user.email))].map((email, index) => {
-    console.log("count", index + 1);
-    return (
-      <>
-      <span key={index}>{email}</span>
-      <br />
-      </>
-      
-    )
-  }) 
-} */}
-
-            {
-            filterUser==="ban" &&  bannedUsers.map(merchants=><>
-            {
-                  value_count?.MerchantView ?
-                  <Link key={merchants?._id} to={`/viewClient/${merchants?._id}`} state={{merchants}}>
-                  <div className="row client-list">
-                    <div className="col-lg-2 col-sm-12">
-                      <p>{merchants?.phone}</p>
-                    </div>
-                    <div className="col-lg-2 col-sm-12">
-                      <p>{merchants?.name}</p>
-                    </div>
-                    <div className="col-lg-2 col-sm-12">
-                      <p>{merchants?.brandName}</p>
-                    </div>
-                    <div className="col-lg-2 col-sm-12">
-                      <p>{merchants?.email}</p>
-                    </div>
-                    <div className="col-lg-2 col-sm-12">
-                      <p>{merchants?.createdAt?.slice(0,10)}</p>
-                    </div>
-                    <div className="col-lg-2 col-sm-12">
-                   
-                       {
-                        merchants?.approval==="ban" &&   <p className="status-btn" style={{backgroundColor:"red"}}  >{merchants?.approval}</p>
-                      }
-                    
-                    </div>
-                  </div>
-                </Link>
-                :
-                <div className="row client-list">
-                <div className="col-lg-2 col-sm-12">
-                  <p>{merchants?.phone}</p>
-                </div>
-                <div className="col-lg-2 col-sm-12">
-                  <p>{merchants?.name}</p>
-                </div>
-                <div className="col-lg-2 col-sm-12">
-                  <p>{merchants?.brandName}</p>
-                </div>
-                <div className="col-lg-2 col-sm-12">
-                  <p>{merchants?.email}</p>
-                </div>
-                <div className="col-lg-2 col-sm-12">
-                  <p>{merchants?.createdAt?.slice(0,10)}</p>
-                </div>
-                <div className="col-lg-2 col-sm-12">
-               
-                   {
-                    merchants?.approval==="ban" &&   <p className="status-btn" style={{backgroundColor:"red"}}  >{merchants?.approval}</p>
-                  }
-                
-                </div>
-              </div>
-            }
-              
-            
-            </>) 
-          }
-          {
-           filterUser==="all" && SingleEmailOneTime?.slice(indexOfFirstItem, indexOfLastItem).sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt)).map((merchants)=><>
-              {
-                  value_count?.MerchantView ?
-                  <Link key={merchants?._id} to={`/viewClient/${merchants?._id}`} state={{merchants}}>
-                  <div className="row client-list">
-                    <div className="col-lg-2 col-sm-12">
-                      <p>{merchants?.phone}</p>
-                    </div>
-                    <div className="col-lg-2 col-sm-12">
-                      <p>{merchants?.name}</p>
-                    </div>
-                    <div className="col-lg-2 col-sm-12">
-                      <p>{merchants?.brandName}</p>
-                    </div>
-                    <div className="col-lg-2 col-sm-12">
-                      <p>{merchants?.email}</p>
-                    </div>
-                    <div className="col-lg-2 col-sm-12">
-                      <p>{merchants?.createdAt?.slice(0,10)}</p>
-                    </div>
-                    <div className="col-lg-2 col-sm-12">
-                      {
-                        merchants?.approval==="request" &&   <p className="status-btn" style={{backgroundColor:"#ff6f00"}} >{merchants?.approval}</p>
-                      }
-                       {
-                        merchants?.approval==="approved" &&   <p className="status-btn"  >{merchants?.approval}</p>
-                      } 
-                       {
-                        merchants?.approval==="ban" &&   <p className="status-btn" style={{backgroundColor:"blue"}}  >{merchants?.approval}</p>
-                      }
-                    
-                    </div>
-                  </div>
-                </Link>
-                :
-                <div className="row client-list">
-                <div className="col-lg-2 col-sm-12">
-                  <p>{merchants?.phone}</p>
-                </div>
-                <div className="col-lg-2 col-sm-12">
-                  <p>{merchants?.name}</p>
-                </div>
-                <div className="col-lg-2 col-sm-12">
-                  <p>{merchants?.brandName}</p>
-                </div>
-                <div className="col-lg-2 col-sm-12">
-                  <p>{merchants?.email}</p>
-                </div>
-                <div className="col-lg-2 col-sm-12">
-                  <p>{merchants?.createdAt?.slice(0,10)}</p>
-                </div>
-                <div className="col-lg-2 col-sm-12">
-                  {
-                    merchants?.approval==="request" &&   <p className="status-btn" style={{backgroundColor:"#ff6f00"}} >{merchants?.approval}</p>
-                  }
-                   {
-                    merchants?.approval==="approved" &&   <p className="status-btn"  >{merchants?.approval}</p>
-                  } 
-                   {
-                    merchants?.approval==="ban" &&   <p className="status-btn" style={{backgroundColor:"blue"}}  >{merchants?.approval}</p>
-                  }
-                
-                </div>
-              </div>
-              }
-           
-            </>)
-          }
-        
+         
           
          
         </div>
