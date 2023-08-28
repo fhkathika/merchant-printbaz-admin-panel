@@ -35,8 +35,8 @@ const ViewOrder = () => {
   useEffect(()=>{
     const getOrderById=async()=>{
              // Fetch the updated order details
-    // await fetch(`https://mserver.printbaz.com/getorder/${id}`)
-    await fetch(`http://localhost:5000/getorder/${id}`)
+    await fetch(`https://mserver.printbaz.com/getorder/${id}`)
+    // await fetch(`http://localhost:5000/getorder/${id}`)
     .then(res=>res.json())
     .then(data => {setGetSpecificOrderById(data)
       setOrderStatus(data.orderStatus);
@@ -285,7 +285,7 @@ const ViewOrder = () => {
                 </div> 
                 <div className='d-flex  align_center col-lg- col-sm-2 '>
               
-                        <div style={{display:""}}>
+                        {/* <div style={{display:""}}>
                           
                             <select
                             id="status-filter"
@@ -319,7 +319,7 @@ const ViewOrder = () => {
   
   {deliverAssign === "pathao" && (
                               <>
-                                {/* <option value="paid">Paid</option> */}
+                              
                                 <option value="delivery tiger">Delivery Tiger</option>
                              
                               </>
@@ -328,7 +328,7 @@ const ViewOrder = () => {
   {paymentStatus === "delivery tiger" && (
                               <>
                               <option value="pathao">Pathao</option>
-                              {/* <option value="Unpaid">Unpaid</option> */}
+                           
                              
                                 
                               </>
@@ -340,7 +340,7 @@ const ViewOrder = () => {
                      
                      
                         </div>
-                        
+                         */}
                        
                
 
