@@ -87,14 +87,20 @@ const getFilteredUsers = () => {
 
     if (startDate && endDate) {
       // Both start and end dates are selected
-      if (userDate < startDate || userDate > endDate) return false;
-    } else if (startDate) {
+      if (userDate >= startDate && userDate <= endDate) {
+        // Date is within the range
+      } else {
+        // Date is outside the range
+        return false;
+      }
+    }  else if (startDate) {
       // Only start date is selected
       if (userDate.toDateString() !== startDate.toDateString()) return false;
     } else if (endDate) {
       // Only end date is selected
       if (userDate.toDateString() !== endDate.toDateString()) return false;
     }
+
 
     return true;
   });

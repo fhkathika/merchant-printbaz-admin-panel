@@ -129,41 +129,52 @@ const applyFilters = () => {
     if (filterOrderId && !order._id.includes(filterOrderId)) {
       return false;
     }
-
-   
-        // Date comparison
-    const userDate = new Date(order.createdAt);
-    // Reset time to 00:00:00 to compare just the date
-    userDate.setHours(0, 0, 0, 0);
-
-    if (startDate && endDate) {
-      // Both start and end dates are selected
-      const start = new Date(startDate);
-      start.setHours(0, 0, 0, 0);
+  
     
-      const end = new Date(endDate);
-      end.setHours(23, 59, 59, 999); // Set to end of day
+    if ((order && order.statusDate) || (order && order.createdAt)) {
+      const formattedStatusDate = order.statusDate?.replace(" at", "");
+  const userDate = new Date(formattedStatusDate);
+  console.log("userDate",userDate);
+     // Now you can proceed with your date comparisons as before.
+     userDate.setHours(0, 0, 0, 0);
     
-      if (userDate < start || userDate > end) return false;
-    
-    } else if (startDate) {
-      // Only start date is selected
-      const start = new Date(startDate);
-      start.setHours(0, 0, 0, 0);
-    
-      const end = new Date(startDate);
-      end.setHours(23, 59, 59, 999); // Set to end of day
-    
-      if (userDate < start || userDate > end) return false;
-    
-    } else if (endDate) {
-      // Only end date is selected
-      const end = new Date(endDate);
-      end.setHours(23, 59, 59, 999); // Set to end of day
-    
-      if (userDate > end) return false;
+     if (startDate && endDate) {
+       // Both start and end dates are selected
+       const start = new Date(startDate);
+       start.setHours(0, 0, 0, 0);
+     
+       const end = new Date(endDate);
+       end.setHours(23, 59, 59, 999); // Set to end of day
+     
+       if (userDate < start || userDate > end) return false;
+     
+     } else if (startDate) {
+       // Only start date is selected
+       const start = new Date(startDate);
+       start.setHours(0, 0, 0, 0);
+     
+       const end = new Date(startDate);
+       end.setHours(23, 59, 59, 999); // Set to end of day
+     
+       if (userDate < start || userDate > end) return false;
+     
+     } else if (endDate) {
+       // Only end date is selected
+       const end = new Date(endDate);
+       end.setHours(23, 59, 59, 999); // Set to end of day
+     
+       if (userDate > end) return false;
+     }
+    } else {
+      console.error("order or order.statusDate is undefined.");
     }
-    
+   
+
+
+    console.log("order.statusDate:", order.statusDate);
+   
+    console.log("Type of order.statusDate:", typeof order.statusDate);
+
     // Filter by recipient name
     if (filterName && !order.name.includes(filterName)) {
       return false;
@@ -178,6 +189,7 @@ const applyFilters = () => {
     return true;
   });
 };
+
 
 const orderMap=applyFilters()
 
@@ -537,7 +549,7 @@ const actualIndexOfLastItemOfUnpaidOrders = indexOfLastItem > unPaidOrders.lengt
                       <p style={{fontSize: '14px'}}> created at: {new Date(orders?.createdAt).toLocaleDateString('en-US', options)}</p>
                       {
                         orders?.statusDate  && 
-                        <p style={{fontSize: '14px'}}> uppdated at: {new Date(orders?.statusDate).toLocaleDateString('en-US', options)}</p>
+                        <p style={{fontSize: '14px'}}> uppdated at: {orders?.statusDate}</p>
                       }
                      
                     </div>
