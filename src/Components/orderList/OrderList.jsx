@@ -1,11 +1,13 @@
 import React, { useEffect, useState } from 'react';
-import { Link,useLocation } from 'react-router-dom';
+import { Link,useLocation,useNavigate } from 'react-router-dom';
 import useGetMongoData from '../../hooks/useGetMongoData';
 import DatePicker from 'react-datepicker';
 import 'react-datepicker/dist/react-datepicker.css';
 import Navigationbar from '../navigationBar/Navigationbar';
 import { useRoleAsignData } from '../../hooks/useRoleAsignData';
+
 const OrderList = () => {
+
   const { orderAll } = useGetMongoData();
   const [allMerchant,setAllMerchant]=useState([])
   const {value_count}=useRoleAsignData()
@@ -13,10 +15,10 @@ const OrderList = () => {
   const [filterOrders,setFilterOrders]=useState('all');
   const [currentPage, setCurrentPage] = useState(1);
   const [itemsPerPage, setItemsPerPage] = useState(20); 
-
+  const navigate = useNavigate();
+  const location = useLocation();
   const indexOfLastItem = currentPage * itemsPerPage;
   const indexOfFirstItem = indexOfLastItem - itemsPerPage;
-
   const [filterStatus, setFilterStatus] = useState('all');
   const [filterPaymentStatus, setFilterPaymentStatus] = useState('');
   const [filterOrderId, setFilterOrderId] = useState('');
@@ -25,12 +27,13 @@ const OrderList = () => {
   const [filterName, setFilterName] = useState('');
   const [filterBrand, setFilterBrand] = useState('');
 console.log("filterName",filterName);
-  const location = useLocation();
+ 
   const [previousPath, setPreviousPath] = useState('');
   useEffect(() => {
     // Update the previousPath state when the location changes
     setPreviousPath(location.pathname);
   }, [location.pathname]);
+  
   useEffect(()=>{
     const getOrders = async () => {
      await fetch('https://mserver.printbaz.com/alluser') //for main site
@@ -63,14 +66,19 @@ const handleInputChange = (event) => {
     default:
       break;
   }
+  
 };
 
 const handleChangeStartDate = (date) => {
   setStartDate(date);
+    // Update local storage
+   
 };
 
 const handleChangeEndDate = (date) => {
   setEndDate(date);
+    // Update local storage
+    
 };
 let matchingMerchant
 //  console.log("allMerchant",allMerchant);
@@ -78,39 +86,7 @@ let date = new Date(orderAll?.createdAt); // create a new Date object
 
 let options = { month: 'long', day: 'numeric', year: 'numeric', hour: 'numeric', minute: 'numeric' }; // options for toLocaleDateString
 
-let formattedDate = date.toLocaleDateString('en-US', options); // use toLocaleDateString to format the date
-function timeSince(date) {
 
-  var seconds = Math.floor((new Date() - date) / 1000);
-
-  var interval = seconds / 31536000;
-
-  if (interval > 1) {
-    return Math.floor(interval) + " years ago";
-  }
-  interval = seconds / 2592000;
-  if (interval > 1) {
-    return Math.floor(interval) + " months ago";
-  }
-  interval = seconds / 86400;
-  if (interval > 1) {
-    return Math.floor(interval) + " days ago";
-  }
-  interval = seconds / 3600;
-  if (interval > 1) {
-    return Math.floor(interval) + " hours ago";
-  }
-  interval = seconds / 60;
-  if (interval > 1) {
-    return Math.floor(interval) + " minutes ago";
-  }
-  return Math.floor(seconds) + " seconds ago";
-}
-
-const handlePaymentStausInputChange = (event, index) => {
-  const { name, value } = event.target;
-  setFilterOrders(value)
-}
 
 const applyFilters = () => {
   return orderAll.filter((order) => {
@@ -167,10 +143,7 @@ const applyFilters = () => {
     } else {
       console.error("order or order.statusDate is undefined.");
     }
-   
-
-
-
+  
     // Filter by recipient name
     // if (filterName && !order.phone.includes(filterName)) {
     //   return false;
@@ -190,31 +163,6 @@ const applyFilters = () => {
 
 const orderMap=applyFilters()
 
-let pendingOrders=orderAll?.filter(users=>users?.orderStatus==="Pending");
-let approvedOrders=orderAll?.filter(users=>users?.orderStatus==="Approved");
-let  confirmedOrders=orderAll?.filter(users=>users?.orderStatus==="confirmed");
-let onHoldArtworkIssueOrders=orderAll?.filter(users=>users?.orderStatus==="on hold artwork issue");
-let onHoldBillingIssueOrders=orderAll?.filter(users=>users?.orderStatus==="on hold billing issue");
-let onHoldOutOfStockOrders=orderAll?.filter(users=>users?.orderStatus==="on hold out of stock");
-let inProductionOrders=orderAll?.filter(users=>users?.orderStatus==="in-production");
-let outForDeliveryOrders=orderAll?.filter(users=>users?.orderStatus==="out for delivery");
-let deliveredOrders=orderAll?.filter(users=>users?.orderStatus==="delivered");
-let cancelOrders=orderAll?.filter(users=>users?.orderStatus==="cancel");
-let returnOrders=orderAll?.filter(users=>users?.orderStatus==="returned");
-// payment staus
-let paidOrders=orderAll?.filter(users=>users?.paymentStatus==="paid");
-
-let unPaidOrders=orderAll?.filter(users=>users?.paymentStatus==="Unpaid");
-let searchByOrderId= orderAll?.filter(OrederId => OrederId?._id?.includes(filterOrders));
-let filterByClientPhone=orderAll?.filter(users=>users?.phone===filterOrders);
-let filterByBrandName=orderAll?.filter(users=>users?.clientbrandName===filterOrders);
-// console.log("filterByBrandName",filterByBrandName);
-// console.log("filterByrecepientPhone",filterByClientPhone);
-// const handleOrderIdChange = (e) => {
-//   const value = e.target.value;
-//   // console.log(value);
-//   setFilterOrders(value);
-// }
 const getViewClientColor = (status) => {
   if (status === "Pending") {
     return "Orange";
@@ -264,45 +212,9 @@ const getViewClientColor = (status) => {
 };
 
 
-const filerByOrderDate = orderAll.filter(order => {
-  const date = new Date(order?.createdAt);
-  const orderDate = date;
-  
-   if (startDate && endDate) {
-    // return orderDate >= new Date(startDate) && orderDate <= new Date(endDate);
-    const start = new Date(startDate);
-    const end = new Date(endDate);
-    end.setDate(end.getDate() + 1); // Adjust the end date to the next day
-    return orderDate >= start && orderDate < end;
-  } 
-   else if (startDate && !endDate) {
-    const start = new Date(startDate);
-    const end = new Date(startDate);
-    end.setDate(end.getDate() + 1); // Set the end date to the next day
-    return orderDate >= start && orderDate < end;
-  }
-
-  return false;
-});
-
-// console.log("filterByOrderDate", filerByOrderDate);
-
 
 const actualIndexOfLastItem = indexOfLastItem > orderAll.length ? orderAll.length : indexOfLastItem;
-const actualIndexOfLastItemOfpendingOrders = indexOfLastItem > pendingOrders.length ? pendingOrders.length : indexOfLastItem;
-const actualIndexOfLastItemOfapprovedOrders = indexOfLastItem > approvedOrders.length ? approvedOrders.length : indexOfLastItem;
-const actualIndexOfLastItemOfconfirmedOrders = indexOfLastItem >  confirmedOrders.length ?  confirmedOrders.length : indexOfLastItem;
-const actualIndexOfLastItemOfonHoldArtworkIssueOrders = indexOfLastItem > onHoldArtworkIssueOrders.length ? onHoldArtworkIssueOrders.length : indexOfLastItem;
-const actualIndexOfLastItemOfonHoldBillingIssueOrders = indexOfLastItem > onHoldBillingIssueOrders.length ? onHoldBillingIssueOrders.length : indexOfLastItem;
-const actualIndexOfLastItemOfonHoldOutOfStockOrders = indexOfLastItem > onHoldOutOfStockOrders.length ? onHoldOutOfStockOrders.length : indexOfLastItem;
-const actualIndexOfLastItemOfinProductionOrders = indexOfLastItem > inProductionOrders.length ? inProductionOrders.length : indexOfLastItem;
-const actualIndexOfLastItemOfoutForDeliveryOrders = indexOfLastItem > outForDeliveryOrders.length ? outForDeliveryOrders.length : indexOfLastItem;
-const actualIndexOfLastItemOfdeliveredOrders = indexOfLastItem > deliveredOrders.length ? deliveredOrders.length : indexOfLastItem;
-const actualIndexOfLastItemOfcancelOrders = indexOfLastItem > cancelOrders.length ? cancelOrders.length : indexOfLastItem;
-const actualIndexOfLastItemOfreturnOrders = indexOfLastItem > returnOrders.length ? returnOrders.length : indexOfLastItem;
-const actualIndexOfLastItemOfPaidOrders = indexOfLastItem > paidOrders.length ? paidOrders.length : indexOfLastItem;
-const actualIndexOfLastItemOfUnpaidOrders = indexOfLastItem > unPaidOrders.length ? unPaidOrders.length : indexOfLastItem;
-    return (
+   return (
         <div>
           <meta charSet="UTF-8" />
           <meta httpEquiv="X-UA-Compatible" content="IE=edge" />
@@ -320,19 +232,19 @@ const actualIndexOfLastItemOfUnpaidOrders = indexOfLastItem > unPaidOrders.lengt
             <div className="row order-filter">
               <div className="col-lg-2 col-sm-12">
                 <label htmlFor="name-filter" style={{marginBottom:"8px"}}>Recipient Number</label>
-                <input type="text" id="name-filter" className="form-control"onChange={handleInputChange}  />
+                <input type="text" id="name-filter" className="form-control" value={filterName} onChange={handleInputChange}  />
               </div>
               <div className="col-lg-2 col-sm-12">
                 <label htmlFor="id-filter" style={{marginBottom:"8px"}}>Order Id:</label>
-                <input type="text" id="id-filter" className="form-control" onChange={handleInputChange} />
+                <input type="text" id="id-filter" className="form-control" value={filterOrderId}  onChange={handleInputChange} />
               </div>
               <div className="col-lg-2 col-sm-12">
                 <label htmlFor="brand-filter" style={{marginBottom:"8px"}}>Brand Name</label>
-                <input type="text" id="brand-filter" onChange={(e) =>  handleInputChange(e)}  className="form-control" />
+                <input type="text" id="brand-filter" value={filterBrand} onChange={(e) =>  handleInputChange(e)}  className="form-control" />
               </div>
               <div className="col-lg-2 col-sm-12">
                 <label htmlFor="paymentStatus-filter" style={{marginBottom:"8px"}}>Payment:</label>
-                <select id="paymentStatus-filter" className="form-control" onChange={(e) =>  handleInputChange(e)}>
+                <select id="paymentStatus-filter" value={filterPaymentStatus} className="form-control" onChange={(e) =>  handleInputChange(e)}>
                   <option value=''>none</option>
                   <option value="Unpaid">Unpaid</option>
                   <option value="paid">Paid</option>
@@ -342,18 +254,18 @@ const actualIndexOfLastItemOfUnpaidOrders = indexOfLastItem > unPaidOrders.lengt
               <div className="col-lg-1 col-sm-12">
                   <label htmlFor="startDate" className="form-label">Start Date</label>
 
-                                   <DatePicker className='form-control' selected={startDate} onChange={handleChangeStartDate} selectsStart startDate={startDate} endDate={endDate} />
+                                   <DatePicker className='form-control' value={startDate} selected={startDate} onChange={handleChangeStartDate} selectsStart startDate={startDate} endDate={endDate} />
                 
                   </div>   
                    <div className="col-lg-1 col-sm-12">
                
                  
                   <label style={{textAlign:"start"}} htmlFor="endDate" className="form-label">End Date</label>
-                  <DatePicker className='form-control' selected={endDate} onChange={handleChangeEndDate} selectsEnd startDate={startDate} endDate={endDate} minDate={startDate} />
+                  <DatePicker className='form-control' selected={endDate} value={endDate} onChange={handleChangeEndDate} selectsEnd startDate={startDate} endDate={endDate} minDate={startDate} />
                   </div>
               <div className="col-lg-2 col-sm-12">
                 <label htmlFor="status-filter" style={{marginBottom:"8px"}}>Status:</label>
-                <select id="status-filter"  className="form-control" onChange={(e) =>  handleInputChange(e)}>
+                <select id="status-filter"  className="form-control" value={filterStatus} onChange={(e) =>  handleInputChange(e)}>
                   <option   value="all">All</option>
                   <option value="Pending">Pending</option>
                   <option value="on hold artwork issue">On hold -  Artwork issue</option>

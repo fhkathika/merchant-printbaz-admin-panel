@@ -20,19 +20,25 @@ import DeliverySystem from './Components/deliverySystem/DeliverySystem';
 import AllDeliveryList from './Components/allDeliveries/AllDeliveryList';
 import Analytics from './Components/analytics/Analytics';
 import AllRcvList from './Components/allRcvList/AllRcvList';
+import { FilterProvider } from './Components/filterContext/FilterContext';
 function App() {
   return (
     <div className="">
        <Routes>
        <Route path="/" element={<PrivateRoute><Dashboard /></PrivateRoute>} />
        <Route path="/allMerchants" element={<PrivateRoute><AllMerchants /> </PrivateRoute>} />
-       <Route path="/orderList"    element={<PrivateRoute><OrderList /> </PrivateRoute>} />
+     <FilterProvider>
+     <Route path="/orderList"    element={<PrivateRoute><OrderList /> </PrivateRoute>} />
+       <Route path="/viewOrder/:id"element={<PrivateRoute><ViewOrder /> </PrivateRoute>} />
+      
+     </FilterProvider>
+      
        <Route path="/filemanager"  element={<PrivateRoute><Filemanager /> </PrivateRoute>} />
        <Route path="/liveChat"     element={<PrivateRoute><LiveChat /> </PrivateRoute>} />
        <Route path="/mailBox"      element={<PrivateRoute><Mailbox /> </PrivateRoute>} />
        <Route path="/ticket"       element={<PrivateRoute><Ticket /> </PrivateRoute>} />
      <Route path="/viewClient/:id" element={<PrivateRoute><ViewClient /> </PrivateRoute>} />
-       <Route path="/viewOrder/:id"element={<PrivateRoute><ViewOrder /> </PrivateRoute>} />
+    
       <Route path="/viewTicket/:id"element={<PrivateRoute><ViewTicket/> </PrivateRoute>} />
       <Route path="/deliverySystem"element={<PrivateRoute><DeliverySystem/> </PrivateRoute>} />
       <Route path="/alldeliveries"element={<PrivateRoute><AllDeliveryList/> </PrivateRoute>} />
