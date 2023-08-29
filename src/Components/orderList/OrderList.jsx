@@ -9,7 +9,6 @@ const OrderList = () => {
   const { orderAll } = useGetMongoData();
   const [allMerchant,setAllMerchant]=useState([])
   const {value_count}=useRoleAsignData()
-  console.log("value_count?viewOrders", value_count?.OrderView);
   const [show, setShow] = useState({});
   const [filterOrders,setFilterOrders]=useState('all');
   const [currentPage, setCurrentPage] = useState(1);
@@ -25,7 +24,7 @@ const OrderList = () => {
   const [endDate, setEndDate] = useState(null);
   const [filterName, setFilterName] = useState('');
   const [filterBrand, setFilterBrand] = useState('');
-
+console.log("filterName",filterName);
   const location = useLocation();
   const [previousPath, setPreviousPath] = useState('');
   useEffect(() => {
@@ -112,7 +111,7 @@ const handlePaymentStausInputChange = (event, index) => {
   const { name, value } = event.target;
   setFilterOrders(value)
 }
-console.log("orderAll",orderAll);
+
 const applyFilters = () => {
   return orderAll.filter((order) => {
     // Filter by status
@@ -134,7 +133,7 @@ const applyFilters = () => {
     if ((order && order.statusDate) || (order && order.createdAt)) {
       const formattedStatusDate = order.statusDate?.replace(" at", "");
   const userDate = new Date(formattedStatusDate);
-  console.log("userDate",userDate);
+  
      // Now you can proceed with your date comparisons as before.
      userDate.setHours(0, 0, 0, 0);
     
@@ -171,14 +170,12 @@ const applyFilters = () => {
    
 
 
-    console.log("order.statusDate:", order.statusDate);
-   
-    console.log("Type of order.statusDate:", typeof order.statusDate);
 
     // Filter by recipient name
-    if (filterName && !order.name.includes(filterName)) {
-      return false;
-    }
+    // if (filterName && !order.phone.includes(filterName)) {
+    //   return false;
+    // }
+    if (filterName && order.phone.indexOf(filterName) === -1) return false;
 
     // Filter by brand
     if (filterBrand && (!order?.clientbrandName || !order.clientbrandName.includes(filterBrand))) {
@@ -212,7 +209,7 @@ let searchByOrderId= orderAll?.filter(OrederId => OrederId?._id?.includes(filter
 let filterByClientPhone=orderAll?.filter(users=>users?.phone===filterOrders);
 let filterByBrandName=orderAll?.filter(users=>users?.clientbrandName===filterOrders);
 // console.log("filterByBrandName",filterByBrandName);
-console.log("filterByrecepientPhone",filterByClientPhone);
+// console.log("filterByrecepientPhone",filterByClientPhone);
 // const handleOrderIdChange = (e) => {
 //   const value = e.target.value;
 //   // console.log(value);
