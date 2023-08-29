@@ -107,8 +107,8 @@ const ViewOrder = () => {
     try {
       const response = await fetch(
         
-        // `https://mserver.printbaz.com/updatePaymentStatus/${id}`,
-      `http://localhost:5000/updatePaymentStatus/${id}`,
+        `https://mserver.printbaz.com/updatePaymentStatus/${id}`,
+      // `http://localhost:5000/updatePaymentStatus/${id}`,
         {
           method: "PUT",
           headers: {
@@ -311,6 +311,7 @@ const ViewOrder = () => {
                              
                             <option value="pathao"> Pathao</option>
                             <option value="delivery tiger">Delivery Tiger</option>
+                            <option value="others">Others</option>
                         
                         
   
@@ -321,7 +322,7 @@ const ViewOrder = () => {
                               <>
                               
                                 <option value="delivery tiger">Delivery Tiger</option>
-                             
+                                <option value="others">Others</option>
                               </>
                             )}
   
@@ -329,7 +330,15 @@ const ViewOrder = () => {
                               <>
                               <option value="pathao">Pathao</option>
                            
-                             
+                              <option value="others">Others</option>
+                                
+                              </>
+                            )} 
+                            {paymentStatus === "others" && (
+                              <>
+                              <option value="pathao">Pathao</option>
+                           
+                              <option value="delivery tiger">Delivery Tiger</option>
                                 
                               </>
                             )}

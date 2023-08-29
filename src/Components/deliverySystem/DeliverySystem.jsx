@@ -11,6 +11,7 @@ import Navigationbar from '../navigationBar/Navigationbar';
 const DeliverySystem = () => {
   const {orderAll}=useGetMongoData()
   const {deliveryAll}=useGetDeliveryList()
+
   const {rcvAll}=useGetRcvList()
   const [showAlert, setShowAlert] = useState(false);
   const [showAlertRecvAmount, setShowAlertRecvAmount] = useState(false);
@@ -160,6 +161,17 @@ const gotoAllDeliveries=()=>{
 const gotoAllRcvAmount=()=>{
   navigate("/allRcvMoney")
 }
+let deliveriesDeliverySystem=deliveryAll
+let ordersForDeliverySystem=orderAll
+function syncArrays(sourceArray, targetItem) {
+  const sourceItem = sourceArray.find(item => item._id === targetItem.orderId);
+  return sourceItem && sourceItem.orderStatus !== targetItem.orderStatus
+    ? { ...targetItem, orderStatus: sourceItem.orderStatus }
+    : targetItem;
+}
+// Using the function
+deliveriesDeliverySystem = syncArrays(ordersForDeliverySystem, deliveriesDeliverySystem);
+
     return (
         <div>
           <meta charSet="UTF-8" />
@@ -213,9 +225,13 @@ const gotoAllRcvAmount=()=>{
                         </tr>
                       </thead>
                       <tbody>
-                     
+
+ 
+
                       {
    deliveryAll?.slice(0,5).map((list, index) => {
+    const syncedListItem = syncArrays(orderAll, list);
+    console.log("syncedListItem",syncedListItem);
        let date = new Date(list?.date); 
        let options = { year: 'numeric', month: 'long', day: 'numeric' }; 
        let formattedDate = date.toLocaleDateString('en-US', options); 
@@ -230,15 +246,15 @@ const gotoAllRcvAmount=()=>{
     
        return (
            <tr className="info">
-               <td>{list?.searchByOrderId?.statusDate}</td>
-              <td><a href={`/viewOrder/${list?.orderId}`} target="_blank" rel="noreferrer">{list?.orderId}</a>
-              </td>
+               <td>{syncedListItem?.searchByOrderId?.statusDate}</td>
+               <td><a href={`/viewOrder/${syncedListItem?.orderId}`} target="_blank" rel="noreferrer">{syncedListItem?.orderId}</a></td>
+             
                <td>{list?.collectAmount} TK</td>
                <td>{list?.searchByOrderId?.deliveryAssignTo}</td>
                <td>{list?.deliveryFeeForAdmin}TK</td>
-               <td><p className="status-btn">{list?.orderStatus}</p></td>
+               <td><p className="status-btn">{syncedListItem?.orderStatus}</p></td>
                <td>{printbazRcv} TK</td>
-               <td > <p className="status-btn" > {list?.searchByOrderId?.paymentStatus}</p> </td>
+               <td > <p className="status-btn" > {syncedListItem?.searchByOrderId?.paymentStatus}</p> </td>
                <td style={{color:"red"}}>{list?.returnValue} TK</td>
            </tr>
        );
