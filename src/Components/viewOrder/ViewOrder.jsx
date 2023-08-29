@@ -141,8 +141,8 @@ const ViewOrder = () => {
     try {
       const response = await fetch(
         
-        // `https://mserver.printbaz.com/updatePaymentStatus/${id}`,
-      `http://localhost:5000/deliveryAssignTo/${id}`,
+        `https://mserver.printbaz.com/deliveryAssignTo/${id}`,
+      // `http://localhost:5000/deliveryAssignTo/${id}`,
         {
           method: "PUT",
           headers: {
@@ -285,7 +285,7 @@ const ViewOrder = () => {
                 </div> 
                 <div className='d-flex  align_center col-lg- col-sm-2 '>
               
-                        {/* <div style={{display:""}}>
+                        <div style={{display:""}}>
                           
                             <select
                             id="status-filter"
@@ -335,12 +335,9 @@ const ViewOrder = () => {
                             )}
                           </select>
                         
-                          
-                     
-                     
-                     
+                      
                         </div>
-                         */}
+                         
                        
                
 

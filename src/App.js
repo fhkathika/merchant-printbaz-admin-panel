@@ -27,11 +27,11 @@ function App() {
        <Routes>
        <Route path="/" element={<PrivateRoute><Dashboard /></PrivateRoute>} />
        <Route path="/allMerchants" element={<PrivateRoute><AllMerchants /> </PrivateRoute>} />
-     <FilterProvider>
+    
      <Route path="/orderList"    element={<PrivateRoute><OrderList /> </PrivateRoute>} />
        <Route path="/viewOrder/:id"element={<PrivateRoute><ViewOrder /> </PrivateRoute>} />
       
-     </FilterProvider>
+    
       
        <Route path="/filemanager"  element={<PrivateRoute><Filemanager /> </PrivateRoute>} />
        <Route path="/liveChat"     element={<PrivateRoute><LiveChat /> </PrivateRoute>} />
