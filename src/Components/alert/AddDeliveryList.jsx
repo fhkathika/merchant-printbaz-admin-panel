@@ -39,7 +39,8 @@ const handleSubmitDeliveryList = (e) => {
   // Set a loading state if you have one.
   // setLoading(true);
 
-  fetch('http://localhost:5000/submitDeliveryList', {
+  // fetch('http://localhost:5000/submitDeliveryList', {
+  fetch('https://mserver.printbaz.com/submitDeliveryList', {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json'
