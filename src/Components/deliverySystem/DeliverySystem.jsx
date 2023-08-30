@@ -14,6 +14,7 @@ const DeliverySystem = () => {
 
   const {rcvAll}=useGetRcvList()
   const [showAlert, setShowAlert] = useState(false);
+  const [deliveryExist, setDeliveryExist] = useState(false);
   const [showAlertRecvAmount, setShowAlertRecvAmount] = useState(false);
   const totalCollectAmount = deliveryAll?.reduce((acc, curr) => acc +parseFloat (curr.collectAmount || 0), 0);
   const totalDeliveryAmount = deliveryAll?.reduce((acc, curr) => acc + parseFloat(curr.deliveryFee || 0), 0);
@@ -62,12 +63,21 @@ console.log("totalRcvAmount",totalRcvAmount);
     const navigate=useNavigate()
     console.log("deliveryAll",deliveryAll);
     let searchByOrderId
+    let inputOrderIdfind
     const handleInputOrderId = (e, idx) => {
       const newRows = [...rows];
+
       newRows[idx].orderId = e.target.value;
+    
       console.log(" newRows[idx].orderId", newRows[idx].orderId);
        ordersDetail = orderAll?.find(order => order?._id?.includes(newRows[idx].orderId));
-      console.log("orders from d system pop up",ordersDetail);
+       inputOrderIdfind = deliveryAll?.find(order => order?.orderId?.includes(newRows[idx].orderId));
+       if(inputOrderIdfind){
+         setDeliveryExist("deliveryId exists");
+       }
+       else{
+        setDeliveryExist("deliveryId does not exists");
+       }
       newRows[idx].searchByOrderId = ordersDetail || {};
       setRows(newRows);
     }  
@@ -78,7 +88,7 @@ console.log("totalRcvAmount",totalRcvAmount);
  
     }
     
- 
+  console.log("orders from d system pop up",inputOrderIdfind);
    
   const returnValue=Number(searchByOrderId?.printbazcost)+Number(searchByOrderId?.deliveryFee)
   const handleInputColAmount = (e, idx) => {
@@ -346,7 +356,7 @@ deliveriesDeliverySystem = syncArrays(ordersForDeliverySystem, deliveriesDeliver
           rows={rows}
           // returnValue={returnValue}
           setRows={setRows}
-          ordersDetail={ordersDetail}
+          deliveryExist={deliveryExist}
           collectAmount={collectAmount}
           setCollectAmount={setCollectAmount}
           handleInputColAmount={handleInputColAmount}

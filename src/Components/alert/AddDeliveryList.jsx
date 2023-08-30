@@ -6,7 +6,7 @@ import 'react-datepicker/dist/react-datepicker.css';
 import AlertMessage from "./AlertMessage";
 import DeliveryListAddedAlert from "./DeliveryListAddedAlert";
 import useGetDeliveryList from "../../hooks/useGetDeliveryList";
-const AddDeliveryList = ({ showAlert,onClose,startDate,returnValue,handleReturnValue,handleInputColAmount,collectAmount,setCollectAmount,setRows,rows,handleChangeStartDate,handleInputOrderId,ordersDetail,searchByOrderId,handleEmailChange}) => {
+const AddDeliveryList = ({ deliveryExist,showAlert,onClose,startDate,returnValue,handleReturnValue,handleInputColAmount,collectAmount,setCollectAmount,setRows,rows,handleChangeStartDate,handleInputOrderId,ordersDetail,searchByOrderId,handleEmailChange}) => {
   const {deliveryAll}=useGetDeliveryList()
   const [exitIdAlert, setExitIdAlert] = useState(false);
   const [show, setShow] = useState(false);
@@ -27,12 +27,12 @@ const addField = () => {
 const removeField = (indexToRemove) => {
   setRows(prevRows => prevRows.filter((_, index) => index !== indexToRemove));
 };
-
+console.log("ordersDetail",ordersDetail);
 
 const handleSubmitDeliveryList = (e) => {
   e.preventDefault();
-  const existTrackingId= deliveryAll.find(order => order.orderId === ordersDetail);
-  if(existTrackingId){
+  
+  if(deliveryExist==="deliveryId exists"){
     setExitIdAlert(true)
     return
   }
