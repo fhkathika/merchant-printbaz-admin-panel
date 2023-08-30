@@ -38,8 +38,8 @@ console.log("filterTrackingId",filterTrackingId);
   
   useEffect(()=>{
     const getOrders = async () => {
-    //  await fetch('https://mserver.printbaz.com/alluser') //for main site
-     await fetch('http://localhost:5000/alluser') //for testing site
+     await fetch('https://mserver.printbaz.com/alluser') //for main site
+    //  await fetch('http://localhost:5000/alluser') //for testing site
     .then(res=>res.json())
     .then(data => setAllMerchant(data))
     }
@@ -94,10 +94,9 @@ let date = new Date(orderAll?.createdAt); // create a new Date object
 
 let options = { month: 'long', day: 'numeric', year: 'numeric', hour: 'numeric', minute: 'numeric' }; // options for toLocaleDateString
 
-
-
 const applyFilters = () => {
   return orderAll.filter((order) => {
+    console.log("order from applyFilters",order?.trackingId);
     // Filter by status
     if (filterStatus !== 'all' && order.orderStatus !== filterStatus) {
       return false;
@@ -116,10 +115,19 @@ const applyFilters = () => {
     if (filterOrderId && !order._id.includes(filterOrderId)) {
       return false;
     } 
-    if (filterTrackingId && order.trackingId && !order.trackingId.includes(filterTrackingId)) {
-      return false;
+    // if (filterTrackingId && order.trackingId && !order.trackingId.includes(filterTrackingId)) {
+    //   console.log("Filtering based on tracking ID", { filterTrackingId, orderTrackingId: order.trackingId });
+    //   return false;
+    // }
+    if (filterTrackingId) {
+      if (order && 'trackingId' in order) {
+        if (order.trackingId?.indexOf(filterTrackingId) === -1) {
+          return false;
+        }
+      } else {
+        console.warn("order or order.trackingId is undefined");
+      }
     }
-    
     
     if ((order && order.statusDate) || (order && order.createdAt)) {
       const formattedStatusDate = order.statusDate?.replace(" at", "");
@@ -263,9 +271,9 @@ const actualIndexOfLastItem = indexOfLastItem > orderAll.length ? orderAll.lengt
                   <option value="paid">Paid</option>
                 </select>
               </div> 
-                <div className="col-lg-1 col-sm-12">
+                <div className="col-lg-2 col-sm-12">
                 <label htmlFor="tracking-filter" style={{marginBottom:"8px"}}>Tracking Id:</label>
-                <input type="text" id="tracking-filter" className="form-control"  onChange={handleInputChange} />
+                <input type="text" id="tracking-filter" className="form-control" value={filterTrackingId}  onChange={handleInputChange} />
               </div>  
                <div className="col-lg-1 col-sm-12">
                 <label htmlFor="deliveryAssign-filter" style={{marginBottom:"8px"}}>Delivery Assign:</label>

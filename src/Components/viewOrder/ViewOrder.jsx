@@ -190,8 +190,8 @@ setTrackingId(e.target.value)
     try {
       const response = await fetch(
         
-        `https://mserver.printbaz.com/addTrackingID/${id}`,
-      // `http://localhost:5000/addTrackingID/${id}`,
+        // `https://mserver.printbaz.com/addTrackingID/${id}`,
+      `http://localhost:5000/addTrackingID/${id}`,
         {
           method: "PUT",
           headers: {

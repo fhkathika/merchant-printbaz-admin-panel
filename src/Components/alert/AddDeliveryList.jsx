@@ -5,8 +5,10 @@ import DatePicker from 'react-datepicker';
 import 'react-datepicker/dist/react-datepicker.css';
 import AlertMessage from "./AlertMessage";
 import DeliveryListAddedAlert from "./DeliveryListAddedAlert";
-const AddDeliveryList = ({ showAlert,onClose,startDate,returnValue,handleReturnValue,handleInputColAmount,collectAmount,setCollectAmount,setRows,rows,handleChangeStartDate,handleInputOrderId,searchByOrderId,handleEmailChange}) => {
-
+import useGetDeliveryList from "../../hooks/useGetDeliveryList";
+const AddDeliveryList = ({ showAlert,onClose,startDate,returnValue,handleReturnValue,handleInputColAmount,collectAmount,setCollectAmount,setRows,rows,handleChangeStartDate,handleInputOrderId,ordersDetail,searchByOrderId,handleEmailChange}) => {
+  const {deliveryAll}=useGetDeliveryList()
+  const [exitIdAlert, setExitIdAlert] = useState(false);
   const [show, setShow] = useState(false);
   const [delSuccessAlert, setDelSuccessAlert] = useState(false);
 
@@ -29,7 +31,11 @@ const removeField = (indexToRemove) => {
 
 const handleSubmitDeliveryList = (e) => {
   e.preventDefault();
-  
+  const existTrackingId= deliveryAll.find(order => order.orderId === ordersDetail);
+  if(existTrackingId){
+    setExitIdAlert(true)
+    return
+  }
   // Optional: Data Validation before sending
   // if (!isValid(rows)) {
   //   alert('Invalid data');
@@ -243,6 +249,10 @@ const handleSubmitDeliveryList = (e) => {
                           <button style={{marginTop: '30px'}} type="submit">Submit</button>
                         </div>
                       </div>
+                      {
+                        exitIdAlert &&
+                        <span style={{color:'red'}}>Tracking id already exist</span>
+                      }
                     </div>
                     </form>
                   

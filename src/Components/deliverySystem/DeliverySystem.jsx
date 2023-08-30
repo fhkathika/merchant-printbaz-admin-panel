@@ -52,21 +52,23 @@ const totalReceivable= deliveryAll?.reduce((acc, list) => {
 
   return acc + amount;
 }, 0);
+let ordersDetail
 console.log("totalRcvAmount",totalRcvAmount);
   const [startDate,setStartDate]=useState(null);
   // const [findOrderById, setFindOrderById] = useState();
     // const [searchByOrderId, setSearchByOrderId] = useState();
     const[ collectAmount,setCollectAmount]=useState()
-const navigate=useNavigate()
+
+    const navigate=useNavigate()
     console.log("deliveryAll",deliveryAll);
     let searchByOrderId
     const handleInputOrderId = (e, idx) => {
       const newRows = [...rows];
       newRows[idx].orderId = e.target.value;
       console.log(" newRows[idx].orderId", newRows[idx].orderId);
-      const order = orderAll?.find(order => order?._id?.includes(newRows[idx].orderId));
-      console.log("orders from d system pop up",order);
-      newRows[idx].searchByOrderId = order || {};
+       ordersDetail = orderAll?.find(order => order?._id?.includes(newRows[idx].orderId));
+      console.log("orders from d system pop up",ordersDetail);
+      newRows[idx].searchByOrderId = ordersDetail || {};
       setRows(newRows);
     }  
       const handleEmailChange = (e, idx) => {
@@ -344,6 +346,7 @@ deliveriesDeliverySystem = syncArrays(ordersForDeliverySystem, deliveriesDeliver
           rows={rows}
           // returnValue={returnValue}
           setRows={setRows}
+          ordersDetail={ordersDetail}
           collectAmount={collectAmount}
           setCollectAmount={setCollectAmount}
           handleInputColAmount={handleInputColAmount}

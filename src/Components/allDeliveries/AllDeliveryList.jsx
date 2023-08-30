@@ -12,7 +12,11 @@ const AllDeliveryList = () => {
     const totalReturnAmount = deliveryAll?.reduce((acc, curr) => acc + parseFloat(curr.returnValue || 0), 0);
    
     const [filterOrdersId,setFilterOrdersId]=useState();
-    
+    const [filterPaymentStatus, setFilterPaymentStatus] = useState('');
+    const [filterStatus, setFilterStatus] = useState('all');
+    const [filterDeliveryAssignStatus, setFilterDeliveryAssignStatus] = useState('');
+    const [filterTrackingId, setFilterTrackingId] = useState('');
+    const [orderIdFilter, setOrderIdFilter] = useState('');
     const [startDate,setStartDate]=useState(null);
     const [endDate,setEndDate]=useState(null);
       //  calculate the total sum of printbazRcv
@@ -74,6 +78,32 @@ const totalPrintbazRcv = deliveryAll?.reduce((acc, list) => {
     // console.log(value);
     setFilterOrdersId(value);
   }
+
+  const handleInputChange = (event) => {
+    const { id, value } = event.target;
+    switch (id) {
+      case 'deliveryStatus-filter':
+        setFilterStatus(value);
+        break; 
+         case 'payment-filter':
+        setFilterPaymentStatus(value);
+        break;
+   
+    case 'deliveryAiign-filter':
+      setFilterDeliveryAssignStatus(value);
+    break; 
+    case 'trackingId-filter':
+    setFilterTrackingId(value);
+    break;
+     case 'orderId-filter':
+      setOrderIdFilter(value);
+    break;
+      // ...other cases
+      default:
+        break;
+    }
+    
+  };
     return (
         <div>
         <meta charSet="UTF-8" />
@@ -86,24 +116,42 @@ const totalPrintbazRcv = deliveryAll?.reduce((acc, list) => {
        <Navigationbar/>
         <section className="sales_report">
         <div className="row">
-            <div className="col-lg-7 col-sm-12">
+            <div className="col-lg-2 col-sm-12">
               <div className="seals_report_title mt-3">
                 <Button onClick={backToDelivReport} variant='warning'>Back to Delivery Report</Button>
               </div>
             </div>
 
          
-           <div  className="row col-lg-5 col-sm-12" >
-           <div className="col-lg-4 col-sm-12">
-              <label htmlFor="brand-filter" className="form-label">Delivery Id:</label>
-              <input type="text" id="id-filter" className="form-control" onChange={(e) =>  handleDeliveryIdChange(e)} />
+           <div  className="row col-lg-10 col-sm-12" >
+           <div className="col-lg-2 col-sm-12">
+              <label htmlFor="trackingId-filter" className="form-label">Tracking Id:</label>
+              <input type="text" id="trackingId-filter" className="form-control" onChange={(e) =>  handleDeliveryIdChange(e)} />
+            </div> 
+            <div className="col-lg-2 col-sm-12">
+              <label htmlFor="orderId-filter" className="form-label">Order Id:</label>
+              <input type="text" id="orderId-filter" className="form-control" onChange={(e) =>  handleDeliveryIdChange(e)} />
+            </div><div className="col-lg-2 col-sm-12">
+              <label htmlFor="deliveryStatus-filter" className="form-label">Delivery Status:</label>
+              <input type="text" id="deliveryStatus-filter" className="form-control" onChange={(e) =>  handleDeliveryIdChange(e)} />
+            </div><div className="col-lg-2 col-sm-12">
+              <label htmlFor="payment-filter" className="form-label">Payment status:</label>
+              <select id="payment-filter" value="" className="form-control" onChange={(e) =>  handleInputChange(e)}>
+                <option value=""> None</option>
+                <option value="pathao"> Pathao</option>
+                          <option value="delivery tiger">Delivery Tiger</option>
+                          <option value="others">Others</option>
+                </select>
+            </div><div className="col-lg-2 col-sm-12">
+              <label htmlFor="deliveryAiign-filter" className="form-label">Delivery Assign To:</label>
+              <input type="text" id="deliveryAiign-filter" className="form-control" onChange={(e) =>  handleDeliveryIdChange(e)} />
             </div>
             
-            <div className="col-lg-4 col-sm-12">
+            <div className="col-lg-1 col-sm-12">
               <label htmlFor="date-filter" className="form-label">Start Date:</label>
               <DatePicker className='form-control' selected={startDate} onChange={handleChangeStartDate} selectsStart startDate={startDate} endDate={endDate} />
             </div>
-            <div className="col-lg-4 col-sm-12">
+            <div className="col-lg-1 col-sm-12">
                
                  
                <label style={{textAlign:"start"}} htmlFor="endDate" className="form-label">End Date</label>
