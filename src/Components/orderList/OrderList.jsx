@@ -26,7 +26,9 @@ const OrderList = () => {
   const [endDate, setEndDate] = useState(null);
   const [filterName, setFilterName] = useState('');
   const [filterBrand, setFilterBrand] = useState('');
-console.log("filterName",filterName);
+  const [filterDeliveryAssignStatus, setFilterDeliveryAssignStatus] = useState('');
+  const [filterTrackingId, setFilterTrackingId] = useState('');
+console.log("filterTrackingId",filterTrackingId);
  
   const [previousPath, setPreviousPath] = useState('');
   useEffect(() => {
@@ -36,8 +38,8 @@ console.log("filterName",filterName);
   
   useEffect(()=>{
     const getOrders = async () => {
-     await fetch('https://mserver.printbaz.com/alluser') //for main site
-    //  await fetch('http://localhost:5000/alluser') //for testing site
+    //  await fetch('https://mserver.printbaz.com/alluser') //for main site
+     await fetch('http://localhost:5000/alluser') //for testing site
     .then(res=>res.json())
     .then(data => setAllMerchant(data))
     }
@@ -61,6 +63,12 @@ const handleInputChange = (event) => {
   break; 
    case 'brand-filter':
   setFilterBrand(value);
+  break; 
+  case 'deliveryAssign-filter':
+    setFilterDeliveryAssignStatus(value);
+  break; 
+  case 'tracking-filter':
+  setFilterTrackingId(value);
   break;
     // ...other cases
     default:
@@ -94,6 +102,10 @@ const applyFilters = () => {
     if (filterStatus !== 'all' && order.orderStatus !== filterStatus) {
       return false;
     }
+ // Filter by delivery assign
+    if (filterDeliveryAssignStatus !== '' && order.deliveryAssignTo !== filterDeliveryAssignStatus) {
+      return false;
+    }
 
     // Filter by payment status
     if (filterPaymentStatus && order.paymentStatus !== filterPaymentStatus) {
@@ -103,8 +115,11 @@ const applyFilters = () => {
     // Filter by order ID
     if (filterOrderId && !order._id.includes(filterOrderId)) {
       return false;
+    } 
+    if (filterTrackingId && order.trackingId && !order.trackingId.includes(filterTrackingId)) {
+      return false;
     }
-  
+    
     
     if ((order && order.statusDate) || (order && order.createdAt)) {
       const formattedStatusDate = order.statusDate?.replace(" at", "");
@@ -211,8 +226,6 @@ const getViewClientColor = (status) => {
   // return "defaultColor";
 };
 
-
-
 const actualIndexOfLastItem = indexOfLastItem > orderAll.length ? orderAll.length : indexOfLastItem;
    return (
         <div>
@@ -238,16 +251,29 @@ const actualIndexOfLastItem = indexOfLastItem > orderAll.length ? orderAll.lengt
                 <label htmlFor="id-filter" style={{marginBottom:"8px"}}>Order Id:</label>
                 <input type="text" id="id-filter" className="form-control" value={filterOrderId}  onChange={handleInputChange} />
               </div>
-              <div className="col-lg-2 col-sm-12">
+              <div className="col-lg-1 col-sm-12">
                 <label htmlFor="brand-filter" style={{marginBottom:"8px"}}>Brand Name</label>
                 <input type="text" id="brand-filter" value={filterBrand} onChange={(e) =>  handleInputChange(e)}  className="form-control" />
               </div>
-              <div className="col-lg-2 col-sm-12">
+              <div className="col-lg-1 col-sm-12">
                 <label htmlFor="paymentStatus-filter" style={{marginBottom:"8px"}}>Payment:</label>
                 <select id="paymentStatus-filter" value={filterPaymentStatus} className="form-control" onChange={(e) =>  handleInputChange(e)}>
                   <option value=''>none</option>
                   <option value="Unpaid">Unpaid</option>
                   <option value="paid">Paid</option>
+                </select>
+              </div> 
+                <div className="col-lg-1 col-sm-12">
+                <label htmlFor="tracking-filter" style={{marginBottom:"8px"}}>Tracking Id:</label>
+                <input type="text" id="tracking-filter" className="form-control"  onChange={handleInputChange} />
+              </div>  
+               <div className="col-lg-1 col-sm-12">
+                <label htmlFor="deliveryAssign-filter" style={{marginBottom:"8px"}}>Delivery Assign:</label>
+                <select id="deliveryAssign-filter" value={filterDeliveryAssignStatus} className="form-control" onChange={(e) =>  handleInputChange(e)}>
+                <option value=""> None</option>
+                <option value="pathao"> Pathao</option>
+                          <option value="delivery tiger">Delivery Tiger</option>
+                          <option value="others">Others</option>
                 </select>
               </div>
              
@@ -301,15 +327,21 @@ const actualIndexOfLastItem = indexOfLastItem > orderAll.length ? orderAll.lengt
                 <div className="col-lg-2 col-sm-12">
                   <h4>Order Id</h4>
                 </div>
-                <div className="col-lg-3 col-sm-12">
+                 <div className="col-lg-2 col-sm-12">
+                  <h4>Tracking Id</h4>
+                </div>
+                <div className="col-lg-2 col-sm-12">
                   <h4>Recipient Info</h4>
                 </div>
-                <div className="col-lg-2 col-sm-12">
+                <div className="col-lg-1 col-sm-12">
                   <h4>Payment</h4>
                 </div>
-                <div className="col-lg-2 col-sm-12">
+                <div className="col-lg-1 col-sm-12">
                   <h4>Collect Amount</h4>
                 </div>
+                <div className="col-lg-1 col-sm-12">
+                  <h4>Delivery Assign </h4>
+                </div> 
                 <div className="col-lg-1 col-sm-12">
                   <h4>Status</h4>
                 </div>
@@ -336,16 +368,22 @@ const actualIndexOfLastItem = indexOfLastItem > orderAll.length ? orderAll.lengt
                     <div className="col-lg-2 col-sm-12">
                       <p>{orders?._id}</p>
                     </div>
-                    <div className="col-lg-3 col-sm-12">
+                    <div className="col-lg-2 col-sm-12">
+                      <p>{orders?.trackingId}</p>
+                    </div>
+                    <div className="col-lg-2 col-sm-12">
                       <p>{orders?.name}</p>
                       <p>{orders?.address}</p>
                       <p>{orders?.phone}</p>
                     </div>
-                    <div className="col-lg-2 col-sm-12">
+                    <div className="col-lg-1 col-sm-12">
                       <p className="p-status-btn">{orders?.paymentStatus}</p>
                     </div>
-                    <div className="col-lg-2 col-sm-12">
+                    <div className="col-lg-1 col-sm-12">
                       <p> {totalPrintBazCostWithoutDeliveryFee} TK</p>
+                    </div>  
+                    <div className="col-lg-1 col-sm-12">
+                    <p> {orders?.deliveryAssignTo}</p>
                     </div>
                     <div className="col-lg-1 col-sm-12">
                       <p className="status-btn" style={{backgroundColor:getViewClientColor(orders?.orderStatus)}}>{orders?.orderStatus}</p>
@@ -361,6 +399,7 @@ const actualIndexOfLastItem = indexOfLastItem > orderAll.length ? orderAll.lengt
                 </Link>
                 :    
                 <div key={orders?._id} className="row client-list">
+                  
                 <div className="col-lg-2 col-sm-12">
                  {/* Display the corresponding allMerchant name */}
                  <p>{orders?.clientName}</p>
@@ -370,7 +409,11 @@ const actualIndexOfLastItem = indexOfLastItem > orderAll.length ? orderAll.lengt
                 <div className="col-lg-2 col-sm-12">
                   <p>{orders?._id}</p>
                 </div>
-                <div className="col-lg-3 col-sm-12">
+                <div className="col-lg-2 col-sm-12">
+                <p>{orders?.trackingId}</p>
+                </div>
+                
+                <div className="col-lg-1 col-sm-12">
                   <p>{orders?.name}</p>
                   <p>{orders?.address}</p>
                   <p>{orders?.phone}</p>
@@ -380,6 +423,9 @@ const actualIndexOfLastItem = indexOfLastItem > orderAll.length ? orderAll.lengt
                 </div>
                 <div className="col-lg-2 col-sm-12">
                   <p> {totalPrintBazCostWithoutDeliveryFee} TK</p>
+                </div>
+                <div className="col-lg-2 col-sm-12">
+                  <p> {orders?.deliveryAssignTo} TK</p>
                 </div>
                 <div className="col-lg-1 col-sm-12">
                   <p className="status-btn" style={{backgroundColor:getViewClientColor(orders?.orderStatus)}}>{orders?.orderStatus}</p>

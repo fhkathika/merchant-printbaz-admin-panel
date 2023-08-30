@@ -15,13 +15,21 @@ import html2canvas from "html2canvas";
 import { useHistory } from 'react-router-dom';
 import ReactDOMServer from 'react-dom/server';
 import { useRoleAsignData } from '../../hooks/useRoleAsignData';
+import useGetMongoData from '../../hooks/useGetMongoData';
 const ViewOrder = () => {
   let { id } = useParams();
+  const {orderAll}=useGetMongoData()
   const location = useLocation();
   const [previousPath, setPreviousPath] = useState('');
+  const [showAlert, setShowAlert] = useState(false);
+  const [exitIdAlert, setExitIdAlert] = useState(false);
+  const [edit, setEdit] = useState(false);
   const navigate = useNavigate();
+  
 
   const [getSpecificOrderById, setGetSpecificOrderById] = useState();
+  const [trackingId, setTrackingId] = useState();
+  const [fetchTrackingId, setFetchtrackingId] = useState();
   const viewOrder = location.state ? location?.state?.orders : null;
   const previousPathLocation = location.state ? location?.state?.previousPath : null;
   const viewClient = location.state?.matchingMerchant;
@@ -42,6 +50,7 @@ const ViewOrder = () => {
       setOrderStatus(data.orderStatus);
       setPaymentStatus(data.paymentStatus);
       setDeliverAssign(data?.deliveryAssignTo);
+      setFetchtrackingId(data?.trackingId);
     })
       
     
@@ -63,7 +72,11 @@ const ViewOrder = () => {
   let options = {month: 'long', day: 'numeric', year: 'numeric', hour: 'numeric', minute: 'numeric'  }; // options for toLocaleDateString
   
   let formattedDate = date.toLocaleDateString('en-US', options); // use toLocaleDateString to format the date
-  
+  const handleInputTrackingID=(e)=>{
+    
+setTrackingId(e.target.value)
+  }
+ 
   const handleInputChange = async (e) => {
     const status = e.target.value; // the new status
   // console.log("status",status);
@@ -167,6 +180,42 @@ const ViewOrder = () => {
       // Handle error here
     }
   };
+  const handleTrackingIdSubmit=async(e)=>{
+    e.preventDefault()
+   const existTrackingId= orderAll.find(order => order.trackingId === trackingId);
+   if(existTrackingId){
+     setExitIdAlert(true)
+     return
+   }
+    try {
+      const response = await fetch(
+        
+        `https://mserver.printbaz.com/addTrackingID/${id}`,
+      // `http://localhost:5000/addTrackingID/${id}`,
+        {
+          method: "PUT",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({ trackingId: trackingId }),
+        }
+      );
+  
+      if (response.ok) {
+        // Update the approval status in the viewClient object
+        setTrackingId(trackingId);
+        setShowAlert(true)
+        // console.log("Success:", getSpecificOrderById);
+        // Update your state or perform any other necessary operations with the updated viewClient object
+      } else {
+        console.error("status Error:", response);
+        // Handle error here
+      }
+    } catch (error) {
+      console.error("Error:", error.message);
+      // Handle error here
+    }
+  }
   const handleUpdatePopUp=(e)=>{
     e.preventDefault()
 
@@ -276,95 +325,93 @@ const ViewOrder = () => {
           <div className="all-content">
             <div className="row">
               {/* <div className="col-lg-12 col-sm-12 flex"> */}
-                <div className="view-client-title my-3 col-lg-10 col-sm-10">
+                <div className="view-client-title my-3 col-lg-8 col-sm-10">
                   {/* <Link to="/orderList"><span style={{fontSize: '30px'}}>
                       &lt; </span> View Order Details</Link> */}
                       <span onClick={handleBack} style={{ fontSize: '30px', cursor: 'pointer' }}>
       &lt; Back
     </span>
                 </div> 
-                <div className='d-flex  align_center col-lg- col-sm-2 '>
-              
-                        <div style={{display:""}}>
-                          
-                            <select
-                            id="status-filter"
-                            className="status-btn"
-                            style={{
-                              border: "none",
-                              padding: "8px",
-                            
-                              marginRight:'20px',
-                              marginBottom:"5px",
-                              backgroundColor: getViewClientColor(
-                                deliverAssign
-                              ),
-                            }}
-                            onChange={(e) => handleDeliverAssignChange(e)}
-                          >
-                           {
-                             deliverAssign?
-                             <option value>{deliverAssign}</option>
-                             :
-                             <option value>No service</option>
-                           }
-                             
-                            <option value="pathao"> Pathao</option>
-                            <option value="delivery tiger">Delivery Tiger</option>
-                            <option value="others">Others</option>
-                        
-                        
-  
-                         
-  
-  
-  {deliverAssign === "pathao" && (
-                              <>
-                              
-                                <option value="delivery tiger">Delivery Tiger</option>
-                                <option value="others">Others</option>
-                              </>
-                            )}
-  
-  {paymentStatus === "delivery tiger" && (
-                              <>
-                              <option value="pathao">Pathao</option>
-                           
-                              <option value="others">Others</option>
-                                
-                              </>
-                            )} 
-                            {paymentStatus === "others" && (
-                              <>
-                              <option value="pathao">Pathao</option>
-                           
-                              <option value="delivery tiger">Delivery Tiger</option>
-                                
-                              </>
-                            )}
-                          </select>
-                        
-                      
-                        </div>
-                         
-                       
+                <div className='flex col-lg-4 col-sm-2 '>
                
+        
+         <div style={{display:""}}>
+                          
+                          <select
+                          id="status-filter"
+                          className="status-btn"
+                          style={{
+                            border: "none",
+                            padding: "10px",
+                          
+                          marginRight:"20px",
+                           
+                            backgroundColor: getViewClientColor(
+                              deliverAssign
+                            ),
+                          }}
+                          onChange={(e) => handleDeliverAssignChange(e)}
+                        >
+                         {
+                           deliverAssign?
+                           <option value>{deliverAssign}</option>
+                           :
+                           <option value>No service</option>
+                         }
+                           
+                          <option value="pathao"> Pathao</option>
+                          <option value="delivery tiger">Delivery Tiger</option>
+                          <option value="others">Others</option>
+                      
+                      
 
-                <div className="view-client-title " style={{marginRight:"10px"}}>
-            <Button variant="warning" onClick={downloadShippingDetail}><span><img style={{width:"23px",hight:"20px"}} src="/images/download.png" alt='download'/></span>Shipping Detail</Button>
-            <div id="shipping-detail" style={{position: 'absolute', left: '-10000px', top: '-10000px'}}>
-                <ShippingDetail getSpecificOrderById={getSpecificOrderById} />
-            </div>
-          
-        </div>
+                       
 
- 
-                {
-                  value_count?.edit_Order &&
-                  <div className="view-client-title my-3  " >
-                  <Button variant="success" onClick={handleUpdatePopUp}>Edit Order</Button>
-                  </div>
-                }
+
+{deliverAssign === "pathao" && (
+                            <>
+                            
+                              <option value="delivery tiger">Delivery Tiger</option>
+                              <option value="others">Others</option>
+                            </>
+                          )}
+
+{paymentStatus === "delivery tiger" && (
+                            <>
+                            <option value="pathao">Pathao</option>
+                         
+                            <option value="others">Others</option>
+                              
+                            </>
+                          )} 
+                          {paymentStatus === "others" && (
+                            <>
+                            <option value="pathao">Pathao</option>
+                         
+                            <option value="delivery tiger">Delivery Tiger</option>
+                              
+                            </>
+                          )}
+                        </select>
+                      
+                    
+                      </div>
+             
+              <div className="view-client-title " style={{marginRight:"10px"}}>
+          <Button variant="warning" onClick={downloadShippingDetail}><span><img style={{width:"23px",hight:"20px"}} src="/images/download.png" alt='download'/></span>Shipping Detail</Button>
+          <div id="shipping-detail" style={{position: 'absolute', left: '-10000px', top: '-10000px'}}>
+              <ShippingDetail getSpecificOrderById={getSpecificOrderById} />
+          </div>
+        
+      </div>
+{
+                value_count?.edit_Order &&
+                <div className="view-client-title my-3  " >
+                <Button variant="success" onClick={handleUpdatePopUp}>Edit Order</Button>
+                </div>
+              }
+        
+                  
               
                 </div>
                  
@@ -375,9 +422,46 @@ const ViewOrder = () => {
               <div className="col-12">
                 <div className="order-id bg-white p-4  shadow-sm" >
                 <div style={{display:""}} className="row">
-                <h3 className=" font-weight-bold col-lg-6 font_16" onClick={copyOrderId}>ORDER ID: {id} &nbsp;<span style={{cursor:"pointer",padding:"5px",fontSize:"16px"}} ref={target}  onClick={copyOrderId}><i class="fa fa-copy ml-2 mt-1 text-green cursor-pointer text-sm"></i></span> 
+                  <div className='col-lg-6'>
+                  <h3 className=" font-weight-bold col-lg-12 font_16" onClick={copyOrderId}>ORDER ID: {id} &nbsp;<span style={{cursor:"pointer",padding:"5px",fontSize:"16px"}} ref={target}  onClick={copyOrderId}><i class="fa fa-copy ml-2 mt-1 text-green cursor-pointer text-sm"></i></span> 
                 <h5 className='font_16' style={{marginTop:"10px"}}>{formattedDate}</h5>
                 </h3>
+                  {
+                    fetchTrackingId ?
+                    <div className='d-flex'>
+                    <label htmlFor="Tracking-number-filter" style={{marginBottom:"8px"}}>Tracking Id: </label>
+                   <h5 style={{color:"Blue",marginLeft:"10px"}}>{fetchTrackingId} <i onClick={()=>setEdit(!edit)} style={{fontSize:"15px",color:"black",cursor:"pointer"}} class="fa fa-edit"></i> </h5>
+                   {
+                     edit===true &&
+                     <div className="col-lg-2 col-sm-12 mb-4" >
+                     <label htmlFor="Tracking-number-filter" style={{}}>Tracking Id: </label>
+                      <form onSubmit={handleTrackingIdSubmit} className="flex">
+                     
+                      <input type="text" id="Tracking-number-filter" style={{width:"auto"}} value={trackingId} onChange={(e) =>  handleInputTrackingID(e)}  className="form-control" />
+                      <Button type="submit">submit</Button>
+                      </form>
+                    {
+                      exitIdAlert && <span style={{color:'red'}}>Tracking id already exist</span>
+                    }
+                      </div>
+                   }
+                    </div>
+                    :
+                    <div className="col-lg-2 col-sm-12 mb-4" >
+                    <label htmlFor="Tracking-number-filter" style={{}}>Tracking Id: </label>
+                     <form onSubmit={handleTrackingIdSubmit} className="flex">
+                    
+                     <input type="text" id="Tracking-number-filter" style={{width:"auto"}} value={trackingId} onChange={(e) =>  handleInputTrackingID(e)}  className="form-control" />
+                     <Button type="submit">submit</Button>
+                     </form>
+                     {
+                      exitIdAlert && <span style={{color:'red'}}>Tracking id already exist</span>
+                    }
+                     </div>
+                  }
+                  </div>
+              
+            
                   {/* <button className="status-btn d-inline-block py-2 px-3 font-weight-bold">{viewOrder?.orderStatus}</button> */}
                   <Overlay target={target.current} show={show} placement="right">
         {(props) => (
