@@ -59,7 +59,7 @@ const ViewOrder = () => {
           // Update the previousPath state when the location changes
  
         },[getSpecificOrderById])
-      
+      console.log("getSpecificOrderById",getSpecificOrderById);
   const [orderStatus, setOrderStatus] = useState();
   const [paymentStatus, setPaymentStatus] = useState();
   const [deliverAssign, setDeliverAssign] = useState();
@@ -67,6 +67,7 @@ const ViewOrder = () => {
   const [show, setShow] = useState(false);
   const target = useRef(null);
   console.log("deliverAssign",deliverAssign);
+  const returnValue=Number(getSpecificOrderById?.printbazcost)+Number(getSpecificOrderById?.deliveryFee)
   let date = new Date(getSpecificOrderById?.createdAt); // create a new Date object
 
   let options = {month: 'long', day: 'numeric', year: 'numeric', hour: 'numeric', minute: 'numeric'  }; // options for toLocaleDateString
@@ -77,41 +78,71 @@ const ViewOrder = () => {
 setTrackingId(e.target.value)
   }
  
+ 
   const handleInputChange = async (e) => {
-    const status = e.target.value; // the new status
-  // console.log("status",status);
-
-    //   await fetch(`http://localhost:5000/update-approval/${viewClient?._id}`, { //for testing site
+    const status = e.target.value;
     try {
-      const response = await fetch(
-        
-        `https://mserver.printbaz.com/updateOrderStatus/${id}`,
-      // `http://localhost:5000/updateOrderStatus/${id}`,
-        {
-          method: "PUT",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({ orderStatus: status }),
+        const response = await fetch(
+           `https://mserver.printbaz.com/updateOrderStatus/${id}`,{ 
+      // `http://localhost:5000/updateOrderStatus/${id}`, {
+            method: "PUT",
+            headers: {
+                "Content-Type": "application/json",
+            },
+            body: JSON.stringify({ orderStatus: status }),
+        });
+
+        if (response.ok) {
+            setOrderStatus(status);
+            SendOrderStatusMail({
+              status: status,
+              _id: getSpecificOrderById?._id,
+              userMail: getSpecificOrderById?.userMail 
+            });
+
+            // Check if the new status requires an update/addition to the DeliveryList
+            if (['out for delivery', 'delivered', 'returned'].includes(status.toLowerCase())) {
+                // Construct the deliveryList data based on the changed order
+                const deliveryData = {
+                    // add your delivery list data here,
+                    orderId:getSpecificOrderById?._id,
+                    statusDate:getSpecificOrderById?.statusDate,
+                    collectAmount:getSpecificOrderById?.collectAmount,
+                    trackingId:getSpecificOrderById?.trackingId,
+                    recvMoney:getSpecificOrderById?.recvMoney,
+                    printbazcost:getSpecificOrderById?.printbazcost,
+                    orderStatus:status,
+                    paymentStatus:getSpecificOrderById?.paymentStatus,
+                    deliveryAssignTo:getSpecificOrderById?.deliveryAssignTo,
+                    printBazRcvable:'',
+                    returnValue:status==="returned"?returnValue:0,
+                    deliveryFeeForAdmin:'',
+                    deliveryFeeForClient:getSpecificOrderById?.deliveryFee
+
+                };
+
+                // Add/update the data in the DeliveryList
+                const deliveryResponse = await fetch('https://mserver.printbaz.com/addOrUpdateDeliveryList', {
+                  // const deliveryResponse = await fetch('http://localhost:5000/addOrUpdateDeliveryList', {
+                    method: 'PUT',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify(deliveryData),
+                });
+
+                if (!deliveryResponse.ok) {
+                    console.error('Failed to update DeliveryList');
+                }
+            }
+        } else {
+            console.error('status Error:', response);
         }
-      );
-  
-      if (response.ok) {
-        // Update the approval status in the viewClient object
-        setOrderStatus(status);
-        SendOrderStatusMail({status:status,_id:getSpecificOrderById?._id,userMail:getSpecificOrderById?.userMail })
-        // console.log("Success:", viewOrder);
-        // Update your state or perform any other necessary operations with the updated viewClient object
-      } else {
-        console.error("status Error:", response);
-        // Handle error here
-      }
     } catch (error) {
-      console.error("Error:", error.message);
-      // Handle error here
+        console.error('Error:', error.message);
     }
-  }; 
-  
+};
+
   const handleInputPaymentChange = async (e) => {
     const status = e.target.value; // the new status
   // console.log("status",status);
@@ -134,7 +165,37 @@ setTrackingId(e.target.value)
       if (response.ok) {
         // Update the approval status in the viewClient object
         setPaymentStatus(status);
-  
+        const deliveryData = {
+          // add your delivery list data here,
+          orderId:getSpecificOrderById?._id,
+          statusDate:getSpecificOrderById?.statusDate,
+          collectAmount:getSpecificOrderById?.collectAmount,
+          trackingId:getSpecificOrderById?.trackingId,
+          recvMoney:getSpecificOrderById?.recvMoney,
+          printbazcost:getSpecificOrderById?.printbazcost,
+          orderStatus:getSpecificOrderById?.orderStatus,
+          paymentStatus:status,
+          deliveryAssignTo:getSpecificOrderById?.deliveryAssignTo,
+          printBazRcvable:'',
+          returnValue:getSpecificOrderById?.orderStatus==="returned"?returnValue:0,
+          deliveryFeeForAdmin:'',
+          deliveryFeeForClient:getSpecificOrderById?.deliveryFee
+
+      };
+
+      // Add/update the data in the DeliveryList
+      const deliveryResponse = await fetch('https://mserver.printbaz.com/addOrUpdateDeliveryList', {
+        // const deliveryResponse = await fetch('http://localhost:5000/addOrUpdateDeliveryList', {
+          method: 'PUT',
+          headers: {
+              'Content-Type': 'application/json',
+          },
+          body: JSON.stringify(deliveryData),
+      });
+
+      if (!deliveryResponse.ok) {
+          console.error('Failed to update DeliveryList');
+      }
         // console.log("Success:", getSpecificOrderById);
         // Update your state or perform any other necessary operations with the updated viewClient object
       } else {
@@ -168,7 +229,37 @@ setTrackingId(e.target.value)
       if (response.ok) {
         // Update the approval status in the viewClient object
         setDeliverAssign(status);
-  
+        const deliveryData = {
+          // add your delivery list data here,
+          orderId:getSpecificOrderById?._id,
+          statusDate:getSpecificOrderById?.statusDate,
+          collectAmount:getSpecificOrderById?.collectAmount,
+          trackingId:getSpecificOrderById?.trackingId,
+          recvMoney:getSpecificOrderById?.recvMoney,
+          printbazcost:getSpecificOrderById?.printbazcost,
+          orderStatus:getSpecificOrderById?.orderStatus,
+          paymentStatus:getSpecificOrderById?.paymentStatus,
+          deliveryAssignTo:status,
+          printBazRcvable:'',
+          returnValue:getSpecificOrderById?.orderStatus==="returned"?returnValue:0,
+          deliveryFeeForAdmin:'',
+          deliveryFeeForClient:getSpecificOrderById?.deliveryFee
+
+      };
+
+      // Add/update the data in the DeliveryList
+      const deliveryResponse = await fetch('https://mserver.printbaz.com/addOrUpdateDeliveryList', {
+        // const deliveryResponse = await fetch('http://localhost:5000/addOrUpdateDeliveryList', {
+          method: 'PUT',
+          headers: {
+              'Content-Type': 'application/json',
+          },
+          body: JSON.stringify(deliveryData),
+      });
+
+      if (!deliveryResponse.ok) {
+          console.error('Failed to update DeliveryList');
+      }
         // console.log("Success:", getSpecificOrderById);
         // Update your state or perform any other necessary operations with the updated viewClient object
       } else {
@@ -205,6 +296,33 @@ setTrackingId(e.target.value)
         // Update the approval status in the viewClient object
         setTrackingId(trackingId);
         setShowAlert(true)
+        const deliveryData = {
+          // add your delivery list data here,
+          orderId:getSpecificOrderById?._id,
+          statusDate:getSpecificOrderById?.statusDate,
+          collectAmount:getSpecificOrderById?.collectAmount,
+          trackingId:trackingId,
+          recvMoney:getSpecificOrderById?.recvMoney,
+          printbazcost:getSpecificOrderById?.printbazcost,
+          orderStatus:getSpecificOrderById?.orderStatus,
+          paymentStatus:getSpecificOrderById?.paymentStatus,
+          deliveryAssignTo:getSpecificOrderById?.deliveryAssignTo,
+          printBazRcvable:'',
+          returnValue:getSpecificOrderById?.orderStatus==="returned"?returnValue:0,
+          deliveryFeeForAdmin:'',
+          deliveryFeeForClient:getSpecificOrderById?.deliveryFee
+
+      };
+
+      // Add/update the data in the DeliveryList
+      const deliveryResponse = await fetch('https://mserver.printbaz.com/addOrUpdateDeliveryList', {
+        // const deliveryResponse = await fetch('http://localhost:5000/addOrUpdateDeliveryList', {
+          method: 'PUT',
+          headers: {
+              'Content-Type': 'application/json',
+          },
+          body: JSON.stringify(deliveryData),
+      });
         // console.log("Success:", getSpecificOrderById);
         // Update your state or perform any other necessary operations with the updated viewClient object
       } else {

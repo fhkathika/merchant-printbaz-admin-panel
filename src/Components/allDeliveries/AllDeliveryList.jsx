@@ -4,14 +4,17 @@ import { useNavigate } from 'react-router-dom';
 import useGetDeliveryList from '../../hooks/useGetDeliveryList';
 import Navigationbar from '../navigationBar/Navigationbar';
 import DatePicker from 'react-datepicker';
+import useGetMongoData from '../../hooks/useGetMongoData';
+import ConfirmRole from '../alert/ConfirmRole';
+import ConfirmDelete from '../alert/ConfirmDelete';
 const AllDeliveryList = () => {
     const {deliveryAll}=useGetDeliveryList()
+    const {orderAll}=useGetMongoData()
+    const [isModalOpen, setModalOpen]= useState(false);
     const totalCollectAmount = deliveryAll?.reduce((acc, curr) => acc +parseFloat (curr.collectAmount || 0), 0);
     const totalDeliveryAmount = deliveryAll?.reduce((acc, curr) => acc + parseFloat(curr.deliveryFee || 0), 0);
     const totalCollectAmountByCourier = deliveryAll?.reduce((acc, curr) => acc + parseFloat(curr.cashCollectNyCourier || 0), 0);
     const totalReturnAmount = deliveryAll?.reduce((acc, curr) => acc + parseFloat(curr.returnValue || 0), 0);
-   
-    const [filterOrdersId,setFilterOrdersId]=useState();
     const [filterPaymentStatus, setFilterPaymentStatus] = useState('');
     const [filterStatus, setFilterStatus] = useState('all');
     const [filterDeliveryAssignStatus, setFilterDeliveryAssignStatus] = useState('');
@@ -19,6 +22,8 @@ const AllDeliveryList = () => {
     const [orderIdFilter, setOrderIdFilter] = useState('');
     const [startDate,setStartDate]=useState(null);
     const [endDate,setEndDate]=useState(null);
+    const [editing, setEditing] = useState(null);
+
       //  calculate the total sum of printbazRcv
 const totalPrintbazRcv = deliveryAll?.reduce((acc, list) => {
   let amount = 0;
@@ -29,38 +34,22 @@ const totalPrintbazRcv = deliveryAll?.reduce((acc, list) => {
   }
   return acc + amount;
 }, 0); 
-   
-    const filteredDelivery = deliveryAll?.filter(delivery => {
-      // Convert the date strings to Date objects for comparison
-      const deliveryDate = new Date(delivery.date);
-      const start = new Date(startDate);
-      const end = new Date(endDate);
-    
-      let idMatch = true;
-      let dateMatch = true;
-    
-      if (filterOrdersId) {
-        idMatch = delivery._id === filterOrdersId;
-      }
-    
-      // Scenario 1: Only start date provided
-      if (startDate && !endDate) {
-        dateMatch = deliveryDate >= start;
-      }
-      // Scenario 2: Only end date provided
-      else if (!startDate && endDate) {
-        dateMatch = deliveryDate <= end;
-      }
-      // Scenario 3: Both dates provided
-      else if (startDate && endDate) {
-        dateMatch = deliveryDate >= start && deliveryDate <= end;
-      }
-      // Scenario 4: Neither date provided
-      // In this case, dateMatch remains true
-      
-      return idMatch && dateMatch;
-    });
-    
+const totalReceivable= deliveryAll?.reduce((acc, list) => {
+  if (list?.searchByOrderId?.paymentStatus === "paid") {
+      // Skip this value and continue with the accumulation
+      return acc;
+  }
+
+  let amount = 0;
+  if (list?.orderStatus === "returned") {
+      amount = 0 - (list?.deliveryFeeForAdmin);
+  } else {
+      amount = (list?.collectAmount) - (list?.deliveryFeeForAdmin);
+  }
+
+  return acc + amount;
+}, 0);
+ 
     const navigate=useNavigate()
     const backToDelivReport=()=>{
         navigate("/deliverySystem")
@@ -73,12 +62,7 @@ const totalPrintbazRcv = deliveryAll?.reduce((acc, list) => {
     setEndDate(date)
    
   }
-  const handleDeliveryIdChange = (e) => {
-    const value = e.target.value;
-    // console.log(value);
-    setFilterOrdersId(value);
-  }
-
+ 
   const handleInputChange = (event) => {
     const { id, value } = event.target;
     switch (id) {
@@ -104,7 +88,173 @@ const totalPrintbazRcv = deliveryAll?.reduce((acc, list) => {
     }
     
   };
-    return (
+  let deliveriesDeliverySystem=deliveryAll
+  let ordersForDeliverySystem=orderAll
+  function syncArrays(sourceArray, targetItem) {
+    const sourceItem = sourceArray.find(item => item._id === targetItem.orderId);
+    return sourceItem && sourceItem.orderStatus !== targetItem.orderStatus
+      ? { ...targetItem, orderStatus: sourceItem.orderStatus }
+      : targetItem;
+  }
+  function parseStatusDate(statusDate) {
+    // Replace 'at' with ',' to unify the format
+    const cleanedStatusDate = statusDate.replace(' at ', ', ');
+  
+    // Try to parse it into a JavaScript Date object
+    const parsedDate = new Date(cleanedStatusDate);
+  
+    // Check if the date is valid
+    if (isNaN(parsedDate)) {
+      console.error("Invalid date format");
+      return null;
+    }
+  
+    return parsedDate;
+  }
+  
+   
+  const applyFilters = () => {
+    return deliveryAll.filter((order) => {
+      deliveriesDeliverySystem = syncArrays(ordersForDeliverySystem, deliveriesDeliverySystem);
+      console.log("order from applyFilters",order?.trackingId);
+      // Filter by status
+      if (filterStatus !== 'all' && order.orderStatus !== filterStatus) {
+        return false;
+      }
+   // Filter by delivery assign
+      if (filterDeliveryAssignStatus !== '' && order?.deliveryAssignTo !== filterDeliveryAssignStatus) {
+        return false;
+      }
+  
+      // Filter by payment status
+      if (filterPaymentStatus && order?.paymentStatus !== filterPaymentStatus) {
+        return false;
+      }
+  
+      // Filter by order ID
+      if (orderIdFilter && !order.orderId.includes(orderIdFilter)) {
+        return false;
+
+      } 
+      
+      ///filter by tracking id
+      if (filterTrackingId && !order?.trackingId.includes(filterTrackingId)) {
+        return false;
+      } 
+
+
+      if (order && order?.statusDate) {
+        const formattedStatusDate = order.statusDate;
+    
+        // Check if formattedStatusDate is not an empty string
+        if (formattedStatusDate.trim() === '') {
+          console.error("statusDate is empty.");
+          return false;
+        }
+    
+        const userDate = parseStatusDate(formattedStatusDate);
+        if (!userDate) return false;
+    
+        console.log("User Date:", userDate); // Debugging line
+    
+        if (startDate && endDate) {
+          // Both start and end dates are selected
+          const start = new Date(startDate);
+          const end = new Date(endDate);
+          end.setHours(23, 59, 59, 999); // Set to end of the day
+          
+          console.log("Start and End Dates:", start, end); // Debugging line
+    
+          if (userDate < start || userDate > end) return false;
+    
+        } else if (startDate) {
+          // Only start date is selected
+          const start = new Date(startDate);
+          start.setHours(0, 0, 0, 0); // Set to start of the day
+    
+          console.log("Start Date:", start); // Debugging line
+    
+          if (userDate < start) return false;
+    
+        } else if (endDate) {
+          // Only end date is selected
+          const end = new Date(endDate);
+          end.setHours(23, 59, 59, 999); // Set to end of the day
+    
+          console.log("End Date:", end); // Debugging line
+    
+          if (userDate > end) return false;
+        }
+    
+        return true;  // Return true if none of the conditions to return false are met
+    
+      }
+   
+  
+      return true;
+    });
+  };
+  const deleteDelivery = async (orderId) => {
+    try {
+      // const response = await fetch(`http://localhost:5000/deleteDelivery/${orderId}`, {
+      const response = await fetch(`https://mserver.printbaz.com/deleteDelivery/${orderId}`, {
+        method: 'DELETE',
+      });
+  
+      if (response.ok) {
+        console.log("Successfully deleted");
+        
+        // Refresh your data or remove the item from your local state to reflect the deletion
+      } else {
+        console.error('Delete Error:', response);
+      }
+    } catch (error) {
+      console.error('Error:', error.message);
+    }
+  };
+  
+  const handleModalClose = () => {
+    // Close the modal when the "Cancel" button is clicked
+    setModalOpen(false);
+  };
+  const deliveryMap=applyFilters()
+  const handleSubmit = (e) => {
+    e.preventDefault()
+    // Show the modal when the "Create Role" button is clicked
+    setModalOpen(true);
+  };
+
+  // update delivery admin 
+
+  const handleEditChange = async (e, orderId) => {
+    const updatedDeliveryFee = e.target.value;
+    try {
+      const response = await fetch(`https://mserver.printbaz.com/updateDeliveryFee/${orderId}`, {
+      // const response = await fetch(`http://localhost:5000/updateDeliveryFee/${orderId}`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ deliveryFeeForAdmin: updatedDeliveryFee }),
+      });
+    
+      if (response.ok) {
+        console.log("Successfully updated");
+        // Here you can also update your local state to reflect the change
+        // For example: setDeliveryMap(updatedMap)
+      } else {
+        console.error('Update Error:', response);
+      }
+    } catch (error) {
+      console.error('Error:', error.message);
+    }
+  };
+  
+  const toggleEditing = (orderId) => {
+    setEditing(editing === orderId ? null : orderId);
+  };
+  
+   return (
         <div>
         <meta charSet="UTF-8" />
         <meta httpEquiv="X-UA-Compatible" content="IE=edge" />
@@ -116,65 +266,78 @@ const totalPrintbazRcv = deliveryAll?.reduce((acc, list) => {
        <Navigationbar/>
         <section className="sales_report">
         <div className="row">
-            <div className="col-lg-2 col-sm-12">
-              <div className="seals_report_title mt-3">
-                <Button onClick={backToDelivReport} variant='warning'>Back to Delivery Report</Button>
+              <div className="col-12">
+                <div className="seals_report_title">
+                  <h1>Delivery Report</h1>
+                </div>
               </div>
             </div>
-
+            <div className="row non-input-bar-01">
+              <div className="col-xs-12 col-sm-6 col-md-6 col-lg-3">
+                <div id="cardbox1">
+                  <div className="statistic-box">
+                    <h3>Amount Receivable</h3>
+                    <div className="counter-number pull-right">
+                      <span className="count-number">{totalReceivable}</span>
+                      <span className="slight" style={{fontWeight: 'bolder'}}>৳</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+        <div className="row">
+           
          
-           <div  className="row col-lg-10 col-sm-12" >
+           <div  className="row col-lg-12 col-sm-12" >
            <div className="col-lg-2 col-sm-12">
               <label htmlFor="trackingId-filter" className="form-label">Tracking Id:</label>
-              <input type="text" id="trackingId-filter" className="form-control" onChange={(e) =>  handleDeliveryIdChange(e)} />
+              <input type="text" id="trackingId-filter" value={filterTrackingId} className="form-control" onChange={(e) =>  handleInputChange(e)} />
             </div> 
             <div className="col-lg-2 col-sm-12">
               <label htmlFor="orderId-filter" className="form-label">Order Id:</label>
-              <input type="text" id="orderId-filter" className="form-control" onChange={(e) =>  handleDeliveryIdChange(e)} />
-            </div><div className="col-lg-2 col-sm-12">
+              <input type="text" id="orderId-filter" value={orderIdFilter} className="form-control" onChange={(e) =>  handleInputChange(e)} />
+            </div><div className="col-lg-1 col-sm-12">
               <label htmlFor="deliveryStatus-filter" className="form-label">Delivery Status:</label>
-              <input type="text" id="deliveryStatus-filter" className="form-control" onChange={(e) =>  handleDeliveryIdChange(e)} />
-            </div><div className="col-lg-2 col-sm-12">
+              <select id="deliveryStatus-filter"  className="form-control" onChange={(e) =>  handleInputChange(e)}>
+                <option value="all"> All</option>
+                <option value="out for delivery">Out for delivery</option>
+                 <option value="delivered">Delivered</option>
+                 <option value="returned">Returned</option>
+                </select>
+            </div><div className="col-lg-1 col-sm-12">
               <label htmlFor="payment-filter" className="form-label">Payment status:</label>
-              <select id="payment-filter" value="" className="form-control" onChange={(e) =>  handleInputChange(e)}>
+              <select id="payment-filter" value={filterPaymentStatus} className="form-control" onChange={(e) =>  handleInputChange(e)}>
+              <option value=''>none</option>
+                  <option value="Unpaid">Unpaid</option>
+                  <option value="paid">Paid</option>  
+                </select>
+            </div><div className="col-lg-2 col-sm-12">
+              <label htmlFor="deliveryAiign-filter" className="form-label">Delivery Assign To:</label>
+              <select id="deliveryAiign-filter" value={filterDeliveryAssignStatus} className="form-control" onChange={(e) =>  handleInputChange(e)}>
                 <option value=""> None</option>
                 <option value="pathao"> Pathao</option>
                           <option value="delivery tiger">Delivery Tiger</option>
                           <option value="others">Others</option>
                 </select>
-            </div><div className="col-lg-2 col-sm-12">
-              <label htmlFor="deliveryAiign-filter" className="form-label">Delivery Assign To:</label>
-              <input type="text" id="deliveryAiign-filter" className="form-control" onChange={(e) =>  handleDeliveryIdChange(e)} />
             </div>
             
-            <div className="col-lg-1 col-sm-12">
-              <label htmlFor="date-filter" className="form-label">Start Date:</label>
-              <DatePicker className='form-control' selected={startDate} onChange={handleChangeStartDate} selectsStart startDate={startDate} endDate={endDate} />
-            </div>
-            <div className="col-lg-1 col-sm-12">
+            <div className="col-lg-2 col-sm-12">
+                  <label htmlFor="startDate" className="form-label">Start Date</label>
+
+                                   <DatePicker className='form-control' value={startDate} selected={startDate} onChange={handleChangeStartDate} selectsStart startDate={startDate} endDate={endDate} />
+                
+                  </div>   
+                   <div className="col-lg-2 col-sm-12">
                
                  
-               <label style={{textAlign:"start"}} htmlFor="endDate" className="form-label">End Date</label>
-               <DatePicker className='form-control' selected={endDate} onChange={handleChangeEndDate} selectsEnd startDate={startDate} endDate={endDate} minDate={startDate} />
-               </div>
+                  <label style={{textAlign:"start"}} htmlFor="endDate" className="form-label">End Date</label>
+                  <DatePicker className='form-control' selected={endDate} value={endDate} onChange={handleChangeEndDate} selectsEnd startDate={startDate} endDate={endDate} minDate={startDate} />
+                  </div>
            </div>
             
                 
           </div>
-          {/*
-          <div className="row non-input-bar-01">
-            <div className="col-xs-12 col-sm-6 col-md-6 col-lg-3">
-              <div id="cardbox1">
-                <div className="statistic-box">
-                  <h3>Amount Receivable</h3>
-                  <div className="counter-number pull-right">
-                    <span className="count-number">11,350</span>
-                    <span className="slight" style={{fontWeight: 'bolder'}}>৳</span>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div> */}
+       
           <div className="row input-bar-01">
             <div className="col-xs-12 col-sm-12 col-md-12 col-lg-12">
               <div className="lobipanel">
@@ -187,6 +350,7 @@ const totalPrintbazRcv = deliveryAll?.reduce((acc, list) => {
                     <tr>
                           <th>Date</th>
                           <th>Order ID</th>
+                          <th>Tracking ID</th>
                           <th>Cash Collection Amount</th>
                           <th>Delivery Assign To</th>
                           <th>Delivery Fee</th>
@@ -199,75 +363,63 @@ const totalPrintbazRcv = deliveryAll?.reduce((acc, list) => {
                     <tbody>
                    
                     {
-filteredDelivery ?
+   deliveryMap
+   .sort((a, b) => new Date(b?.statusDate) - new Date(a?.statusDate))
+   .sort((a, b) => new Date(b?.statusDate) - new Date(a?.statusDate))
+   ?.map((list, index) => {
+    // const syncedListItem = syncArrays(orderAll, list);
+    // console.log("syncedListItem",syncedListItem);
+       let date = new Date(list?.date); 
+       let options = { year: 'numeric', month: 'long', day: 'numeric' }; 
+       let formattedDate = date.toLocaleDateString('en-US', options); 
+       let printbazRcv=0
+       if(list?.orderStatus==="returned"){
+         printbazRcv=0-(list?.deliveryFeeForAdmin)
+       }
+       else{
+        printbazRcv=(list?.collectAmount)-(list?.deliveryFeeForAdmin)
+       }
+    
+    
+       return (
+           <tr className="info">
+               <td>{list?.statusDate}</td>
+               <td><a href={`/viewOrder/${list?.orderId}`} target="_blank" rel="noreferrer">{list?.orderId}</a></td>
+             
+               <td>{list?.trackingId}</td>
+               <td>{list?.collectAmount} TK</td>
+               <td>{list?.deliveryAssignTo}</td>
+               <td>
+      {editing === list?.orderId ? (
+        <input
+          type="number"
+          defaultValue={list?.deliveryFeeForAdmin}
+          onBlur={() => toggleEditing(null)} // Stop editing when focus is lost
+          onChange={(e) => handleEditChange(e, list?.orderId)}
+        />
+      ) : (
+        `${list?.deliveryFeeForAdmin} TK`
+      )}
+      <button  style={{fontSize:"15px",color:"black",cursor:"pointer",border:"none",backgroundColor:"none" ,marginLeft:"10px"}}  onClick={() => toggleEditing(list?.orderId)}> {editing === list?.orderId ? 'Save' : <i style={{fontSize:"15px",color:"black",cursor:"pointer"}} class="fa fa-edit"></i>}</button>
+      {/* <button onClick={() => toggleEditing(list?.orderId)}>
+        {editing === list?.orderId ? 'Save' : 'Edit'}
+      </button> */}
+    </td>
+               <td><p className="status-btn">{list?.orderStatus}</p></td>
+               <td>{printbazRcv} TK</td>
+               <td > <p className="status-btn" > {list?.paymentStatus}</p> </td>
+               <td style={{color:"red"}}>{list?.returnValue} TK</td>
+               <td> <button onClick={handleSubmit} style={{float: 'right', background: 'transparent', border: 'none', color: 'red', fontSize: '16px'}}><i className="fa fa-trash" aria-hidden="true" /></button></td>
+               <ConfirmDelete isOpen={ isModalOpen} onClose={handleModalClose} onConfirm={() => deleteDelivery(list?.orderId)}/>
 
-
-  filteredDelivery?.map((list, index) => {
-      let date = new Date(list?.date); 
-      let options = { year: 'numeric', month: 'long', day: 'numeric' }; 
-      let formattedDate = date.toLocaleDateString('en-US', options); 
-      let printbazRcv=0
-      if(list?.orderStatus==="returned"){
-        printbazRcv=0-(list?.deliveryFeeForAdmin)
-      }
-      else{
-       printbazRcv=(list?.collectAmount)-(list?.deliveryFeeForAdmin)
-      }
+           </tr>
+       );
+   })
    
-   
-      return (
-          <tr className="info">
-              <td>{list?.searchByOrderId?.statusDate}</td>
-             <td>{list?.orderId}</td>
-              <td>{list?.collectAmount} TK</td>
-              <td>{list?.searchByOrderId?.deliveryAssignTo}</td>
-              <td>{list?.deliveryFeeForAdmin}TK</td>
-              <td><p className="status-btn">{list?.orderStatus}</p></td>
-              <td>{printbazRcv} TK</td>
-              <td > <p className="status-btn" > {list?.searchByOrderId?.paymentStatus}</p> </td>
-              <td style={{color:"red"}}>{list?.returnValue} TK</td>
-          </tr>
-      );
-  })
-  
-
- :
-
- 
-  deliveryAll?.map((list, index) => {
-      let date = new Date(list?.date); 
-      let options = { year: 'numeric', month: 'long', day: 'numeric' }; 
-      let formattedDate = date.toLocaleDateString('en-US', options); 
-      let printbazRcv=0
-      if(list?.orderStatus==="returned"){
-        printbazRcv=0-(list?.deliveryFeeForAdmin)
-      }
-      else{
-       printbazRcv=(list?.collectAmount)-(list?.deliveryFeeForAdmin)
-      }
-   
-   
-      return (
-          <tr className="info">
-              <td>{list?.searchByOrderId?.statusDate}</td>
-             <td>{list?._id}</td>
-              <td>{list?.collectAmount} TK</td>
-              <td>{list?.searchByOrderId?.deliveryAssignTo}</td>
-              <td>{list?.deliveryFeeForAdmin}TK</td>
-              <td><p className="status-btn">{list?.orderStatus}</p></td>
-              <td>{printbazRcv} TK</td>
-              <td > <p className="status-btn" > {list?.searchByOrderId?.paymentStatus}</p> </td>
-              <td style={{color:"red"}}>{list?.returnValue} TK</td>
-          </tr>
-      );
-  })
-  
-
 }
-
-
-                      <tr className="info">
+  <tr className="info">
                         <td style={{fontWeight: 700}}>Total</td>
+                        <td style={{fontWeight: 700}} />
                         <td style={{fontWeight: 700}} />
                         <td style={{fontWeight: 700}}>{totalCollectAmount} TK</td>
                         <td style={{fontWeight: 700}} />

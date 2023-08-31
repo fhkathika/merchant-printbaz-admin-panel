@@ -40,7 +40,7 @@ function App() {
      <Route path="/viewClient/:id" element={<PrivateRoute><ViewClient /> </PrivateRoute>} />
     
       <Route path="/viewTicket/:id"element={<PrivateRoute><ViewTicket/> </PrivateRoute>} />
-      <Route path="/deliverySystem"element={<PrivateRoute><DeliverySystem/> </PrivateRoute>} />
+      <Route path="/deliverySystem"element={<PrivateRoute><AllDeliveryList/></PrivateRoute>} />
       <Route path="/alldeliveries"element={<PrivateRoute><AllDeliveryList/> </PrivateRoute>} />
       <Route path="/allRcvMoney"element={<PrivateRoute><AllRcvList/> </PrivateRoute>} />
        <Route path="/invitaionPage"element={<SendInvitationPage/> } />
