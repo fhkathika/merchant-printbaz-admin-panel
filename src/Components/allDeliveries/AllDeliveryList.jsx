@@ -409,8 +409,8 @@ const totalReceivable= deliveryAll?.reduce((acc, list) => {
                <td>{printbazRcv} TK</td>
                <td > <p className="status-btn" > {list?.paymentStatus}</p> </td>
                <td style={{color:"red"}}>{list?.returnValue} TK</td>
-               <td> <button onClick={handleSubmit} style={{float: 'right', background: 'transparent', border: 'none', color: 'red', fontSize: '16px'}}><i className="fa fa-trash" aria-hidden="true" /></button></td>
-               <ConfirmDelete isOpen={ isModalOpen} onClose={handleModalClose} onConfirm={() => deleteDelivery(list?.orderId)}/>
+               {/* <td> <button onClick={handleSubmit} style={{float: 'right', background: 'transparent', border: 'none', color: 'red', fontSize: '16px'}}><i className="fa fa-trash" aria-hidden="true" /></button></td>
+               <ConfirmDelete isOpen={ isModalOpen} onClose={handleModalClose} orderId={list?.orderId} onConfirm={() => deleteDelivery(list?.orderId)}/> */}
 
            </tr>
        );
