@@ -182,7 +182,7 @@ setTrackingId(e.target.value)
           deliveryFeeForClient:getSpecificOrderById?.deliveryFee
 
       };
-
+      if (['out for delivery', 'delivered', 'returned'].includes(getSpecificOrderById?.orderStatus.toLowerCase())) {
       // Add/update the data in the DeliveryList
       const deliveryResponse = await fetch('https://mserver.printbaz.com/addOrUpdateDeliveryList', {
         // const deliveryResponse = await fetch('http://localhost:5000/addOrUpdateDeliveryList', {
@@ -198,6 +198,7 @@ setTrackingId(e.target.value)
       }
         // console.log("Success:", getSpecificOrderById);
         // Update your state or perform any other necessary operations with the updated viewClient object
+    }
       } else {
         console.error("status Error:", response);
         // Handle error here
@@ -246,7 +247,7 @@ setTrackingId(e.target.value)
           deliveryFeeForClient:getSpecificOrderById?.deliveryFee
 
       };
-
+      if (['out for delivery', 'delivered', 'returned'].includes(getSpecificOrderById?.orderStatus.toLowerCase())) {
       // Add/update the data in the DeliveryList
       const deliveryResponse = await fetch('https://mserver.printbaz.com/addOrUpdateDeliveryList', {
         // const deliveryResponse = await fetch('http://localhost:5000/addOrUpdateDeliveryList', {
@@ -262,6 +263,7 @@ setTrackingId(e.target.value)
       }
         // console.log("Success:", getSpecificOrderById);
         // Update your state or perform any other necessary operations with the updated viewClient object
+    }
       } else {
         console.error("status Error:", response);
         // Handle error here
@@ -313,7 +315,7 @@ setTrackingId(e.target.value)
           deliveryFeeForClient:getSpecificOrderById?.deliveryFee
 
       };
-
+      if (['out for delivery', 'delivered', 'returned'].includes(getSpecificOrderById?.orderStatus.toLowerCase())) {
       // Add/update the data in the DeliveryList
       const deliveryResponse = await fetch('https://mserver.printbaz.com/addOrUpdateDeliveryList', {
         // const deliveryResponse = await fetch('http://localhost:5000/addOrUpdateDeliveryList', {
@@ -325,6 +327,7 @@ setTrackingId(e.target.value)
       });
         // console.log("Success:", getSpecificOrderById);
         // Update your state or perform any other necessary operations with the updated viewClient object
+    }
       } else {
         console.error("status Error:", response);
         // Handle error here
@@ -510,6 +513,15 @@ setTrackingId(e.target.value)
                          
                             <option value="delivery tiger">Delivery Tiger</option>
                             <option value="no service">No service</option>
+                              
+                            </>
+                          )}
+                           {deliverAssign === "no service" && (
+                            <>
+                            <option value="pathao">Pathao</option>
+                         
+                            <option value="delivery tiger">Delivery Tiger</option>
+                            <option value="others">Others</option>
                               
                             </>
                           )}

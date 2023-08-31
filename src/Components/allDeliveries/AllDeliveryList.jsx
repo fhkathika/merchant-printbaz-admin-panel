@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Button } from 'react-bootstrap';
 import { useNavigate } from 'react-router-dom';
 import useGetDeliveryList from '../../hooks/useGetDeliveryList';
@@ -11,10 +11,7 @@ const AllDeliveryList = () => {
     const {deliveryAll}=useGetDeliveryList()
     const {orderAll}=useGetMongoData()
     const [isModalOpen, setModalOpen]= useState(false);
-    const totalCollectAmount = deliveryAll?.reduce((acc, curr) => acc +parseFloat (curr.collectAmount || 0), 0);
-    const totalDeliveryAmount = deliveryAll?.reduce((acc, curr) => acc + parseFloat(curr.deliveryFee || 0), 0);
-    const totalCollectAmountByCourier = deliveryAll?.reduce((acc, curr) => acc + parseFloat(curr.cashCollectNyCourier || 0), 0);
-    const totalReturnAmount = deliveryAll?.reduce((acc, curr) => acc + parseFloat(curr.returnValue || 0), 0);
+   
     const [filterPaymentStatus, setFilterPaymentStatus] = useState('');
     const [filterStatus, setFilterStatus] = useState('all');
     const [filterDeliveryAssignStatus, setFilterDeliveryAssignStatus] = useState('');
@@ -24,33 +21,7 @@ const AllDeliveryList = () => {
     const [endDate,setEndDate]=useState(null);
     const [editing, setEditing] = useState(null);
 
-      //  calculate the total sum of printbazRcv
-const totalPrintbazRcv = deliveryAll?.reduce((acc, list) => {
-  let amount = 0;
-  if (list?.orderStatus === "returned") {
-      amount = 0 - (list?.deliveryFeeForAdmin);
-  } else {
-      amount = (list?.collectAmount) - (list?.deliveryFeeForAdmin);
-  }
-  return acc + amount;
-}, 0); 
-const totalReceivable= deliveryAll?.reduce((acc, list) => {
-  if (list?.searchByOrderId?.paymentStatus === "paid") {
-      // Skip this value and continue with the accumulation
-      return acc;
-  }
-
-  let amount = 0;
-  if (list?.orderStatus === "returned") {
-      amount = 0 - (list?.deliveryFeeForAdmin);
-  } else {
-      amount = (list?.collectAmount) - (list?.deliveryFeeForAdmin);
-  }
-
-  return acc + amount;
-}, 0);
- 
-    const navigate=useNavigate()
+   const navigate=useNavigate()
     const backToDelivReport=()=>{
         navigate("/deliverySystem")
   }
@@ -63,6 +34,51 @@ const totalReceivable= deliveryAll?.reduce((acc, list) => {
    
   }
  
+useEffect(()=>{
+
+    // Process and update the delivery list here
+orderAll.forEach(async (getSpecificOrderById) => {
+   const returnValue=Number(getSpecificOrderById?.printbazcost)+Number(getSpecificOrderById?.deliveryFee)
+   const deliveryData = {
+       orderId: getSpecificOrderById._id,
+       statusDate: getSpecificOrderById.statusDate,
+       collectAmount: getSpecificOrderById.collectAmount,
+       trackingId: getSpecificOrderById?.trackingId,
+       recvMoney: getSpecificOrderById.recvMoney,
+       printbazcost: getSpecificOrderById.printbazcost,
+       orderStatus: getSpecificOrderById.orderStatus,
+       paymentStatus: getSpecificOrderById.paymentStatus,
+       deliveryAssignTo: getSpecificOrderById.deliveryAssignTo,
+       printBazRcvable: '',
+       returnValue: getSpecificOrderById.orderStatus === "returned" ? returnValue : 0,
+       deliveryFeeForAdmin: '',
+       deliveryFeeForClient: getSpecificOrderById.deliveryFee
+   };
+
+   if (['out for delivery', 'delivered', 'returned'].includes(getSpecificOrderById.orderStatus.toLowerCase())) {
+       // Add/update the data in the DeliveryList
+       const deliveryResponse = await fetch('https://mserver.printbaz.com/addOrUpdateDeliveryList', {
+           // const deliveryResponse = await fetch('http://localhost:5000/addOrUpdateDeliveryList', {
+           method: 'PUT',
+           headers: {
+               'Content-Type': 'application/json',
+           },
+           body: JSON.stringify(deliveryData),
+       });
+       // console.log("Success:", getSpecificOrderById);
+       // Update your state or perform any other necessary operations with the updated viewClient object
+   // Fetch delivery list from the API and update local storage
+   // Similar to how you fetch orders and update the delivery list in your previous code
+   // Update local storage for delivery list
+  //  localStorage.setItem('deliveryList', JSON.stringify(deliveryResponse));
+   }
+});
+
+   
+
+
+},[])
+  
   const handleInputChange = (event) => {
     const { id, value } = event.target;
     switch (id) {
@@ -194,6 +210,32 @@ const totalReceivable= deliveryAll?.reduce((acc, list) => {
       return true;
     });
   };
+  const deliveryMap=applyFilters()
+     //  calculate the total sum of printbazRcv
+const totalPrintbazRcv = deliveryMap?.reduce((acc, list) => {
+  let amount = 0;
+  if (list?.orderStatus === "returned") {
+      amount = 0 - (list?.deliveryFeeForAdmin);
+  } else {
+      amount = (list?.collectAmount) - (list?.deliveryFeeForAdmin);
+  }
+  return acc + amount;
+}, 0); 
+const totalReceivable= deliveryMap?.reduce((acc, list) => {
+  if (list?.paymentStatus === "paid") {
+      // Skip this value and continue with the accumulation
+      return acc;
+  }
+
+  let amount = 0;
+  if (list?.orderStatus === "returned") {
+      amount = 0 - (list?.deliveryFeeForAdmin);
+  } else {
+      amount = (list?.collectAmount) - (list?.deliveryFeeForAdmin);
+  }
+
+  return acc + amount;
+}, 0);
   const deleteDelivery = async (orderId) => {
     try {
       // const response = await fetch(`http://localhost:5000/deleteDelivery/${orderId}`, {
@@ -217,7 +259,7 @@ const totalReceivable= deliveryAll?.reduce((acc, list) => {
     // Close the modal when the "Cancel" button is clicked
     setModalOpen(false);
   };
-  const deliveryMap=applyFilters()
+
   const handleSubmit = (e) => {
     e.preventDefault()
     // Show the modal when the "Create Role" button is clicked
@@ -253,7 +295,10 @@ const totalReceivable= deliveryAll?.reduce((acc, list) => {
   const toggleEditing = (orderId) => {
     setEditing(editing === orderId ? null : orderId);
   };
-  
+  const totalCollectAmount = deliveryMap?.reduce((acc, curr) => acc +parseFloat (curr.collectAmount || 0), 0);
+  const totalDeliveryAmount = deliveryMap?.reduce((acc, curr) => acc + parseFloat(curr.deliveryFee || 0), 0);
+  const totalCollectAmountByCourier = deliveryMap?.reduce((acc, curr) => acc + parseFloat(curr.cashCollectNyCourier || 0), 0);
+  const totalReturnAmount = deliveryMap?.reduce((acc, curr) => acc + parseFloat(curr.returnValue || 0), 0);
    return (
         <div>
         <meta charSet="UTF-8" />
