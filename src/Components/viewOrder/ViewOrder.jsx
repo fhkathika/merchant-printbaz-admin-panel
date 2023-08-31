@@ -477,9 +477,9 @@ setTrackingId(e.target.value)
                            <option value>No service</option>
                          }
                            
-                          <option value="pathao"> Pathao</option>
+                          {/* <option value="pathao"> Pathao</option>
                           <option value="delivery tiger">Delivery Tiger</option>
-                          <option value="others">Others</option>
+                          <option value="others">Others</option> */}
                       
                       
 
@@ -491,22 +491,25 @@ setTrackingId(e.target.value)
                             
                               <option value="delivery tiger">Delivery Tiger</option>
                               <option value="others">Others</option>
+                              <option value>No service</option>
                             </>
                           )}
 
-{paymentStatus === "delivery tiger" && (
+{deliverAssign === "delivery tiger" && (
                             <>
                             <option value="pathao">Pathao</option>
                          
                             <option value="others">Others</option>
+                            <option value>No service</option>
                               
                             </>
                           )} 
-                          {paymentStatus === "others" && (
+                          {deliverAssign === "others" && (
                             <>
                             <option value="pathao">Pathao</option>
                          
                             <option value="delivery tiger">Delivery Tiger</option>
+                            <option value>No service</option>
                               
                             </>
                           )}
