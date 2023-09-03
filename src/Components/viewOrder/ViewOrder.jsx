@@ -480,9 +480,9 @@ setTrackingId(e.target.value)
                            <option value="no service">No service</option>
                          }
                            
-                          {/* <option value="pathao"> Pathao</option>
+                           <option value="pathao"> Pathao</option>
                           <option value="delivery tiger">Delivery Tiger</option>
-                          <option value="others">Others</option> */}
+                          <option value="others">Others</option> 
                       
                       
 
