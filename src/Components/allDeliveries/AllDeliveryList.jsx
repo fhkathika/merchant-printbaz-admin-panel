@@ -153,11 +153,16 @@ orderAll.forEach(async (getSpecificOrderById) => {
 
       } 
       
-      ///filter by tracking id
-      if (filterTrackingId && !order?.trackingId.includes(filterTrackingId)) {
-        return false;
-      } 
-
+     
+         // Filter by tracking ID
+    if (filterTrackingId) {
+      if (!order?.trackingId) {
+        return false; // Skip this order if trackingId is undefined or null
+      }
+      if (!order.trackingId.includes(filterTrackingId)) {
+        return false; // Skip this order if trackingId doesn't match the filter
+      }
+    }
 
       if (order && order?.statusDate) {
         const formattedStatusDate = order.statusDate;
@@ -211,6 +216,7 @@ orderAll.forEach(async (getSpecificOrderById) => {
     });
   };
   const deliveryMap=applyFilters()
+  console.log("deliveryMap",deliveryMap);
      //  calculate the total sum of printbazRcv
 const totalPrintbazRcv = deliveryMap?.reduce((acc, list) => {
   let amount = 0;
@@ -265,7 +271,12 @@ const totalReceivable= deliveryMap?.reduce((acc, list) => {
     // Show the modal when the "Create Role" button is clicked
     setModalOpen(true);
   };
-
+  function convertDatabaseDateToJSDate(dbDate) {
+    // remove the 'at' and extra commas
+    const cleanedDate = dbDate.replace(' at ', ', ').replace(',', '');
+    return new Date(cleanedDate);
+  }
+  
   // update delivery admin 
 
   const handleEditChange = async (e, orderId) => {
@@ -409,8 +420,18 @@ const totalReceivable= deliveryMap?.reduce((acc, list) => {
                    
                     {
    deliveryMap
-   .sort((a, b) => new Date(b?.statusDate) - new Date(a?.statusDate))
-   .sort((a, b) => new Date(b?.statusDate) - new Date(a?.statusDate))
+   .sort((a, b) => {
+    const dateA = convertDatabaseDateToJSDate(a?.statusDate);
+    const dateB = convertDatabaseDateToJSDate(b?.statusDate);
+    if(dateA && dateB) {
+      return dateB - dateA; // sort in descending order
+    } else if (dateA) {
+      return -1; // If dateA exists but dateB does not, place A before B
+    } else if (dateB) {
+      return 1; // If dateB exists but dateA does not, place B before A
+    }
+    return 0; // If neither exist, don't sort them
+  })
    ?.map((list, index) => {
     // const syncedListItem = syncArrays(orderAll, list);
     // console.log("syncedListItem",syncedListItem);

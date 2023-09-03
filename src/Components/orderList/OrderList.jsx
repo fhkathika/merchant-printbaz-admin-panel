@@ -119,15 +119,15 @@ const applyFilters = () => {
     //   console.log("Filtering based on tracking ID", { filterTrackingId, orderTrackingId: order.trackingId });
     //   return false;
     // }
-    if (filterTrackingId) {
-      if (order && 'trackingId' in order) {
-        if (order.trackingId?.indexOf(filterTrackingId) === -1) {
-          return false;
+         // Filter by tracking ID
+         if (filterTrackingId) {
+          if (!order?.trackingId) {
+            return false; // Skip this order if trackingId is undefined or null
+          }
+          if (!order.trackingId.includes(filterTrackingId)) {
+            return false; // Skip this order if trackingId doesn't match the filter
+          }
         }
-      } else {
-        console.warn("order or order.trackingId is undefined");
-      }
-    }
     
     if ((order && order.statusDate) || (order && order.createdAt)) {
       const formattedStatusDate = order.statusDate?.replace(" at", "");
