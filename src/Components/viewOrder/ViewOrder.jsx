@@ -473,19 +473,26 @@ setTrackingId(e.target.value)
                           }}
                           onChange={(e) => handleDeliverAssignChange(e)}
                         >
-                         {
-                           deliverAssign?
-                           <option value>{deliverAssign}</option>
-                           :
-                           <option value="no service">No service</option>
-                         }
-                           
-                           <option value="pathao"> Pathao</option>
+                  {
+                    deliverAssign ?
+                    <option value={deliverAssign}>
+                    {deliverAssign=== "pathao"&& "Pathao" }
+                    {deliverAssign=== "delivery tiger"&& "Delivery Tiger" }
+                    {deliverAssign=== "others"&& "Others" }
+                    {deliverAssign=== "no service"&& "No service" }
+                   
+                
+                  </option>
+                    :
+                    <>
+                     <option value="no service"> No service</option>
+                    <option value="pathao"> Pathao</option>
                           <option value="delivery tiger">Delivery Tiger</option>
-                          <option value="others">Others</option> 
-                      
-                      
-
+                          <option value="others">Others</option>
+                    </>
+                     
+                  }
+                    
                        
 
 
