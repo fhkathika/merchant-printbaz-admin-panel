@@ -58,7 +58,7 @@ orderAll.forEach(async (getSpecificOrderById) => {
    if (['out for delivery', 'delivered', 'returned'].includes(getSpecificOrderById.orderStatus.toLowerCase())) {
        // Add/update the data in the DeliveryList
        const deliveryResponse = await fetch('https://mserver.printbaz.com/addOrUpdateDeliveryList', {
-           // const deliveryResponse = await fetch('http://localhost:5000/addOrUpdateDeliveryList', {
+          //  const deliveryResponse = await fetch('http://localhost:5000/addOrUpdateDeliveryList', {
            method: 'PUT',
            headers: {
                'Content-Type': 'application/json',
@@ -282,8 +282,8 @@ const totalReceivable= deliveryMap?.reduce((acc, list) => {
   const handleEditChange = async (e, orderId) => {
     const updatedDeliveryFee = e.target.value;
     try {
-      const response = await fetch(`https://mserver.printbaz.com/updateDeliveryFee/${orderId}`, {
-      // const response = await fetch(`http://localhost:5000/updateDeliveryFee/${orderId}`, {
+      // const response = await fetch(`https://mserver.printbaz.com/updateDeliveryFee/${orderId}`, {
+      const response = await fetch(`http://localhost:5000/updateDeliveryFee/${orderId}`, {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
@@ -342,8 +342,6 @@ const totalReceivable= deliveryMap?.reduce((acc, list) => {
               </div>
             </div>
         <div className="row">
-           
-         
            <div  className="row col-lg-12 col-sm-12" >
            <div className="col-lg-2 col-sm-12">
               <label htmlFor="trackingId-filter" className="form-label">Tracking Id:</label>
@@ -400,8 +398,8 @@ const totalReceivable= deliveryMap?.reduce((acc, list) => {
                 <div className="panel-title">
                   <h4>Delivery List</h4>
                 </div>
-                <div className="panel-body">
-                  <table className="table">
+                <div className="panel-body" >
+                  <table className="table" >
                     <thead>
                     <tr>
                           <th>Date</th>
@@ -448,7 +446,7 @@ const totalReceivable= deliveryMap?.reduce((acc, list) => {
     
     
        return (
-           <tr className="info">
+           <tr className="info" >
                <td>{list?.statusDate}</td>
                <td><a href={`/viewOrder/${list?.orderId}`} target="_blank" rel="noreferrer">{list?.orderId}</a></td>
              
@@ -471,8 +469,31 @@ const totalReceivable= deliveryMap?.reduce((acc, list) => {
         {editing === list?.orderId ? 'Save' : 'Edit'}
       </button> */}
     </td>
-               <td><p className="status-btn">{list?.orderStatus}</p></td>
+    {
+      list?.orderStatus==="returned" &&
+      <td><p className="status-btn" style={{backgroundColor:"red",color:"white"}}>{list?.orderStatus}</p></td>
+   
+    } 
+    {
+      list?.orderStatus==="out for delivery" &&
+      <td><p className="status-btn" style={{backgroundColor:"orange",color:"white"}}>{list?.orderStatus}</p></td>
+   
+    }
+    {
+      list?.orderStatus==="delivered" &&
+      <td><p className="status-btn" >{list?.orderStatus}</p></td>
+   
+    }
+             
                <td>{printbazRcv} TK</td>
+               {
+                 list?.paymentStatus==="paid" &
+                  <td > <p className="status-btn" > {list?.paymentStatus}</p> </td>
+               } 
+               {
+                 list?.paymentStatus==="Unpaid" &
+                  <td > <p className="status-btn"  style={{backgroundColor:""}}> {list?.paymentStatus}</p> </td>
+               }
                <td > <p className="status-btn" > {list?.paymentStatus}</p> </td>
                <td style={{color:"red"}}>{list?.returnValue} TK</td>
                {/* <td> <button onClick={handleSubmit} style={{float: 'right', background: 'transparent', border: 'none', color: 'red', fontSize: '16px'}}><i className="fa fa-trash" aria-hidden="true" /></button></td>

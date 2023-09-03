@@ -25,8 +25,6 @@ const ViewOrder = () => {
   const [exitIdAlert, setExitIdAlert] = useState(false);
   const [edit, setEdit] = useState(false);
   const navigate = useNavigate();
-  
-
   const [getSpecificOrderById, setGetSpecificOrderById] = useState();
   const [trackingId, setTrackingId] = useState();
   const [fetchTrackingId, setFetchtrackingId] = useState();
@@ -135,6 +133,22 @@ setTrackingId(e.target.value)
                     console.error('Failed to update DeliveryList');
                 }
             }
+            else if (status.toLowerCase() === 'cancel') {
+              // Delete the order from the delivery list
+              const deleteResponse = await fetch(`https://mserver.printbaz.com/deleteFromDeliveryList/${id}`, {
+              // const deleteResponse = await fetch(`http://localhost:5000/deleteFromDeliveryList/${id}`, {
+                  method: 'DELETE',
+                  headers: {
+                      'Content-Type': 'application/json',
+                  }
+              });
+              
+              if (deleteResponse.ok) {
+                  console.log('Successfully deleted from DeliveryList');
+              } else {
+                  console.error('Failed to delete from DeliveryList');
+              }
+          }
         } else {
             console.error('status Error:', response);
         }
@@ -1397,27 +1411,28 @@ onChange={(e) => handleInputChange(e)}
     </div>
  
     <div className="row order-list-title d-none-phone">
-      <div className="col-1">
+      
+      <div className="col-3">
         <h4>Color</h4>
       </div>
-      <div className="col-1" style={{display:"flex",justifyContent:"center"}}>
+      <div className="col-3" style={{display:"flex",justifyContent:"center"}}>
         <h4>T-shirt Size</h4>
       </div>
-      <div className="col-2" style={{display:"flex",justifyContent:"center"}}>
+      <div className="col-3" style={{display:"flex",justifyContent:"center"}}>
         <h4>Quantity</h4>
       </div>
-      <div className="col-1" style={{display:"flex",justifyContent:"center"}}>
+      {/* <div className="col-1" style={{display:"flex",justifyContent:"center"}}>
         <h4>Print Size</h4>
-      </div>
-      <div className="col-3" style={{display:"flex",justifyContent:"center"}}>
+      </div> */}
+      {/* <div className="col-3" style={{display:"flex",justifyContent:"center"}}>
         <h4>Main File</h4>
-      </div>
+      </div> */}
       <div className="col-3" style={{display:"flex",justifyContent:"center"}}>
         <h4>Picture</h4>
       </div>
-        <div className="col-1">
+        {/* <div className="col-1">
         <h4>BrandLogo</h4>
-      </div>
+      </div> */}
       {/* <div className="col-2">
         <h4>Picture</h4>
       </div> */}
@@ -1425,58 +1440,19 @@ onChange={(e) => handleInputChange(e)}
     {
       getSpecificOrderById?.orderDetailArr?.map((orderDetail,orderIndex)=><>
         <div className="row order-tab d-none-phone " key={orderIndex}>
-      <div className="col-1">
+        <h3 style={{color:"orange"}}>Line Item: {orderIndex+1}</h3>
+        
+      <div className="col-3">
         <p>{orderDetail?.color}</p>
       </div>
-      <div className="col-1" style={{display:"flex",justifyContent:"center"}}>
+      <div className="col-3" style={{display:"flex",justifyContent:"center"}}>
         {orderDetail?.teshirtSize}
       </div>
-      <div className="col-2" style={{display:"flex",justifyContent:"center"}}>
+      <div className="col-3" style={{display:"flex",justifyContent:"center"}}>
       {orderDetail?.quantity}
       </div>
-      <div className="col-1" style={{display:"flex",justifyContent:"center"}}>
-      {/* {orderDetail?.printSide} */}
-      <p>frontSide :{orderDetail?.printSize}</p>
-      {
-       (orderDetail?.printSide=== "backSide" ||  orderDetail?.printSide=== "bothSide") && 
-       <p>backSide:{orderDetail?.printSizeBack}</p>
-     }
+ 
     
-       
-      </div>
-      <div className="col-lg-3" style={{display:"flex",justifyContent:"center"}}>
-      <div className="card file">
-{
-orderDetail?.file?.map((fileUrl,fileIndex) => {
-// Extract the file ID from the URL
-//  let fileId = "";
-//  if (fileUrl?.includes("/file/d/")) {
-//    fileId = fileUrl?.split("/file/d/")[1]?.split("/")[0];
-//  } else if (fileUrl?.includes("id=")) {
-//    fileId = fileUrl?.split("id=")[1];
-//  }
-
-const fileId = fileUrl?.split('/d/')[1].split('/view')[0];
-const downloadUrl = `https://drive.google.com/uc?export=download&id=${fileId}`;
-const previewURL = `https://drive.google.com/file/d/${fileId}/preview`;
-// Construct the direct download link
-//  const downloadUrl = `https://drive.google.com/uc?export=download&id=${fileId}`;
-let dropdownId = `dropdown${orderIndex}-${fileIndex}`;
-return (
-<div key={fileIndex}>
-
-<div className="file-info">
-<iframe src={previewURL}  style={{ textDecoration: "none" }} height="auto" width="auto" title="orcode"></iframe>
-<a className="dropdown-item" href={downloadUrl} download><p style={{cursor:"pointer"}} href={downloadUrl} download>download</p></a>
-
-</div>
-</div>
-)
-})
-}
-</div>
-
-</div>
       <div className="col-lg-2" style={{display:"flex",justifyContent:"right"}}>
       <div className="card file">
 {
@@ -1507,8 +1483,85 @@ return (
 }
 </div>
       </div>
-       <div className="col-lg-2">
-       {
+    
+    </div>
+    <div className="row  " >
+      {/* <h3 style={{color:"orange"}}>Line Item: {orderIndex+1}</h3> */}
+      <div className="col-12 "  key={orderIndex}>
+    
+      {/* {orderDetail?.printSide} */}
+    
+      <h4 >Print side : <span className='bold'> Both side   /   Front side   /    back side</span></h4>
+      <h4 >FrontSide : <span className='bold'>{orderDetail?.printSize}</span></h4>
+      <h4>BackSide:{orderDetail?.printSizeBack}</h4>
+     
+    
+       
+    
+     <div className="col-lg-12" >
+     <h4>Main File :</h4>
+      <div className="card file">
+{
+orderDetail?.file?.map((fileUrl,fileIndex) => {
+// Extract the file ID from the URL
+//  let fileId = "";
+//  if (fileUrl?.includes("/file/d/")) {
+//    fileId = fileUrl?.split("/file/d/")[1]?.split("/")[0];
+//  } else if (fileUrl?.includes("id=")) {
+//    fileId = fileUrl?.split("id=")[1];
+//  }
+
+const fileId = fileUrl?.split('/d/')[1].split('/view')[0];
+const downloadUrl = `https://drive.google.com/uc?export=download&id=${fileId}`;
+const previewURL = `https://drive.google.com/file/d/${fileId}/preview`;
+// Construct the direct download link
+//  const downloadUrl = `https://drive.google.com/uc?export=download&id=${fileId}`;
+let dropdownId = `dropdown${orderIndex}-${fileIndex}`;
+return (
+<div key={fileIndex} style={{display:"flex"}}>
+
+<div className="file-info" style={{marginLeft:"15px"}}>
+<iframe src={previewURL}  style={{ textDecoration: "none" }} height="auto" width="auto" title="orcode"></iframe>
+<a className="dropdown-item" href={downloadUrl} download><p style={{cursor:"pointer"}} href={downloadUrl} download>download</p></a>
+
+</div>
+</div>
+)
+})
+}
+</div>
+
+</div>
+     
+     {/* <p >Main File :<div className="file-info">
+<iframe src={previewURL}  style={{ textDecoration: "none" }} height="auto" width="auto" title="orcode"></iframe>
+<a className="dropdown-item" href={downloadUrl} download><p style={{cursor:"pointer"}} href={downloadUrl} download>download</p></a>
+
+</div></p> */}
+   
+
+{
+orderDetail?.brandLogo &&
+<>
+<h4>Brang Logo :</h4>
+<div className="card file">
+      {
+(() => {
+// Extract the file ID from the URL
+let fileId = "";
+if (orderDetail?.brandLogo?.includes("/file/d/")) {
+fileId = orderDetail?.brandLogo?.split("/file/d/")[1].split("/")[0];
+} else if (orderDetail?.brandLogo?.includes("id=")) {
+fileId = orderDetail?.brandLogo?.split("id=")[1];
+}
+// Construct the direct download link
+const downloadUrl = `https://drive.google.com/uc?export=download&id=${fileId}`;
+
+return (
+<div >
+
+<div className="card-body file-info">
+{
 orderDetail?.brandLogo &&
 <>
 
@@ -1522,26 +1575,27 @@ fileId = orderDetail?.brandLogo?.split("/file/d/")[1].split("/")[0];
 } else if (orderDetail?.brandLogo?.includes("id=")) {
 fileId = orderDetail?.brandLogo?.split("id=")[1];
 }
+const previewURL = `https://drive.google.com/file/d/${fileId}/preview`;
 // Construct the direct download link
 const downloadUrl = `https://drive.google.com/uc?export=download&id=${fileId}`;
-const previewURL = `https://drive.google.com/file/d/${fileId}/preview`;
+
 return (
-<div>
+<div >
 
-
+<div className="card-body file-info">
 {
 orderDetail?.brandLogo ?
-<div className="file-info" >
+<div>
 <iframe src={previewURL}  style={{ textDecoration: "none" }} height="auto" width="auto" title="orcode"></iframe>
-<a className="dropdown-item" href={downloadUrl} download><p style={{cursor:"pointer"}} href={downloadUrl} download>download</p></a>
-
+<a className="dropdown-item" href={downloadUrl} download> <p>Brand Logo</p></a>
 </div>
-// * <a className="dropdown-item"  href={downloadUrl} download> Brand Logo</a> */
 :
 ""
 }
 
 
+{/* <span className="file-size">1009.2kb</span><br /> */}
+</div>
 </div>
 )
 })()
@@ -1551,9 +1605,25 @@ orderDetail?.brandLogo ?
 </>
 
 }
+
+
+{/* <span className="file-size">1009.2kb</span><br /> */}
+</div>
+</div>
+)
+})()
+}
+
+</div>
+</>
+
+}
+
       </div>
+      <hr />
     </div>
 
+{/* for mobile  */}
     <div className="row  diplay_none" >
       <h3 style={{color:"orange"}}>Line Item: {orderIndex+1}</h3>
       <div className="col-12 "  key={orderIndex}>
