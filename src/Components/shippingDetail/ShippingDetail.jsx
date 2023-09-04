@@ -12,19 +12,31 @@ const ShippingDetail = ({getSpecificOrderById}) => {
         
           <div className="container">
             <div className="row">
-              <div className="col-12">
-                {/* <a target="_blank" href="https://printbaz.com/">
+              {/* <div className="col-12">
+                <a target="_blank" href="https://printbaz.com/">
                   <img src="https://media.discordapp.net/attachments/1069579536842379305/1103281899469811712/logo01.png?width=1440&height=392" style={{width: '10%', marginTop: '50px'}} alt="" />
-                </a> */}
-              </div>
+                </a>
+              </div> */}
               <div className="row" style={{marginTop: '50px'}}>
-                <div className="col-6 invoice-to" style={{display: 'inline-block'}}>
+                <div className='flex'>
+                <div className='col-6'>
+                <div className=" invoice-to" style={{display: 'inline-block'}}>
                   <h2>Shipping Detail </h2>
                 
                 </div>
                <div>
                  <h4>Order ID: <span>{getSpecificOrderById?._id}</span></h4>
+                
                </div>
+
+                </div>
+                <div className=" invoice-to" style={{display: 'inline-block'}}>
+                <h4>Tracking Id : <span>{getSpecificOrderById?.trackingId}</span></h4>
+                
+                </div>
+                </div>
+                
+                
         
               </div>
             

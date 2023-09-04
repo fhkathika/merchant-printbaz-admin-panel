@@ -11,7 +11,7 @@ const AllDeliveryList = () => {
     const {deliveryAll}=useGetDeliveryList()
     const {orderAll}=useGetMongoData()
     const [isModalOpen, setModalOpen]= useState(false);
-   
+   console.log("deliveryAll",deliveryAll);
     const [filterPaymentStatus, setFilterPaymentStatus] = useState('');
     const [filterStatus, setFilterStatus] = useState('all');
     const [filterDeliveryAssignStatus, setFilterDeliveryAssignStatus] = useState('');
@@ -20,7 +20,10 @@ const AllDeliveryList = () => {
     const [startDate,setStartDate]=useState(null);
     const [endDate,setEndDate]=useState(null);
     const [editing, setEditing] = useState(null);
-
+    const [currentPage, setCurrentPage] = useState(1);
+    const [itemsPerPage, setItemsPerPage] = useState(20); 
+    const indexOfLastItem = currentPage * itemsPerPage;
+    const indexOfFirstItem = indexOfLastItem - itemsPerPage;
    const navigate=useNavigate()
     const backToDelivReport=()=>{
         navigate("/deliverySystem")
@@ -33,11 +36,13 @@ const AllDeliveryList = () => {
     setEndDate(date)
    
   }
- 
-useEffect(()=>{
+  
+  let deliveryFeeForOthers,deliveryFeeForPathao;
+  useEffect(()=>{
 
     // Process and update the delivery list here
 orderAll.forEach(async (getSpecificOrderById) => {
+
    const returnValue=Number(getSpecificOrderById?.printbazcost)+Number(getSpecificOrderById?.deliveryFee)
    const deliveryData = {
        orderId: getSpecificOrderById._id,
@@ -49,16 +54,20 @@ orderAll.forEach(async (getSpecificOrderById) => {
        orderStatus: getSpecificOrderById.orderStatus,
        paymentStatus: getSpecificOrderById.paymentStatus,
        deliveryAssignTo: getSpecificOrderById.deliveryAssignTo,
-       printBazRcvable: '',
+       deliveryArea:getSpecificOrderById?.area,
+       orderDetailArrr:getSpecificOrderById?.orderDetailArr,
+      deliveryFee:(getSpecificOrderById.deliveryAssignTo==="pathao" && deliveryFeeForPathao)||(getSpecificOrderById.deliveryAssignTo==="others" && deliveryFeeForOthers),
+      deliveryFeeForDeliveryTiger:"",
+      printBazRcvable: '',
        returnValue: getSpecificOrderById.orderStatus === "returned" ? returnValue : 0,
-       deliveryFeeForAdmin: '',
+      //  deliveryFeeForAdmin: deliveryAll?.deliveryFeeForAdmin?deliveryAll?.deliveryFeeForAdmin:'',
        deliveryFeeForClient: getSpecificOrderById.deliveryFee
    };
 
    if (['out for delivery', 'delivered', 'returned'].includes(getSpecificOrderById.orderStatus.toLowerCase())) {
        // Add/update the data in the DeliveryList
-       const deliveryResponse = await fetch('https://mserver.printbaz.com/addOrUpdateDeliveryList', {
-          //  const deliveryResponse = await fetch('http://localhost:5000/addOrUpdateDeliveryList', {
+      //  const deliveryResponse = await fetch('https://mserver.printbaz.com/addOrUpdateDeliveryList', {
+           const deliveryResponse = await fetch('http://localhost:5000/addOrUpdateDeliveryList', {
            method: 'PUT',
            headers: {
                'Content-Type': 'application/json',
@@ -78,7 +87,6 @@ orderAll.forEach(async (getSpecificOrderById) => {
 
 
 },[])
-  
   const handleInputChange = (event) => {
     const { id, value } = event.target;
     switch (id) {
@@ -132,7 +140,7 @@ orderAll.forEach(async (getSpecificOrderById) => {
   const applyFilters = () => {
     return deliveryAll.filter((order) => {
       deliveriesDeliverySystem = syncArrays(ordersForDeliverySystem, deliveriesDeliverySystem);
-      console.log("order from applyFilters",order?.trackingId);
+      // console.log("order from applyFilters",order?.trackingId);
       // Filter by status
       if (filterStatus !== 'all' && order.orderStatus !== filterStatus) {
         return false;
@@ -175,8 +183,8 @@ orderAll.forEach(async (getSpecificOrderById) => {
     
         const userDate = parseStatusDate(formattedStatusDate);
         if (!userDate) return false;
-    
-        console.log("User Date:", userDate); // Debugging line
+    // 
+        // console.log("User Date:", userDate); // Debugging line
     
         if (startDate && endDate) {
           // Both start and end dates are selected
@@ -184,7 +192,7 @@ orderAll.forEach(async (getSpecificOrderById) => {
           const end = new Date(endDate);
           end.setHours(23, 59, 59, 999); // Set to end of the day
           
-          console.log("Start and End Dates:", start, end); // Debugging line
+          // console.log("Start and End Dates:", start, end); // Debugging line
     
           if (userDate < start || userDate > end) return false;
     
@@ -193,7 +201,7 @@ orderAll.forEach(async (getSpecificOrderById) => {
           const start = new Date(startDate);
           start.setHours(0, 0, 0, 0); // Set to start of the day
     
-          console.log("Start Date:", start); // Debugging line
+          // console.log("Start Date:", start); // Debugging line
     
           if (userDate < start) return false;
     
@@ -202,7 +210,7 @@ orderAll.forEach(async (getSpecificOrderById) => {
           const end = new Date(endDate);
           end.setHours(23, 59, 59, 999); // Set to end of the day
     
-          console.log("End Date:", end); // Debugging line
+          // console.log("End Date:", end); // Debugging line
     
           if (userDate > end) return false;
         }
@@ -221,9 +229,9 @@ orderAll.forEach(async (getSpecificOrderById) => {
 const totalPrintbazRcv = deliveryMap?.reduce((acc, list) => {
   let amount = 0;
   if (list?.orderStatus === "returned") {
-      amount = 0 - (list?.deliveryFeeForAdmin);
+      amount = 0 - (list?.deliveryFee);
   } else {
-      amount = (list?.collectAmount) - (list?.deliveryFeeForAdmin);
+      amount = (list?.collectAmount) - (list?.deliveryFee);
   }
   return acc + amount;
 }, 0); 
@@ -235,9 +243,9 @@ const totalReceivable= deliveryMap?.reduce((acc, list) => {
 
   let amount = 0;
   if (list?.orderStatus === "returned") {
-      amount = 0 - (list?.deliveryFeeForAdmin);
+      amount = 0 - (list?.deliveryFee);
   } else {
-      amount = (list?.collectAmount) - (list?.deliveryFeeForAdmin);
+      amount = (list?.collectAmount) - (list?.deliveryFee);
   }
 
   return acc + amount;
@@ -288,7 +296,7 @@ const totalReceivable= deliveryMap?.reduce((acc, list) => {
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({ deliveryFeeForAdmin: updatedDeliveryFee }),
+        body: JSON.stringify({ deliveryFeeForDeliveryTiger: updatedDeliveryFee }),
       });
     
       if (response.ok) {
@@ -406,6 +414,7 @@ const totalReceivable= deliveryMap?.reduce((acc, list) => {
                           <th>Order ID</th>
                           <th>Tracking ID</th>
                           <th>Cash Collection Amount</th>
+                          <th>Area</th>
                           <th>Delivery Assign To</th>
                           <th>Delivery Fee</th>
                           <th>Delivery Status</th>
@@ -438,13 +447,96 @@ const totalReceivable= deliveryMap?.reduce((acc, list) => {
        let formattedDate = date.toLocaleDateString('en-US', options); 
        let printbazRcv=0
        if(list?.orderStatus==="returned"){
-         printbazRcv=0-(list?.deliveryFeeForAdmin)
+         printbazRcv=0-(list?.deliveryFee)
        }
        else{
-        printbazRcv=(list?.collectAmount)-(list?.deliveryFeeForAdmin)
+      
+         if(list?.deliveryAssignTo==="delivery tiger"){
+          printbazRcv=(list?.collectAmount)-(list?.deliveryFeeForDeliveryTiger)
+         
+         } 
+         else{
+          printbazRcv=(list?.collectAmount)-(list?.deliveryFee)
+         }
+        // else if(list?.deliveryAssignTo==="pathao"){
+        //   printbazRcv=(list?.collectAmount)-(deliveryFeeForPathao)
+         
+        //  }else if(list?.deliveryAssignTo==="delivery tiger"){
+        //   printbazRcv=(list?.collectAmount)-(list?.deliveryFeeForAdmin)
+         
+        //  }
+
        }
     
-    
+    // delivery fee for admin 
+  let deliveryFeeInsideDhaka = 0;
+  let deliveryFeeInsideDhakaForPathao = 0;
+  const baseDeliveryFee = 70;
+  const baseDeliveryFeeForPathao = 70+(list?.collectAmount*0.01);
+  const additionalDeliveryFee = 15;
+  let QuantityBase=0
+  let totalQuantity=0;
+
+  let deliveryFeeOutSideDhaka = 0;
+  let deliveryFeeOutSideDhakaForPathao = 0;
+  const baseDeliveryFeeOutSideDhaka = 100;
+  const baseDeliveryFeeOutSideDhakaForPathao = 100+(list?.collectAmount*0.01);
+  const additionalDeliveryFeeOutSideDhaka = 25;
+  console.log("list",list?.orderDetailArrr);
+  for  (var j = 0; j < list?.orderDetailArrr?.length; j++) {
+    QuantityBase=Number( list?.orderDetailArrr[j]?.quantity)
+    totalQuantity =Number(QuantityBase+totalQuantity)
+ 
+ console.log("QuantityBase",QuantityBase);
+ // Calculate delivery fee inside Dhaka
+if (list?.orderDetailArrr?.length > 0) {
+  const groups = Math.floor(totalQuantity / 5);
+  const remainder = totalQuantity % 5;
+
+  if (groups === 0) {
+    deliveryFeeInsideDhaka = baseDeliveryFee;
+    deliveryFeeInsideDhakaForPathao = baseDeliveryFeeForPathao;
+  } else if (remainder === 0) {
+    deliveryFeeInsideDhaka = baseDeliveryFee + (groups - 1) * additionalDeliveryFee;
+    deliveryFeeInsideDhakaForPathao = baseDeliveryFeeForPathao + (groups - 1) * additionalDeliveryFee;
+  } else {
+    deliveryFeeInsideDhaka = baseDeliveryFee + groups * additionalDeliveryFee;
+    deliveryFeeInsideDhakaForPathao = baseDeliveryFeeForPathao + groups * additionalDeliveryFee;
+  }
+  }
+
+// outside dhaka
+
+  if (list?.orderDetailArrr[j]?.quantity > 0) {
+    // Calculate the number of groups of 5 items in the order
+    const groups = Math.floor(totalQuantity / 5);
+
+    // Calculate the remainder
+    const remainder = totalQuantity % 5;
+
+    // Calculate the delivery fee
+    if (groups === 0) {
+      deliveryFeeOutSideDhaka = baseDeliveryFeeOutSideDhaka;
+      deliveryFeeOutSideDhakaForPathao = baseDeliveryFeeOutSideDhakaForPathao;
+    } else if (remainder === 0) {
+      deliveryFeeOutSideDhaka =baseDeliveryFeeOutSideDhaka +(groups - 1) * additionalDeliveryFeeOutSideDhaka;
+      deliveryFeeOutSideDhakaForPathao =baseDeliveryFeeOutSideDhakaForPathao +(groups - 1) * additionalDeliveryFeeOutSideDhaka;
+    } else {
+      deliveryFeeOutSideDhaka =baseDeliveryFeeOutSideDhaka +groups * additionalDeliveryFeeOutSideDhaka;
+      deliveryFeeOutSideDhakaForPathao =baseDeliveryFeeOutSideDhakaForPathao +groups * additionalDeliveryFeeOutSideDhaka;
+    }
+  }
+  }
+
+  if (list?.deliveryArea === "outside dhaka") {
+    deliveryFeeForOthers = deliveryFeeOutSideDhaka;
+    deliveryFeeForPathao = deliveryFeeOutSideDhakaForPathao;
+  } else {
+    deliveryFeeForOthers = deliveryFeeInsideDhaka;
+    deliveryFeeForPathao = deliveryFeeInsideDhakaForPathao;
+  }
+console.log("deliveryFeeForOthers",deliveryFeeForOthers);
+console.log("deliveryFeeForPathao",deliveryFeeForPathao);
        return (
            <tr className="info" >
                <td>{list?.statusDate}</td>
@@ -452,23 +544,47 @@ const totalReceivable= deliveryMap?.reduce((acc, list) => {
              
                <td>{list?.trackingId}</td>
                <td>{list?.collectAmount} TK</td>
+               <td>{list?.deliveryArea}</td>
                <td>{list?.deliveryAssignTo}</td>
                <td>
-      {editing === list?.orderId ? (
+  {(() => {
+    if (list?.deliveryAssignTo==="others") {
+      return deliveryFeeForOthers;
+    } else if (list?.deliveryAssignTo==="delivery tiger") {
+      return editing === list?.orderId ? (
         <input
           type="number"
-          defaultValue={list?.deliveryFeeForAdmin}
+          defaultValue={list?.deliveryFeeForDeliveryTiger}
           onBlur={() => toggleEditing(null)} // Stop editing when focus is lost
           onChange={(e) => handleEditChange(e, list?.orderId)}
         />
-      ) : (
-        `${list?.deliveryFeeForAdmin} TK`
-      )}
-      <button  style={{fontSize:"15px",color:"black",cursor:"pointer",border:"none",backgroundColor:"none" ,marginLeft:"10px"}}  onClick={() => toggleEditing(list?.orderId)}> {editing === list?.orderId ? 'Save' : <i style={{fontSize:"15px",color:"black",cursor:"pointer"}} class="fa fa-edit"></i>}</button>
-      {/* <button onClick={() => toggleEditing(list?.orderId)}>
-        {editing === list?.orderId ? 'Save' : 'Edit'}
-      </button> */}
-    </td>
+      )
+       : (
+        `${list?.deliveryFeeForDeliveryTiger} TK`
+      );
+    } 
+    else if (list?.deliveryAssignTo==="pathao") {
+      return deliveryFeeForPathao;
+    }
+  })()}
+  {
+    list?.deliveryAssignTo==="delivery tiger" &&
+    <button
+    style={{
+      fontSize: "15px",
+      color: "black",
+      cursor: "pointer",
+      border: "none",
+      backgroundColor: "none",
+      marginLeft: "10px",
+    }}
+    onClick={() => toggleEditing(list?.orderId)}
+  >
+    {editing === list?.orderId ? "Save" : <i className="fa fa-edit"></i>}
+  </button>
+  }
+
+</td>
     {
       list?.orderStatus==="returned" &&
       <td><p className="status-btn" style={{backgroundColor:"red",color:"white"}}>{list?.orderStatus}</p></td>
@@ -486,14 +602,7 @@ const totalReceivable= deliveryMap?.reduce((acc, list) => {
     }
              
                <td>{printbazRcv} TK</td>
-               {
-                 list?.paymentStatus==="paid" &
-                  <td > <p className="status-btn" > {list?.paymentStatus}</p> </td>
-               } 
-               {
-                 list?.paymentStatus==="Unpaid" &
-                  <td > <p className="status-btn"  style={{backgroundColor:""}}> {list?.paymentStatus}</p> </td>
-               }
+           
                <td > <p className="status-btn" > {list?.paymentStatus}</p> </td>
                <td style={{color:"red"}}>{list?.returnValue} TK</td>
                {/* <td> <button onClick={handleSubmit} style={{float: 'right', background: 'transparent', border: 'none', color: 'red', fontSize: '16px'}}><i className="fa fa-trash" aria-hidden="true" /></button></td>
@@ -509,6 +618,7 @@ const totalReceivable= deliveryMap?.reduce((acc, list) => {
                         <td style={{fontWeight: 700}} />
                         <td style={{fontWeight: 700}} />
                         <td style={{fontWeight: 700}}>{totalCollectAmount} TK</td>
+                        <td style={{fontWeight: 700}} />
                         <td style={{fontWeight: 700}} />
                         <td style={{fontWeight: 700}}>{totalDeliveryAmount} TK</td>
                         <td style={{fontWeight: 700}} />

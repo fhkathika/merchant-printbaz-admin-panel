@@ -259,10 +259,10 @@ const actualIndexOfLastItem = indexOfLastItem > orderAll.length ? orderAll.lengt
                 <label htmlFor="id-filter" style={{marginBottom:"8px"}}>Order Id:</label>
                 <input type="text" id="id-filter" className="form-control" value={filterOrderId}  onChange={handleInputChange} />
               </div>
-              <div className="col-lg-1 col-sm-12">
+              {/* <div className="col-lg-1 col-sm-12">
                 <label htmlFor="brand-filter" style={{marginBottom:"8px"}}>Brand Name</label>
                 <input type="text" id="brand-filter" value={filterBrand} onChange={(e) =>  handleInputChange(e)}  className="form-control" />
-              </div>
+              </div> */}
               <div className="col-lg-1 col-sm-12">
                 <label htmlFor="paymentStatus-filter" style={{marginBottom:"8px"}}>Payment:</label>
                 <select id="paymentStatus-filter" value={filterPaymentStatus} className="form-control" onChange={(e) =>  handleInputChange(e)}>

@@ -41,8 +41,8 @@ const ViewOrder = () => {
   useEffect(()=>{
     const getOrderById=async()=>{
              // Fetch the updated order details
-    await fetch(`https://mserver.printbaz.com/getorder/${id}`)
-    // await fetch(`http://localhost:5000/getorder/${id}`)
+    // await fetch(`https://mserver.printbaz.com/getorder/${id}`)
+    await fetch(`http://localhost:5000/getorder/${id}`)
     .then(res=>res.json())
     .then(data => {setGetSpecificOrderById(data)
       setOrderStatus(data.orderStatus);
@@ -81,8 +81,8 @@ setTrackingId(e.target.value)
     const status = e.target.value;
     try {
         const response = await fetch(
-           `https://mserver.printbaz.com/updateOrderStatus/${id}`,{ 
-      // `http://localhost:5000/updateOrderStatus/${id}`, {
+          //  `https://mserver.printbaz.com/updateOrderStatus/${id}`,{ 
+      `http://localhost:5000/updateOrderStatus/${id}`, {
             method: "PUT",
             headers: {
                 "Content-Type": "application/json",
@@ -114,14 +114,14 @@ setTrackingId(e.target.value)
                     deliveryAssignTo:getSpecificOrderById?.deliveryAssignTo,
                     printBazRcvable:'',
                     returnValue:status==="returned"?returnValue:0,
-                    deliveryFeeForAdmin:'',
+                    // deliveryFeeForAdmin:'',
                     deliveryFeeForClient:getSpecificOrderById?.deliveryFee
 
                 };
 
                 // Add/update the data in the DeliveryList
-                const deliveryResponse = await fetch('https://mserver.printbaz.com/addOrUpdateDeliveryList', {
-                  // const deliveryResponse = await fetch('http://localhost:5000/addOrUpdateDeliveryList', {
+                // const deliveryResponse = await fetch('https://mserver.printbaz.com/addOrUpdateDeliveryList', {
+                  const deliveryResponse = await fetch('http://localhost:5000/addOrUpdateDeliveryList', {
                     method: 'PUT',
                     headers: {
                         'Content-Type': 'application/json',
@@ -135,8 +135,8 @@ setTrackingId(e.target.value)
             }
             else if (status.toLowerCase() === 'cancel') {
               // Delete the order from the delivery list
-              const deleteResponse = await fetch(`https://mserver.printbaz.com/deleteFromDeliveryList/${id}`, {
-              // const deleteResponse = await fetch(`http://localhost:5000/deleteFromDeliveryList/${id}`, {
+              // const deleteResponse = await fetch(`https://mserver.printbaz.com/deleteFromDeliveryList/${id}`, {
+              const deleteResponse = await fetch(`http://localhost:5000/deleteFromDeliveryList/${id}`, {
                   method: 'DELETE',
                   headers: {
                       'Content-Type': 'application/json',
@@ -192,7 +192,7 @@ setTrackingId(e.target.value)
           deliveryAssignTo:getSpecificOrderById?.deliveryAssignTo,
           printBazRcvable:'',
           returnValue:getSpecificOrderById?.orderStatus==="returned"?returnValue:0,
-          deliveryFeeForAdmin:'',
+          // deliveryFeeForAdmin:'',
           deliveryFeeForClient:getSpecificOrderById?.deliveryFee
 
       };
@@ -230,8 +230,8 @@ setTrackingId(e.target.value)
     try {
       const response = await fetch(
         
-        `https://mserver.printbaz.com/deliveryAssignTo/${id}`,
-      // `http://localhost:5000/deliveryAssignTo/${id}`,
+        // `https://mserver.printbaz.com/deliveryAssignTo/${id}`,
+      `http://localhost:5000/deliveryAssignTo/${id}`,
         {
           method: "PUT",
           headers: {
@@ -257,14 +257,14 @@ setTrackingId(e.target.value)
           deliveryAssignTo:status,
           printBazRcvable:'',
           returnValue:getSpecificOrderById?.orderStatus==="returned"?returnValue:0,
-          deliveryFeeForAdmin:'',
+          // deliveryFeeForAdmin:'',
           deliveryFeeForClient:getSpecificOrderById?.deliveryFee
 
       };
       if (['out for delivery', 'delivered', 'returned'].includes(getSpecificOrderById?.orderStatus.toLowerCase())) {
       // Add/update the data in the DeliveryList
-      const deliveryResponse = await fetch('https://mserver.printbaz.com/addOrUpdateDeliveryList', {
-        // const deliveryResponse = await fetch('http://localhost:5000/addOrUpdateDeliveryList', {
+      // const deliveryResponse = await fetch('https://mserver.printbaz.com/addOrUpdateDeliveryList', {
+        const deliveryResponse = await fetch('http://localhost:5000/addOrUpdateDeliveryList', {
           method: 'PUT',
           headers: {
               'Content-Type': 'application/json',
@@ -325,7 +325,7 @@ setTrackingId(e.target.value)
           deliveryAssignTo:getSpecificOrderById?.deliveryAssignTo,
           printBazRcvable:'',
           returnValue:getSpecificOrderById?.orderStatus==="returned"?returnValue:0,
-          deliveryFeeForAdmin:'',
+          // deliveryFeeForAdmin:'',
           deliveryFeeForClient:getSpecificOrderById?.deliveryFee
 
       };
@@ -1491,9 +1491,9 @@ return (
     
       {/* {orderDetail?.printSide} */}
     
-      <h4 >Print side : <span className='bold'> Both side   /   Front side   /    back side</span></h4>
-      <h4 >FrontSide : <span className='bold'>{orderDetail?.printSize}</span></h4>
-      <h4>BackSide:{orderDetail?.printSizeBack}</h4>
+      <h4 >Print side : <span className='bold'> {orderDetail?.printSide}</span></h4>
+      <h4 >FrontSide : <span className='bold'>{orderDetail?.printSize?orderDetail?.printSize:"N/A"}</span></h4>
+      <h4>BackSide: {orderDetail?.printSizeBack ? orderDetail?.printSizeBack :"N/A"}</h4>
      
     
        

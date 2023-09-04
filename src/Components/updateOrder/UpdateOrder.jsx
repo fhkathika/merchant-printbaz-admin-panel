@@ -992,8 +992,7 @@ console.log("getSpecificOrderById out side delete func",getSpecificOrderById);
                     {imageprogress === 0 ? null : (
          <ProgressBar now={imageprogress} label={`${imageprogress}%`} />
           )}
-{
-  individualOrder?.brandLogo &&
+
 <Form.Group  className="mb-3">
   <Form.Label>Upload Your Brand Logo (optional)</Form.Label>
   {  (() => {
@@ -1070,7 +1069,7 @@ console.log("getSpecificOrderById out side delete func",getSpecificOrderById);
  
   
 </Form.Group>
-}
+
 
                      </>
                      ))}
