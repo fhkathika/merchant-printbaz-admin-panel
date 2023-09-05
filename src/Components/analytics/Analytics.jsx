@@ -120,6 +120,10 @@ const tShirtQuantityForDeliveredOrders= deliveredOrders?.reduce((sum, order) => 
 const tShirtQuantityForReturnOrders= returnOrders?.reduce((sum, order) => {
   return sum + (order?.orderDetailArr?.reduce((innerSum, item) => innerSum + parseInt(item.quantity || 0), 0));
 }, 0);
+
+const tShirtQuantityForDeliveredAndPaidOrders= paidAndDeliveredOrders?.reduce((sum, order) => {
+  return sum + (order?.orderDetailArr?.reduce((innerSum, item) => innerSum + parseInt(item.quantity || 0), 0));
+}, 0);
 //  Return  black ,white tshirt count
 const colorQuantitiesForReturn = returnOrders?.reduce((acc, order) => {
   return (order?.orderDetailArr || []).reduce((innerAcc, item) => {
@@ -688,7 +692,7 @@ return (
                 
                   <div className="card-body" style={{display:"flex",justifyContent:"flex-end"}}>
                    
-                    <h4 className="float-right" style={{marginTop:"2px"}}>{countPaidAndDeliveredOrders}</h4>
+                    <h4 className="float-right" style={{marginTop:"2px"}}>{countPaidAndDeliveredOrders}({tShirtQuantityForDeliveredAndPaidOrders})</h4>
                     </div>
                     </div>
                   <div  style={{display:"flex",justifyContent:"flex-end",padding:"0px 25px"}}>
