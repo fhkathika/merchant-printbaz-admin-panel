@@ -364,10 +364,7 @@ return (
                   
                   </div>
                 </div>
-               
-              
-
-              </div>
+                </div>
                 <div className="col-md-3">
                
                 <div className="card stat-card" style={{height:"152px"}}>
@@ -379,7 +376,7 @@ return (
                 <div>
                     <div className="card-body" style={{display:"flex",justifyContent:"center"}}>
                    
-                    <h4 className="float-right" style={{marginLeft:"40px",marginTop:"2px"}}>{countoutForDeliveryOrders}</h4>
+                    <h4 className="float-right" style={{marginLeft:"40px",marginTop:"2px"}}>{countoutForDeliveryOrders}({tShirtQuantityForOutFOrDelivery})</h4>
                     </div>
                     <div  style={{display:"flex",justifyContent:"flex-end",padding:"0px 20px",marginTop:"35px"}}>
                
