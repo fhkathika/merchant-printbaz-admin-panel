@@ -234,7 +234,7 @@ const getViewClientColor = (status) => {
   // return "defaultColor";
 };
 
-const actualIndexOfLastItem = indexOfLastItem > orderAll.length ? orderAll.length : indexOfLastItem;
+const actualIndexOfLastItem = indexOfLastItem > orderMap.length ? orderMap.length : indexOfLastItem;
    return (
         <div>
           <meta charSet="UTF-8" />

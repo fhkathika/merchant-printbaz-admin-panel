@@ -21,8 +21,8 @@ const AllMerchants = () => {
   const [currentPage, setCurrentPage] = useState(1);
   const [itemsPerPage, setItemsPerPage] = useState(30); 
   const indexOfLastItem = currentPage * itemsPerPage;
-const indexOfFirstItem = indexOfLastItem - itemsPerPage;
-const {value_count}=useRoleAsignData()
+  const indexOfFirstItem = indexOfLastItem - itemsPerPage;
+  const {value_count}=useRoleAsignData()
 let count=0
 
 
@@ -177,7 +177,7 @@ return (
             </div>
           </div>
           <div style={{textAlign:"right"}}>
-          <span style={{marginRight:"20px"}}>{indexOfFirstItem + 1} - {actualIndexOfLastItem < 30 ? (filteredUsers?.length ): actualIndexOfLastItem} of {filteredUsers.length}</span>
+          <span style={{marginRight:"20px"}}>{indexOfFirstItem + 1} - {actualIndexOfLastItem < 30 ? (filteredUsers?.length ): actualIndexOfLastItem} of {SingleEmailOneTime.length}</span>
     <button style={{marginRight:"20px",border:"none"}} onClick={() => setCurrentPage(currentPage - 1)} disabled={currentPage === 1} ><img style={{height:"10px",width:"15px"}} src='images/left-arrow.png' alt="left arrow"/></button>
     <button style={{height:"40px",border:"none"}} onClick={() => setCurrentPage(currentPage + 1)} disabled={currentPage === Math.ceil(SingleEmailOneTime.length / itemsPerPage)}><img style={{height:"10px",width:"15px"}} src='images/right-arrow.png' alt="right arrow"/></button>
    

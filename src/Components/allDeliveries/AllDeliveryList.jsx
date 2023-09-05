@@ -224,7 +224,9 @@ orderAll.forEach(async (getSpecificOrderById) => {
     });
   };
   const deliveryMap=applyFilters()
-  console.log("deliveryMap",deliveryMap);
+  console.log("deliveryMap",deliveryMap.length);
+  console.log("indexOfLastItem",indexOfLastItem);
+  const actualIndexOfLastItem = indexOfLastItem > deliveryMap.length ? deliveryMap.length : indexOfLastItem;
      //  calculate the total sum of printbazRcv
 const totalPrintbazRcv = deliveryMap?.reduce((acc, list) => {
   let amount = 0;
@@ -436,9 +438,16 @@ const totalReceivable= deliveryMap?.reduce((acc, list) => {
           <div className="row input-bar-01">
             <div className="col-xs-12 col-sm-12 col-md-12 col-lg-12">
               <div className="lobipanel">
-                <div className="panel-title">
+                <div className="panel-title flex">
                   <h4>Delivery List</h4>
+                  <div style={{textAlign:"right"}}>
+          <span style={{marginRight:"20px"}}>{indexOfFirstItem + 1} - {actualIndexOfLastItem  } of {deliveryMap.length}</span>
+    <button style={{marginRight:"20px",border:"none"}} onClick={() => setCurrentPage(currentPage - 1)} disabled={currentPage === 1} ><img style={{height:"10px",width:"15px"}} src='images/left-arrow.png' alt="left arrow"/></button>
+    <button style={{height:"40px",border:"none"}} onClick={() => setCurrentPage(currentPage + 1)} disabled={currentPage === Math.ceil(deliveryMap.length / itemsPerPage)}><img style={{height:"10px",width:"15px"}} src='images/right-arrow.png' alt="right arrow"/></button>
+   
+          </div>
                 </div>
+            
                 <div className="panel-body" >
                   <table className="table" >
                     <thead>
