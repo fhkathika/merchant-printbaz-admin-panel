@@ -108,6 +108,8 @@ let returnOrders=orderAll?.filter(users=>users?.orderStatus==="returned");
 let pendingTickets=fetchAllTicket?.filter(ticket=>ticket?.ticketStatus==="pending");
 let repliedTickets=fetchAllTicket?.filter(ticket=>ticket?.ticketStatus==="replied");
 let openTickets=fetchAllTicket?.filter(ticket=>ticket?.ticketStatus==="open");
+let paidOrders=orderAll?.filter(payment=>payment?.paymentStatus==="paid");
+let paidAndDeliveredOrders=orderAll?.filter(payment=>payment?.paymentStatus==="paid" && payment?.orderStatus==="delivered" );
 // filter  sum of total quantity tshirt
 const tShirtQuantityForOutFOrDelivery= outForDeliveryOrders?.reduce((sum, order) => {
   return sum + (order?.orderDetailArr?.reduce((innerSum, item) => innerSum + parseInt(item.quantity || 0), 0));
@@ -193,22 +195,29 @@ let countreturnOrders = returnOrders?.length || 0;
 let countpendingTickets = pendingTickets?.length || 0;
 let countrepliedTickets = repliedTickets?.length || 0;
 let countopenTickets = openTickets?.length || 0;
+let countDeliverOrders=(deliveredOrders?.length || 0)
+let countPaidAndDeliveredOrders=(paidAndDeliveredOrders?.length || 0)
+console.log("countDeliverOrders",countDeliverOrders);
+console.log("countPaidAndDeliveredOrders",countPaidAndDeliveredOrders);
 let countODROrders = countoutForDeliveryOrders+countreturnOrders+countdeliveredOrders;
-const totalpendingPBazCost = pendingOrders?.reduce((acc, curr) => acc +parseFloat (curr.printbazcost || 0)+parseInt(curr.deliveryFee), 0);
-const totalapprovedPBazCost = approvedOrders?.reduce((acc, curr) => acc +parseFloat (curr.printbazcost || 0)+parseInt(curr.deliveryFee), 0);
-const totalconfirmedPBazCost = confirmedOrders?.reduce((acc, curr) => acc +parseFloat (curr.printbazcost || 0)+parseInt(curr.deliveryFee), 0);
-const totalonHoldArtworkIssuePBazCost = onHoldArtworkIssueOrders?.reduce((acc, curr) => acc +parseFloat (curr.printbazcost || 0)+parseInt(curr.deliveryFee), 0);
-const totalonHoldBillingIssuePBazCost = onHoldBillingIssueOrders?.reduce((acc, curr) => acc +parseFloat (curr.printbazcost || 0)+parseInt(curr.deliveryFee), 0);
-const totalonHoldOutOfStockPBazCost = onHoldOutOfStockOrders?.reduce((acc, curr) => acc +parseFloat (curr.printbazcost || 0)+parseInt(curr.deliveryFee), 0);
-const totalinProductionPBazCost = inProductionOrders?.reduce((acc, curr) => acc +parseFloat (curr.printbazcost || 0)+parseInt(curr.deliveryFee), 0);
-const totaloutForDeliveryPBazCost = outForDeliveryOrders?.reduce((acc, curr) => acc +parseFloat (curr.printbazcost || 0)+parseInt(curr.deliveryFee), 0);
-const totaldeliveredPBazCost = deliveredOrders?.reduce((acc, curr) => acc +parseFloat (curr.printbazcost || 0)+parseInt(curr.deliveryFee), 0);
-const totalpaymentReleasedPBazCost = paymentReleaseddOrders?.reduce((acc, curr) => acc +parseFloat (curr.printbazcost || 0)+parseInt(curr.deliveryFee), 0);
-const totalcancelPBazCost = cancelOrders?.reduce((acc, curr) => acc +parseFloat (curr.printbazcost || 0)+parseInt(curr.deliveryFee), 0);
-const totalreturnPBazCost = returnOrders?.reduce((acc, curr) => acc +parseFloat (curr.printbazcost || 0)+parseInt(curr.deliveryFee), 0);
+const totalpendingPBazCost = pendingOrders?.reduce((acc, curr) => acc +parseFloat (curr.printbazcost || 0), 0);
+const totalapprovedPBazCost = approvedOrders?.reduce((acc, curr) => acc +parseFloat (curr.printbazcost || 0), 0);
+const totalconfirmedPBazCost = confirmedOrders?.reduce((acc, curr) => acc +parseFloat (curr.printbazcost || 0), 0);
+const totalonHoldArtworkIssuePBazCost = onHoldArtworkIssueOrders?.reduce((acc, curr) => acc +parseFloat (curr.printbazcost || 0), 0);
+const totalonHoldBillingIssuePBazCost = onHoldBillingIssueOrders?.reduce((acc, curr) => acc +parseFloat (curr.printbazcost || 0), 0);
+const totalonHoldOutOfStockPBazCost = onHoldOutOfStockOrders?.reduce((acc, curr) => acc +parseFloat (curr.printbazcost || 0), 0);
+const totalinProductionPBazCost = inProductionOrders?.reduce((acc, curr) => acc +parseFloat (curr.printbazcost || 0), 0);
+const totaloutForDeliveryPBazCost = outForDeliveryOrders?.reduce((acc, curr) => acc +parseFloat (curr.printbazcost || 0), 0);
+const totaldeliveredPBazCost = deliveredOrders?.reduce((acc, curr) => acc +parseFloat (curr.printbazcost || 0), 0);
+const totalpaymentReleasedPBazCost = paymentReleaseddOrders?.reduce((acc, curr) => acc +parseFloat (curr.printbazcost || 0), 0);
+const totalcancelPBazCost = cancelOrders?.reduce((acc, curr) => acc +parseFloat (curr.printbazcost || 0), 0);
+const totalreturnPBazCost = returnOrders?.reduce((acc, curr) => acc +parseFloat (curr.printbazcost || 0), 0);
+const totalpaidAndDeliveredPBazCost = paidAndDeliveredOrders?.reduce((acc, curr) => acc +parseFloat (curr.printbazcost || 0), 0);
 const TotalODR= Number(totaldeliveredPBazCost+totaloutForDeliveryPBazCost+totalreturnPBazCost)
 
-console.log("outForDeliveryOrders",outForDeliveryOrders);
+
+
+console.log("totalpaidAndDeliveredPBazCost",totalpaidAndDeliveredPBazCost);
 
 const downloadInfIntoXl = (event) => {
   const dynmamicId = event.currentTarget.dataset.orderId;
@@ -666,8 +675,35 @@ return (
               
                   </div>
                 </div>
+                
 
               </div> 
+              <div className="col-md-3">
+                <div className="card stat-card"  style={{height:"152px"}}>
+                <div className="" style={{display:"flex",justifyContent:"space-between",alignItem:"center"}}>
+                  <div className="card-body pb-0">
+                    <h5 className="">Total Delivered And Paid </h5>
+                    <h2 className="float-right">{totalpaidAndDeliveredPBazCost} TK</h2>
+                    </div>
+                
+                  <div className="card-body" style={{display:"flex",justifyContent:"flex-end"}}>
+                   
+                    <h4 className="float-right" style={{marginTop:"2px"}}>{countPaidAndDeliveredOrders}</h4>
+                    </div>
+                    </div>
+                  <div  style={{display:"flex",justifyContent:"flex-end",padding:"0px 25px"}}>
+                   
+                    <span style={{cursor:"pointer"}} onClick={downloadInfIntoXl} data-order-id="order-detail-ODI"><img style={{width:"25px",hight:"25px"}} src="/images/download.png" alt='download'/></span>
+                <div id="order-detail-ODI" style={{position: 'absolute', left: '-10000px', top: '-10000px'}}>
+                <GetOrdersXl orderList={[outForDeliveryOrders,deliveredOrders,returnOrders]}/>
+              
+            </div> 
+              
+                  </div>
+                </div>
+                
+
+              </div>
            
               <div className="col-md-3">
                

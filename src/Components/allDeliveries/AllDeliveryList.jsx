@@ -469,6 +469,7 @@ const totalReceivable= deliveryMap?.reduce((acc, list) => {
                    
                     {
    deliveryMap
+   ?.slice(indexOfFirstItem, indexOfLastItem)
    .sort((a, b) => {
     const dateA = convertDatabaseDateToJSDate(a?.statusDate);
     const dateB = convertDatabaseDateToJSDate(b?.statusDate);
