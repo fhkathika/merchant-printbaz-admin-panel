@@ -57,7 +57,7 @@ orderAll.forEach(async (getSpecificOrderById) => {
        deliveryArea:getSpecificOrderById?.area,
        orderDetailArrr:getSpecificOrderById?.orderDetailArr,
       deliveryFee:(getSpecificOrderById.deliveryAssignTo==="pathao" && deliveryFeeForPathao)||(getSpecificOrderById.deliveryAssignTo==="others" && deliveryFeeForOthers),
-      deliveryFeeForDeliveryTiger:"",
+      // deliveryFeeForDeliveryTiger:"",
       printBazRcvable: '',
        returnValue: getSpecificOrderById.orderStatus === "returned" ? returnValue : 0,
       //  deliveryFeeForAdmin: deliveryAll?.deliveryFeeForAdmin?deliveryAll?.deliveryFeeForAdmin:'',
@@ -66,8 +66,8 @@ orderAll.forEach(async (getSpecificOrderById) => {
 
    if (['out for delivery', 'delivered', 'returned'].includes(getSpecificOrderById.orderStatus.toLowerCase())) {
        // Add/update the data in the DeliveryList
-      //  const deliveryResponse = await fetch('https://mserver.printbaz.com/addOrUpdateDeliveryList', {
-           const deliveryResponse = await fetch('http://localhost:5000/addOrUpdateDeliveryList', {
+       const deliveryResponse = await fetch('https://mserver.printbaz.com/addOrUpdateDeliveryList', {
+          //  const deliveryResponse = await fetch('http://localhost:5000/addOrUpdateDeliveryList', {
            method: 'PUT',
            headers: {
                'Content-Type': 'application/json',
@@ -229,9 +229,22 @@ orderAll.forEach(async (getSpecificOrderById) => {
 const totalPrintbazRcv = deliveryMap?.reduce((acc, list) => {
   let amount = 0;
   if (list?.orderStatus === "returned") {
+    if(list?.deliveryAssignTo==="delivery tiger"){
+      amount = 0 - (list?.deliveryFeeForDeliveryTiger?list?.deliveryFeeForDeliveryTiger:0);
+    }
+    else{
       amount = 0 - (list?.deliveryFee);
+    }
+      
   } else {
+    if(list?.deliveryAssignTo==="delivery tiger"){
+     
+      amount = (list?.collectAmount) - (list?.deliveryFeeForDeliveryTiger?list?.deliveryFeeForDeliveryTiger:0);
+    }
+    else{
       amount = (list?.collectAmount) - (list?.deliveryFee);
+    }
+     
   }
   return acc + amount;
 }, 0); 
@@ -243,9 +256,21 @@ const totalReceivable= deliveryMap?.reduce((acc, list) => {
 
   let amount = 0;
   if (list?.orderStatus === "returned") {
+    if(list?.deliveryAssignTo==="delivery tiger"){
+      amount = 0- (list?.deliveryFeeForDeliveryTiger?list?.deliveryFeeForDeliveryTiger:0);
+    }
+    else{
       amount = 0 - (list?.deliveryFee);
+    }
+      
   } else {
+    if(list?.deliveryAssignTo==="delivery tiger"){
+      amount = (list?.collectAmount) - (list?.deliveryFeeForDeliveryTiger?list?.deliveryFeeForDeliveryTiger:0);
+    }
+    else{
       amount = (list?.collectAmount) - (list?.deliveryFee);
+    }
+      
   }
 
   return acc + amount;
@@ -289,9 +314,10 @@ const totalReceivable= deliveryMap?.reduce((acc, list) => {
 
   const handleEditChange = async (e, orderId) => {
     const updatedDeliveryFee = e.target.value;
+    console.log("updatedDeliveryFee",updatedDeliveryFee);
     try {
-      // const response = await fetch(`https://mserver.printbaz.com/updateDeliveryFee/${orderId}`, {
-      const response = await fetch(`http://localhost:5000/updateDeliveryFee/${orderId}`, {
+      const response = await fetch(`https://mserver.printbaz.com/updateDeliveryFee/${orderId}`, {
+      // const response = await fetch(`http://localhost:5000/updateDeliveryFee/${orderId}`, {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
@@ -315,7 +341,14 @@ const totalReceivable= deliveryMap?.reduce((acc, list) => {
     setEditing(editing === orderId ? null : orderId);
   };
   const totalCollectAmount = deliveryMap?.reduce((acc, curr) => acc +parseFloat (curr.collectAmount || 0), 0);
-  const totalDeliveryAmount = deliveryMap?.reduce((acc, curr) => acc + parseFloat(curr.deliveryFee || 0), 0);
+  const totalDeliveryAmount = deliveryMap?.reduce((acc, curr) => {
+    if (curr?.deliveryAssignTo === "delivery tiger") {
+      return acc + parseFloat(curr.deliveryFeeForDeliveryTiger || 0);
+    } else {
+      return acc + parseFloat(curr.deliveryFee || 0);
+    }
+  }, 0);
+  
   const totalCollectAmountByCourier = deliveryMap?.reduce((acc, curr) => acc + parseFloat(curr.cashCollectNyCourier || 0), 0);
   const totalReturnAmount = deliveryMap?.reduce((acc, curr) => acc + parseFloat(curr.returnValue || 0), 0);
    return (
@@ -342,7 +375,7 @@ const totalReceivable= deliveryMap?.reduce((acc, list) => {
                   <div className="statistic-box">
                     <h3>Amount Receivable</h3>
                     <div className="counter-number pull-right">
-                      <span className="count-number">{totalReceivable}</span>
+                      <span className="count-number">{totalReceivable.toFixed(2)}</span>
                       <span className="slight" style={{fontWeight: 'bolder'}}>৳</span>
                     </div>
                   </div>
@@ -447,7 +480,13 @@ const totalReceivable= deliveryMap?.reduce((acc, list) => {
        let formattedDate = date.toLocaleDateString('en-US', options); 
        let printbazRcv=0
        if(list?.orderStatus==="returned"){
-         printbazRcv=0-(list?.deliveryFee)
+        if(list?.deliveryAssignTo==="delivery tiger"){
+          printbazRcv=0-(list?.deliveryFeeForDeliveryTiger)
+        }
+        else{
+          printbazRcv=0-(list?.deliveryFee)
+        }
+         
        }
        else{
       
@@ -560,7 +599,7 @@ console.log("deliveryFeeForPathao",deliveryFeeForPathao);
         />
       )
        : (
-        `${list?.deliveryFeeForDeliveryTiger} TK`
+        `${list?.deliveryFeeForDeliveryTiger?list?.deliveryFeeForDeliveryTiger : ''} TK`
       );
     } 
     else if (list?.deliveryAssignTo==="pathao") {
@@ -601,7 +640,7 @@ console.log("deliveryFeeForPathao",deliveryFeeForPathao);
    
     }
              
-               <td>{printbazRcv} TK</td>
+               <td>{printbazRcv ? printbazRcv: Number(0)} TK</td>
            
                <td > <p className="status-btn" > {list?.paymentStatus}</p> </td>
                <td style={{color:"red"}}>{list?.returnValue} TK</td>
@@ -620,9 +659,9 @@ console.log("deliveryFeeForPathao",deliveryFeeForPathao);
                         <td style={{fontWeight: 700}}>{totalCollectAmount} TK</td>
                         <td style={{fontWeight: 700}} />
                         <td style={{fontWeight: 700}} />
-                        <td style={{fontWeight: 700}}>{totalDeliveryAmount} TK</td>
+                        <td style={{fontWeight: 700}}>{totalDeliveryAmount.toFixed(2)} TK</td>
                         <td style={{fontWeight: 700}} />
-                        <td style={{fontWeight: 700}}>{totalPrintbazRcv} TK</td>
+                        <td style={{fontWeight: 700}}>{totalPrintbazRcv.toFixed(2)} TK</td>
                         <td style={{fontWeight: 700}} />
                         <td style={{fontWeight: 700}}>{totalReturnAmount} TK</td>
                       </tr>

@@ -170,7 +170,7 @@ return (
               <label htmlFor="status-filter">Status:</label>
               <select id="status-filter" className="form-control"   onChange={(e) =>  handleInputChange(e)}>
                 <option value="all">All</option>
-                <option value="pending">Pending</option>
+                <option value="request">Pending</option>
                 <option value="approved">Approved</option>
                 <option value="ban">Ban</option>
               </select>
@@ -230,7 +230,7 @@ return (
                 </div>
                 <div className="col-lg-2 col-sm-12">
                   {
-                    merchants?.approval==="requiest" &&   <p className="status-btn" style={{backgroundColor:"red"}} >{merchants?.approval}</p>
+                    merchants?.approval==="request" &&   <p className="status-btn" style={{backgroundColor:"red"}} >{merchants?.approval}</p>
                   }
                    {
                     merchants?.approval==="approved" &&   <p className="status-btn"  >{merchants?.approval}</p>
