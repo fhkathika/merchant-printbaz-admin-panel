@@ -37,56 +37,7 @@ const AllDeliveryList = () => {
    
   }
   
-  let deliveryFeeForOthers,deliveryFeeForPathao;
-  useEffect(()=>{
 
-    // Process and update the delivery list here
-orderAll.forEach(async (getSpecificOrderById) => {
-
-   const returnValue=Number(getSpecificOrderById?.printbazcost)+Number(getSpecificOrderById?.deliveryFee)
-   const deliveryData = {
-       orderId: getSpecificOrderById._id,
-       statusDate: getSpecificOrderById.statusDate,
-       collectAmount: getSpecificOrderById.collectAmount,
-       trackingId: getSpecificOrderById?.trackingId,
-       recvMoney: getSpecificOrderById.recvMoney,
-       printbazcost: getSpecificOrderById.printbazcost,
-       orderStatus: getSpecificOrderById.orderStatus,
-       paymentStatus: getSpecificOrderById.paymentStatus,
-       deliveryAssignTo: getSpecificOrderById.deliveryAssignTo,
-       deliveryArea:getSpecificOrderById?.area,
-       orderDetailArrr:getSpecificOrderById?.orderDetailArr,
-      deliveryFee:(getSpecificOrderById.deliveryAssignTo==="pathao" && deliveryFeeForPathao)||(getSpecificOrderById.deliveryAssignTo==="others" && deliveryFeeForOthers),
-      // deliveryFeeForDeliveryTiger:"",
-      printBazRcvable: '',
-       returnValue: getSpecificOrderById.orderStatus === "returned" ? returnValue : 0,
-      //  deliveryFeeForAdmin: deliveryAll?.deliveryFeeForAdmin?deliveryAll?.deliveryFeeForAdmin:'',
-       deliveryFeeForClient: getSpecificOrderById.deliveryFee
-   };
-
-   if (['out for delivery', 'delivered', 'returned'].includes(getSpecificOrderById.orderStatus.toLowerCase())) {
-       // Add/update the data in the DeliveryList
-       const deliveryResponse = await fetch('https://mserver.printbaz.com/addOrUpdateDeliveryList', {
-          //  const deliveryResponse = await fetch('http://localhost:5000/addOrUpdateDeliveryList', {
-           method: 'PUT',
-           headers: {
-               'Content-Type': 'application/json',
-           },
-           body: JSON.stringify(deliveryData),
-       });
-       // console.log("Success:", getSpecificOrderById);
-       // Update your state or perform any other necessary operations with the updated viewClient object
-   // Fetch delivery list from the API and update local storage
-   // Similar to how you fetch orders and update the delivery list in your previous code
-   // Update local storage for delivery list
-  //  localStorage.setItem('deliveryList', JSON.stringify(deliveryResponse));
-   }
-});
-
-   
-
-
-},[])
   const handleInputChange = (event) => {
     const { id, value } = event.target;
     switch (id) {
@@ -138,8 +89,9 @@ orderAll.forEach(async (getSpecificOrderById) => {
   
    
   const applyFilters = () => {
+    deliveriesDeliverySystem = syncArrays(ordersForDeliverySystem, deliveriesDeliverySystem);
     return deliveryAll.filter((order) => {
-      deliveriesDeliverySystem = syncArrays(ordersForDeliverySystem, deliveriesDeliverySystem);
+      
       // console.log("order from applyFilters",order?.trackingId);
       // Filter by status
       if (filterStatus !== 'all' && order.orderStatus !== filterStatus) {
@@ -224,7 +176,158 @@ orderAll.forEach(async (getSpecificOrderById) => {
     });
   };
   const deliveryMap=applyFilters()
-  console.log("deliveryMap",deliveryMap.length);
+  console.log("orderAll",orderAll);
+  // Utility function to calculate delivery fee
+function calculateDeliveryFee(list) {
+  console.log("Input to calculateDeliveryFee", list);
+  let deliveryFeeForOthers = 0;
+  let deliveryFeeForPathao = 0;
+
+  // Initialize variables for the logic
+  let deliveryFeeInsideDhaka = 0;
+  let deliveryFeeInsideDhakaForPathao = 0;
+  const baseDeliveryFee = 70;
+  const baseDeliveryFeeForPathao = 70 + (list?.collectAmount * 0.01);
+  const additionalDeliveryFee = 15;
+  let QuantityBase = 0;
+  let totalQuantity = 0;
+
+  let deliveryFeeOutSideDhaka = 0;
+  let deliveryFeeOutSideDhakaForPathao = 0;
+  const baseDeliveryFeeOutSideDhaka = 100;
+  const baseDeliveryFeeOutSideDhakaForPathao = 100 + (list?.collectAmount * 0.01);
+  const additionalDeliveryFeeOutSideDhaka = 25;
+
+  for (let j = 0; j < list?.orderDetailArr?.length; j++) {
+    QuantityBase = Number(list?.orderDetailArr[j]?.quantity);
+    totalQuantity = Number(QuantityBase + totalQuantity);
+
+    // Calculate delivery fee inside Dhaka
+    if (list?.orderDetailArr?.length > 0) {
+      const groups = Math.floor(totalQuantity / 5);
+      const remainder = totalQuantity % 5;
+
+      if (groups === 0) {
+        deliveryFeeInsideDhaka = baseDeliveryFee;
+        deliveryFeeInsideDhakaForPathao = baseDeliveryFeeForPathao;
+      } else if (remainder === 0) {
+        deliveryFeeInsideDhaka = baseDeliveryFee + (groups - 1) * additionalDeliveryFee;
+        deliveryFeeInsideDhakaForPathao = baseDeliveryFeeForPathao + (groups - 1) * additionalDeliveryFee;
+      } else {
+        deliveryFeeInsideDhaka = baseDeliveryFee + groups * additionalDeliveryFee;
+        deliveryFeeInsideDhakaForPathao = baseDeliveryFeeForPathao + groups * additionalDeliveryFee;
+      }
+    }
+
+    // Calculate delivery fee outside Dhaka
+    if (list?.orderDetailArr[j]?.quantity > 0) {
+      const groups = Math.floor(totalQuantity / 5);
+      const remainder = totalQuantity % 5;
+
+      if (groups === 0) {
+        deliveryFeeOutSideDhaka = baseDeliveryFeeOutSideDhaka;
+        deliveryFeeOutSideDhakaForPathao = baseDeliveryFeeOutSideDhakaForPathao;
+      } else if (remainder === 0) {
+        deliveryFeeOutSideDhaka = baseDeliveryFeeOutSideDhaka + (groups - 1) * additionalDeliveryFeeOutSideDhaka;
+        deliveryFeeOutSideDhakaForPathao = baseDeliveryFeeOutSideDhakaForPathao + (groups - 1) * additionalDeliveryFeeOutSideDhaka;
+      } else {
+        deliveryFeeOutSideDhaka = baseDeliveryFeeOutSideDhaka + groups * additionalDeliveryFeeOutSideDhaka;
+        deliveryFeeOutSideDhakaForPathao = baseDeliveryFeeOutSideDhakaForPathao + groups * additionalDeliveryFeeOutSideDhaka;
+      }
+    }
+  }
+
+  if (list?.deliveryArea === "outside dhaka") {
+    deliveryFeeForOthers = deliveryFeeOutSideDhaka;
+    deliveryFeeForPathao = deliveryFeeOutSideDhakaForPathao;
+  } else {
+    deliveryFeeForOthers = deliveryFeeInsideDhaka;
+    deliveryFeeForPathao = deliveryFeeInsideDhakaForPathao;
+  }
+
+
+  // Return the calculated fees
+  return { deliveryFeeForOthers,
+     deliveryFeeForPathao,
+     deliveryFeeOutSideDhaka,
+     deliveryFeeOutSideDhakaForPathao,
+     deliveryFeeInsideDhaka,
+     deliveryFeeInsideDhakaForPathao
+    };
+}
+
+  let printbazRcv=0
+  useEffect(()=>{
+    console.log("Test call to calculateDeliveryFee", calculateDeliveryFee({/* dummy data */}));
+    const fetchData = async () => {
+    // Process and update the delivery list here
+const allPromises=orderAll.map(async (getSpecificOrderById) => {
+  console.log("getSpecificOrderById", getSpecificOrderById);
+
+  const {  deliveryFeeOutSideDhaka,
+    deliveryFeeOutSideDhakaForPathao,
+    deliveryFeeInsideDhaka,
+    deliveryFeeInsideDhakaForPathao } = calculateDeliveryFee(getSpecificOrderById);
+    const deliveryFee = (getSpecificOrderById.deliveryAssignTo === "pathao" 
+  && getSpecificOrderById?.area === "outside dhaka") ? deliveryFeeOutSideDhakaForPathao 
+  : (getSpecificOrderById.deliveryAssignTo === "pathao" 
+  && getSpecificOrderById?.area === "inside dhaka") ? deliveryFeeInsideDhakaForPathao
+  : (getSpecificOrderById.deliveryAssignTo === "others" 
+  && getSpecificOrderById?.area === "inside dhaka") ? deliveryFeeInsideDhaka
+  : (getSpecificOrderById.deliveryAssignTo === "others" 
+  && getSpecificOrderById?.area === "outside dhaka") ? deliveryFeeOutSideDhaka
+  : 0; // Default value if none of the conditions match
+
+  console.log("deliveryFeeForOthers from funct", deliveryFeeOutSideDhakaForPathao); // make sure this logs the expected value
+   const returnValue=Number(getSpecificOrderById?.printbazcost)+Number(getSpecificOrderById?.deliveryFee)
+   const deliveryData = {
+       orderId: getSpecificOrderById._id,
+       statusDate: getSpecificOrderById.statusDate,
+       collectAmount: getSpecificOrderById.collectAmount,
+       trackingId: getSpecificOrderById?.trackingId,
+       recvMoney: getSpecificOrderById.recvMoney,
+       printbazcost: getSpecificOrderById.printbazcost,
+       orderStatus: getSpecificOrderById.orderStatus,
+       paymentStatus: getSpecificOrderById.paymentStatus,
+       deliveryAssignTo: getSpecificOrderById.deliveryAssignTo,
+       deliveryArea:getSpecificOrderById?.area,
+       orderDetailArrr:getSpecificOrderById?.orderDetailArr,
+       deliveryFee:deliveryFee,
+      
+      // deliveryFeeForDeliveryTiger:"",
+      printBazRcvable: printbazRcv,
+       returnValue: getSpecificOrderById.orderStatus === "returned" ? returnValue : 0,
+      //  deliveryFeeForAdmin: deliveryAll?.deliveryFeeForAdmin?deliveryAll?.deliveryFeeForAdmin:'',
+       deliveryFeeForClient: getSpecificOrderById.deliveryFee
+   };
+
+   if (['out for delivery', 'delivered', 'returned'].includes(getSpecificOrderById.orderStatus.toLowerCase())) {
+       // Add/update the data in the DeliveryList
+       const deliveryResponse = await fetch('https://mserver.printbaz.com/addOrUpdateDeliveryList', {
+          //  const deliveryResponse = await fetch('http://localhost:5000/addOrUpdateDeliveryList', {
+           method: 'PUT',
+           headers: {
+               'Content-Type': 'application/json',
+           },
+           body: JSON.stringify(deliveryData),
+       });
+       // console.log("Success:", getSpecificOrderById);
+       // Update your state or perform any other necessary operations with the updated viewClient object
+   // Fetch delivery list from the API and update local storage
+   // Similar to how you fetch orders and update the delivery list in your previous code
+   // Update local storage for delivery list
+  //  localStorage.setItem('deliveryList', JSON.stringify(deliveryResponse));
+   }
+});
+
+   
+    // Wait for all fetch requests to complete
+    await Promise.all(allPromises);
+    }
+
+    fetchData();
+},[ orderAll ])
+  console.log("deliveryMap",deliveryMap);
   console.log("indexOfLastItem",indexOfLastItem);
   const actualIndexOfLastItem = indexOfLastItem > deliveryMap.length ? deliveryMap.length : indexOfLastItem;
      //  calculate the total sum of printbazRcv
@@ -488,36 +591,11 @@ const totalReceivable= deliveryMap?.reduce((acc, list) => {
        let date = new Date(list?.date); 
        let options = { year: 'numeric', month: 'long', day: 'numeric' }; 
        let formattedDate = date.toLocaleDateString('en-US', options); 
-       let printbazRcv=0
-       if(list?.orderStatus==="returned"){
-        if(list?.deliveryAssignTo==="delivery tiger"){
-          printbazRcv=0-(list?.deliveryFeeForDeliveryTiger)
-        }
-        else{
-          printbazRcv=0-(list?.deliveryFee)
-        }
-         
-       }
-       else{
-      
-         if(list?.deliveryAssignTo==="delivery tiger"){
-          printbazRcv=(list?.collectAmount)-(list?.deliveryFeeForDeliveryTiger)
-         
-         } 
-         else{
-          printbazRcv=(list?.collectAmount)-(list?.deliveryFee)
-         }
-        // else if(list?.deliveryAssignTo==="pathao"){
-        //   printbazRcv=(list?.collectAmount)-(deliveryFeeForPathao)
-         
-        //  }else if(list?.deliveryAssignTo==="delivery tiger"){
-        //   printbazRcv=(list?.collectAmount)-(list?.deliveryFeeForAdmin)
-         
-        //  }
-
-       }
+    
+     
     
     // delivery fee for admin 
+    let deliveryFeeForOthers,deliveryFeeForPathao;
   let deliveryFeeInsideDhaka = 0;
   let deliveryFeeInsideDhakaForPathao = 0;
   const baseDeliveryFee = 70;
@@ -578,14 +656,43 @@ if (list?.orderDetailArrr?.length > 0) {
   }
 
   if (list?.deliveryArea === "outside dhaka") {
+    console.log("out side",list?.deliveryArea);
     deliveryFeeForOthers = deliveryFeeOutSideDhaka;
     deliveryFeeForPathao = deliveryFeeOutSideDhakaForPathao;
   } else {
+    console.log("inside",list?.deliveryArea);
     deliveryFeeForOthers = deliveryFeeInsideDhaka;
     deliveryFeeForPathao = deliveryFeeInsideDhakaForPathao;
   }
-console.log("deliveryFeeForOthers",deliveryFeeForOthers);
-console.log("deliveryFeeForPathao",deliveryFeeForPathao);
+console.log("deliveryFeeForOthers",deliveryFeeForOthers + list?.deliveryArea);
+console.log("deliveryFeeForPathao",deliveryFeeForPathao + list?.deliveryArea);
+if(list?.orderStatus==="returned"){
+  if(list?.deliveryAssignTo==="delivery tiger"){
+    printbazRcv=0-(list?.deliveryFeeForDeliveryTiger)
+  }
+  else{
+    printbazRcv=0-(list?.deliveryFee)
+  }
+   
+ }
+ else{
+
+   if(list?.deliveryAssignTo==="delivery tiger"){
+    printbazRcv=(list?.collectAmount)-(list?.deliveryFeeForDeliveryTiger)
+   
+   } 
+   else{
+    printbazRcv=(list?.collectAmount)-(list?.deliveryFee)
+   }
+  // else if(list?.deliveryAssignTo==="pathao"){
+  //   printbazRcv=(list?.collectAmount)-(deliveryFeeForPathao)
+   
+  //  }else if(list?.deliveryAssignTo==="delivery tiger"){
+  //   printbazRcv=(list?.collectAmount)-(list?.deliveryFeeForAdmin)
+   
+  //  }
+
+ }
        return (
            <tr className="info" >
                <td>{list?.statusDate}</td>

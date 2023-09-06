@@ -113,6 +113,7 @@ setTrackingId(e.target.value)
                     paymentStatus:getSpecificOrderById?.paymentStatus,
                     deliveryAssignTo:getSpecificOrderById?.deliveryAssignTo,
                     printBazRcvable:'',
+                    deliveryArea:getSpecificOrderById?.area,
                     returnValue:status==="returned"?returnValue:0,
                     // deliveryFeeForAdmin:'',
                     deliveryFeeForClient:getSpecificOrderById?.deliveryFee
@@ -189,6 +190,7 @@ setTrackingId(e.target.value)
           printbazcost:getSpecificOrderById?.printbazcost,
           orderStatus:getSpecificOrderById?.orderStatus,
           paymentStatus:status,
+          deliveryArea:getSpecificOrderById?.area,
           deliveryAssignTo:getSpecificOrderById?.deliveryAssignTo,
           printBazRcvable:'',
           returnValue:getSpecificOrderById?.orderStatus==="returned"?returnValue:0,
@@ -255,6 +257,7 @@ setTrackingId(e.target.value)
           orderStatus:getSpecificOrderById?.orderStatus,
           paymentStatus:getSpecificOrderById?.paymentStatus,
           deliveryAssignTo:status,
+          deliveryArea:getSpecificOrderById?.area,
           printBazRcvable:'',
           returnValue:getSpecificOrderById?.orderStatus==="returned"?returnValue:0,
           // deliveryFeeForAdmin:'',
@@ -324,6 +327,7 @@ setTrackingId(e.target.value)
           paymentStatus:getSpecificOrderById?.paymentStatus,
           deliveryAssignTo:getSpecificOrderById?.deliveryAssignTo,
           printBazRcvable:'',
+          deliveryArea:getSpecificOrderById?.area,
           returnValue:getSpecificOrderById?.orderStatus==="returned"?returnValue:0,
           // deliveryFeeForAdmin:'',
           deliveryFeeForClient:getSpecificOrderById?.deliveryFee
