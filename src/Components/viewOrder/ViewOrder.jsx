@@ -97,7 +97,40 @@ setTrackingId(e.target.value)
               _id: getSpecificOrderById?._id,
               userMail: getSpecificOrderById?.userMail 
             });
-
+          
+              const returnedAmm =
+                Number(getSpecificOrderById?.printbazcost) +
+                Number(getSpecificOrderById?.deliveryFee);
+              const orderReturmed = status==="returned" ||  getSpecificOrderById?.orderStatus=== "returned";
+          console.log("orderReturmed",orderReturmed);
+          if(orderReturmed===true){
+            try {
+              const response = await fetch(
+                // `http://localhost:5000/returnOrderAddition/${id}`,
+                `https://mserver.printbaz.com/returnOrderAddition/${id}`,
+                {
+                  method: "PUT",
+                  headers: {
+                    "Content-Type": "application/json",
+                  },
+                  body: JSON.stringify({ returnedAmount: returnedAmm }),
+                }
+              );
+          
+              if (response.ok) {
+                // Update the approval status in the viewClient object
+                // You can update the state or do whatever you want here
+              } else {
+                console.error("Status Error:", response);
+                // Handle error here
+              }
+            } catch (error) {
+              console.error("Error:", error.message);
+              // Handle error here
+            }
+          }
+            
+         
             // Check if the new status requires an update/addition to the DeliveryList
             if (['out for delivery', 'delivered', 'returned'].includes(status.toLowerCase())) {
                 // Construct the deliveryList data based on the changed order
