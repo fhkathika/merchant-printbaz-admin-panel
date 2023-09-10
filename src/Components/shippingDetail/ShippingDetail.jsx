@@ -53,7 +53,10 @@ const ShippingDetail = ({getSpecificOrderById}) => {
               
                 <div className="col-md-6 col-sm-12 mb-3 mt-3">
                   <p style={{fontWeight:"600",fontSize:"25px"}}>Collect Amount</p>
-                  <p style={{fontWeight:"600",fontSize:"25px"}}>{getSpecificOrderById?.collectAmount}tk</p>
+
+<p style={{fontWeight:"600",fontSize:"25px"}}>{ getSpecificOrderById?.paymentStatus==="paid" ? 0 : getSpecificOrderById?.collectAmount}tk</p>
+                
+                 
                   <p style={{fontWeight:"600",fontSize:"25px"}}>Brand Name: <span>{getSpecificOrderById?.clientbrandName}</span></p>
    
                   
