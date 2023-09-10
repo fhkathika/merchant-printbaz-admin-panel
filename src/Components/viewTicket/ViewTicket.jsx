@@ -82,6 +82,7 @@ const ViewTicket = () => {
  // Fetch the chat log from the server when the component mounts
        
         fetchOrderIddata();
+        fetchUserIddata()
             // Fetch the chat log every 10 seconds
       const intervalId = setInterval(fetchOrderIddata, 10000);
 
@@ -101,6 +102,18 @@ const ViewTicket = () => {
           console.error(err);
         }
       };
+      const fetchUserIddata = async () => {
+        try {
+          // const response = await axios.get(`http://localhost:5000/getuesrIdmessages/${viewTicketDetail?.userId}`);
+          const response = await axios.get(`https://mserver.printbaz.com/getuesrIdmessages/${viewTicketDetail?.userId}`);
+ 
+          setUsersStoredTickets(response.data.messages);
+       
+        } catch (err) {
+          console.error(err);
+        }
+      };
+
       let filterByTicketId=usersStoredTickets?.find(ticket=>ticket.ticketId===viewTicketDetail?.ticketId)
       const SendTicketCopy = (ticketCopy) => {
         console.log("SendTicketCopy clicked");
@@ -232,6 +245,7 @@ const ViewTicket = () => {
           }
           setNewMsg('');
           fetchOrderIddata()
+          fetchUserIddata()
           console.log("chatLog",chatLog);
         } catch (err) {
           console.error(err);
@@ -348,8 +362,13 @@ const ViewTicket = () => {
                "General Query"
                 
                 }</h2>
-                
-                <p>Order ID: <Link to={`/viewOrder/${viewTicketDetail?.orderId}`}>{viewTicketDetail?.orderId}</Link> </p>
+                 {
+                  viewTicketDetail?.orderId ?
+                  <p>Order ID: <Link to={`/viewOrder/${viewTicketDetail?.orderId}`}>{viewTicketDetail?.orderId}</Link> </p>
+                     :
+                     <p> Phone Number: {viewTicketDetail?.userId}</p>
+                }
+               
                 <p>Ticket ID: {viewTicketDetail?.ticketId}</p>
               </div>
             </div>

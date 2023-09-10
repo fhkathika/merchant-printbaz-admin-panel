@@ -14,6 +14,17 @@ let searchByTicketId= fetchAllTicket?.filter(OrederId => OrederId?.ticketId?.inc
 // console.log("closeQuery",closeQuery);
 const [ticketIssue, setTicketIssue] = useState( "all" );
 const {value_count}=useRoleAsignData();
+const sortedTickets = [...fetchAllTicket].sort((a, b) => {
+  const lastMessageA = a.messages[a.messages.length - 1]?.timestamp;
+  const lastMessageB = b.messages[b.messages.length - 1]?.timestamp;
+
+  // Parse the timestamps to Date objects
+  const dateA = new Date(lastMessageA);
+  const dateB = new Date(lastMessageB);
+
+  // Sort in descending order to have the most recent first
+  return dateB - dateA;
+});
 let newMsg=0
 let getAdminEmail=fetchAllTicket?.filter(ticket=>ticket.adminUser===adminUser?.email &&  (ticket?.ticketStatus==="pending(created by client)" || ticket?.ticketStatus==="pending"))
 console.log("adminUser?.email",adminUser?.email); 
@@ -257,7 +268,15 @@ return (
                </h6>  
                
                         <h3>{allTicket?.userName ? allTicket?.userName : "Printbaz"}</h3>
-                        <h4>Order ID: {allTicket?.orderId}</h4>
+                        {
+                           allTicket?.orderId?
+                           <h4>Order ID: {allTicket?.orderId}</h4>
+                           :
+                           <h4>Phone Number: {allTicket?.userId}</h4>
+                        }
+                       
+                       
+
                         <h5>Ticket ID: {allTicket?.ticketId}</h5>
                        
                         <span>
@@ -334,7 +353,13 @@ return (
                </h6>  
                
                         <h3>{allTicket?.userName ? allTicket?.userName : "Printbaz"}</h3>
-                        <h4>Order ID: {allTicket?.orderId}</h4>
+                        {
+                           allTicket?.orderId?
+                           <h4>Order ID: {allTicket?.orderId}</h4>
+                           :
+                           <h4>Phone Number: {allTicket?.userId}</h4>
+                        }
+                       
                         <h5>Ticket ID: {allTicket?.ticketId}</h5>
                        
                         <span>
@@ -424,7 +449,13 @@ return (
                </h6>  
                
                         <h3>{allTicket?.userName ? allTicket?.userName : "Printbaz"}</h3>
-                        <h4>Order ID: {allTicket?.orderId}</h4>
+                        {
+                           allTicket?.orderId?
+                           <h4>Order ID: {allTicket?.orderId}</h4>
+                           :
+                           <h4>Phone Number: {allTicket?.userId}</h4>
+                        }
+                       
                         <h5>Ticket ID: {allTicket?.ticketId}</h5>
                        
                         <span>
@@ -501,7 +532,13 @@ return (
                </h6>  
                
                         <h3>{allTicket?.userName ? allTicket?.userName : "Printbaz"}</h3>
-                        <h4>Order ID: {allTicket?.orderId}</h4>
+                        {
+                           allTicket?.orderId?
+                           <h4>Order ID: {allTicket?.orderId}</h4>
+                           :
+                           <h4>Phone Number: {allTicket?.userId}</h4>
+                        }
+                       
                         <h5>Ticket ID: {allTicket?.ticketId}</h5>
                        
                         <span>
@@ -554,7 +591,7 @@ return (
                          } )
           }
           {
-          ticketIssue==="all" && fetchAllTicket?.sort((a, b) => {
+          ticketIssue==="all" && sortedTickets?.sort((a, b) => {
             // Sort by lastTimestamp in descending order
             const timestampA = new Date(a.messages[a.messages.length - 1].timestamp);
             const timestampB = new Date(b.messages[b.messages.length - 1].timestamp);
@@ -603,7 +640,13 @@ return (
                </h6>  
                
                         <h3>{allTicket?.userName ? allTicket?.userName : "Printbaz"}</h3>
-                        <h4>Order ID: {allTicket?.orderId}</h4>
+                        {
+                           allTicket?.orderId?
+                           <h4>Order ID: {allTicket?.orderId}</h4>
+                           :
+                           <h4>Phone Number: {allTicket?.userId}</h4>
+                        }
+                       
                         <h5>Ticket ID: {allTicket?.ticketId}</h5>
                        
                         <span>
@@ -698,7 +741,13 @@ return (
                </h6>  
                
                         <h3>{allTicket?.userName ? allTicket?.userName : "Printbaz"}</h3>
-                        <h4>Order ID: {allTicket?.orderId}</h4>
+                        {
+                           allTicket?.orderId?
+                           <h4>Order ID: {allTicket?.orderId}</h4>
+                           :
+                           <h4>Phone Number: {allTicket?.userId}</h4>
+                        }
+                       
                         <h5>Ticket ID: {allTicket?.ticketId}</h5>
                        
                         <span>
@@ -790,7 +839,13 @@ return (
                </h6>  
                
                         <h3>{allTicket?.userName}</h3>
-                        <h4>Order ID: {allTicket?.orderId}</h4>
+                        {
+                           allTicket?.orderId?
+                           <h4>Order ID: {allTicket?.orderId}</h4>
+                           :
+                           <h4>Phone Number: {allTicket?.userId}</h4>
+                        }
+                       
                         <h5>Ticket ID: {allTicket?.ticketId}</h5>
                        
                         <span>
@@ -858,7 +913,13 @@ return (
                </h6>  
                
                         <h3>{allTicket?.userName}</h3>
-                        <h4>Order ID: {allTicket?.orderId}</h4>
+                        {
+                           allTicket?.orderId?
+                           <h4>Order ID: {allTicket?.orderId}</h4>
+                           :
+                           <h4>Phone Number: {allTicket?.userId}</h4>
+                        }
+                       
                         <h5>Ticket ID: {allTicket?.ticketId}</h5>
                        
                         <span>
@@ -949,7 +1010,13 @@ return (
                </h6>  
                
                         <h3>{allTicket?.userName}</h3>
-                        <h4>Order ID: {allTicket?.orderId}</h4>
+                        {
+                           allTicket?.orderId?
+                           <h4>Order ID: {allTicket?.orderId}</h4>
+                           :
+                           <h4>Phone Number: {allTicket?.userId}</h4>
+                        }
+                       
                         <h5>Ticket ID: {allTicket?.ticketId}</h5>
                        
                         <span>
@@ -1017,7 +1084,13 @@ return (
                </h6>  
                
                         <h3>{allTicket?.userName}</h3>
-                        <h4>Order ID: {allTicket?.orderId}</h4>
+                        {
+                           allTicket?.orderId?
+                           <h4>Order ID: {allTicket?.orderId}</h4>
+                           :
+                           <h4>Phone Number: {allTicket?.userId}</h4>
+                        }
+                       
                         <h5>Ticket ID: {allTicket?.ticketId}</h5>
                        
                         <span>
@@ -1108,7 +1181,13 @@ return (
                </h6>  
                
                         <h3>{allTicket?.userName}</h3>
-                        <h4>Order ID: {allTicket?.orderId}</h4>
+                        {
+                           allTicket?.orderId?
+                           <h4>Order ID: {allTicket?.orderId}</h4>
+                           :
+                           <h4>Phone Number: {allTicket?.userId}</h4>
+                        }
+                       
                         <h5>Ticket ID: {allTicket?.ticketId}</h5>
                        
                         <span>
@@ -1176,7 +1255,13 @@ return (
                </h6>  
                
                         <h3>{allTicket?.userName}</h3>
-                        <h4>Order ID: {allTicket?.orderId}</h4>
+                        {
+                           allTicket?.orderId?
+                           <h4>Order ID: {allTicket?.orderId}</h4>
+                           :
+                           <h4>Phone Number: {allTicket?.userId}</h4>
+                        }
+                       
                         <h5>Ticket ID: {allTicket?.ticketId}</h5>
                        
                         <span>
@@ -1267,7 +1352,13 @@ return (
                </h6>  
                
                         <h3>{allTicket?.userName}</h3>
-                        <h4>Order ID: {allTicket?.orderId}</h4>
+                        {
+                           allTicket?.orderId?
+                           <h4>Order ID: {allTicket?.orderId}</h4>
+                           :
+                           <h4>Phone Number: {allTicket?.userId}</h4>
+                        }
+                       
                         <h5>Ticket ID: {allTicket?.ticketId}</h5>
                        
                         <span>
@@ -1336,7 +1427,13 @@ return (
                </h6>  
                
                         <h3>{allTicket?.userName}</h3>
-                        <h4>Order ID: {allTicket?.orderId}</h4>
+                        {
+                           allTicket?.orderId?
+                           <h4>Order ID: {allTicket?.orderId}</h4>
+                           :
+                           <h4>Phone Number: {allTicket?.userId}</h4>
+                        }
+                       
                         <h5>Ticket ID: {allTicket?.ticketId}</h5>
                        
                         <span>
@@ -1427,7 +1524,13 @@ return (
                </h6>  
                
                         <h3>{allTicket?.userName}</h3>
-                        <h4>Order ID: {allTicket?.orderId}</h4>
+                        {
+                           allTicket?.orderId?
+                           <h4>Order ID: {allTicket?.orderId}</h4>
+                           :
+                           <h4>Phone Number: {allTicket?.userId}</h4>
+                        }
+                       
                         <h5>Ticket ID: {allTicket?.ticketId}</h5>
                        
                         <span>
@@ -1495,7 +1598,13 @@ return (
                </h6>  
                
                         <h3>{allTicket?.userName}</h3>
-                        <h4>Order ID: {allTicket?.orderId}</h4>
+                        {
+                           allTicket?.orderId?
+                           <h4>Order ID: {allTicket?.orderId}</h4>
+                           :
+                           <h4>Phone Number: {allTicket?.userId}</h4>
+                        }
+                       
                         <h5>Ticket ID: {allTicket?.ticketId}</h5>
                        
                         <span>
@@ -1586,7 +1695,13 @@ return (
                </h6>  
                
                         <h3>{allTicket?.userName}</h3>
-                        <h4>Order ID: {allTicket?.orderId}</h4>
+                        {
+                           allTicket?.orderId?
+                           <h4>Order ID: {allTicket?.orderId}</h4>
+                           :
+                           <h4>Phone Number: {allTicket?.userId}</h4>
+                        }
+                       
                         <h5>Ticket ID: {allTicket?.ticketId}</h5>
                        
                         <span>
@@ -1654,7 +1769,13 @@ return (
                </h6>  
                
                         <h3>{allTicket?.userName}</h3>
-                        <h4>Order ID: {allTicket?.orderId}</h4>
+                        {
+                           allTicket?.orderId?
+                           <h4>Order ID: {allTicket?.orderId}</h4>
+                           :
+                           <h4>Phone Number: {allTicket?.userId}</h4>
+                        }
+                       
                         <h5>Ticket ID: {allTicket?.ticketId}</h5>
                        
                         <span>
@@ -1747,7 +1868,13 @@ return (
                </h6>  
                
                         <h3>{allTicket?.userName}</h3>
-                        <h4>Order ID: {allTicket?.orderId}</h4>
+                        {
+                           allTicket?.orderId?
+                           <h4>Order ID: {allTicket?.orderId}</h4>
+                           :
+                           <h4>Phone Number: {allTicket?.userId}</h4>
+                        }
+                       
                         <h5>Ticket ID: {allTicket?.ticketId}</h5>
                        
                         <span>
@@ -1815,7 +1942,13 @@ return (
                </h6>  
                
                         <h3>{allTicket?.userName}</h3>
-                        <h4>Order ID: {allTicket?.orderId}</h4>
+                        {
+                           allTicket?.orderId?
+                           <h4>Order ID: {allTicket?.orderId}</h4>
+                           :
+                           <h4>Phone Number: {allTicket?.userId}</h4>
+                        }
+                       
                         <h5>Ticket ID: {allTicket?.ticketId}</h5>
                        
                         <span>
@@ -1906,7 +2039,13 @@ return (
                </h6>  
                
                         <h3>{allTicket?.userName}</h3>
-                        <h4>Order ID: {allTicket?.orderId}</h4>
+                        {
+                           allTicket?.orderId?
+                           <h4>Order ID: {allTicket?.orderId}</h4>
+                           :
+                           <h4>Phone Number: {allTicket?.userId}</h4>
+                        }
+                       
                         <h5>Ticket ID: {allTicket?.ticketId}</h5>
                        
                         <span>
@@ -1975,7 +2114,13 @@ return (
                </h6>  
                
                         <h3>{allTicket?.userName}</h3>
-                        <h4>Order ID: {allTicket?.orderId}</h4>
+                        {
+                           allTicket?.orderId?
+                           <h4>Order ID: {allTicket?.orderId}</h4>
+                           :
+                           <h4>Phone Number: {allTicket?.userId}</h4>
+                        }
+                       
                         <h5>Ticket ID: {allTicket?.ticketId}</h5>
                        
                         <span>
@@ -2072,7 +2217,13 @@ return (
                </h6>  
                
                         <h3>{allTicket?.userName}</h3>
-                        <h4>Order ID: {allTicket?.orderId}</h4>
+                        {
+                           allTicket?.orderId?
+                           <h4>Order ID: {allTicket?.orderId}</h4>
+                           :
+                           <h4>Phone Number: {allTicket?.userId}</h4>
+                        }
+                       
                         <h5>Ticket ID: {allTicket?.ticketId}</h5>
                        
                         <span>
@@ -2150,7 +2301,13 @@ return (
                </h6>  
                
                         <h3>{allTicket?.userName}</h3>
-                        <h4>Order ID: {allTicket?.orderId}</h4>
+                        {
+                           allTicket?.orderId?
+                           <h4>Order ID: {allTicket?.orderId}</h4>
+                           :
+                           <h4>Phone Number: {allTicket?.userId}</h4>
+                        }
+                       
                         <h5>Ticket ID: {allTicket?.ticketId}</h5>
                        
                         <span>
@@ -2240,7 +2397,13 @@ return (
                </h6>  
                
                         <h3>{allTicket?.userName}</h3>
-                        <h4>Order ID: {allTicket?.orderId}</h4>
+                        {
+                           allTicket?.orderId?
+                           <h4>Order ID: {allTicket?.orderId}</h4>
+                           :
+                           <h4>Phone Number: {allTicket?.userId}</h4>
+                        }
+                       
                         <h5>Ticket ID: {allTicket?.ticketId}</h5>
                        
                         <span>
@@ -2308,7 +2471,13 @@ return (
                </h6>  
                
                         <h3>{allTicket?.userName}</h3>
-                        <h4>Order ID: {allTicket?.orderId}</h4>
+                        {
+                           allTicket?.orderId?
+                           <h4>Order ID: {allTicket?.orderId}</h4>
+                           :
+                           <h4>Phone Number: {allTicket?.userId}</h4>
+                        }
+                       
                         <h5>Ticket ID: {allTicket?.ticketId}</h5>
                        
                         <span>
