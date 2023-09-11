@@ -199,6 +199,7 @@ const ViewTicket = () => {
              userEmail:viewTicketDetail?.userEmail,
              userName:viewTicketDetail?.userName,
              userOrderId:viewTicketDetail?.orderId,
+             userId:viewTicketDetail?.userId,
              adminUser:adminUser?.email,
               user: 'Printbaz',
                content: newMsg };
@@ -214,6 +215,7 @@ const ViewTicket = () => {
             admin: newMessage.user,
             adminUser: newMessage.adminUser,
             orderId:newMessage.userOrderId,
+            userId:newMessage.userId && newMessage.userId,
             timestamp: new Date().toISOString(), // this won't be the exact timestamp saved in the DB
           };
           Object.entries(chatMessage).forEach(([key,value])=>{
