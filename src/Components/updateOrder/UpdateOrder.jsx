@@ -1000,8 +1000,12 @@ console.log("getSpecificOrderById out side delete func",getSpecificOrderById);
      if (typeof item?.brandLogo === 'string') { // singleFile is a URL string
       fileId = item?.brandLogo?.split('/d/')[1]?.split('/view')[0];
       brandLogoPreviewURL =`https://drive.google.com/file/d/${fileId}/preview`;
-    } else  { // singleFile is a file object
+    }else if (item?.brandLogo instanceof Blob || item?.brandLogo instanceof File) { // singleFile is a file object
       brandLogoPreviewURL = URL.createObjectURL(item?.brandLogo);
+    } else {
+      // Handle the case when item?.brandLogo is neither a string nor a file object
+      // Set brandLogoPreviewURL to some default or null
+      brandLogoPreviewURL = null;
     }
       // const fileId = item?.brandLogo?.split('/d/')[1].split('/view')[0];
       // const previewURL = `https://drive.google.com/file/d/${fileId}/preview`;
