@@ -998,7 +998,7 @@ console.log("getSpecificOrderById out side delete func",getSpecificOrderById);
   {  (() => {
         let fileId, brandLogoPreviewURL;
      if (typeof item?.brandLogo === 'string') { // singleFile is a URL string
-      fileId = item?.brandLogo?.split('/d/')[1].split('/view')[0];
+      fileId = item?.brandLogo?.split('/d/')[1]?.split('/view')[0];
       brandLogoPreviewURL =`https://drive.google.com/file/d/${fileId}/preview`;
     } else  { // singleFile is a file object
       brandLogoPreviewURL = URL.createObjectURL(item?.brandLogo);
