@@ -1392,7 +1392,7 @@ onChange={(e) => handleInputChange(e)}
                   
                       <div className='flex'>
                       <h6>Receivable Amount</h6>
-                      <span style={{marginTop:"10px"}}>{getSpecificOrderById?.recvMoney}BDT</span>
+                      <span style={{marginTop:"10px"}}>{parseInt(getSpecificOrderById?.recvMoney)}BDT</span>
                       </div>
                       
                     </div>

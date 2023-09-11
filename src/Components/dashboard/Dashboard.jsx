@@ -91,8 +91,8 @@ setWorstMerchants(sortedWorstMerchants);
 
 
   let pendingOrders = orderAll?.filter(users => users?.orderStatus === "Pending");
-let approvedOrders=orderAll?.filter(users=>users?.orderStatus==="Approved");
-let confirmedOrders=orderAll?.filter(users=>users?.orderStatus==="confirmed");
+let   approvedOrders=orderAll?.filter(users=>users?.orderStatus==="Approved");
+let   confirmedOrders=orderAll?.filter(users=>users?.orderStatus==="confirmed");
 let onHoldOutOfStockOrders=orderAll?.filter(users=>users?.orderStatus==="on hold out of stock");
 let inProductionOrders=orderAll?.filter(users=>users?.orderStatus==="in-production");
 let outForDeliveryOrders=orderAll?.filter(users=>users?.orderStatus==="out for delivery");
@@ -152,24 +152,140 @@ const whiteQuantity = (colorQuantitiesForReturn?.white)+(colorQuantitiesForOutFo
 const blackQuantity = (colorQuantitiesForReturn?.black)+(colorQuantitiesForOutForDelivery?.black)+(colorQuantitiesForDelivered?.black) || 0;
 
     // in production black ,white tshirt size count 
-    const sizeCountsForInProduction = inProductionOrders?.reduce((acc, order) => {
-      return (order?.orderDetailArr || []).reduce((innerAcc, item) => {
-        if (item.color === "black") {
-          // Initialize the size object for black if it doesn't exist
-          if (!innerAcc.black[item.teshirtSize]) {
-            innerAcc.black[item.teshirtSize] = 0;
+    // const sizeCountsForInProduction = inProductionOrders?.reduce((acc, order) => {
+    //   return (order?.orderDetailArr || []).reduce((innerAcc, item) => {
+    //     if (item.color === "black") {
+    //       // Initialize the size object for black if it doesn't exist
+    //       if (!innerAcc.black[item.teshirtSize]) {
+    //         innerAcc.black[item.teshirtSize] = 0;
+    //       }
+    //       innerAcc.black[item.teshirtSize] += parseInt(item.quantity || 0);
+    //     } else if (item.color === "white") {
+    //       // Initialize the size object for white if it doesn't exist
+    //       if (!innerAcc.white[item.teshirtSize]) {
+    //         innerAcc.white[item.teshirtSize] = 0;
+    //       }
+    //       innerAcc.white[item.teshirtSize] += parseInt(item.quantity || 0);
+    //     }
+    //     return innerAcc;
+    //   }, acc);
+    // }, { white: {}, black: {} }); 
+    // const sizeCountsForconfirmedOrders = inProductionOrders?.reduce((acc, order) => {
+    //   return (order?.orderDetailArr || []).reduce((innerAcc, item) => {
+    //     if (item.color === "black") {
+    //       // Initialize the size object for black if it doesn't exist
+    //       if (!innerAcc.black[item.teshirtSize]) {
+    //         innerAcc.black[item.teshirtSize] = 0;
+    //       }
+    //       innerAcc.black[item.teshirtSize] += parseInt(item.quantity || 0);
+    //     } else if (item.color === "white") {
+    //       // Initialize the size object for white if it doesn't exist
+    //       if (!innerAcc.white[item.teshirtSize]) {
+    //         innerAcc.white[item.teshirtSize] = 0;
+    //       }
+    //       innerAcc.white[item.teshirtSize] += parseInt(item.quantity || 0);
+    //     }
+    //     return innerAcc;
+    //   }, acc);
+    // }, 
+    // { white: {}, black: {} }); 
+    // const sizeCountsForpendingOrders= pendingOrders?.reduce((acc, order) => {
+    //   return (order?.orderDetailArr || []).reduce((innerAcc, item) => {
+    //     if (item.color === "black") {
+    //       // Initialize the size object for black if it doesn't exist
+    //       if (!innerAcc.black[item.teshirtSize]) {
+    //         innerAcc.black[item.teshirtSize] = 0;
+    //       }
+    //       innerAcc.black[item.teshirtSize] += parseInt(item.quantity || 0);
+    //     } else if (item.color === "white") {
+    //       // Initialize the size object for white if it doesn't exist
+    //       if (!innerAcc.white[item.teshirtSize]) {
+    //         innerAcc.white[item.teshirtSize] = 0;
+    //       }
+    //       innerAcc.white[item.teshirtSize] += parseInt(item.quantity || 0);
+    //     }
+    //     return innerAcc;
+    //   }, acc);
+    // }, { white: {}, black: {} });
+    //  const sizeCountsForapprovedOrders= approvedOrders?.reduce((acc, order) => {
+    //   return (order?.orderDetailArr || []).reduce((innerAcc, item) => {
+    //     if (item.color === "black") {
+    //       // Initialize the size object for black if it doesn't exist
+    //       if (!innerAcc.black[item.teshirtSize]) {
+    //         innerAcc.black[item.teshirtSize] = 0;
+    //       }
+    //       innerAcc.black[item.teshirtSize] += parseInt(item.quantity || 0);
+    //     } else if (item.color === "white") {
+    //       // Initialize the size object for white if it doesn't exist
+    //       if (!innerAcc.white[item.teshirtSize]) {
+    //         innerAcc.white[item.teshirtSize] = 0;
+    //       }
+    //       innerAcc.white[item.teshirtSize] += parseInt(item.quantity || 0);
+    //     }
+    //     return innerAcc;
+    //   }, acc);
+    // }, { white: {}, black: {} });
+
+    const countSizeForOrders = (orders, size) => {
+      return orders?.reduce((acc, order) => {
+        return (order?.orderDetailArr || []).reduce((innerAcc, item) => {
+          if (item.color === "black") {
+            // Initialize the size object for black if it doesn't exist
+            if (!innerAcc.black[item.teshirtSize]) {
+              innerAcc.black[item.teshirtSize] = 0;
+            }
+            innerAcc.black[item.teshirtSize] += parseInt(item.quantity || 0);
+          } else if (item.color === "white") {
+            // Initialize the size object for white if it doesn't exist
+            if (!innerAcc.white[item.teshirtSize]) {
+              innerAcc.white[item.teshirtSize] = 0;
+            }
+            innerAcc.white[item.teshirtSize] += parseInt(item.quantity || 0);
           }
-          innerAcc.black[item.teshirtSize] += parseInt(item.quantity || 0);
-        } else if (item.color === "white") {
-          // Initialize the size object for white if it doesn't exist
-          if (!innerAcc.white[item.teshirtSize]) {
-            innerAcc.white[item.teshirtSize] = 0;
-          }
-          innerAcc.white[item.teshirtSize] += parseInt(item.quantity || 0);
-        }
-        return innerAcc;
-      }, acc);
-    }, { white: {}, black: {} });
+          return innerAcc;
+        }, acc);
+      }, { white: {}, black: {} });
+    };
+    
+    const sizeCountsForInProduction = countSizeForOrders(inProductionOrders);
+    const sizeCountsForConfirmedOrders = countSizeForOrders(confirmedOrders);
+    const sizeCountsForPendingOrders = countSizeForOrders(pendingOrders);
+    const sizeCountsForApprovedOrders = countSizeForOrders(approvedOrders);
+    
+    const sumSizeAcrossOrdersWhite = (size) => {
+      return [
+        sizeCountsForInProduction,
+        sizeCountsForConfirmedOrders,
+        sizeCountsForPendingOrders,
+        sizeCountsForApprovedOrders
+      ].reduce((acc, sizeCounts) => acc + (sizeCounts.white?.[size] || 0), 0);
+    }; 
+      const sumSizeAcrossOrdersBlack= (size) => {
+      return [
+       
+        sizeCountsForConfirmedOrders,
+        sizeCountsForPendingOrders,
+        sizeCountsForApprovedOrders
+      ].reduce((acc, sizeCounts) => acc + (sizeCounts.black?.[size] || 0), 0);
+    };
+    
+    const whiteMNeeded = sumSizeAcrossOrdersWhite("m");
+    const whiteLNeeded = sumSizeAcrossOrdersWhite("L");
+    const whiteXlNeeded = sumSizeAcrossOrdersWhite("XL");
+    const whiteXxlNeeded = sumSizeAcrossOrdersWhite("XXL");
+    const blackMNeeded =  sumSizeAcrossOrdersBlack("m");
+    const blackLNeeded =  sumSizeAcrossOrdersBlack("L");
+    const blackXlNeeded = sumSizeAcrossOrdersBlack("XL");
+    const blackXxlNeeded =sumSizeAcrossOrdersBlack("XXL");
+    
+    console.log("whiteMNeeded:", whiteMNeeded);
+    console.log("whiteLNeeded:", whiteLNeeded);
+    console.log("whiteXxlNeeded:", whiteXxlNeeded);
+    console.log("whiteXlNeeded:", whiteXlNeeded);
+    console.log("blackMNeeded:",  blackMNeeded);
+    console.log("blackLNeeded:",  blackLNeeded);
+    console.log("blackXlNeeded:", blackXlNeeded);
+    console.log("blackXxlNeeded:",blackXxlNeeded);
     
 
 let countTotalTshirtDispatched=tShirtQuantityForOutFOrDelivery+tShirtQuantityForDeliveredOrders+tShirtQuantityForReturnOrders
@@ -490,7 +606,7 @@ return (
                <div className="card stat-card" style={{height:"152px"}}>
                <div className="" style={{display:"flex",justifyContent:"space-between",alignItem:"center"}}>
                  <div className="card-body ">
-                 <h5 className="">White T-shirt Needed</h5>
+                 <h5 className="">White T-shirt In Production </h5>
                  <div style={{display:"flex"}}>
 <div>
 <p className="float-right">M  - {sizeCountsForInProduction.white?.m?sizeCountsForInProduction.white?.m:0}</p>
@@ -531,7 +647,7 @@ return (
                <div className="card stat-card" style={{height:"152px"}}>
                <div className="" style={{display:"flex",justifyContent:"space-between",alignItem:"center"}}>
                  <div className="card-body ">
-                 <h5 className="">Black T-shirt Needed</h5>
+                 <h5 className="">Black T-shirt In production</h5>
                  <div style={{display:"flex"}}>
 <div>
 
@@ -541,6 +657,88 @@ return (
 <div style={{marginLeft:"20px"}}>
 <p className="float-right"> XL - {sizeCountsForInProduction.black?.XL?sizeCountsForInProduction.black?.XL:0}</p>
                     <p className="float-right"> XXL  -  {sizeCountsForInProduction.black?.XXL?sizeCountsForInProduction.black?.XXL:0}</p>
+</div>
+                 </div>
+                  
+                   
+                   </div>
+               <div>
+               <div className="card-body" style={{display:"flex",justifyContent:"center",height:"50%"}}>
+                  
+                  {/* <h4 className="float-right" style={{marginLeft:"40px",marginTop:"2px"}}>{countTotalTshirtDispatched}</h4> */}
+                  </div>
+               <div  style={{display:"flex",justifyContent:"flex-end",padding:"0px 20px",marginTop:"35px"}}>
+                  
+                  {/* <span style={{cursor:"pointer"}} onClick={downloadInfIntoXl} data-order-id="order-detail-totalTShirt"><img style={{width:"25px",hight:"25px"}} src="/images/download.png" alt='download'/></span> */}
+              <div id="order-detail-totalTShirt"style={{position: 'absolute', left: '-10000px', top: '-10000px'}}>
+              <GetTotalTshirtDispatched countTotalTshirtDispatched={countTotalTshirtDispatched} whiteQuantity={whiteQuantity} blackQuantity={blackQuantity}/>
+          </div> 
+            
+                </div>
+               </div>
+              
+                   </div>
+                  
+               </div>
+              
+             
+
+             </div> <div className="col-md-3">
+               
+               <div className="card stat-card" style={{height:"152px"}}>
+               <div className="" style={{display:"flex",justifyContent:"space-between",alignItem:"center"}}>
+                 <div className="card-body ">
+                 <h5 className="">White T-shirt Needed</h5>
+                 <div style={{display:"flex"}}>
+<div>
+<p className="float-right">M  - {whiteMNeeded}</p>
+ <p className="float-right">L  -  {whiteLNeeded}</p>
+</div>
+<div style={{marginLeft:"20px"}}>
+<p className="float-right"> XL - {whiteXlNeeded}</p>
+ <p className="float-right"> XXL  -  {whiteXxlNeeded}</p>
+</div>
+                 </div>
+                  
+                   
+                   </div>
+               <div>
+               <div className="card-body" style={{display:"flex",justifyContent:"center",height:"50%"}}>
+                  
+                  {/* <h4 className="float-right" style={{marginLeft:"40px",marginTop:"2px"}}>{countTotalTshirtDispatched}</h4> */}
+                  </div>
+               <div  style={{display:"flex",justifyContent:"flex-end",padding:"0px 20px",marginTop:"35px"}}>
+                  
+                  {/* <span style={{cursor:"pointer"}} onClick={downloadInfIntoXl} data-order-id="order-detail-totalTShirt"><img style={{width:"25px",hight:"25px"}} src="/images/download.png" alt='download'/></span> */}
+              <div id="order-detail-totalTShirt"style={{position: 'absolute', left: '-10000px', top: '-10000px'}}>
+              <GetTotalTshirtDispatched countTotalTshirtDispatched={countTotalTshirtDispatched} whiteQuantity={whiteQuantity} blackQuantity={blackQuantity}/>
+          </div> 
+            
+                </div>
+               </div>
+              
+                   </div>
+                  
+               </div>
+              
+             
+
+             </div>
+              <div className="col-md-3">
+               
+               <div className="card stat-card" style={{height:"152px"}}>
+               <div className="" style={{display:"flex",justifyContent:"space-between",alignItem:"center"}}>
+                 <div className="card-body ">
+                 <h5 className="">Black T-shirt Needed</h5>
+                 <div style={{display:"flex"}}>
+<div>
+
+<p className="float-right">M  - {blackMNeeded}</p>
+   <p className="float-right">L  -  {blackLNeeded}</p>
+</div>
+<div style={{marginLeft:"20px"}}>
+<p className="float-right"> XL - {blackXlNeeded}</p>
+  <p className="float-right"> XXL  -  {blackXxlNeeded}</p>
 </div>
                  </div>
                   
