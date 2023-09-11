@@ -13,11 +13,58 @@ const ViewClient = () => {
   const [getUserById, setGetUserById] = useState();
   const {value_count}=useRoleAsignData()
   console.log("viewClient",viewClient);
+
+ 
+  
+  // Payment Released
+   const orderStatusPaymentReleased=orderAll
+  ?.filter(order => order.userMail === viewClient?.email && order.orderStatus==="payment-released" ) 
+  //return amount
+ 
+    const orderSatatusReturned=orderAll
+  ?.filter(order =>order.userMail === viewClient?.email && order.orderStatus==="returned" )
+  // console.log("orderStatus pament released",orderStatusPaymentReleased);
+console.log("orderSatatusReturned",orderSatatusReturned);
+
+
+  
+  let totalReceiveBase=0,totalReturnAmmountBase=0;
+for(let i=0;i<orderStatusPaymentReleased?.length;i++){
+  let totalReceive=orderStatusPaymentReleased[i]?.recvMoney;
+  totalReceiveBase +=totalReceive;
+// console.log("totalReceiveBase",totalReceiveBase);
+}
+for(let i=0;i<orderSatatusReturned?.length;i++){
+  let totalReturn=orderSatatusReturned[i]?.returnedAmount;
+  if(totalReturn){
+    totalReturnAmmountBase +=totalReturn;
+  }
+
+
+}
+
+//patmnet status =paid,orderstatus :delivered
+const PaymentStausPaid=orderAll
+?.filter(order => order.userMail === viewClient?.email && order.paymentStatus==="paid" && order?.orderStatus==="delivered")
+
+const returnValueFilter=orderAll?.filter(order =>  order.userMail === viewClient?.email&& order?.orderStatus==="returned")
+
+
+let statusPaidbase=0; let totalpaid
+for(let i=0;i<PaymentStausPaid?.length;i++){
+   totalpaid=Number(PaymentStausPaid[i]?.recvMoney);
+  statusPaidbase =statusPaidbase+totalpaid;
+ 
+  // setTotalBill(totalBill+totalpaid);
+
+}
+  let dueAmount=statusPaidbase-(totalReceiveBase+totalReturnAmmountBase)
+console.log("totalReturnAmmountBase",totalReturnAmmountBase);
 useEffect(()=>{
   const getOrderById=async()=>{
            // Fetch the updated order details
-  // await fetch(`https://mserver.printbaz.com/getUser/${viewClient?._id}`)
-  await fetch(`http://localhost:5000/getUser/${viewClient?._id}`)
+  await fetch(`https://mserver.printbaz.com/getUser/${viewClient?._id}`)
+  // await fetch(`http://localhost:5000/getUser/${viewClient?._id}`)
   .then(res=>res.json())
   .then(data => {setGetUserById(data)})
     
@@ -111,7 +158,7 @@ useEffect(()=>{
                 </div>
               </div>
             </div>
-            <div className="row">
+            <div className="row m-2">
               <div className="col-lg-3 col-sm-12">
                 <div className="client-details">
                   <div className="row">
@@ -398,6 +445,34 @@ useEffect(()=>{
                       }
                     
                     
+                    </div>
+                  </div>
+                </div>
+              
+          
+          <div className="bg-white p-4 shadow-sm mb-3 client-details">
+                  <div className="row amu-title">
+                    <div className="col-12">
+                      <h3 className="all-title">Payments</h3>
+                      <div className='flex'>
+                      <h6>Total Payment Released:</h6>
+                      <span style={{marginTop:"10px",color:"orange",fontSize:'16px'}}>{totalReceiveBase} TK</span>
+                      </div>
+                      <div className='flex'>
+                      <h6>Total Bill:</h6>
+                      <span style={{marginTop:"10px",color:"orange",fontSize:'16px'}}>{parseInt(statusPaidbase)} TK</span>
+                      </div> 
+                      <div className='flex'>
+                      <h6>Return Value:</h6>
+                      <span style={{marginTop:"10px",color:"orange",fontSize:'16px'}}> {Number(totalReturnAmmountBase)} TK</span>
+                      </div> 
+                      <div className='flex'>
+                      
+                      <h6>Due Amount:</h6>
+                      <span style={{marginTop:"10px",color:"orange",fontSize:'16px'}}>{dueAmount.toFixed(2)} TK</span>
+                      </div>
+                   
+                      
                     </div>
                   </div>
                 </div>
