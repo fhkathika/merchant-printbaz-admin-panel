@@ -63,20 +63,64 @@ console.log("orderSatatusReturned",orderSatatusReturned);
 const merchOrders=orderAll
 ?.filter(order =>order.userMail === viewClient?.email  )
   console.log("merchOrders",merchOrders);
+
+
+  const updateReturnedAmount = async (orderId, returnedAmount) => {
+    try {
+      const response = await fetch(
+        `https://mserver.printbaz.com/returnOrderAddition/${orderId}`,
+        {
+          method: "PUT",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({ returnedAmount }),
+        }
+      );
+  
+      if (response.ok) {
+        // Update the approval status in the viewClient object
+        // You can update the state or do whatever you want here
+      } else {
+        console.error("Status Error:", response);
+        // Handle error here
+      }
+    } catch (error) {
+      console.error("Error:", error.message);
+      // Handle error here
+    }
+  };
+  
   let totalReceiveBase=0,totalReturnAmmountBase=0;
 for(let i=0;i<orderStatusPaymentReleased?.length;i++){
   let totalReceive=orderStatusPaymentReleased[i]?.recvMoney;
   totalReceiveBase +=totalReceive;
 // console.log("totalReceiveBase",totalReceiveBase);
 }
-for(let i=0;i<orderSatatusReturned?.length;i++){
-  let totalReturn=orderSatatusReturned[i]?.returnedAmount;
-  if(totalReturn){
-    totalReturnAmmountBase +=totalReturn;
+// for(let i=0;i<orderSatatusReturned?.length;i++){
+//   let totalReturn=orderSatatusReturned[i]?.returnedAmount;
+//   if(totalReturn){
+//     totalReturnAmmountBase +=totalReturn;
+//   }
+
+
+// }
+// Check if orderStatusReturned is an array before looping
+if (Array.isArray(orderSatatusReturned)) {
+  for (let i = 0; i < orderSatatusReturned.length; i++) {
+    const totalReturn = Number(orderSatatusReturned[i]?.returnedAmount);
+    const deliveryFee = Number(orderSatatusReturned[i]?.deliveryFee);
+    
+    // If totalReturn and deliveryFee exist and are numbers, add them to totalReturnAmountBase
+   
+      totalReturnAmmountBase += (totalReturn + deliveryFee);
+    
   }
-
-
 }
+
+// Now, totalReturnAmountBase contains the sum of all returnedAmounts and their associated deliveryFees
+console.log("Total Return Amount (with delivery fees): ", totalReturnAmmountBase);
+
 
 //patmnet status =paid,orderstatus :delivered
 const PaymentStausPaid=orderAll
@@ -548,7 +592,12 @@ useEffect(()=>{
                   </div>
                   {orderAll
                     ?.filter((order) => order.userMail === viewClient?.email)
-                    ?.map((orderInfo, index) => (
+                    ?.map((orderInfo, index) => {
+     // You can conditionally update returnedAmount based on the orderStatus
+     if (orderInfo?.orderStatus === "returned") {
+      updateReturnedAmount(orderInfo._id, orderInfo.printbazcost, orderInfo.deliveryFee);
+    }
+     return(
                       <div className="row client-list">
                         <div className="col-lg-2 col-sm-12">
                           <p>{orderInfo?.name}</p>
@@ -574,7 +623,7 @@ useEffect(()=>{
                           <p className="status-btn">{orderInfo?.orderStatus}</p>
                         </div>
                       </div>
-                    ))}
+                    )})}
                 </div>
                 }
               

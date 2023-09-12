@@ -6,8 +6,9 @@ import UsersStoredSupportTickets from '../userStoredSupportTicket/UsersStoredSup
 import Accordion from 'react-bootstrap/Accordion';
 import { AuthContext } from '../../authProvider/AuthProvider';
 import { useRoleAsignData } from '../../hooks/useRoleAsignData';
-function TabForViewOrder({orderId,email,viewClient,viewOrder,clientName}) {
+function TabForViewOrder({orderId,email,viewClient,viewOrder,clientName,specificOrder}) {
   const {adminUser,loading,loginAdminUser,currentUser}=useContext(AuthContext);
+  console.log("specificOrder",specificOrder);
   // const {clientName}=viewOrder;
   const [activeTab, setActiveTab] = useState('tab1');
   const [showTicketPopUp, setShowTicketPopUp] = useState(false);
@@ -26,7 +27,14 @@ function TabForViewOrder({orderId,email,viewClient,viewOrder,clientName}) {
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
   };
-
+  let lastStatusChange=null;
+  // Check if statusHistory array is present and not empty
+if (specificOrder?.statusHistory && specificOrder?.statusHistory?.length > 0) {
+   lastStatusChange = specificOrder?.statusHistory[specificOrder?.statusHistory?.length - 1];
+  console.log("Last status change:", lastStatusChange);
+} else {
+  console.log("No status history available.");
+}
 // fetch msg for support ticket 
 const fetchChatLog = async () => {
   try {
@@ -197,6 +205,7 @@ headers: {
      value_count?.discussion &&
      <div className="admin-dis-chat">
      <div className="col-12">
+       
        <form onSubmit={handleSendDiscussionMessage}>
          <input type="text" name="msg" value={newMsg} onChange={handleNewMessageChange} placeholder="Write Your Message....." />
          <button className='btn_phone' type="submit">Post</button>
@@ -221,12 +230,16 @@ headers: {
                 <small style={{fontSize:"14px",marginLeft:"15px",color:"gray",fontWeight:"400"}}>{msg?.createTime}</small>
                 </div>
                {msg?.content}
+            
              </div>
+
+             
            </div>
            )
          
          })
        }
+          <p><span style={{color:"orange"}}>{lastStatusChange?.status}</span> changed by <span style={{color:"blue"}}>{lastStatusChange?.changedBy}</span> at {lastStatusChange?.time}</p>
           <div ref={messagesEndRef} />
      
        {/* <div className="dis-post pb-4">

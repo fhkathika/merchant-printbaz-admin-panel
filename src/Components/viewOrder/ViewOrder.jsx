@@ -1,4 +1,4 @@
-import React, { useState,useRef, useEffect } from 'react';
+import React, { useState,useRef, useEffect, useContext } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import TabForViewOrder from '../tabForViewOrder.jsx/TabForViewOrder';
 import Overlay from 'react-bootstrap/Overlay';
@@ -16,6 +16,7 @@ import { useHistory } from 'react-router-dom';
 import ReactDOMServer from 'react-dom/server';
 import { useRoleAsignData } from '../../hooks/useRoleAsignData';
 import useGetMongoData from '../../hooks/useGetMongoData';
+import { AuthContext } from '../../authProvider/AuthProvider';
 const ViewOrder = () => {
   let { id } = useParams();
   const {orderAll}=useGetMongoData()
@@ -32,6 +33,8 @@ const ViewOrder = () => {
   const previousPathLocation = location.state ? location?.state?.previousPath : null;
   const viewClient = location.state?.matchingMerchant;
   const {value_count}=useRoleAsignData()
+  const {adminUser}=useContext(AuthContext);
+  console.log("adminUser",adminUser?.email);
   const handleBack = () => {
     console.log("back btn");
     navigate(previousPathLocation); // Go back to the previous page
@@ -76,8 +79,10 @@ const ViewOrder = () => {
 setTrackingId(e.target.value)
   }
  
- 
-  const handleInputChange = async (e) => {
+ const statusChangeTimeRecord=new Date().toLocaleString("en-US", { month: 'long', day: 'numeric', year: 'numeric', hour: 'numeric', minute: 'numeric' })
+  
+ console.log("statusChangeTimeRecord",statusChangeTimeRecord);
+ const handleInputChange = async (e) => {
     const status = e.target.value;
     try {
         const response = await fetch(
@@ -87,7 +92,7 @@ setTrackingId(e.target.value)
             headers: {
                 "Content-Type": "application/json",
             },
-            body: JSON.stringify({ orderStatus: status }),
+            body: JSON.stringify({ orderStatus: status,statusChangedBy:adminUser?.email,statusChangeTime:statusChangeTimeRecord }),
         });
 
         if (response.ok) {
@@ -1793,7 +1798,7 @@ orderDetail?.brandLogo ?
                 <div className="admin-dis section">
                   <div className="row admin-dis-tab">
                     <div className="col-12">
-                      <TabForViewOrder orderId={id} email={getSpecificOrderById?.userMail} viewOrder={viewOrder} clientName={getSpecificOrderById?.clientName}  ></TabForViewOrder>
+                      <TabForViewOrder orderId={id} email={getSpecificOrderById?.userMail} viewOrder={viewOrder} clientName={getSpecificOrderById?.clientName}    specificOrder={getSpecificOrderById}  ></TabForViewOrder>
                       {/* <Ticket style={{visibility:"none"}}  email={viewClient?.email}/> */}
                       {/* <ul className="nav nav-tabs admin-dis">
                         <li className="nav-item admin-dis-li">
