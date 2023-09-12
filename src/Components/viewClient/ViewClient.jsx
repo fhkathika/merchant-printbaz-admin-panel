@@ -5,16 +5,50 @@ import useGetMongoData from "../../hooks/useGetMongoData";
 import { useRoleAsignData } from "../../hooks/useRoleAsignData";
 import Navigationbar from "../navigationBar/Navigationbar";
 import SendUserApproveMail from "../sendUserApproveMail/SendUserApproveMail";
-
+import * as XLSX from 'xlsx';
+import GetMercahntOrderXl from "../GetMercahntOrderXl";
+import useSingleMercahntorder from "../../hooks/useSingleMercahntorder";
 const ViewClient = () => {
   const { orderAll } = useGetMongoData();
+  const { merchantOrder } = useSingleMercahntorder();
   const location = useLocation();
   const viewClient = location.state ? location?.state?.merchants : null;
   const [getUserById, setGetUserById] = useState();
   const {value_count}=useRoleAsignData()
-  console.log("viewClient",viewClient);
 
- 
+
+  const downloadInfIntoXl = (event) => {
+    const dynmamicId = event.currentTarget.dataset.orderId;
+    console.log("downloadInfIntoXl", dynmamicId);
+      const shippingDetailElement = document.getElementById(dynmamicId);
+  
+      // Assume the element contains a table. 
+      // If not, you'll need to extract and format the data appropriately for Excel.
+      const table = shippingDetailElement.querySelector('table');
+  
+      // Convert the table to a Workbook object
+      const wb = XLSX.utils.table_to_book(table);
+  
+      // Write the workbook to a blob
+      const wbout = XLSX.write(wb, { bookType: 'xlsx', bookSST: true, type: 'array' });
+  
+      // Trigger a download
+      const blob = new Blob([wbout], { type: 'application/octet-stream' });
+      const url = window.URL.createObjectURL(blob);
+  
+      const a = document.createElement('a');
+      a.style.display = 'none';
+      a.href = url;
+      a.download = 'OrderList.xlsx';
+  
+      document.body.appendChild(a);
+      a.click();
+  
+      // Cleanup
+      window.URL.revokeObjectURL(url);
+      document.body.removeChild(a);
+  }
+  
   
   // Payment Released
    const orderStatusPaymentReleased=orderAll
@@ -26,8 +60,9 @@ const ViewClient = () => {
   // console.log("orderStatus pament released",orderStatusPaymentReleased);
 console.log("orderSatatusReturned",orderSatatusReturned);
 
-
-  
+const merchOrders=orderAll
+?.filter(order =>order.userMail === viewClient?.email  )
+  console.log("merchOrders",merchOrders);
   let totalReceiveBase=0,totalReturnAmmountBase=0;
 for(let i=0;i<orderStatusPaymentReleased?.length;i++){
   let totalReceive=orderStatusPaymentReleased[i]?.recvMoney;
@@ -478,9 +513,19 @@ useEffect(()=>{
                 </div>
               </div>
               <div className="col-lg-9 col-sm-12">
+             
                 {
                   value_count?.orderList &&
+                  
                   <div className="client-order-list">
+                     <div  style={{display:"flex",justifyContent:"flex-end",padding:"0px ",marginBottom:"10px"}}>
+                  
+                  <span style={{cursor:"pointer",border:"1px solid #dad5d5",padding:"5px",borderRadius:"4px"}} onClick={downloadInfIntoXl} data-order-id="view-order-detail"><img style={{width:"30px",hight:"25px"}} src="/images/download.png" alt='download'/></span>
+              <div id="view-order-detail"style={{position: 'absolute', left: '-10000px', top: '-10000px'}}>
+              <GetMercahntOrderXl merchOrders={[merchOrders]}/>
+          </div> 
+            
+                </div>
                   <div className="row" style={{ marginBottom: "30px" }}>
                     <div className="col-lg-2 col-sm-12">
                       <h4>Name</h4>

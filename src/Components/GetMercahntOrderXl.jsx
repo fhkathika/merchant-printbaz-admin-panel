@@ -1,8 +1,8 @@
 
 import Table from 'react-bootstrap/Table';
 
-function GetTodaysOutForDeliveryOrders({orderList=[]}) {
-
+function GetMercahntOrderXl({merchOrders=[]}) {
+  console.log("object",merchOrders);
   return (
     <div>
     
@@ -11,40 +11,39 @@ function GetTodaysOutForDeliveryOrders({orderList=[]}) {
       <thead>
           <tr>
           <th>Order Id</th>
+            <th>Client Name</th>
+            <th>Client Number</th>
             <th>Recipient Name</th>
             <th>Recipient Number</th>
             <th>Recipient Address</th>
-            <th>Collect Amount</th>
-            <th>Item Quantity</th>
+            <th>Receivable Amount</th>
+            <th>Status</th>
+            <th>Payment Status</th>
           </tr>
         </thead>
         <tbody>
           {
-              orderList?.flatMap(orders=>(
+              merchOrders?.flatMap(orders=>(
 
                 orders?.map(pending=>
                   <tr  key={pending?._id}>
            
            <td>{pending?._id}</td>
+         
+                  <td>{pending?.clientName}</td>
+                  <td>{pending?.clientPhone}</td>
                   <td>{pending?.name}</td>
                   <td>{pending?.address}</td>
                   <td>{pending?.phone}</td>
-                  <td>{pending?.collectAmount}</td>
-                  <td>
-                  {pending?.orderDetailArr.reduce(
-                    (totalQuantity, item) =>
-                      totalQuantity + parseInt(item.quantity, 10),
-                    0
-                  )}
-                </td>
-                 
+                  <td>{pending?.recvMoney}</td>
+                  <td>{pending?.orderStatus}</td>
+                  <td>{pending?.paymentStatus}</td>
                 </tr>
                   )
               ))
             
               
           } 
-         
         
         
         </tbody>
@@ -54,4 +53,4 @@ function GetTodaysOutForDeliveryOrders({orderList=[]}) {
   );
 }
 
-export default GetTodaysOutForDeliveryOrders;
+export default GetMercahntOrderXl;
