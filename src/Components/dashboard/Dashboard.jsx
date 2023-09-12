@@ -10,6 +10,7 @@ import * as XLSX from 'xlsx';
 import GetOrdersXl from '../GetOrdersXl';
 import GetTotalTshirtDispatched from '../GetTotalTshirtDispatched';
 import useGetAllTickets from '../../hooks/useGetAllTickets';
+import GetTodaysOutForDeliveryOrders from '../GetTodaysOutForDeliveryOrders';
 const Dashboard = () => {
   const {adminUser,loading,loginAdminUser,currentUser}=useContext(AuthContext);
   const { orderAll } = useGetMongoData();
@@ -90,7 +91,7 @@ setWorstMerchants(sortedWorstMerchants);
 
 
 
-  let pendingOrders = orderAll?.filter(users => users?.orderStatus === "Pending");
+let pendingOrders = orderAll?.filter(users => users?.orderStatus === "Pending");
 let   approvedOrders=orderAll?.filter(users=>users?.orderStatus==="Approved");
 let   confirmedOrders=orderAll?.filter(users=>users?.orderStatus==="confirmed");
 let onHoldOutOfStockOrders=orderAll?.filter(users=>users?.orderStatus==="on hold out of stock");
@@ -289,6 +290,25 @@ const blackQuantity = (colorQuantitiesForReturn?.black)+(colorQuantitiesForOutFo
     
 
 let countTotalTshirtDispatched=tShirtQuantityForOutFOrDelivery+tShirtQuantityForDeliveredOrders+tShirtQuantityForReturnOrders
+const today = new Date();
+const options = { month: 'long', day: 'numeric', year: 'numeric' };
+const todayFormatted = today.toLocaleDateString('en-US', options);
+
+const countOutForDeliveryOrdersToday = outForDeliveryOrders
+  ?.filter(order => {
+    // Extract just the date part from the stored date-time string
+    const datePart = order.statusDate?.split(' at ')[0];
+    return datePart === todayFormatted;
+  }).length || 0;
+
+  const outForDeliveryOrdersToday = outForDeliveryOrders
+  ?.filter(order => {
+    // Extract just the date part from the stored date-time string
+    const datePart = order.statusDate?.split(' at ')[0];
+    return datePart === todayFormatted;
+  }) || [];
+
+console.log("outForDeliveryOrdersToday",outForDeliveryOrdersToday);
 let countPendingOrders = pendingOrders?.length || 0;
 let countapprovedOrders = approvedOrders?.length || 0;
 let countconfirmedOrders = confirmedOrders?.length || 0;
@@ -310,7 +330,17 @@ const totaldeliveredPBazCost = deliveredOrders?.reduce((acc, curr) => acc +parse
 const totalreturnPBazCost = returnOrders?.reduce((acc, curr) => acc +parseFloat (curr.printbazcost || 0), 0);
 const TotalODR= Number(totaldeliveredPBazCost+totaloutForDeliveryPBazCost+totalreturnPBazCost)
 const totalpaidAndDeliveredPBazCost = paidAndDeliveredOrders?.reduce((acc, curr) => acc +parseFloat (curr.printbazcost || 0), 0);
-console.log("outForDeliveryOrders",outForDeliveryOrders);
+
+const tShirtQuantityForOutForDeliveryToday = outForDeliveryOrdersToday?.reduce((sum, order) => {
+  if (!order?.orderDetailArr) return sum;
+  return sum + order.orderDetailArr.reduce((innerSum, item) => {
+    if (isNaN(item.quantity)) return innerSum;
+    return innerSum + parseInt(item.quantity, 10);
+  }, 0);
+}, 0) || 0;
+
+console.log("countOutForDeliveryOrdersToday",countOutForDeliveryOrdersToday);
+console.log("countOutForDeliveryOrdersToday",countOutForDeliveryOrdersToday);
 
 const downloadInfIntoXl = (event) => {
   const dynmamicId = event.currentTarget.dataset.orderId;
@@ -761,6 +791,39 @@ return (
               
                    </div>
                   
+               </div>
+              
+             
+
+             </div>
+             <div className="col-md-3">
+               
+               <div className="card stat-card" style={{height:"152px"}}>
+               <div className="" style={{display:"flex",justifyContent:"space-between",alignItem:"center"}}>
+                 <div className="card-body">
+                   <h5 className="">Out for delivery Today</h5>
+                   {/* <h2 className="float-right">{totaldeliveredPBazCost} TK</h2> */}
+                   </div>
+               <div>
+<div className="card-body" style={{display:"flex",justifyContent:"center"}}>
+                  
+                   <h4 className="float-right" style={{marginLeft:"40px",marginTop:"2px"}}>{countOutForDeliveryOrdersToday}</h4>
+                   </div>
+
+                   <div  style={{display:"flex",justifyContent:"flex-end",padding:"0px 20px",marginTop:"35px"}}>
+               
+               <span style={{cursor:"pointer"}} onClick={downloadInfIntoXl} data-order-id="order-detail-outForDeliveryToday"><img style={{width:"25px",hight:"25px"}} src="/images/download.png" alt='download'/></span>
+           <div id="order-detail-outForDeliveryToday"style={{position: 'absolute', left: '-10000px', top: '-10000px'}}>
+           <GetTodaysOutForDeliveryOrders orderList={[outForDeliveryOrdersToday]} />
+       </div> 
+         
+             </div>
+               </div>
+                
+                   </div>
+                 <div>
+                 
+                 </div>
                </div>
               
              
