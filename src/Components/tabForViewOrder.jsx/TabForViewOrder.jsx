@@ -130,9 +130,6 @@ headers: {
   }
 }; 
 
-
-
- 
   const fetchAllTicketData = async () => {
     try {
       // const response = await axios.get('http://localhost:5000/allTicket');
@@ -170,6 +167,7 @@ headers: {
     
     setPopupId(generateId()); // Call the generateId function to get the generated ID
   };
+
   return (
     <div className="TabForViewOrder">
       {
@@ -230,7 +228,7 @@ headers: {
                 <small style={{fontSize:"14px",marginLeft:"15px",color:"gray",fontWeight:"400"}}>{msg?.createTime}</small>
                 </div>
                {msg?.content}
-            
+            mkjhkhj
              </div>
 
              
@@ -239,7 +237,12 @@ headers: {
          
          })
        }
-          <p><span style={{color:"orange"}}>{lastStatusChange?.status}</span> changed by <span style={{color:"blue"}}>{lastStatusChange?.changedBy}</span> at {lastStatusChange?.time}</p>
+       {
+         specificOrder?.statusHistory?.map(status=>
+          <p>Status <span style={{color:"orange"}}>{lastStatusChange?.status}</span> changed by <span style={{color:"blue"}}>{lastStatusChange?.changedBy}</span> at {lastStatusChange?.time}</p>
+          )
+       }
+         
           <div ref={messagesEndRef} />
      
        {/* <div className="dis-post pb-4">
