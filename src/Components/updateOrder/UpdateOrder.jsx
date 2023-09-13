@@ -378,6 +378,41 @@ console.log("getSpecificOrderById out side delete func",getSpecificOrderById);
             return false;
           }
         };
+        const handleDeleteItem = (indexToDelete) => {
+         
+          setDeletepopUp(true);
+          // console.log("click Delete button ", indexToDelete);
+        
+          if (deletepopUp) {
+            let remainingOrders
+            // Uncomment and use this code to update the remainingOrders array
+           
+               remainingOrders = getSpecificOrderById?.orderDetailArr.filter((_, index) => index !== indexToDelete);
+              setGetSpecificOrderById(prevState => ({
+                ...prevState,
+                orderDetailArr: remainingOrders
+              }));
+              // setFormData(remainingOrders)
+           
+        
+            setFormData({
+              name: getSpecificOrderById?.name,
+              phone: getSpecificOrderById?.phone,
+              address: getSpecificOrderById?.address,
+              instruction: getSpecificOrderById?.instruction,
+              collectAmount: getSpecificOrderById?.collectAmount,
+              area: getSpecificOrderById?.area,
+              orderDetailArr:  remainingOrders?.map(order => {
+              
+                 return order
+                 }),
+                 
+            
+            })
+    
+            setDeletepopUp(false); // Close the modal here if needed
+          }
+        };
         
        
         const handleUpdate = async (e) => {
@@ -449,7 +484,7 @@ console.log("getSpecificOrderById out side delete func",getSpecificOrderById);
               formData2.append('deliveryFee', deliveryFee);
               formData2.append('recvMoney', recvMoney);
               formData2.append('userMail', getSpecificOrderById?.userMail);
-         
+              // formData2.append('orderDetailArr', JSON.stringify(formData.orderDetailArr));  // Use the updated orderDetailArr
               const response = await fetch(`https://mserver.printbaz.com/updateorder/${viewOrder?._id}`, {
               // const response = await fetch(`http://localhost:5000/updateorder/${viewOrder?._id}`, {
                 method: "PUT",
@@ -492,54 +527,7 @@ console.log("getSpecificOrderById out side delete func",getSpecificOrderById);
           const handleDeleteModalClose=()=>{
             setDeletepopUp(false)
           }
-          const handleDeleteItem = (indexToDelete) => {
-         
-            setDeletepopUp(true);
-            console.log("click Delete button ", indexToDelete);
-          
-            if (deletepopUp) {
-              // fetch(`http://localhost:5000/deleteOrderFromEditOrder/${viewOrder?._id}/${indexToDelete}`, {
-              fetch(`https://mserver.printbaz.com/deleteOrderFromEditOrder/${viewOrder?._id}/${indexToDelete}`, {
-                method: 'DELETE'
-              })
-                .then(res => res.json())
-                .then(data => {
-                  console.log("data delete", data);
-                  let remainingOrders
-                  // Uncomment and use this code to update the remainingOrders array
-                  if (data?.success) {
-                     remainingOrders = getSpecificOrderById?.orderDetailArr.filter((_, index) => index !== indexToDelete);
-                    setGetSpecificOrderById(prevState => ({
-                      ...prevState,
-                      orderDetailArr: remainingOrders
-                    }));
-                    // setFormData(remainingOrders)
-                 
-                  }
-                  setFormData({
-                    name: getSpecificOrderById?.name,
-                    phone: getSpecificOrderById?.phone,
-                    address: getSpecificOrderById?.address,
-                    instruction: getSpecificOrderById?.instruction,
-                    collectAmount: getSpecificOrderById?.collectAmount,
-                    area: getSpecificOrderById?.area,
-                    orderDetailArr:  remainingOrders?.map(order => {
-                    
-                       return order
-                       })
-                  
-                  })
-          
-                  setDeletepopUp(false); // Close the modal here if needed
-            
-                })
-                .catch(error => {
-                  console.error("Error deleting order:", error);
-                  // Handle the error
-                });
-            }
-          };
-          
+   
           
   return (
     <>

@@ -4,8 +4,6 @@ import { Link } from 'react-router-dom';
 import { AuthContext } from '../../authProvider/AuthProvider';
 import { useRoleAsignData } from '../../hooks/useRoleAsignData';
 import 'bootstrap/dist/css/bootstrap.min.css';
-import 'bootstrap/dist/js/bootstrap.bundle.min.js'; // Import Bootstrap JavaScript
-
 const Navigationbar = () => {
     const {adminUser,loading,loginAdminUser,currentUser}=useContext(AuthContext);
     // console.log("adminUser",adminUser);
@@ -72,16 +70,18 @@ const Navigationbar = () => {
               <Link className="nav-link active" aria-current="page" to="/orderList">Orders</Link>
               </li>
             
-              <li className="nav-item dropdown">
-                  <a className="nav-link dropdown-toggle" href="#" id="navbarDropdownMenuLink" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-                    Analytics
-                  </a>
-                  <ul className="dropdown-menu nav-dropdown-menu" aria-labelledby="navbarDropdownMenuLink">
-                    <li><a className="dropdown-item nav-dropdown-item" href="#">Merchants</a></li>
-                    <li><a className="dropdown-item nav-dropdown-item" href="#">Order</a></li>
-                    <li><a className="dropdown-item nav-dropdown-item" href="#">Transaction</a></li>
-                  </ul>
-                </li>
+              <li class="nav-item dropdown">
+  <a class="nav-link dropdown-toggle" href="#" id="navbarDropdownMenuLink" role="button">
+    Analytics
+  </a>
+  <ul class="dropdown-menu nav-dropdown-menu">
+    <li><Link class="dropdown-item nav-dropdown-item" to="/analytics">Analytics</Link></li>
+    <li><Link class="dropdown-item nav-dropdown-item" href="/deliverySystem">Delivery System</Link></li>
+    <li><Link class="dropdown-item nav-dropdown-item" href="/salesReport">SalesReport</Link></li>
+    <li><Link class="dropdown-item nav-dropdown-item" href="/teshirtVendor">T-shirt Vendor</Link></li>
+  </ul>
+</li>
+          
               <li className="nav-item">
               <Link className="nav-link active" aria-current="page" to="/mailBox">Mail Box</Link>
               </li>
@@ -120,10 +120,10 @@ const Navigationbar = () => {
                 <Link className="nav-link active" aria-current="page" to="/filemanager">File Manager</Link>
         
               </li> 
-               <li className="nav-item">
+               {/* <li className="nav-item">
                 <Link className="nav-link active" aria-current="page" to="/deliverySystem">Delivery System</Link>
         
-              </li> 
+              </li>  */}
                <li className="nav-item">
                 <Link className="nav-link active" aria-current="page" to="/invitaionPage">Send Invitation</Link>
         
@@ -138,6 +138,7 @@ const Navigationbar = () => {
               </li>  
           
             </ul>
+    
             <p style={{color:"white",marginTop:"13px"}}>{adminUser?.email}</p>
           </div>
         </div>
@@ -182,10 +183,19 @@ const Navigationbar = () => {
                   
                  {
                     value_count?.analytics && 
-                    <li className="nav-item dropdown" key={`${value_count?._id}-analytics`}>
-                   <Link className="nav-link active" aria-current="page" to="/analytics">Analytics</Link>
-                  
+                    <li class="nav-item dropdown">
+                    <a class="nav-link dropdown-toggle" href="#" id="navbarDropdownMenuLink" role="button">
+                      Analytics
+                    </a>
+                    <ul class="dropdown-menu nav-dropdown-menu">
+                      <li><Link class="dropdown-item nav-dropdown-item" to="/analytics">Analytics</Link></li>
+                      <li><Link class="dropdown-item nav-dropdown-item" to="/deliverySystem">Delivery System</Link></li>
+                      <li><Link class="dropdown-item nav-dropdown-item" to="/salesReport">SalesReport</Link></li>
+                      <li><Link class="dropdown-item nav-dropdown-item" to="/teshirtVendor">T-shirt Vendor</Link></li>
+                    </ul>
                   </li>
+                          
+                
                  }
                  { value_count?.mailBox && 
  <li className="nav-item" key={`${value_count?._id}-mailBox`}>
@@ -237,12 +247,12 @@ const Navigationbar = () => {
                   
                         </li>
                  } 
-                 {value_count?.deliverySystem && 
+                 {/* {value_count?.deliverySystem && 
                           <li className="nav-item" key={`${value_count?._id}-deliverySystem`}>
                           <Link className="nav-link active" aria-current="page" to="/deliverySystem">Delivery Syatem</Link>
                   
                         </li>
-                 }
+                 } */}
                   
                     <li className="nav-item">
                      <Link className="nav-link active" aria-current="page" to="/invitaionPage">Send Invitation</Link>

@@ -74,6 +74,11 @@ let createTime=new Date().toLocaleString("en-US", { month: 'long', day: 'numeric
     console.error(err);
   }
 };
+const findMentions = (message) => {
+  const mentions = message.match(/@\w+/g) || [];
+  return mentions.map((mention) => mention.slice(1)); // remove '@' symbol
+};
+
 ///send discussion message handler 
 const handleSendDiscussionMessage = async (e) => {
   e.preventDefault();
@@ -82,7 +87,9 @@ const handleSendDiscussionMessage = async (e) => {
       setShowAlert(true)
       return;
   }  
- 
+   // Find mentions in the new message
+   const mentions = findMentions(newMsg);
+
   const formData=new FormData();
     const newMessage = {  unread:true,clientOrderId:orderId, content: newMsg,userEmail:adminUser?.email,userName:"admin",userRole:"admin" };
 
@@ -99,7 +106,8 @@ const handleSendDiscussionMessage = async (e) => {
     Object.entries(chatMessage).forEach(([key,value])=>{
       formData.append(key,value)
     })
-
+ // Add mentions to the formData or any data structure you are sending to the server
+    formData.append("mentions", JSON.stringify(mentions));
     // Add the new message to the local state immediately
     setChatLog([...chatLog, chatMessage]);
     

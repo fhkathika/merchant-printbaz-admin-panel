@@ -278,7 +278,7 @@ const allPromises=orderAll.map(async (getSpecificOrderById) => {
   && getSpecificOrderById?.area === "outside dhaka") ? deliveryFeeOutSideDhaka
   : 0; // Default value if none of the conditions match
 
-  console.log("deliveryFeeForOthers from funct", deliveryFeeOutSideDhakaForPathao); // make sure this logs the expected value
+  // console.log("deliveryFeeForOthers from funct", deliveryFeeOutSideDhakaForPathao); // make sure this logs the expected value
    const returnValue=Number(getSpecificOrderById?.printbazcost)+Number(getSpecificOrderById?.deliveryFee)
    const deliveryData = {
        orderId: getSpecificOrderById._id,
@@ -331,55 +331,66 @@ const allPromises=orderAll.map(async (getSpecificOrderById) => {
   console.log("indexOfLastItem",indexOfLastItem);
   const actualIndexOfLastItem = indexOfLastItem > deliveryMap.length ? deliveryMap.length : indexOfLastItem;
      //  calculate the total sum of printbazRcv
-const totalPrintbazRcv = deliveryMap?.reduce((acc, list) => {
-  let amount = 0;
-  if (list?.orderStatus === "returned") {
-    if(list?.deliveryAssignTo==="delivery tiger"){
-      amount = 0 - (list?.deliveryFeeForDeliveryTiger?list?.deliveryFeeForDeliveryTiger:0);
-    }
-    else{
-      amount = 0 - (list?.deliveryFee);
-    }
-      
-  } else {
-    if(list?.deliveryAssignTo==="delivery tiger"){
-     
-      amount = (list?.collectAmount) - (list?.deliveryFeeForDeliveryTiger?list?.deliveryFeeForDeliveryTiger:0);
-    }
-    else{
-      amount = (list?.collectAmount) - (list?.deliveryFee);
-    }
-     
-  }
-  return acc + amount;
-}, 0); 
-const totalReceivable= deliveryMap?.reduce((acc, list) => {
+     const totalPrintbazRcv = (deliveryMap || []).reduce((acc, list) => {
+      let amount = 0;
+    
+      // Debug: Print list object and its properties to console to inspect
+      console.log("List: ", list);
+      console.log("orderStatus: ", list?.orderStatus);
+      console.log("deliveryAssignTo: ", list?.deliveryAssignTo);
+      console.log("collectAmount: ", list?.collectAmount);
+      console.log("deliveryFee: ", list?.deliveryFee);
+      console.log("deliveryFeeForDeliveryTiger: ", list?.deliveryFeeForDeliveryTiger);
+    
+      if (list?.orderStatus === "returned") {
+        if(list?.deliveryAssignTo === "delivery tiger") {
+          amount = 0 - (list?.deliveryFeeForDeliveryTiger ? Number(list?.deliveryFeeForDeliveryTiger) : 0);
+        } else {
+          amount = 0 - Number(list?.deliveryFee || 0); // Fallback to 0 if list?.deliveryFee is null or undefined
+        }
+      } else {
+        if(list?.deliveryAssignTo === "delivery tiger") {
+          amount = Number(list?.collectAmount || 0) - (list?.deliveryFeeForDeliveryTiger ? Number(list?.deliveryFeeForDeliveryTiger) : 0);
+        } else {
+          amount = Number(list?.collectAmount || 0) - Number(list?.deliveryFee || 0); // Fallback to 0 if list?.deliveryFee is null or undefined
+        }
+      }
+    
+      // Debug: Print calculated amount to console
+      console.log("Calculated amount: ", amount);
+    
+      return acc + amount;
+    }, 0);
+    
+    // Debug: Print totalPrintbazRcv to console
+    console.log("Total Printbaz Received: ", totalPrintbazRcv);
+console.log("totalPrintbazRcv",totalPrintbazRcv);
+const totalReceivable = (deliveryMap || []).reduce((acc, list) => {
   if (list?.paymentStatus === "paid") {
-      // Skip this value and continue with the accumulation
-      return acc;
+    // Skip this value and continue with the accumulation
+    return acc;
   }
 
   let amount = 0;
   if (list?.orderStatus === "returned") {
-    if(list?.deliveryAssignTo==="delivery tiger"){
-      amount = 0- (list?.deliveryFeeForDeliveryTiger?list?.deliveryFeeForDeliveryTiger:0);
+    if(list?.deliveryAssignTo === "delivery tiger"){
+      amount = 0 - (list?.deliveryFeeForDeliveryTiger ? Number(list?.deliveryFeeForDeliveryTiger) : 0);
+    } else {
+      amount = 0 - Number(list?.deliveryFee || 0); // Use fallback value of 0
     }
-    else{
-      amount = 0 - (list?.deliveryFee);
-    }
-      
   } else {
-    if(list?.deliveryAssignTo==="delivery tiger"){
-      amount = (list?.collectAmount) - (list?.deliveryFeeForDeliveryTiger?list?.deliveryFeeForDeliveryTiger:0);
+    if(list?.deliveryAssignTo === "delivery tiger"){
+      amount = Number(list?.collectAmount || 0) - (list?.deliveryFeeForDeliveryTiger ? Number(list?.deliveryFeeForDeliveryTiger) : 0);
+    } else {
+      amount = Number(list?.collectAmount || 0) - Number(list?.deliveryFee || 0); // Use fallback value of 0
     }
-    else{
-      amount = (list?.collectAmount) - (list?.deliveryFee);
-    }
-      
   }
 
   return acc + amount;
 }, 0);
+
+console.log("Total Receivable: ", totalReceivable);
+
   const deleteDelivery = async (orderId) => {
     try {
       // const response = await fetch(`http://localhost:5000/deleteDelivery/${orderId}`, {
@@ -778,7 +789,7 @@ if(list?.orderStatus==="returned"){
                         <td style={{fontWeight: 700}} />
                         <td style={{fontWeight: 700}}>{totalDeliveryAmount.toFixed(2)} TK</td>
                         <td style={{fontWeight: 700}} />
-                        <td style={{fontWeight: 700}}>{totalPrintbazRcv.toFixed(2)} TK</td>
+                        <td style={{fontWeight: 700}}>{Number(totalPrintbazRcv).toFixed(2)} TK</td>
                         <td style={{fontWeight: 700}} />
                         <td style={{fontWeight: 700}}>{totalReturnAmount} TK</td>
                       </tr>
