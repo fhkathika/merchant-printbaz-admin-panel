@@ -71,17 +71,16 @@ const Navigationbar = () => {
               </li>
             
               <li class="nav-item dropdown">
-  <a class="nav-link dropdown-toggle" href="#" id="navbarDropdownMenuLink" role="button">
-    Analytics
-  </a>
-  <ul class="dropdown-menu nav-dropdown-menu">
-    <li><Link class="dropdown-item nav-dropdown-item" to="/analytics">Analytics</Link></li>
-    <li><Link class="dropdown-item nav-dropdown-item" href="/deliverySystem">Delivery System</Link></li>
-    <li><Link class="dropdown-item nav-dropdown-item" href="/salesReport">SalesReport</Link></li>
-    <li><Link class="dropdown-item nav-dropdown-item" href="/teshirtVendor">T-shirt Vendor</Link></li>
-  </ul>
-</li>
-          
+                    <a class="nav-link dropdown-toggle" href="#" id="navbarDropdownMenuLink" role="button">
+                      Analytics
+                    </a>
+                    <ul class="dropdown-menu nav-dropdown-menu">
+                      <li><Link class="dropdown-item nav-dropdown-item" to="/analytics">Analytics</Link></li>
+                      <li><Link class="dropdown-item nav-dropdown-item" to="/deliverySystem">Delivery System</Link></li>
+                      <li><Link class="dropdown-item nav-dropdown-item" to="/salesReport">SalesReport</Link></li>
+                      <li><Link class="dropdown-item nav-dropdown-item" to="/teshirtVendor">T-shirt Vendor</Link></li>
+                    </ul>
+                  </li>    
               <li className="nav-item">
               <Link className="nav-link active" aria-current="page" to="/mailBox">Mail Box</Link>
               </li>

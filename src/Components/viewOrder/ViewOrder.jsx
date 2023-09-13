@@ -54,7 +54,6 @@ const ViewOrder = () => {
       setFetchtrackingId(data?.trackingId);
     })
       
-    
          }
          getOrderById()
           // Update the previousPath state when the location changes
