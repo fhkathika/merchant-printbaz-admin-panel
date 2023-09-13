@@ -239,7 +239,7 @@ headers: {
        }
        {
          specificOrder?.statusHistory?.map(status=>
-          <p>Status <span style={{color:"orange"}}>{lastStatusChange?.status}</span> changed by <span style={{color:"blue"}}>{lastStatusChange?.changedBy}</span> at {lastStatusChange?.time}</p>
+          <p>Status <span style={{color:"orange"}}>{status?.status}</span> changed by <span style={{color:"blue"}}>{status?.changedBy}</span> at {status?.time}</p>
           )
        }
          
