@@ -365,8 +365,9 @@ console.log("getSpecificOrderById out side delete func",getSpecificOrderById);
           Math.ceil(formData.collectAmount - (printbazcost + deliveryFee))
         );
         // costHandlingfee = recvMoneyWithouthandling * 0.02;
-        costHandlingfee = Number(formData.collectAmount * 0.02);
+        costHandlingfee = Number(formData.collectAmount * 0.03);
         recvMoney = recvMoneyWithouthandling - costHandlingfee;
+        let suggestedCollectAmount = Math.ceil((1 + printbazcost + deliveryFee) / 0.97);
         // console.log("recvMoney",recvMoney)
         const validateForm = () => {
           if (recvMoney < 0) {
@@ -1128,6 +1129,16 @@ console.log("getSpecificOrderById out side delete func",getSpecificOrderById);
                         placeholder=""
                       />
                     </Form.Group>
+                    <Form.Group className="mb-3 ">
+                           <Form.Label>Minimum Amount to Collect</Form.Label>
+                          
+                           <Form.Control
+                             type="number"
+                             name="collectAmount"
+                             value={ printbazcost && ( deliveryFeeOutSideDhaka ||deliveryFeeInsideDhaka) && suggestedCollectAmount ?suggestedCollectAmount : '' }
+                             readOnly
+                           />
+                         </Form.Group>
                     <div className="costOrder_Style">
                       <label htmlFor="printbazCost">Cash Handling fee</label>{" "}
                       <h3> 2%</h3>
