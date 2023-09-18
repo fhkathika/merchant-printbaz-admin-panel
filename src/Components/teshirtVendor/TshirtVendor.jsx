@@ -1,8 +1,163 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
+import useGetMongoData from '../../hooks/useGetMongoData';
+import AddDamage from '../alert/AddDamage';
+import AddDeliveryList from '../alert/AddDeliveryList';
+import AddTshirtPurchased from '../alert/AddTshirtPurchased';
 import Navigationbar from '../navigationBar/Navigationbar';
 
 const TshirtVendor = () => {
-    return (
+  const { orderAll } = useGetMongoData();
+  const [showAlert, setShowAlert] = useState(false);
+  const [showDamage, setShowDamage] = useState(false);
+  const [getPurchaseTshirt, setGetPurchaseTshirt] = useState([]);
+  const [getDamagedTshirt, setGetDamagedTshirt] = useState([]);
+  const handleAddDeliveryPopUp=()=>{
+    setShowAlert(true)
+    console.log("click delivery system popup",showAlert);
+   
+  } 
+   const handleDamagePopUp=()=>{
+    setShowDamage(true)
+    console.log("click delivery system popup",showDamage);
+   
+  }
+  let inProductionOrders=orderAll?.filter(users=>users?.orderStatus==="in-production");
+  const [tShirtDetail,setTshirtDetail]=useState([{
+    tshirtColor:"",
+    sizeM:"",
+    sizeL:"",
+    sizeXL:"",
+    sizeXXL:"",
+    sizeS:"",
+    perpisCost:"",
+    totalCost:"",
+    date:""
+    
+  },
+
+]) 
+
+const fetchData = () => {
+  // fetch('http://localhost:5000/getAllPurchasedTshirts')
+  fetch('https://mserver.printbaz.com/getAllPurchasedTshirts')
+  .then(response => response.json())
+  .then(data => {
+    console.log("Fetched Data:", data);
+    setGetPurchaseTshirt(data)
+  })
+  .catch(error => {
+    console.error('Error:', error);
+  });
+}
+const fetchDamagedThsirt = () => {
+  // fetch('http://localhost:5000/getAllDamagedTshirts')
+  fetch('https://mserver.printbaz.com/getAllDamagedTshirts')
+  .then(response => response.json())
+  .then(data => {
+    console.log("Fetched Data:", data);
+    setGetDamagedTshirt(data)
+  })
+  .catch(error => {
+    console.error('Error:', error);
+  });
+}
+
+useEffect(() => {
+  fetchData();
+  fetchDamagedThsirt()
+}, [fetchData()]);
+
+ // Initialize counts
+ let totalBlackSizeM = 0;
+ let totalBlackSizeL = 0;
+ let totalBlackSizeXL = 0;
+ let totalBlackSizeXXL = 0;
+ let totalBlackSizeS = 0; 
+ let totalwhiteSizeM = 0;
+ let totalwhiteSizeL = 0;
+ let totalwhiteSizeXL = 0;
+ let totalwhiteSizeXXL = 0;
+ let totalwhiteSizeS = 0;
+  // Filter out the records for black t-shirts
+  const blackTshirts = getPurchaseTshirt.filter(record => record.tshirtColor === 'black');
+  const whiteTshirts = getPurchaseTshirt.filter(record => record.tshirtColor === 'white');
+  // Sum the counts
+  for (const record of blackTshirts) {
+    totalBlackSizeM += Number(record.sizeM || 0);
+    totalBlackSizeL += Number(record.sizeL || 0);
+    totalBlackSizeXL += Number(record.sizeXL || 0);
+    totalBlackSizeXXL += Number(record.sizeXXL || 0);
+    totalBlackSizeS += Number(record.sizeS || 0);
+  }
+  // Sum the counts
+  for (const record of whiteTshirts) {
+    totalwhiteSizeM += Number(record.sizeM || 0);
+    totalwhiteSizeL += Number(record.sizeL || 0);
+    totalwhiteSizeXL += Number(record.sizeXL || 0);
+    totalwhiteSizeXXL += Number(record.sizeXXL || 0);
+    totalwhiteSizeS += Number(record.sizeS || 0);
+  }
+
+const totalTshirtPurchased=
+totalBlackSizeM+
+totalBlackSizeL+
+totalBlackSizeXL+
+totalBlackSizeXXL+
+totalBlackSizeS+
+totalwhiteSizeM+
+totalwhiteSizeL+
+totalwhiteSizeXL+
+totalwhiteSizeXXL+
+totalwhiteSizeS
+const countSizeForOrders = (orders, size) => {
+  return orders?.reduce((acc, order) => {
+    return (order?.orderDetailArr || []).reduce((innerAcc, item) => {
+      if (item.color === "black") {
+        // Initialize the size object for black if it doesn't exist
+        if (!innerAcc.black[item.teshirtSize]) {
+          innerAcc.black[item.teshirtSize] = 0;
+        }
+        innerAcc.black[item.teshirtSize] += parseInt(item.quantity || 0);
+      } else if (item.color === "white") {
+        // Initialize the size object for white if it doesn't exist
+        if (!innerAcc.white[item.teshirtSize]) {
+          innerAcc.white[item.teshirtSize] = 0;
+        }
+        innerAcc.white[item.teshirtSize] += parseInt(item.quantity || 0);
+      }
+      return innerAcc;
+    }, acc);
+  }, { white: {}, black: {} });
+};
+
+const sizeCountsForInProduction = countSizeForOrders(inProductionOrders);
+
+console.log("sizeCountsForInProduction",sizeCountsForInProduction);
+const whiteM=Number(totalwhiteSizeM)-Number(sizeCountsForInProduction.white?.m?sizeCountsForInProduction.white?.m:0)
+const whiteL= Number(totalwhiteSizeL)-Number(sizeCountsForInProduction.white?.L?sizeCountsForInProduction.white?.L:0)
+const whiteXL=Number(totalwhiteSizeXL)-Number(sizeCountsForInProduction.white?.XL?sizeCountsForInProduction.white?.XL:0)
+const whiteXXL=Number(totalwhiteSizeXXL)-Number(sizeCountsForInProduction.white?.XXL?sizeCountsForInProduction.white?.XXL:0)
+const blackM=Number(totalBlackSizeM)-Number(sizeCountsForInProduction.black?.m?sizeCountsForInProduction.black?.m:0)
+const bvlackL=Number(totalBlackSizeL)-Number(sizeCountsForInProduction.black?.L?sizeCountsForInProduction.black?.L:0)
+const blackXL= Number(totalBlackSizeXL)-Number(sizeCountsForInProduction.black?.XL?sizeCountsForInProduction.black?.XL:0)
+const blackXXL=Number(totalBlackSizeXXL)-Number(sizeCountsForInProduction.black?.XXL?sizeCountsForInProduction.black?.XXL:0)
+console.log("whiteM",whiteM,"sizeCountsForInProduction.white?.m",sizeCountsForInProduction.white?.m);
+console.log("whiteL",whiteL);
+console.log("whiteXL",whiteXL);
+console.log("whiteXXL",whiteXXL);
+console.log("blackM",blackM);
+console.log("bvlackL",bvlackL);
+console.log("blackXL",blackXL);
+console.log("blackXXL",blackXXL);
+const totalTshirtInventory=whiteM+
+whiteL+
+whiteXL+
+whiteXXL+
+blackM+
+bvlackL+
+blackXL+
+blackXXL
+return (
         <div>
           <meta charSet="UTF-8" />
           <meta httpEquiv="X-UA-Compatible" content="IE=edge" />
@@ -47,7 +202,7 @@ const TshirtVendor = () => {
               <div className="col-xs-12 col-sm-6 col-md-6 col-lg-6">
                 <div className="lobipanel m-0" style={{height: '374px'}}>
                   <div className="panel-title">
-                    <h4>Inventory<span style={{float: 'right'}}>204 PCS</span></h4>
+                    <h4>Inventory<span style={{float: 'right'}}>{totalTshirtInventory} PCS</span></h4>
                   </div>
                   <div className="panel-body">
                     <table className="table">
@@ -64,65 +219,26 @@ const TshirtVendor = () => {
                       <tbody>
                         <tr className="info">
                           <td>Black</td>
-                          <td>0</td>
-                          <td>15</td>
-                          <td>34</td>
-                          <td>9</td>
-                          <td>5</td>
+                          <td>{totalBlackSizeS}</td>
+                          <td>{blackM}</td>
+                          <td>{bvlackL}</td>
+                          <td>{blackXL}</td>
+                          <td>{blackXXL}</td>
                         </tr>
                         <tr>
                           <td>White</td>
-                          <td>0</td>
-                          <td>10</td>
-                          <td>24</td>
-                          <td>5</td>
-                          <td>0</td>
+                          <td>{totalwhiteSizeS}</td>
+                          <td>{whiteM}</td>
+                          <td>{whiteL}</td>
+                          <td>{whiteXL}</td>
+                          <td>{whiteXXL}</td>
                         </tr>
                       </tbody>
                     </table>
                   </div>
                 </div>
               </div>
-              <div className="col-xs-12 col-sm-6 col-md-6 col-lg-6">
-                <div className="lobipanel m-0">
-                  <div className="panel-title">
-                    <h4>Cost Per Tee Shirt<span style={{float: 'right'}}>150 ৳</span></h4>
-                  </div>
-                  <div className="panel-body">
-                    <table className="table">
-                      <thead>
-                        <tr>
-                          <th>Amount</th>
-                          <th>Date Added</th>
-                        </tr>
-                      </thead>
-                      <tbody>
-                        <tr className="info">
-                          <td>150 ৳</td>
-                          <td>15th June 2023 - 5.00 AM</td>
-                        </tr>
-                        <tr>
-                          <td>100 ৳</td>
-                          <td>13th June 2023 - 5.00 AM</td>
-                        </tr>
-                        <tr>
-                          <td>95 ৳</td>
-                          <td>10th June 2023 - 5.00 AM</td>
-                        </tr>
-                        <tr>
-                          <td>80 ৳</td>
-                          <td>7th June 2023 - 5.00 AM</td>
-                        </tr>
-                      </tbody>
-                    </table>
-                  </div>
-                  <div className="panel-button-tr">
-                    <input type="text" placeholder="Type ammount & update" style={{paddingLeft: '5px'}} />
-                    <button id="button" style={{float: 'right'}}>View More</button>
-                    <button style={{float: 'right'}}>Update</button>
-                  </div>
-                </div>
-              </div>
+             
             </div>
             <div className="row input-bar-01">
               <div className="col-xs-12 col-sm-6 col-md-6 col-lg-6">
@@ -144,151 +260,63 @@ const TshirtVendor = () => {
                         </tr>
                       </thead>
                       <tbody>
-                        <tr className="info">
-                          <td>Black</td>
-                          <td>0</td>
-                          <td>15</td>
-                          <td>34</td>
-                          <td>9</td>
-                          <td>5</td>
-                          <td>15th June 2023 - 5.00 AM</td>
+                    
+                          {
+                            getDamagedTshirt?.map(damaged=>
+                              <tr className="info">
+                          <>
+                              </>
+                              <td>{damaged?.tshirtColor}</td>
+                              <td>{damaged?.sizeS}</td>
+                              <td>{damaged?.sizeM}</td>
+                              <td>{damaged?.sizeL}</td>
+                              <td>{damaged?.sizeXL}</td>
+                              <td>{damaged?.sizeXXL}</td>
+                              <td>{damaged?.date}</td>
+                              
+                                   
                         </tr>
-                        <tr>
-                          <td>White</td>
-                          <td>0</td>
-                          <td>10</td>
-                          <td>24</td>
-                          <td>5</td>
-                          <td>0</td>
-                          <td>15th June 2023 - 5.00 AM</td>
-                        </tr>
-                        <tr>
-                          <td>Black</td>
-                          <td>0</td>
-                          <td>15</td>
-                          <td>34</td>
-                          <td>9</td>
-                          <td>5</td>
-                          <td>14th June 2023 - 5.00 AM</td>
-                        </tr>
-                        <tr>
-                          <td>White</td>
-                          <td>0</td>
-                          <td>10</td>
-                          <td>24</td>
-                          <td>5</td>
-                          <td>0</td>
-                          <td>14th June 2023 - 5.00 AM</td>
-                        </tr>
+                              )
+                            
+                          }
+                  
+                      
+                        
                       </tbody>
                     </table>
                   </div>
                   <div className="panel-button">
-                    <button id="button">Update</button>
+                    <button id="button" onClick={handleDamagePopUp}>Update</button>
                     <button style={{float: 'right'}}>View More</button>
                   </div>
-                  <div id="overlay" />
-                  <div id="popup">
-                    <div className="popupcontrols">
-                      <span id="popupclose">X</span>
-                    </div>
-                    <div className="popupcontent">
-                      <div className="row">
-                        <div className="col-12">
-                          <div className="popup-title-01">
-                            <h2>Total Number Of Tee Shirts Sold</h2>
-                          </div>
-                        </div>
-                      </div>
-                      <div className="row">
-                        <div className="col-2">
-                          <div className="popup-title-02">
-                            <h3>Color</h3>
-                          </div>
-                        </div>
-                        <div className="col-2">
-                          <div className="popup-title-02">
-                            <h3>Size: S</h3>
-                          </div>
-                        </div>
-                        <div className="col-2">
-                          <div className="popup-title-02">
-                            <h3>Size: M</h3>
-                          </div>
-                        </div>
-                        <div className="col-2">
-                          <div className="popup-title-02">
-                            <h3>Size: L</h3>
-                          </div>
-                        </div>
-                        <div className="col-2">
-                          <div className="popup-title-02">
-                            <h3>Size: XL</h3>
-                          </div>
-                        </div>
-                        <div className="col-2">
-                          <div className="popup-title-02">
-                            <h3>Size: XXL</h3>
-                          </div>
-                        </div>
-                      </div>
-                      <div className="row">
-                        <div className="col-2">
-                          <div className="popup-title-03">
-                            <h4>Black</h4>
-                          </div>
-                        </div>
-                        <div className="col-2">
-                          <input type="text" required />
-                        </div>
-                        <div className="col-2">
-                          <input type="text" required />
-                        </div>
-                        <div className="col-2">
-                          <input type="text" required />
-                        </div>
-                        <div className="col-2">
-                          <input type="text" required />
-                        </div>
-                        <div className="col-2">
-                          <input type="text" required />
-                        </div>
-                      </div>
-                      <div className="row">
-                        <div className="col-2">
-                          <div className="popup-title-03">
-                            <h4>White</h4>
-                          </div>
-                        </div>
-                        <div className="col-2">
-                          <input type="text" required />
-                        </div>
-                        <div className="col-2">
-                          <input type="text" required />
-                        </div>
-                        <div className="col-2">
-                          <input type="text" required />
-                        </div>
-                        <div className="col-2">
-                          <input type="text" required />
-                        </div>
-                        <div className="col-2">
-                          <input type="text" required />
-                        </div>
-                      </div>
-                      <div className="row">
-                        <div className="col-12">
-                          <button>Submit</button>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
+                
+                  {showDamage===true && (
+          
+          <AddDamage
+        
+          // returnValue={returnValue}
+          setTshirtDetail={setTshirtDetail}
+          tShirtDetail={tShirtDetail}
+          showDamage={showDamage}
+        
+          message="Your delivery list has been updated successfully."
+          onClose={() => setShowDamage(false)}
+        
+          
+          
+          />
+          
+          
+          )
+          
+          
+          }
                 </div>
               </div>
               <div className="col-xs-12 col-sm-6 col-md-6 col-lg-6">
                 <div className="lobipanel">
                   <div className="panel-title">
-                    <h4>Total Tee Shirt Purchased<span style={{float: 'right'}}>204 PCS</span></h4>
+                    <h4>Total Tee Shirt Purchased<span style={{float: 'right'}}>{totalTshirtPurchased} PCS</span></h4>
                   </div>
                   <div className="panel-body">
                     <table className="table">
@@ -300,127 +328,64 @@ const TshirtVendor = () => {
                           <th>Size: L</th>
                           <th>Size: XL</th>
                           <th>Size: XXL</th>
-                          <th>Date Added</th>
+                          <th>Per pcs</th>
+                          <th>Date </th>
                         </tr>
                       </thead>
                       <tbody>
-                        <tr className="info">
-                          <td>Black</td>
-                          <td>0</td>
-                          <td>15</td>
-                          <td>34</td>
-                          <td>9</td>
-                          <td>5</td>
-                          <td>15th June 2023 - 5.00 AM</td>
-                        </tr>
+                        {
+                          getPurchaseTshirt?.map(tshirt=>
+                            <tr className="info">
+                            <td>{tshirt?.tshirtColor}</td>
+                            <td>{tshirt?.sizeS}</td>
+                            <td>{tshirt?.sizeM}</td>
+                            <td>{tshirt?.sizeL}</td>
+                            <td>{tshirt?.sizeXL}</td>
+                            <td>{tshirt?.sizeXXL}</td>
+                            <td>{tshirt?.perpisCost}</td>
+                            <td>{tshirt?.date}</td>
+                           
+                          </tr>
+                            )
+                        }
+
                        </tbody>
                     </table>
                   </div>
                   <div className="panel-button">
-                    <button id="button">Update</button>
+                    <button id="button" onClick={handleAddDeliveryPopUp}>Update55</button>
                     <button style={{float: 'right'}}>View More</button>
                   </div>
-                  <div id="overlay" />
-                  <div id="popup">
-                    <div className="popupcontrols">
-                      <span id="popupclose">X</span>
-                    </div>
-                    <div className="popupcontent">
-                      <div className="row">
-                        <div className="col-12">
-                          <div className="popup-title-01">
-                            <h2>Total Number Of Tee Shirts Sold</h2>
-                          </div>
-                        </div>
-                      </div>
-                      <div className="row">
-                        <div className="col-2">
-                          <div className="popup-title-02">
-                            <h3>Color</h3>
-                          </div>
-                        </div>
-                        <div className="col-2">
-                          <div className="popup-title-02">
-                            <h3>Size: S</h3>
-                          </div>
-                        </div>
-                        <div className="col-2">
-                          <div className="popup-title-02">
-                            <h3>Size: M</h3>
-                          </div>
-                        </div>
-                        <div className="col-2">
-                          <div className="popup-title-02">
-                            <h3>Size: L</h3>
-                          </div>
-                        </div>
-                        <div className="col-2">
-                          <div className="popup-title-02">
-                            <h3>Size: XL</h3>
-                          </div>
-                        </div>
-                        <div className="col-2">
-                          <div className="popup-title-02">
-                            <h3>Size: XXL</h3>
-                          </div>
-                        </div>
-                      </div>
-                      <div className="row">
-                        <div className="col-2">
-                          <div className="popup-title-03">
-                            <h4>Black</h4>
-                          </div>
-                        </div>
-                        <div className="col-2">
-                          <input type="text" required />
-                        </div>
-                        <div className="col-2">
-                          <input type="text" required />
-                        </div>
-                        <div className="col-2">
-                          <input type="text" required />
-                        </div>
-                        <div className="col-2">
-                          <input type="text" required />
-                        </div>
-                        <div className="col-2">
-                          <input type="text" required />
-                        </div>
-                      </div>
-                      <div className="row">
-                        <div className="col-2">
-                          <div className="popup-title-03">
-                            <h4>White</h4>
-                          </div>
-                        </div>
-                        <div className="col-2">
-                          <input type="text" required />
-                        </div>
-                        <div className="col-2">
-                          <input type="text" required />
-                        </div>
-                        <div className="col-2">
-                          <input type="text" required />
-                        </div>
-                        <div className="col-2">
-                          <input type="text" required />
-                        </div>
-                        <div className="col-2">
-                          <input type="text" required />
-                        </div>
-                      </div>
-                      <div className="row">
-                        <div className="col-12">
-                          <button>Submit</button>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
+                  {showAlert===true && (
+          
+          <AddTshirtPurchased
+        
+          // returnValue={returnValue}
+          setTshirtDetail={setTshirtDetail}
+          tShirtDetail={tShirtDetail}
+          showAlert={showAlert}
+        
+          message="Your delivery list has been updated successfully."
+          onClose={() => setShowAlert(false)}
+        
+          
+          
+          />
+          
+          
+          )
+          
+          
+          } 
+         
+              
                 </div>
               </div>
             </div>
           </section>
         </div>
+
+        
       );
 };
 
