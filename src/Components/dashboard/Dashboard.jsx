@@ -255,7 +255,7 @@ const blackQuantity = (colorQuantitiesForReturn?.black)+(colorQuantitiesForOutFo
     
     const sumSizeAcrossOrdersWhite = (size) => {
       return [
-        sizeCountsForInProduction,
+        // sizeCountsForInProduction,
         sizeCountsForConfirmedOrders,
         sizeCountsForPendingOrders,
         sizeCountsForApprovedOrders
