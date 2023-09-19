@@ -7,7 +7,7 @@ import 'react-datepicker/dist/react-datepicker.css';
 import AlertMessage from "./AlertMessage";
 import DeliveryListAddedAlert from "./DeliveryListAddedAlert";
 import useGetDeliveryList from "../../hooks/useGetDeliveryList";
-const AddTshirtPurchased = ({ showAlert,onClose,setTshirtDetail,tShirtDetail}) => {
+const AddTshirtPurchased = ({ showAlert,onClose,setTshirtDetail,tShirtDetail,fetchData}) => {
        
   const [exitIdAlert, setExitIdAlert] = useState(false);
   const [show, setShow] = useState(false);
@@ -29,7 +29,7 @@ const updated=[...tShirtDetail]
   setTshirtDetail(updated);
   }
 
-  
+  let totalcostOfTshirt
 const handleSubmitDeliveryList = (e) => {
   e.preventDefault();
   console.log("tShirtDetail",tShirtDetail);
@@ -57,7 +57,7 @@ const handleSubmitDeliveryList = (e) => {
   })
   .then(data => {
     console.log(data);
- 
+    fetchData()
     // Optionally provide feedback to user
     // alert('Data submitted successfully!');
   })
@@ -163,9 +163,10 @@ const handleSubmitDeliveryList = (e) => {
                           </div>
                         </div>
                       </div>
+                      
                     {
                         tShirtDetail?.map((item,index)=>{
-                         let totalcostOfTshirt=item.perpisCost*(Number(item.sizeS)+Number(item.sizeM)+Number(item.sizeL)+Number(item.sizeXL)+Number(item.sizeXXL))
+                          item.totalCost=item.perpisCost*(Number(item.sizeS)+Number(item.sizeM)+Number(item.sizeL)+Number(item.sizeXL)+Number(item.sizeXXL))
                           return(
 <form onSubmit={handleSubmitDeliveryList}>
                     <div className="popupcontent">
@@ -199,7 +200,7 @@ const handleSubmitDeliveryList = (e) => {
                           <input
                           style={{border: '1px solid #ececec', width: '100%', height: '50px', padding: '5px'}}
           type="number"
-          value={totalcostOfTshirt || ""}
+          value={item.totalCost|| ""}
           onChange={(e) => updateField(e, "totalCost", index)}
           placeholder="totalcost"
           min="0"

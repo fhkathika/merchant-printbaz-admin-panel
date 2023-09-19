@@ -7,7 +7,7 @@ import 'react-datepicker/dist/react-datepicker.css';
 import AlertMessage from "./AlertMessage";
 import DeliveryListAddedAlert from "./DeliveryListAddedAlert";
 import useGetDeliveryList from "../../hooks/useGetDeliveryList";
-const AddDamage = ({ showDamage,onClose,setTshirtDetail,tShirtDetail}) => {
+const AddDamage = ({ showDamage,onClose,setTshirtDetail,tShirtDetail, fetchDamagedThsirt}) => {
        
   const [exitIdAlert, setExitIdAlert] = useState(false);
   const [show, setShow] = useState(false);
@@ -57,7 +57,7 @@ const handleSubmitDamageList = (e) => {
   })
   .then(data => {
     console.log(data);
- 
+    fetchDamagedThsirt()
     // Optionally provide feedback to user
     // alert('Data submitted successfully!');
   })

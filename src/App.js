@@ -23,6 +23,8 @@ import AllRcvList from './Components/allRcvList/AllRcvList';
 import { FilterProvider } from './Components/filterContext/FilterContext';
 import SalesReport from './Components/salesReport/SalesReport';
 import TshirtVendor from './Components/teshirtVendor/TshirtVendor';
+import AllPurchasedTshirt from './Components/AllPurchasedTshirt/AllPurchasedTshirt';
+import AllDamageTShirt from './Components/allDamageTshirt/AllDamageTShirt';
 function App() {
   return (
     <div className="">
@@ -51,6 +53,8 @@ function App() {
        <Route path="/analytics" element={<Analytics/>} />
        <Route path="/salesReport" element={<SalesReport/>} />
        <Route path="/teshirtVendor" element={<TshirtVendor/>} />
+       <Route path="/AllPurchasedTshirt" element={<AllPurchasedTshirt/>} />
+       <Route path="/allDamagedTshirt" element={<AllDamageTShirt/>} />
        <Route
   path="/registerAdminPage"
   element={

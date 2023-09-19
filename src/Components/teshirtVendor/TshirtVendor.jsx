@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import useGetMongoData from '../../hooks/useGetMongoData';
 import AddDamage from '../alert/AddDamage';
 import AddDeliveryList from '../alert/AddDeliveryList';
@@ -11,16 +12,10 @@ const TshirtVendor = () => {
   const [showDamage, setShowDamage] = useState(false);
   const [getPurchaseTshirt, setGetPurchaseTshirt] = useState([]);
   const [getDamagedTshirt, setGetDamagedTshirt] = useState([]);
-  const handleAddDeliveryPopUp=()=>{
-    setShowAlert(true)
-    console.log("click delivery system popup",showAlert);
-   
-  } 
-   const handleDamagePopUp=()=>{
-    setShowDamage(true)
-    console.log("click delivery system popup",showDamage);
-   
-  }
+  const navigate=useNavigate()
+  let pendingOrders = orderAll?.filter(users => users?.orderStatus === "Pending");
+  let   approvedOrders=orderAll?.filter(users=>users?.orderStatus==="Approved");
+  let   confirmedOrders=orderAll?.filter(users=>users?.orderStatus==="confirmed");
   let inProductionOrders=orderAll?.filter(users=>users?.orderStatus==="in-production");
   const [tShirtDetail,setTshirtDetail]=useState([{
     tshirtColor:"",
@@ -36,7 +31,36 @@ const TshirtVendor = () => {
   },
 
 ]) 
+const handleAddDeliveryPopUp=()=>{
+  setShowAlert(true)
+  setTshirtDetail([{
+    tshirtColor:"",
+    sizeM:"",
+    sizeL:"",
+    sizeXL:"",
+    sizeXXL:"",
+    sizeS:"",
+    perpisCost:"",
+    totalCost:"",
+    date:""
+    
+  },
 
+])
+  console.log("click delivery system popup",showAlert);
+ 
+} 
+ const handleDamagePopUp=()=>{
+  setShowDamage(true)
+  console.log("click delivery system popup",showDamage);
+ 
+}
+const handleaAllPurchasedTshirts=()=>{
+  navigate('/allPurchasedTshirt')
+}
+const handleaAllDamagedTshirts=()=>{
+  navigate('/allDamagedTshirt')
+}
 const fetchData = () => {
   // fetch('http://localhost:5000/getAllPurchasedTshirts')
   fetch('https://mserver.printbaz.com/getAllPurchasedTshirts')
@@ -61,11 +85,15 @@ const fetchDamagedThsirt = () => {
     console.error('Error:', error);
   });
 }
-
+let totalCostOfTshirt=0;
+getPurchaseTshirt.forEach((item)=>{
+  totalCostOfTshirt+=item.totalCost
+})
+console.log("totalCostOfTshirt",totalCostOfTshirt);
 useEffect(() => {
   fetchData();
   fetchDamagedThsirt()
-}, [fetchData()]);
+}, []);
 
  // Initialize counts
  let totalBlackSizeM = 0;
@@ -97,7 +125,47 @@ useEffect(() => {
     totalwhiteSizeXXL += Number(record.sizeXXL || 0);
     totalwhiteSizeS += Number(record.sizeS || 0);
   }
+//damage tshirt 
+   // Initialize counts
+ let totalDamgBlackSizeM = 0;
+ let totalDamgBlackSizeL = 0;
+ let totalDamgBlackSizeXL = 0;
+ let totalDamgBlackSizeXXL = 0;
+ let totalDamgBlackSizeS = 0; 
+ let totalDamgwhiteSizeM = 0;
+ let totalDamgwhiteSizeL = 0;
+ let totalDamgwhiteSizeXL = 0;
+ let totalDamgwhiteSizeXXL = 0;
+ let totalDamgwhiteSizeS = 0;
+  // Filter out the records for black t-shirts
+  const blackDmgTshirts = getDamagedTshirt.filter(record => record.tshirtColor === 'black');
+  const whiteDmgTshirts = getDamagedTshirt.filter(record => record.tshirtColor === 'white');
+  // Sum the counts
+  for (const record of blackDmgTshirts) {
+    totalDamgBlackSizeM += Number(record.sizeM || 0);
+    totalDamgBlackSizeL += Number(record.sizeL || 0);
+    totalDamgBlackSizeXL += Number(record.sizeXL || 0);
+    totalDamgBlackSizeXXL += Number(record.sizeXXL || 0);
+    totalDamgBlackSizeS += Number(record.sizeS || 0);
+  }
+  // Sum the counts
+  for (const record of whiteDmgTshirts) {
+    totalDamgwhiteSizeM += Number(record.sizeM || 0);
+    totalDamgwhiteSizeL += Number(record.sizeL || 0);
+    totalDamgwhiteSizeXL += Number(record.sizeXL || 0);
+    totalDamgwhiteSizeXXL += Number(record.sizeXXL || 0);
+    totalDamgwhiteSizeS += Number(record.sizeS || 0);
+  }
 
+console.log("totalDamgBlackSizeL",totalDamgBlackSizeL);
+console.log("totalDamgBlackSizeXL",totalDamgBlackSizeXL);
+console.log("totalDamgBlackSizeXXL",totalDamgBlackSizeXXL);
+console.log("totalDamgBlackSizeS",totalDamgBlackSizeS);
+console.log("totalDamgwhiteSizeM",totalDamgwhiteSizeM);
+console.log("totalDamgwhiteSizeL",totalDamgwhiteSizeL);
+console.log("totalDamgwhiteSizeXL",totalDamgwhiteSizeXL);
+console.log("totalDamgwhiteSizeXXL",totalDamgwhiteSizeXXL);
+console.log("totalDamgwhiteSizeS",totalDamgwhiteSizeS);
 const totalTshirtPurchased=
 totalBlackSizeM+
 totalBlackSizeL+
@@ -133,22 +201,27 @@ const countSizeForOrders = (orders, size) => {
 const sizeCountsForInProduction = countSizeForOrders(inProductionOrders);
 
 console.log("sizeCountsForInProduction",sizeCountsForInProduction);
-const whiteM=Number(totalwhiteSizeM)-Number(sizeCountsForInProduction.white?.m?sizeCountsForInProduction.white?.m:0)
-const whiteL= Number(totalwhiteSizeL)-Number(sizeCountsForInProduction.white?.L?sizeCountsForInProduction.white?.L:0)
-const whiteXL=Number(totalwhiteSizeXL)-Number(sizeCountsForInProduction.white?.XL?sizeCountsForInProduction.white?.XL:0)
-const whiteXXL=Number(totalwhiteSizeXXL)-Number(sizeCountsForInProduction.white?.XXL?sizeCountsForInProduction.white?.XXL:0)
-const blackM=Number(totalBlackSizeM)-Number(sizeCountsForInProduction.black?.m?sizeCountsForInProduction.black?.m:0)
-const bvlackL=Number(totalBlackSizeL)-Number(sizeCountsForInProduction.black?.L?sizeCountsForInProduction.black?.L:0)
-const blackXL= Number(totalBlackSizeXL)-Number(sizeCountsForInProduction.black?.XL?sizeCountsForInProduction.black?.XL:0)
-const blackXXL=Number(totalBlackSizeXXL)-Number(sizeCountsForInProduction.black?.XXL?sizeCountsForInProduction.black?.XXL:0)
-console.log("whiteM",whiteM,"sizeCountsForInProduction.white?.m",sizeCountsForInProduction.white?.m);
-console.log("whiteL",whiteL);
-console.log("whiteXL",whiteXL);
-console.log("whiteXXL",whiteXXL);
-console.log("blackM",blackM);
-console.log("bvlackL",bvlackL);
-console.log("blackXL",blackXL);
-console.log("blackXXL",blackXXL);
+const whiteM=Number(totalwhiteSizeM)-(Number(sizeCountsForInProduction.white?.m?sizeCountsForInProduction.white?.m:0)+Number(totalDamgwhiteSizeM))
+const whiteL= Number(totalwhiteSizeL)-(Number(sizeCountsForInProduction.white?.L?sizeCountsForInProduction.white?.L:0)+Number(totalDamgwhiteSizeL))
+const whiteXL=Number(totalwhiteSizeXL)-(Number(sizeCountsForInProduction.white?.XL?sizeCountsForInProduction.white?.XL:0)+Number(totalDamgwhiteSizeXL))
+const whiteXXL=Number(totalwhiteSizeXXL)-(Number(sizeCountsForInProduction.white?.XXL?sizeCountsForInProduction.white?.XXL:0)+Number(totalDamgwhiteSizeXXL))
+const blackM=Number(totalBlackSizeM)-(Number(sizeCountsForInProduction.black?.m?sizeCountsForInProduction.black?.m:0)+Number(totalDamgBlackSizeM))
+const bvlackL=Number(totalBlackSizeL)-(Number(sizeCountsForInProduction.black?.L?sizeCountsForInProduction.black?.L:0)+Number(totalDamgBlackSizeL))
+const blackXL= Number(totalBlackSizeXL)-(Number(sizeCountsForInProduction.black?.XL?sizeCountsForInProduction.black?.XL:0)+Number(totalDamgBlackSizeXL))
+const blackXXL=Number(totalBlackSizeXXL)-(Number(sizeCountsForInProduction.black?.XXL?sizeCountsForInProduction.black?.XXL:0)+Number(totalDamgBlackSizeXXL))
+console.log("Number(totalBlackSizeM)-Number(sizeCountsForInProduction.black?.m?sizeCountsForInProduction.black?.m:0+Number(totalDamgBlackSizeM))",Number(totalBlackSizeM)-(Number(sizeCountsForInProduction.black?.m?sizeCountsForInProduction.black?.m:0)+Number(totalDamgBlackSizeM)));
+
+const TotalDamageTshirt=
+totalDamgBlackSizeM+
+totalDamgBlackSizeL+
+totalDamgBlackSizeXL+
+totalDamgBlackSizeXXL+
+totalDamgBlackSizeS+
+totalDamgwhiteSizeM+
+totalDamgwhiteSizeL+
+totalDamgwhiteSizeXL+
+totalDamgwhiteSizeXXL+
+totalDamgwhiteSizeS
 const totalTshirtInventory=whiteM+
 whiteL+
 whiteXL+
@@ -156,7 +229,37 @@ whiteXXL+
 blackM+
 bvlackL+
 blackXL+
-blackXXL
+blackXXL;
+
+const sizeCountsForConfirmedOrders = countSizeForOrders(confirmedOrders);
+const sizeCountsForPendingOrders = countSizeForOrders(pendingOrders);
+const sizeCountsForApprovedOrders = countSizeForOrders(approvedOrders);
+
+const sumSizeAcrossOrdersWhite = (size) => {
+  return [
+    // sizeCountsForInProduction,
+    sizeCountsForConfirmedOrders,
+    sizeCountsForPendingOrders,
+    sizeCountsForApprovedOrders
+  ].reduce((acc, sizeCounts) => acc + (sizeCounts.white?.[size] || 0), 0);
+}; 
+  const sumSizeAcrossOrdersBlack= (size) => {
+  return [
+   
+    sizeCountsForConfirmedOrders,
+    sizeCountsForPendingOrders,
+    sizeCountsForApprovedOrders
+  ].reduce((acc, sizeCounts) => acc + (sizeCounts.black?.[size] || 0), 0);
+};
+
+const whiteMNeeded = sumSizeAcrossOrdersWhite("m");
+const whiteLNeeded = sumSizeAcrossOrdersWhite("L");
+const whiteXlNeeded = sumSizeAcrossOrdersWhite("XL");
+const whiteXxlNeeded = sumSizeAcrossOrdersWhite("XXL");
+const blackMNeeded =  sumSizeAcrossOrdersBlack("m");
+const blackLNeeded =  sumSizeAcrossOrdersBlack("L");
+const blackXlNeeded = sumSizeAcrossOrdersBlack("XL");
+const blackXxlNeeded =sumSizeAcrossOrdersBlack("XXL");
 return (
         <div>
           <meta charSet="UTF-8" />
@@ -182,7 +285,7 @@ return (
                   <div className="statistic-box">
                     <h3>Total Cost Of Tee Shirt</h3>
                     <div className="counter-number pull-right">
-                      <span className="count-number">11,350</span>
+                      <span className="count-number">{Number(totalCostOfTshirt)}</span>
                       <span className="slight" style={{fontWeight: 'bolder'}}>৳</span>
                     </div>
                   </div>
@@ -193,7 +296,7 @@ return (
                   <div className="statistic-box">
                     <h3>Inventory Value</h3>
                     <div className="counter-number pull-right">
-                      <span className="count-number">6,750</span>
+                      <span className="count-number">0</span>
                       <span className="slight" style={{fontWeight: 'bolder'}}>৳</span>
                     </div>
                   </div>
@@ -238,13 +341,98 @@ return (
                   </div>
                 </div>
               </div>
+               <div className="col-xs-12 col-sm-6 col-md-6 col-lg-6">
+                 <div className='row'>
+               <div className="col-md-6">
+               
+               <div className="card stat-card" style={{height:"auto"}}>
+               <div className="" style={{display:"flex",justifyContent:"space-between",alignItem:"center"}}>
+                 <div className="card-body ">
+                 <h5 className="">White T-shirt Needed (PAC)</h5>
+                 <div style={{display:"flex"}}>
+<div>
+<p className="float-right">M  - {whiteMNeeded}</p>
+ <p className="float-right">L  -  {whiteLNeeded}</p>
+ <p className="float-right"> XL - {whiteXlNeeded}</p>
+ <p className="float-right"> XXL  -  {whiteXxlNeeded}</p>
+</div>
+</div>
+
+                  
+                   
+                   </div>
+               <div>
+               <div className="card-body" style={{display:"flex",justifyContent:"center",height:"50%"}}>
+                  
+                  {/* <h4 className="float-right" style={{marginLeft:"40px",marginTop:"2px"}}>{countTotalTshirtDispatched}</h4> */}
+                  </div>
+               <div  style={{display:"flex",justifyContent:"flex-end",padding:"0px 20px",marginTop:"35px"}}>
+                  
+                  {/* <span style={{cursor:"pointer"}} onClick={downloadInfIntoXl} data-order-id="order-detail-totalTShirt"><img style={{width:"25px",hight:"25px"}} src="/images/download.png" alt='download'/></span> */}
+              {/* <div id="order-detail-totalTShirt"style={{position: 'absolute', left: '-10000px', top: '-10000px'}}>
+              <GetTotalTshirtDispatched countTotalTshirtDispatched={countTotalTshirtDispatched} whiteQuantity={whiteQuantity} blackQuantity={blackQuantity}/>
+          </div>  */}
+            
+                </div>
+               </div>
+              
+                   </div>
+                  
+               </div>
+              
+             
+
+             </div>
+              <div className="col-md-6">
+               
+               <div className="card stat-card" style={{height:"auto"}}>
+               <div className="" style={{display:"flex",justifyContent:"space-between",alignItem:"center"}}>
+                 <div className="card-body ">
+                 <h5 className="">Black T-shirt Needed (PAC)</h5>
+                 <div style={{display:"flex"}}>
+<div>
+
+<p className="float-right">M  - {blackMNeeded}</p>
+   <p className="float-right">L  -  {blackLNeeded}</p>
+   <p className="float-right"> XL - {blackXlNeeded}</p>
+  <p className="float-right"> XXL  -  {blackXxlNeeded}</p>
+</div>
+
+                 </div>
+                  
+                   
+                   </div>
+               <div>
+               <div className="card-body" style={{display:"flex",justifyContent:"center",height:"50%"}}>
+                  
+                  {/* <h4 className="float-right" style={{marginLeft:"40px",marginTop:"2px"}}>{countTotalTshirtDispatched}</h4> */}
+                  </div>
+               <div  style={{display:"flex",justifyContent:"flex-end",padding:"0px 20px",marginTop:"35px"}}>
+                  
+                  {/* <span style={{cursor:"pointer"}} onClick={downloadInfIntoXl} data-order-id="order-detail-totalTShirt"><img style={{width:"25px",hight:"25px"}} src="/images/download.png" alt='download'/></span> */}
+              {/* <div id="order-detail-totalTShirt"style={{position: 'absolute', left: '-10000px', top: '-10000px'}}>
+              <GetTotalTshirtDispatched countTotalTshirtDispatched={countTotalTshirtDispatched} whiteQuantity={whiteQuantity} blackQuantity={blackQuantity}/>
+          </div> 
+             */}
+                </div>
+               </div>
+              
+                   </div>
+                  
+               </div>
+              
+             
+
+             </div>
+             </div>
+              </div>
              
             </div>
             <div className="row input-bar-01">
               <div className="col-xs-12 col-sm-6 col-md-6 col-lg-6">
                 <div className="lobipanel">
                   <div className="panel-title">
-                    <h4>Damaged<span style={{float: 'right'}}>204 PCS</span></h4>
+                    <h4>Damaged<span style={{float: 'right'}}>{TotalDamageTshirt} PCS</span></h4>
                   </div>
                   <div className="panel-body">
                     <table className="table">
@@ -262,7 +450,7 @@ return (
                       <tbody>
                     
                           {
-                            getDamagedTshirt?.map(damaged=>
+                            getDamagedTshirt?.slice(0,4)?.map(damaged=>
                               <tr className="info">
                           <>
                               </>
@@ -287,7 +475,7 @@ return (
                   </div>
                   <div className="panel-button">
                     <button id="button" onClick={handleDamagePopUp}>Update</button>
-                    <button style={{float: 'right'}}>View More</button>
+                    <button style={{float: 'right'}} onClick={handleaAllDamagedTshirts}>View More</button>
                   </div>
                 
                   {showDamage===true && (
@@ -298,7 +486,7 @@ return (
           setTshirtDetail={setTshirtDetail}
           tShirtDetail={tShirtDetail}
           showDamage={showDamage}
-        
+          fetchDamagedThsirt={ fetchDamagedThsirt}
           message="Your delivery list has been updated successfully."
           onClose={() => setShowDamage(false)}
         
@@ -322,6 +510,7 @@ return (
                     <table className="table">
                       <thead>
                         <tr>
+                        <th>Date </th>
                           <th>T-Shirt Color</th>
                           <th>Size: S</th>
                           <th>Size: M</th>
@@ -329,22 +518,23 @@ return (
                           <th>Size: XL</th>
                           <th>Size: XXL</th>
                           <th>Per pcs</th>
-                          <th>Date </th>
+                          <th>Total Cost</th>
+                         
                         </tr>
                       </thead>
                       <tbody>
                         {
-                          getPurchaseTshirt?.map(tshirt=>
+                          getPurchaseTshirt?.slice(0,4)?.map(tshirt=>
                             <tr className="info">
+                            <td>{tshirt?.date}</td>
                             <td>{tshirt?.tshirtColor}</td>
                             <td>{tshirt?.sizeS}</td>
                             <td>{tshirt?.sizeM}</td>
                             <td>{tshirt?.sizeL}</td>
                             <td>{tshirt?.sizeXL}</td>
                             <td>{tshirt?.sizeXXL}</td>
-                            <td>{tshirt?.perpisCost}</td>
-                            <td>{tshirt?.date}</td>
-                           
+                            <td>{tshirt?.perpisCost} tk</td>
+                            <td>{tshirt?.totalCost} tk</td>
                           </tr>
                             )
                         }
@@ -354,12 +544,12 @@ return (
                   </div>
                   <div className="panel-button">
                     <button id="button" onClick={handleAddDeliveryPopUp}>Update55</button>
-                    <button style={{float: 'right'}}>View More</button>
+                    <button style={{float: 'right'}} onClick={handleaAllPurchasedTshirts}>View More</button>
                   </div>
                   {showAlert===true && (
           
           <AddTshirtPurchased
-        
+          fetchData={fetchData}
           // returnValue={returnValue}
           setTshirtDetail={setTshirtDetail}
           tShirtDetail={tShirtDetail}

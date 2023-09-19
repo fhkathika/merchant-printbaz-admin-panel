@@ -713,7 +713,8 @@ return (
               
              
 
-             </div> <div className="col-md-3">
+             </div> 
+             <div className="col-md-3">
                
                <div className="card stat-card" style={{height:"152px"}}>
                <div className="" style={{display:"flex",justifyContent:"space-between",alignItem:"center"}}>
