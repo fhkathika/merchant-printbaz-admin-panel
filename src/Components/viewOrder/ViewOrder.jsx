@@ -40,12 +40,12 @@ const ViewOrder = () => {
     navigate(previousPathLocation); // Go back to the previous page
   };
 
-  console.log("previousPathLocation",previousPathLocation);
+  console.log("getSpecificOrderById",getSpecificOrderById);
   useEffect(()=>{
     const getOrderById=async()=>{
              // Fetch the updated order details
-    await fetch(`https://mserver.printbaz.com/getorder/${id}`)
-    // await fetch(`http://localhost:5000/getorder/${id}`)
+    // await fetch(`https://mserver.printbaz.com/getorder/${id}`)
+    await fetch(`http://localhost:5000/getorder/${id}`)
     .then(res=>res.json())
     .then(data => {setGetSpecificOrderById(data)
       setOrderStatus(data.orderStatus);
@@ -1317,7 +1317,7 @@ onChange={(e) => handleInputChange(e)}
               <div className="col-lg-4 col-md-12 mb-3">
                 {
                   value_count?.clientDetails &&
-                  <div className="rec-info bg-white p-4 shadow-sm">
+                  <div className="rec-info bg-white p-4 shadow-sm"style={{height:"330px"}}>
                   <div className="row">
                     <div className="col-12">
                       <h3 className="all-title">Client Details</h3>
@@ -1359,10 +1359,30 @@ onChange={(e) => handleInputChange(e)}
                       <h5>Phone</h5>
                       <p>{getSpecificOrderById?.phone}</p>
                     </div>
-                    <div className="col-12">
+                    <div className='row'>
+<div className='col-md-2 col-sm-12' >
+                      <h5>District</h5>
+                      <p>{getSpecificOrderById?.districts}</p>
+                      </div>
+                      <div className='col-md-4 col-sm-12'>
+                      <h5>Zone</h5>
+                      <p>{getSpecificOrderById?.zones}</p>
+                      </div><div className='col-md-6 col-sm-12'>
+                      <h5>Area</h5>
+                      <p>{getSpecificOrderById?.areas}</p>
+                      </div>
+
+                      </div>
+                    <div className="col-md-12 col-sm-12">
                       <h5>Address</h5>
                       <p>{getSpecificOrderById?.address}</p>
-                    </div>
+                    </div> 
+                     
+
+                      
+
+                    
+                   
                   </div>
                 </div>
                 }
@@ -1371,7 +1391,7 @@ onChange={(e) => handleInputChange(e)}
               <div className="col-lg-3 col-md-12">
                 {
                   value_count?.costOfOrder_FullDetails &&
-                  <div className="bg-white p-4 shadow-sm mb-3">
+                  <div className="bg-white p-4 shadow-sm mb-3" style={{height:"330px"}}>
                   <div className="row amu-title">
                     <div className="col-12">
                       <h3 className="all-title">Cost of Order</h3>
