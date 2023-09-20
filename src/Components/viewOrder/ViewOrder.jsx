@@ -1410,7 +1410,7 @@ onChange={(e) => handleInputChange(e)}
                       <div className='flex'>
                       
                       <h6>Cash Handling Fee</h6>
-                      <span style={{marginTop:"10px"}}>2% BDT</span>
+                      <span style={{marginTop:"10px"}}>3% BDT</span>
                       </div>
                    
                   
