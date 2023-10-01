@@ -236,7 +236,7 @@ headers: {
                 <small style={{fontSize:"14px",marginLeft:"15px",color:"gray",fontWeight:"400"}}>{msg?.createTime}</small>
                 </div>
                {msg?.content}
-            mkjhkhj
+          
              </div>
 
              

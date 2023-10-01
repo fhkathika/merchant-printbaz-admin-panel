@@ -307,8 +307,7 @@ const ViewTicket = () => {
            
       
              <button onClick={handleBack} className="ttm-button" ><i className="fa fa-reply" aria-hidden="true" style={{marginRight: '5px'}} />Back</button>
-           
-               
+             
              <button className="ttm-button" onClick={closeTicket}><i className="fa fa-check-circle" aria-hidden="true" style={{marginRight: '5px'}} />Close</button>
             {/* <button className="ttm-button"><i className="fa fa-trash" aria-hidden="true" style={{marginRight: '5px'}} />Delete</button> */}
             <button className="ttm-button" ref={target}

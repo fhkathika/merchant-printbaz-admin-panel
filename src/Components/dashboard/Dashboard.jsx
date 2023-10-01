@@ -226,27 +226,59 @@ const blackQuantity = (colorQuantitiesForReturn?.black)+(colorQuantitiesForOutFo
     //     return innerAcc;
     //   }, acc);
     // }, { white: {}, black: {} });
-
-    const countSizeForOrders = (orders, size) => {
+    const countSizeForOrders = (orders) => {
       return orders?.reduce((acc, order) => {
         return (order?.orderDetailArr || []).reduce((innerAcc, item) => {
-          if (item.color === "black") {
-            // Initialize the size object for black if it doesn't exist
-            if (!innerAcc.black[item.teshirtSize]) {
-              innerAcc.black[item.teshirtSize] = 0;
-            }
-            innerAcc.black[item.teshirtSize] += parseInt(item.quantity || 0);
-          } else if (item.color === "white") {
-            // Initialize the size object for white if it doesn't exist
-            if (!innerAcc.white[item.teshirtSize]) {
-              innerAcc.white[item.teshirtSize] = 0;
-            }
-            innerAcc.white[item.teshirtSize] += parseInt(item.quantity || 0);
+          const color = item.color.toLowerCase();
+          
+          // Initialize innerAcc[color] if it doesn't exist
+          if (!innerAcc[color]) {
+            innerAcc[color] = {};
           }
+          
+          // Check if the teshirtSize is a string or an object
+          if (typeof item.teshirtSize === 'string') {
+            // Handle string case (old format)
+            if (!innerAcc[color][item.teshirtSize]) {
+              innerAcc[color][item.teshirtSize] = 0;
+            }
+            innerAcc[color][item.teshirtSize] += parseInt(item.quantity || 0);
+          } else {
+            // Handle object case (new format)
+            Object.entries(item.teshirtSize || {}).forEach(([size, quantity]) => {
+              if (!innerAcc[color][size]) {
+                innerAcc[color][size] = 0;
+              }
+              innerAcc[color][size] += parseInt(quantity || 0);
+            });
+          }
+      
           return innerAcc;
         }, acc);
-      }, { white: {}, black: {} });
+      }, { white: {}, black: {}, /* Initialize other colors as needed */ });
     };
+    
+    //previous function
+    // const countSizeForOrders = (orders, size) => {
+    //   return orders?.reduce((acc, order) => {
+    //     return (order?.orderDetailArr || []).reduce((innerAcc, item) => {
+    //       if (item.color === "black") {
+    //         // Initialize the size object for black if it doesn't exist
+    //         if (!innerAcc.black[item.teshirtSize]) {
+    //           innerAcc.black[item.teshirtSize] = 0;
+    //         }
+    //         innerAcc.black[item.teshirtSize] += parseInt(item.quantity || 0);
+    //       } else if (item.color === "white") {
+    //         // Initialize the size object for white if it doesn't exist
+    //         if (!innerAcc.white[item.teshirtSize]) {
+    //           innerAcc.white[item.teshirtSize] = 0;
+    //         }
+    //         innerAcc.white[item.teshirtSize] += parseInt(item.quantity || 0);
+    //       }
+    //       return innerAcc;
+    //     }, acc);
+    //   }, { white: {}, black: {} });
+    // };
     
     const sizeCountsForInProduction = countSizeForOrders(inProductionOrders);
     const sizeCountsForConfirmedOrders = countSizeForOrders(confirmedOrders);

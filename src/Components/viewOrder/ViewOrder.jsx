@@ -1498,8 +1498,11 @@ onChange={(e) => handleInputChange(e)}
         <h4>Picture</h4>
       </div> */}
     </div>
+    
     {
-      getSpecificOrderById?.orderDetailArr?.map((orderDetail,orderIndex)=><>
+      getSpecificOrderById?.orderDetailArr?.map((orderDetail,orderIndex)=>
+      orderDetail?.printSide  &&
+      <>
         <div className="row order-tab d-none-phone " key={orderIndex}>
         <h3 style={{color:"orange"}}>Line Item: {orderIndex+1}</h3>
         
@@ -1507,10 +1510,25 @@ onChange={(e) => handleInputChange(e)}
         <p>{orderDetail?.color}</p>
       </div>
       <div className="col-3" style={{display:"flex",justifyContent:"center"}}>
-        {orderDetail?.teshirtSize}
+    
+       <ul>
+      {typeof orderDetail.teshirtSize === 'string' ? (
+        <li>
+          {orderDetail.teshirtSize}- {orderDetail.quantity}
+        </li>
+      ) : (
+        Object.entries(orderDetail.teshirtSize || {}).map(
+          ([size, quantity]) => (
+            <li key={size}>
+              {size}- {quantity}
+            </li>
+          )
+        )
+      )}
+    </ul>
       </div>
       <div className="col-3" style={{display:"flex",justifyContent:"center"}}>
-      {orderDetail?.quantity}
+      {orderDetail?.totalQuantity}
       </div>
  
     
@@ -1546,7 +1564,7 @@ return (
       </div>
     
     </div>
-    <div className="row  " >
+    <div className="row  d-none-phone" >
       {/* <h3 style={{color:"orange"}}>Line Item: {orderIndex+1}</h3> */}
       <div className="col-12 "  key={orderIndex}>
     
@@ -1604,7 +1622,7 @@ return (
 {
 orderDetail?.brandLogo &&
 <>
-<h4>Brang Logo :</h4>
+<h4>Brand Logo :</h4>
 <div className="card file">
       {
 (() => {
@@ -1689,8 +1707,22 @@ orderDetail?.brandLogo ?
       <h3 style={{color:"orange"}}>Line Item: {orderIndex+1}</h3>
       <div className="col-12 "  key={orderIndex}>
      <p >Color:  <span className='bold'>{orderDetail?.color}</span></p>
-     <p >T-shirt Size : <span className='bold'> {orderDetail?.teshirtSize}</span></p>
-     <p >Quantity : <span className='bold'> {orderDetail?.quantity}</span></p>
+     <ul>
+      {typeof orderDetail.teshirtSize === 'string' ? (
+        <li>
+          {orderDetail.teshirtSize}- {orderDetail.quantity}
+        </li>
+      ) : (
+        Object.entries(orderDetail.teshirtSize || {}).map(
+          ([size, quantity]) => (
+            <li key={size}>
+              {size}- {quantity}
+            </li>
+          )
+        )
+      )}
+    </ul>
+     <p >Quantity : <span className='bold'> {orderDetail?.totalQuantity}</span></p>
      <p >Print Size : <span className='bold'>{orderDetail?.printSize}</span></p>
      <div className="col-lg-12" >
      <p>Main File :</p>
