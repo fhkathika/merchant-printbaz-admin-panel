@@ -4,9 +4,13 @@ import { Link } from 'react-router-dom';
 import { useRoleAsignData } from '../../hooks/useRoleAsignData';
 import Navigationbar from '../navigationBar/Navigationbar';
 import DatePicker from 'react-datepicker';
+import * as XLSX from 'xlsx';
 import queryString from 'query-string';
+import MerchantList from '../MerchantList';
+import useGetMongoData from '../../hooks/useGetMongoData';
 const AllMerchants = () => {
   const navigate = useNavigate();
+  const { orderAll } = useGetMongoData();
   const location = useLocation();
   const [allMerchant,setAllMerchant]=useState([])
 
@@ -39,7 +43,9 @@ const handleInputChange = (event) => {
   const { id, value } = event.target;
   switch (id) {
     case 'status-filter':
+      console.log("Setting filterUser to", value);
       setFilterUser(value);
+   
       break;
     case 'email-filter':
       setFilterEmail(value);
@@ -57,6 +63,7 @@ const handleInputChange = (event) => {
     default:
       break;
   }
+  getFilteredUsers();
 };
 
 const handleChangeStartDate = (date) => {
@@ -81,26 +88,15 @@ const getFilteredUsers = () => {
     if (filterContact && user.phone.indexOf(filterContact) === -1) return false;
     if (filterName && user.name.indexOf(filterName) === -1) return false;
     if (filterBrand && user.brandName.indexOf(filterBrand) === -1) return false;
-
+  
     const userDate = new Date(user.createdAt);
-    const userSimpleDate = `${userDate.getFullYear()}-${userDate.getMonth() + 1}-${userDate.getDate()}`;
-
     if (startDate && endDate) {
-      // Both start and end dates are selected
-      if (userDate >= startDate && userDate <= endDate) {
-        // Date is within the range
-      } else {
-        // Date is outside the range
-        return false;
-      }
-    }  else if (startDate) {
-      // Only start date is selected
+      if (userDate < startDate || userDate > endDate) return false;
+    } else if (startDate) {
       if (userDate.toDateString() !== startDate.toDateString()) return false;
     } else if (endDate) {
-      // Only end date is selected
       if (userDate.toDateString() !== endDate.toDateString()) return false;
     }
-
 
     return true;
   });
@@ -108,6 +104,16 @@ const getFilteredUsers = () => {
 
 const filteredUsers = getFilteredUsers();
 console.log("filteredUsers.length",filteredUsers.length);
+
+const inActiveUsers = filteredUsers.filter(user => {
+  // Look for the user in the orders list by email or phone
+  const userHasOrder = orderAll.some(order => order.userMail === user.email || order.phone === user.phone);
+  
+  // Return true if the user doesn't have an order, otherwise false
+  return !userHasOrder;
+});
+
+console.log("usersWithoutOrders",inActiveUsers);
 const actualIndexOfLastItem = indexOfLastItem > SingleEmailOneTime.length ? SingleEmailOneTime.length : indexOfLastItem;
 let formattedDate;
 allMerchant?.map(merchant=>{
@@ -118,6 +124,49 @@ allMerchant?.map(merchant=>{
   return(formattedDate)
 
 })
+const downloadInfIntoXl = (event) => {
+  const dynmamicId = event.currentTarget.dataset.orderId;
+  console.log("downloadInfIntoXl", dynmamicId);
+    const shippingDetailElement = document.getElementById(dynmamicId);
+
+    // Assume the element contains a table. 
+    // If not, you'll need to extract and format the data appropriately for Excel.
+    const table = shippingDetailElement.querySelector('table');
+
+    // Convert the table to a Workbook object
+    const wb = XLSX.utils.table_to_book(table);
+
+    // Write the workbook to a blob
+    const wbout = XLSX.write(wb, { bookType: 'xlsx', bookSST: true, type: 'array' });
+
+    // Trigger a download
+    const blob = new Blob([wbout], { type: 'application/octet-stream' });
+    const url = window.URL.createObjectURL(blob);
+
+    const a = document.createElement('a');
+    a.style.display = 'none';
+    a.href = url;
+    a.download = 'MerchantList.xlsx';
+
+    document.body.appendChild(a);
+    a.click();
+
+    // Cleanup
+    window.URL.revokeObjectURL(url);
+    document.body.removeChild(a);
+}
+
+//     // Sort for worst merchants
+//     const sortedWorstMerchants = Object.keys(counts)
+//     .sort((a, b) => counts[b].returned - counts[a].returned)
+//     .slice(0, 3)
+//     .map(brandName => ({
+//         name: brandName,
+//         deliveredCount: counts[brandName].delivered,
+//         returnedCount: counts[brandName].returned
+//     }));
+
+// setWorstMerchants(sortedWorstMerchants);
 
 return (
         <div>
@@ -168,7 +217,7 @@ return (
                </div>
             <div className="col-lg-2 col-sm-12">
               <label htmlFor="status-filter">Status:</label>
-              <select id="status-filter" className="form-control"   onChange={(e) =>  handleInputChange(e)}>
+              <select id="status-filter" className="form-control"   onChange={  handleInputChange}>
                 <option value="all">All</option>
                 <option value="request">Pending</option>
                 <option value="approved">Approved</option>
@@ -182,6 +231,15 @@ return (
     <button style={{height:"40px",border:"none"}} onClick={() => setCurrentPage(currentPage + 1)} disabled={currentPage === Math.ceil(SingleEmailOneTime.length / itemsPerPage)}><img style={{height:"10px",width:"15px"}} src='images/right-arrow.png' alt="right arrow"/></button>
    
           </div>
+          <div  style={{display:"flex",justifyContent:"flex-end",padding:"0px 25px"}}>
+                   
+                    <span style={{cursor:"pointer"}} onClick={downloadInfIntoXl} data-order-id="all-merchant"><img style={{width:"25px",hight:"25px"}} src="/images/download.png" alt='download'/></span>
+                <div id="all-merchant" style={{position: 'absolute', left: '-10000px', top: '-10000px'}}>
+                <MerchantList merchantList={[filteredUsers]}/>
+              
+            </div> 
+              
+                  </div>
           <div className="row client-list-title">
             <div className="col-lg-2 col-sm-12">
               <h4>Conatct Number</h4>
@@ -203,8 +261,6 @@ return (
             </div>
           </div>
          
-         
-
           {
           filteredUsers?.slice(indexOfFirstItem, indexOfLastItem).sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt))?.map((merchants)=><>
            {/* <Link  key={merchants?._id} to={`/viewTicket/${merchants?._id}`} state={{merchants}}></Link> */}
@@ -276,8 +332,84 @@ return (
         
             </>)
           }
-       
-        
+{/* <h2>Inactive mercahnts</h2>
+<div  style={{display:"flex",justifyContent:"flex-end",padding:"0px 25px"}}>
+                   
+                   <span style={{cursor:"pointer"}} onClick={downloadInfIntoXl} data-order-id="inactive-merchant"><img style={{width:"25px",hight:"25px"}} src="/images/download.png" alt='download'/></span>
+               <div id="inactive-merchant" style={{position: 'absolute', left: '-10000px', top: '-10000px'}}>
+               <MerchantList merchantList={[inActiveUsers]}/>
+             
+           </div> 
+             
+                 </div> 
+          {
+            inActiveUsers?.map(merchants=> 
+              value_count?.MerchantView ?
+              <Link key={merchants?._id} to={`/viewClient/${merchants?._id}`} state={{merchants}}>
+              <div className="row client-list">
+                <div className="col-lg-2 col-sm-12">
+                  <p>{merchants?.phone}</p>
+                </div>
+                <div className="col-lg-2 col-sm-12">
+                  <p>{merchants?.name}</p>
+                </div>
+                <div className="col-lg-2 col-sm-12">
+                  <p>{merchants?.brandName}</p>
+                </div>
+                <div className="col-lg-2 col-sm-12">
+                  <p>{merchants?.email}</p>
+                </div>
+                <div className="col-lg-2 col-sm-12">
+                  <p>{merchants?.createdAt?.slice(0,10)}</p>
+                </div>
+                <div className="col-lg-2 col-sm-12">
+                  {
+                    merchants?.approval==="request" &&   <p className="status-btn" style={{backgroundColor:"red"}} >{merchants?.approval}</p>
+                  }
+                   {
+                    merchants?.approval==="approved" &&   <p className="status-btn"  >{merchants?.approval}</p>
+                  } 
+                   {
+                    merchants?.approval==="ban" &&   <p className="status-btn" style={{backgroundColor:"blue"}}  >{merchants?.approval}</p>
+                  }
+                
+                </div>
+              </div>
+            </Link>
+            :
+            <div className="row client-list">
+            <div className="col-lg-2 col-sm-12">
+              <p>{merchants?.phone}</p>
+            </div>
+            <div className="col-lg-2 col-sm-12">
+              <p>{merchants?.name}</p>
+            </div>
+            <div className="col-lg-2 col-sm-12">
+              <p>{merchants?.brandName}</p>
+            </div>
+            <div className="col-lg-2 col-sm-12">
+              <p>{merchants?.email}</p>
+            </div>
+            <div className="col-lg-2 col-sm-12">
+              <p>{merchants?.createdAt?.slice(0,10)}</p>
+            </div>
+            <div className="col-lg-2 col-sm-12">
+              {
+                merchants?.approval==="requiest" &&   <p className="status-btn" style={{backgroundColor:"red"}} >{merchants?.approval}</p>
+              }
+               {
+                merchants?.approval==="approved" &&   <p className="status-btn"  >{merchants?.approval}</p>
+              } 
+               {
+                merchants?.approval==="ban" &&   <p className="status-btn" style={{backgroundColor:"blue"}}  >{merchants?.approval}</p>
+              }
+            
+            </div>
+          </div>
+            )
+          }
+        */}
+    
          
           
          

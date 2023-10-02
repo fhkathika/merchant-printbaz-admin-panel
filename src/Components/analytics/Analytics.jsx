@@ -22,6 +22,7 @@ const Analytics = () => {
   const location = useLocation();
   const [previousPath, setPreviousPath] = useState('');
   const [worstMerchants, setWorstMerchants] = useState([]);
+  console.log("worstMerchants",worstMerchants);
   const {pendingOrdersAll,
     error,
     currentPage,

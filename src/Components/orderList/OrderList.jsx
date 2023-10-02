@@ -21,6 +21,7 @@ const OrderList = () => {
   const indexOfFirstItem = indexOfLastItem - itemsPerPage;
   const [filterStatus, setFilterStatus] = useState('all');
   const [filterPaymentStatus, setFilterPaymentStatus] = useState('');
+  const [filterProductType, setFilterProductType] = useState('');
   const [filterOrderId, setFilterOrderId] = useState('');
   const [startDate, setStartDate] = useState(null);
   const [endDate, setEndDate] = useState(null);
@@ -54,6 +55,9 @@ const handleInputChange = (event) => {
       break; 
        case 'paymentStatus-filter':
       setFilterPaymentStatus(value);
+      break; 
+        case 'productType-filter':
+      setFilterProductType(value);
       break;
     case 'id-filter':
       setFilterOrderId(value);
@@ -110,7 +114,17 @@ const applyFilters = () => {
     if (filterPaymentStatus && order.paymentStatus !== filterPaymentStatus) {
       return false;
     }
-
+  // Filter by Product type status
+  if(filterProductType){
+  if (filterProductType === "Custom Round Neck") {
+    if (order.hasOwnProperty('category') && order.category !== "Custom Round Neck") {
+      return false; // Exclude orders that have a category but it's not "Custom Round Neck".
+    }
+    // Implicitly include orders without a category and orders with "Custom Round Neck" category.
+  } else if (order.category !== filterProductType) {
+    return false; // Exclude orders that don't match the selected category filter.
+  }
+}
     // Filter by order ID
     if (filterOrderId && !order._id.includes(filterOrderId)) {
       return false;
@@ -270,8 +284,19 @@ const actualIndexOfLastItem = indexOfLastItem > orderMap.length ? orderMap.lengt
                   <option value="Unpaid">Unpaid</option>
                   <option value="paid">Paid</option>
                 </select>
+              </div>   <div className="col-lg-1 col-sm-12">
+                <label htmlFor="productType-filter" style={{marginBottom:"8px"}}>Product Type:</label>
+                <select id="productType-filter" value={filterProductType} className="form-control" onChange={(e) =>  handleInputChange(e)}>
+                  <option value=''>none</option>
+                  <option value="Custom Round Neck">Custom Round Neck</option>
+                  <option value="Blank Drop Sholder">Blank Drop Sholder</option>
+                  <option value="Blank Hoodie">Blank Hoodie</option>
+                  <option value="Blank Round Neck">Blank Round Neck</option>
+                  <option value="Custom Drop Sholder">Custom Drop Sholder</option>
+                  <option value="Custom Hoodie">Custom Hoodie</option>
+                </select>
               </div> 
-                <div className="col-lg-2 col-sm-12">
+                <div className="col-lg-1 col-sm-12">
                 <label htmlFor="tracking-filter" style={{marginBottom:"8px"}}>Tracking Id:</label>
                 <input type="text" id="tracking-filter" className="form-control" value={filterTrackingId}  onChange={handleInputChange} />
               </div>  

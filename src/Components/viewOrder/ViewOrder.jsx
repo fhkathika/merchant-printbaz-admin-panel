@@ -501,15 +501,18 @@ setTrackingId(e.target.value)
           <div className="all-content">
             <div className="row">
               {/* <div className="col-lg-12 col-sm-12 flex"> */}
-                <div className="view-client-title my-3 col-lg-8 col-sm-10">
+                <div className="view-client-title my-3 col-lg-6 col-sm-10">
                   {/* <Link to="/orderList"><span style={{fontSize: '30px'}}>
                       &lt; </span> View Order Details</Link> */}
                       <span onClick={handleBack} style={{ fontSize: '30px', cursor: 'pointer' }}>
       &lt; Back
     </span>
                 </div> 
+                <div className='flex col-lg-2 col-sm-2 mt-3'>
+               <p style={{fontWeight:"600",color:"white",backgroundColor:"orange",padding:"7px",borderRadius:"5px"}}>{getSpecificOrderById?.category}</p>
+             </div>
                 <div className='flex col-lg-4 col-sm-2 '>
-               
+             
         
          <div style={{display:""}}>
                           
@@ -591,7 +594,7 @@ setTrackingId(e.target.value)
                       
                     
                       </div>
-             
+            
               <div className="view-client-title " style={{marginRight:"10px"}}>
           <Button variant="warning" onClick={downloadShippingDetail}><span><img style={{width:"23px",hight:"20px"}} src="/images/download.png" alt='download'/></span>Shipping Detail</Button>
           <div id="shipping-detail" style={{position: 'absolute', left: '-10000px', top: '-10000px'}}>
@@ -609,6 +612,7 @@ setTrackingId(e.target.value)
                   
               
                 </div>
+              
                  
               {/* </div> */}
             </div>
