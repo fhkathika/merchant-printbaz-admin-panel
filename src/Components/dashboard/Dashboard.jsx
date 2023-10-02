@@ -668,7 +668,7 @@ return (
                <div className="card stat-card" style={{height:"300px"}}>
                <div className="" style={{display:"flex",justifyContent:"space-between",alignItem:"center"}}>
                  <div className="card-body ">
-                 <h5 className="">All Colors T-shirt In Production </h5>
+                 <h5 className="">T-shirt In Production(Round neck) </h5>
                  {/* <div style={{display:"flex"}}>
 <div>
 <p className="float-right">M  - {sizeCountsForInProduction.white?.m?sizeCountsForInProduction.white?.m:0}</p>
