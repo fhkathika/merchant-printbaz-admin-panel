@@ -255,7 +255,7 @@ const blackQuantity = (colorQuantitiesForReturn?.black)+(colorQuantitiesForOutFo
       
           return innerAcc;
         }, acc);
-      }, { white: {}, black: {}, /* Initialize other colors as needed */ });
+      }, { white: {}, black: {},green:{},maroon:{} /* Initialize other colors as needed */ });
     };
     
     //previous function
@@ -665,11 +665,11 @@ return (
             
              <div className="col-md-3">
                
-               <div className="card stat-card" style={{height:"152px"}}>
+               <div className="card stat-card" style={{height:"300px"}}>
                <div className="" style={{display:"flex",justifyContent:"space-between",alignItem:"center"}}>
                  <div className="card-body ">
-                 <h5 className="">White T-shirt In Production </h5>
-                 <div style={{display:"flex"}}>
+                 <h5 className="">All Colors T-shirt In Production </h5>
+                 {/* <div style={{display:"flex"}}>
 <div>
 <p className="float-right">M  - {sizeCountsForInProduction.white?.m?sizeCountsForInProduction.white?.m:0}</p>
                     <p className="float-right">L  -  {sizeCountsForInProduction.white?.L?sizeCountsForInProduction.white?.L:0}</p>
@@ -678,8 +678,45 @@ return (
 <p className="float-right"> XL - {sizeCountsForInProduction.white?.XL?sizeCountsForInProduction.white?.XL:0}</p>
                     <p className="float-right"> XXL  -  {sizeCountsForInProduction.white?.XXL?sizeCountsForInProduction.white?.XXL:0}</p>
 </div>
-                 </div>
-                  
+                 </div> */}
+
+
+<table>
+  <thead>
+    <tr>
+      <th>Color</th>
+      <th></th>
+      <th>M</th>
+      <th></th>
+      <th>L</th>
+      <th></th>
+      <th>XL</th>
+      <th></th>
+      <th>XXL</th>
+    </tr>
+  </thead>
+  <tbody>
+    {["white", "black", "maroon", "green"].map((color) => (
+      <tr 
+        style={{
+          backgroundColor: color,
+          color: ["black", "maroon", "green"].includes(color) ? "white" : "initial"
+        }}
+      >
+        <td>{(color)}</td>
+        <td></td>
+        <td>{sizeCountsForInProduction[color]?.m ?? 0}</td>
+        <td></td>
+        <td>{sizeCountsForInProduction[color]?.L ?? 0}</td>
+        <td></td>
+        <td>{sizeCountsForInProduction[color]?.XL ?? 0}</td>
+        <td></td>
+        <td>{sizeCountsForInProduction[color]?.XXL ?? 0}</td>
+      </tr>
+    ))}
+  </tbody>
+</table>
+     
                    
                    </div>
                <div>
