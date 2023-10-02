@@ -696,7 +696,7 @@ return (
     </tr>
   </thead>
   <tbody>
-    {["white", "black", "maroon", "green"].map((color) => (
+    {["black","white", "maroon", "green"].map((color) => (
       <tr 
         style={{
           backgroundColor: color,
