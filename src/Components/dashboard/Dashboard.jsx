@@ -11,12 +11,15 @@ import GetOrdersXl from '../GetOrdersXl';
 import GetTotalTshirtDispatched from '../GetTotalTshirtDispatched';
 import useGetAllTickets from '../../hooks/useGetAllTickets';
 import GetTodaysOutForDeliveryOrders from '../GetTodaysOutForDeliveryOrders';
+import { Form } from 'react-bootstrap';
 const Dashboard = () => {
   const {adminUser,loading,loginAdminUser,currentUser}=useContext(AuthContext);
   const { orderAll } = useGetMongoData();
   const {fetchAllTicket}=useGetAllTickets()
   const location = useLocation();
   const [previousPath, setPreviousPath] = useState('');
+  const [selectProductType, setSelectProductType] = useState('Round Neck');
+  const [selectProductTypePAC, setSelectProductTypePAC] = useState('Round Neck');
   const [worstMerchants, setWorstMerchants] = useState([]);
   const {pendingOrdersAll,
     error,
@@ -90,12 +93,44 @@ setWorstMerchants(sortedWorstMerchants);
     // if (error) return <div>Error loading orders.</div>;
 
 
+// 3 type product pending order 
+let pendingOrdersRoundNeck =orderAll?.filter(order => 
+  order?.orderStatus === "Pending" && 
+  (!order.hasOwnProperty("category") || order?.category === "Custom Round Neck" || order?.category === "Blank Round Neck")
+);
+let pendingOrdersDropSholder = orderAll?.filter(users => users?.orderStatus === "Pending"&&(users?.category==="Custom Drop Sholder" || users?.category==="Blank Drop Sholder"));
 
-let pendingOrders = orderAll?.filter(users => users?.orderStatus === "Pending");
+let pendingOrdersHoodie = orderAll?.filter(users => users?.orderStatus === "Pending"&& (users?.category==="Custom Hoodie" || users?.category==="Blank Hoodie"));
+let pendingOrders= orderAll?.filter(users => users?.orderStatus === "Pending");
+
+// 3 type product approve  order 
+let   approvedOrdersRoundNeck=orderAll?.filter(order => 
+  order?.orderStatus === "Approved" && 
+  (!order.hasOwnProperty("category") || order?.category === "Custom Round Neck" || order?.category === "Blank Round Neck")
+);
+let   approvedOrdersDropSholder=orderAll?.filter(users=>users?.orderStatus==="Approved"&&(users?.category==="Custom Drop Sholder" || users?.category==="Blank Drop Sholder"));
+let   approvedOrdersHoodie=orderAll?.filter(users=>users?.orderStatus==="Approved"&& (users?.category==="Custom Hoodie" || users?.category==="Blank Hoodie"));
 let   approvedOrders=orderAll?.filter(users=>users?.orderStatus==="Approved");
+// 3 type product pending order 
+let   confirmedOrdersRoundNeck=orderAll?.filter(order => 
+  order?.orderStatus === "Confirmed" && 
+  (!order.hasOwnProperty("category") || order?.category === "Custom Round Neck" || order?.category === "Blank Round Neck")
+);
+let   confirmedOrdersDropSholder=orderAll?.filter(users=>users?.orderStatus==="confirmed"&&(users?.category==="Custom Drop Sholder" || users?.category==="Blank Drop Sholder"));
+let   confirmedOrdersHoodie=orderAll?.filter(users=>users?.orderStatus==="confirmed"&& (users?.category==="Custom Hoodie" || users?.category==="Blank Hoodie"));
 let   confirmedOrders=orderAll?.filter(users=>users?.orderStatus==="confirmed");
 let onHoldOutOfStockOrders=orderAll?.filter(users=>users?.orderStatus==="on hold out of stock");
-let inProductionOrders=orderAll?.filter(users=>users?.orderStatus==="in-production");
+//inproductio order of 3 type product 
+let inProductionOrdersRoundNeck = orderAll?.filter(order => 
+  order?.orderStatus === "in-production" && 
+  (!order.hasOwnProperty("category") || order?.category === "Custom Round Neck" || order?.category === "Blank Round Neck")
+);
+
+let inProductionOrdersDropSholder=orderAll?.filter(users=>users?.orderStatus==="in-production" &&(users?.category==="Custom Drop Sholder" || users?.category==="Blank Drop Sholder"));
+let inProductionOrdersHoodie=orderAll?.filter(users=>users?.orderStatus==="in-production" && (users?.category==="Custom Hoodie" || users?.category==="Blank Hoodie"));
+let inProductionOrders=orderAll?.filter(users=>users?.orderStatus==="in-production" && (users?.category==="Custom Round Neck" || users?.category==="Blank Round Neck"));
+
+console.log("pendingOrdersRoundNeck",pendingOrdersRoundNeck);
 let outForDeliveryOrders=orderAll?.filter(users=>users?.orderStatus==="out for delivery");
 let deliveredOrders=orderAll?.filter(users=>users?.orderStatus==="delivered");
 
@@ -255,7 +290,7 @@ const blackQuantity = (colorQuantitiesForReturn?.black)+(colorQuantitiesForOutFo
       
           return innerAcc;
         }, acc);
-      }, { white: {}, black: {},green:{},maroon:{} /* Initialize other colors as needed */ });
+      }, { white: {}, black: {},green:{},maroon:{},nBlue:{},gray:{},red:{} /* Initialize other colors as needed */ });
     };
     
     //previous function
@@ -279,46 +314,60 @@ const blackQuantity = (colorQuantitiesForReturn?.black)+(colorQuantitiesForOutFo
     //     }, acc);
     //   }, { white: {}, black: {} });
     // };
+    // 3 type product inProduction
+    const sizeCountsForInProductionRoundNeck = countSizeForOrders(inProductionOrdersRoundNeck);
+    const sizeCountsForInProductionDropSholder = countSizeForOrders(inProductionOrdersDropSholder);
+    const sizeCountsForInProductionHoodie = countSizeForOrders(inProductionOrdersHoodie);
+  // 3 type product confirm orders 
+    // const sizeCountsForConfirmedOrders = countSizeForOrders(confirmedOrders);
+    const sizeCountsForConfirmedOrdersRoundNeck = countSizeForOrders(confirmedOrdersRoundNeck);
+    const sizeCountsForConfirmedOrdersDropSholder = countSizeForOrders(confirmedOrdersDropSholder);
+    const sizeCountsForConfirmedOrdersHoodie = countSizeForOrders(confirmedOrdersHoodie);
+      // 3 type product pending orders 
+    // const sizeCountsForPendingOrders = countSizeForOrders(pendingOrders);
+    const sizeCountsForPendingOrdersRoundNeck = countSizeForOrders(pendingOrdersRoundNeck);
+    const sizeCountsForPendingOrdersDropSholder = countSizeForOrders(pendingOrdersDropSholder);
+    const sizeCountsForPendingOrdersHoodie = countSizeForOrders(pendingOrdersHoodie);
+      // 3 type product approved orders 
+    // const sizeCountsForApprovedOrders = countSizeForOrders(approvedOrders);
+    const sizeCountsForApprovedOrdersRoundNeck = countSizeForOrders(approvedOrdersRoundNeck);
+    const sizeCountsForApprovedOrdersDropSholder = countSizeForOrders(approvedOrdersDropSholder);
+    const sizeCountsForApprovedOrdersHoodie = countSizeForOrders(approvedOrdersHoodie);
     
-    const sizeCountsForInProduction = countSizeForOrders(inProductionOrders);
-    const sizeCountsForConfirmedOrders = countSizeForOrders(confirmedOrders);
-    const sizeCountsForPendingOrders = countSizeForOrders(pendingOrders);
-    const sizeCountsForApprovedOrders = countSizeForOrders(approvedOrders);
-    
-    const sumSizeAcrossOrdersWhite = (size) => {
-      return [
-        // sizeCountsForInProduction,
-        sizeCountsForConfirmedOrders,
-        sizeCountsForPendingOrders,
-        sizeCountsForApprovedOrders
-      ].reduce((acc, sizeCounts) => acc + (sizeCounts.white?.[size] || 0), 0);
-    }; 
-      const sumSizeAcrossOrdersBlack= (size) => {
-      return [
+    // const sumSizeAcrossOrdersWhite = (size) => {
+    //   return [
+    //     // sizeCountsForInProduction,
+    //     sizeCountsForConfirmedOrders,
+    //     sizeCountsForPendingOrders,
+    //     sizeCountsForApprovedOrders
+    //   ].reduce((acc, sizeCounts) => acc + (sizeCounts.white?.[size] || 0), 0);
+    // }; 
+    //   const sumSizeAcrossOrdersBlack= (size) => {
+    //   return [
        
-        sizeCountsForConfirmedOrders,
-        sizeCountsForPendingOrders,
-        sizeCountsForApprovedOrders
-      ].reduce((acc, sizeCounts) => acc + (sizeCounts.black?.[size] || 0), 0);
-    };
+    //     sizeCountsForConfirmedOrders,
+    //     sizeCountsForPendingOrders,
+    //     sizeCountsForApprovedOrders
+    //   ].reduce((acc, sizeCounts) => acc + (sizeCounts.black?.[size] || 0), 0);
+    // };  
+   
+    // const whiteMNeeded = sumSizeAcrossOrdersWhite("m");
+    // const whiteLNeeded = sumSizeAcrossOrdersWhite("L");
+    // const whiteXlNeeded = sumSizeAcrossOrdersWhite("XL");
+    // const whiteXxlNeeded = sumSizeAcrossOrdersWhite("XXL");
+    // const blackMNeeded =  sumSizeAcrossOrdersBlack("m");
+    // const blackLNeeded =  sumSizeAcrossOrdersBlack("L");
+    // const blackXlNeeded = sumSizeAcrossOrdersBlack("XL");
+    // const blackXxlNeeded =sumSizeAcrossOrdersBlack("XXL");
     
-    const whiteMNeeded = sumSizeAcrossOrdersWhite("m");
-    const whiteLNeeded = sumSizeAcrossOrdersWhite("L");
-    const whiteXlNeeded = sumSizeAcrossOrdersWhite("XL");
-    const whiteXxlNeeded = sumSizeAcrossOrdersWhite("XXL");
-    const blackMNeeded =  sumSizeAcrossOrdersBlack("m");
-    const blackLNeeded =  sumSizeAcrossOrdersBlack("L");
-    const blackXlNeeded = sumSizeAcrossOrdersBlack("XL");
-    const blackXxlNeeded =sumSizeAcrossOrdersBlack("XXL");
-    
-    console.log("whiteMNeeded:", whiteMNeeded);
-    console.log("whiteLNeeded:", whiteLNeeded);
-    console.log("whiteXxlNeeded:", whiteXxlNeeded);
-    console.log("whiteXlNeeded:", whiteXlNeeded);
-    console.log("blackMNeeded:",  blackMNeeded);
-    console.log("blackLNeeded:",  blackLNeeded);
-    console.log("blackXlNeeded:", blackXlNeeded);
-    console.log("blackXxlNeeded:",blackXxlNeeded);
+    // console.log("whiteMNeeded:", whiteMNeeded);
+    // console.log("whiteLNeeded:", whiteLNeeded);
+    // console.log("whiteXxlNeeded:", whiteXxlNeeded);
+    // console.log("whiteXlNeeded:", whiteXlNeeded);
+    // console.log("blackMNeeded:",  blackMNeeded);
+    // console.log("blackLNeeded:",  blackLNeeded);
+    // console.log("blackXlNeeded:", blackXlNeeded);
+    // console.log("blackXxlNeeded:",blackXxlNeeded);
     
 
 let countTotalTshirtDispatched=tShirtQuantityForOutFOrDelivery+tShirtQuantityForDeliveredOrders+tShirtQuantityForReturnOrders
@@ -408,6 +457,33 @@ const downloadInfIntoXl = (event) => {
 
 // Note: This approach assumes that the shipping details are in a table format inside the 'shipping-detail' element.
 console.log("topMerchants,",topMerchants);
+const handleInputChange = (event) => {
+  const { id, value } = event.target;
+  switch (id) {
+    case 'productType-filter':
+      setSelectProductType(value);
+      break; 
+       
+      
+  
+    default:
+      break;
+  }
+  
+};const handleInputChangeForPAC = (event) => {
+  const { id, value } = event.target;
+  switch (id) {
+    case 'productType-filterPAC':
+      setSelectProductTypePAC(value);
+      break; 
+       
+      
+  
+    default:
+      break;
+  }
+  
+};
 return (
         <div>
         <meta charSet="UTF-8" />
@@ -663,209 +739,8 @@ return (
 
              </div> 
             
-             <div className="col-md-3">
-               
-               <div className="card stat-card" style={{height:"300px"}}>
-               <div className="" style={{display:"flex",justifyContent:"space-between",alignItem:"center"}}>
-                 <div className="card-body ">
-                 <h5 className="">T-shirt In Production(Round neck) </h5>
-                 {/* <div style={{display:"flex"}}>
-<div>
-<p className="float-right">M  - {sizeCountsForInProduction.white?.m?sizeCountsForInProduction.white?.m:0}</p>
-                    <p className="float-right">L  -  {sizeCountsForInProduction.white?.L?sizeCountsForInProduction.white?.L:0}</p>
-</div>
-<div style={{marginLeft:"20px"}}>
-<p className="float-right"> XL - {sizeCountsForInProduction.white?.XL?sizeCountsForInProduction.white?.XL:0}</p>
-                    <p className="float-right"> XXL  -  {sizeCountsForInProduction.white?.XXL?sizeCountsForInProduction.white?.XXL:0}</p>
-</div>
-                 </div> */}
-
-
-<table>
-  <thead>
-    <tr>
-      <th>Color</th>
-      <th></th>
-      <th>M</th>
-      <th></th>
-      <th>L</th>
-      <th></th>
-      <th>XL</th>
-      <th></th>
-      <th>XXL</th>
-    </tr>
-  </thead>
-  <tbody>
-    {["black","white", "maroon", "green"].map((color) => (
-      <tr 
-        style={{
-          backgroundColor: color,
-          color: ["black", "maroon", "green"].includes(color) ? "white" : "initial"
-        }}
-      >
-        <td>{(color)}</td>
-        <td></td>
-        <td>{sizeCountsForInProduction[color]?.m ?? 0}</td>
-        <td></td>
-        <td>{sizeCountsForInProduction[color]?.L ?? 0}</td>
-        <td></td>
-        <td>{sizeCountsForInProduction[color]?.XL ?? 0}</td>
-        <td></td>
-        <td>{sizeCountsForInProduction[color]?.XXL ?? 0}</td>
-      </tr>
-    ))}
-  </tbody>
-</table>
-     
-                   
-                   </div>
-               <div>
-               <div className="card-body" style={{display:"flex",justifyContent:"center",height:"50%"}}>
-                  
-                  {/* <h4 className="float-right" style={{marginLeft:"40px",marginTop:"2px"}}>{countTotalTshirtDispatched}</h4> */}
-                  </div>
-               <div  style={{display:"flex",justifyContent:"flex-end",padding:"0px 20px",marginTop:"35px"}}>
-                  
-                  {/* <span style={{cursor:"pointer"}} onClick={downloadInfIntoXl} data-order-id="order-detail-totalTShirt"><img style={{width:"25px",hight:"25px"}} src="/images/download.png" alt='download'/></span> */}
-              <div id="order-detail-totalTShirt"style={{position: 'absolute', left: '-10000px', top: '-10000px'}}>
-              <GetTotalTshirtDispatched countTotalTshirtDispatched={countTotalTshirtDispatched} whiteQuantity={whiteQuantity} blackQuantity={blackQuantity}/>
-          </div> 
-            
-                </div>
-               </div>
+           
               
-                   </div>
-                  
-               </div>
-              
-             
-
-             </div>
-              <div className="col-md-3">
-               
-               <div className="card stat-card" style={{height:"152px"}}>
-               <div className="" style={{display:"flex",justifyContent:"space-between",alignItem:"center"}}>
-                 <div className="card-body ">
-                 <h5 className="">Black T-shirt In production</h5>
-                 <div style={{display:"flex"}}>
-<div>
-
-<p className="float-right">M  - {sizeCountsForInProduction.black?.m?sizeCountsForInProduction.black?.m:0}</p>
-                    <p className="float-right">L  -  {sizeCountsForInProduction.black?.L?sizeCountsForInProduction.black?.L:0}</p>
-</div>
-<div style={{marginLeft:"20px"}}>
-<p className="float-right"> XL - {sizeCountsForInProduction.black?.XL?sizeCountsForInProduction.black?.XL:0}</p>
-                    <p className="float-right"> XXL  -  {sizeCountsForInProduction.black?.XXL?sizeCountsForInProduction.black?.XXL:0}</p>
-</div>
-                 </div>
-                  
-                   
-                   </div>
-               <div>
-               <div className="card-body" style={{display:"flex",justifyContent:"center",height:"50%"}}>
-                  
-                  {/* <h4 className="float-right" style={{marginLeft:"40px",marginTop:"2px"}}>{countTotalTshirtDispatched}</h4> */}
-                  </div>
-               <div  style={{display:"flex",justifyContent:"flex-end",padding:"0px 20px",marginTop:"35px"}}>
-                  
-                  {/* <span style={{cursor:"pointer"}} onClick={downloadInfIntoXl} data-order-id="order-detail-totalTShirt"><img style={{width:"25px",hight:"25px"}} src="/images/download.png" alt='download'/></span> */}
-              <div id="order-detail-totalTShirt"style={{position: 'absolute', left: '-10000px', top: '-10000px'}}>
-              <GetTotalTshirtDispatched countTotalTshirtDispatched={countTotalTshirtDispatched} whiteQuantity={whiteQuantity} blackQuantity={blackQuantity}/>
-          </div> 
-            
-                </div>
-               </div>
-              
-                   </div>
-                  
-               </div>
-              
-             
-
-             </div> 
-             <div className="col-md-3">
-               
-               <div className="card stat-card" style={{height:"152px"}}>
-               <div className="" style={{display:"flex",justifyContent:"space-between",alignItem:"center"}}>
-                 <div className="card-body ">
-                 <h5 className="">White T-shirt Needed (PAC)</h5>
-                 <div style={{display:"flex"}}>
-<div>
-<p className="float-right">M  - {whiteMNeeded}</p>
- <p className="float-right">L  -  {whiteLNeeded}</p>
-</div>
-<div style={{marginLeft:"20px"}}>
-<p className="float-right"> XL - {whiteXlNeeded}</p>
- <p className="float-right"> XXL  -  {whiteXxlNeeded}</p>
-</div>
-                 </div>
-                  
-                   
-                   </div>
-               <div>
-               <div className="card-body" style={{display:"flex",justifyContent:"center",height:"50%"}}>
-                  
-                  {/* <h4 className="float-right" style={{marginLeft:"40px",marginTop:"2px"}}>{countTotalTshirtDispatched}</h4> */}
-                  </div>
-               <div  style={{display:"flex",justifyContent:"flex-end",padding:"0px 20px",marginTop:"35px"}}>
-                  
-                  {/* <span style={{cursor:"pointer"}} onClick={downloadInfIntoXl} data-order-id="order-detail-totalTShirt"><img style={{width:"25px",hight:"25px"}} src="/images/download.png" alt='download'/></span> */}
-              <div id="order-detail-totalTShirt"style={{position: 'absolute', left: '-10000px', top: '-10000px'}}>
-              <GetTotalTshirtDispatched countTotalTshirtDispatched={countTotalTshirtDispatched} whiteQuantity={whiteQuantity} blackQuantity={blackQuantity}/>
-          </div> 
-            
-                </div>
-               </div>
-              
-                   </div>
-                  
-               </div>
-              
-             
-
-             </div>
-              <div className="col-md-3">
-               
-               <div className="card stat-card" style={{height:"152px"}}>
-               <div className="" style={{display:"flex",justifyContent:"space-between",alignItem:"center"}}>
-                 <div className="card-body ">
-                 <h5 className="">Black T-shirt Needed (PAC)</h5>
-                 <div style={{display:"flex"}}>
-<div>
-
-<p className="float-right">M  - {blackMNeeded}</p>
-   <p className="float-right">L  -  {blackLNeeded}</p>
-</div>
-<div style={{marginLeft:"20px"}}>
-<p className="float-right"> XL - {blackXlNeeded}</p>
-  <p className="float-right"> XXL  -  {blackXxlNeeded}</p>
-</div>
-                 </div>
-                  
-                   
-                   </div>
-               <div>
-               <div className="card-body" style={{display:"flex",justifyContent:"center",height:"50%"}}>
-                  
-                  {/* <h4 className="float-right" style={{marginLeft:"40px",marginTop:"2px"}}>{countTotalTshirtDispatched}</h4> */}
-                  </div>
-               <div  style={{display:"flex",justifyContent:"flex-end",padding:"0px 20px",marginTop:"35px"}}>
-                  
-                  {/* <span style={{cursor:"pointer"}} onClick={downloadInfIntoXl} data-order-id="order-detail-totalTShirt"><img style={{width:"25px",hight:"25px"}} src="/images/download.png" alt='download'/></span> */}
-              <div id="order-detail-totalTShirt"style={{position: 'absolute', left: '-10000px', top: '-10000px'}}>
-              <GetTotalTshirtDispatched countTotalTshirtDispatched={countTotalTshirtDispatched} whiteQuantity={whiteQuantity} blackQuantity={blackQuantity}/>
-          </div> 
-            
-                </div>
-               </div>
-              
-                   </div>
-                  
-               </div>
-              
-             
-
-             </div>
              <div className="col-md-3">
                
                <div className="card stat-card" style={{height:"152px"}}>
@@ -999,6 +874,359 @@ return (
              
 
              </div>
+             <div className="col-md-3">
+               
+               <div className="card stat-card" style={{height:"300px"}}>
+               
+                 <div className="card-body " >
+                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+    <h5 htmlFor="productType-filter" style={{ marginBottom: "8px" }}>T-Shirt In production</h5>
+    <select 
+        id="productType-filter" 
+        value={selectProductType} 
+        className="form-control mr-5" 
+        onChange={(e) => handleInputChange(e)} 
+        style={{ maxWidth: '150px' }}  // Adjust the width value accordingly
+    >
+        <option value='Round Neck'>Round Neck</option>
+        <option value="Drop Sholder">Drop Sholder</option>
+        <option value="Hoodie">Hoodie</option>
+    </select>
+</div>
+
+   
+
+
+                 {/* <div style={{display:"flex"}}>
+<div>
+<p className="float-right">M  - {sizeCountsForInProduction.white?.m?sizeCountsForInProduction.white?.m:0}</p>
+                    <p className="float-right">L  -  {sizeCountsForInProduction.white?.L?sizeCountsForInProduction.white?.L:0}</p>
+</div>
+<div style={{marginLeft:"20px"}}>
+<p className="float-right"> XL - {sizeCountsForInProduction.white?.XL?sizeCountsForInProduction.white?.XL:0}</p>
+                    <p className="float-right"> XXL  -  {sizeCountsForInProduction.white?.XXL?sizeCountsForInProduction.white?.XXL:0}</p>
+</div>
+                 </div> */}
+
+
+<table>
+  <thead>
+    <tr>
+      <th>Color</th>
+      <th></th>
+      <th>M</th>
+      <th></th>
+      <th>L</th>
+      <th></th>
+      <th>XL</th>
+      <th></th>
+      <th>XXL</th>
+    </tr>
+  </thead>
+
+  {
+    selectProductType==="Round Neck" &&
+    <tbody>
+    {["black","white", "maroon", "green"].map((color) => (
+      <tr 
+        style={{
+          backgroundColor: color,
+          color: ["black", "maroon", "green"].includes(color) ? "white" : "initial"
+        }}
+      >
+        <td>{(color)}</td>
+        <td>round neck</td>
+        <td>{sizeCountsForInProductionRoundNeck[color]?.m ?? 0}</td>
+        <td></td>
+        <td>{sizeCountsForInProductionRoundNeck[color]?.L ?? 0}</td>
+        <td></td>
+        <td>{sizeCountsForInProductionRoundNeck[color]?.XL ?? 0}</td>
+        <td></td>
+        <td>{sizeCountsForInProductionRoundNeck[color]?.XXL ?? 0}</td>
+      </tr>
+    ))}
+  </tbody>
+  } 
+  {
+    selectProductType==="Drop Sholder" &&
+    <tbody>
+    {["black","white", "maroon", "green"].map((color) => (
+      <tr 
+        style={{
+          backgroundColor: color,
+          color: ["black", "maroon", "green"].includes(color) ? "white" : "initial"
+        }}
+      >
+        <td>{(color)}</td>
+        <td>drop sholder</td>
+        <td>{sizeCountsForInProductionDropSholder[color]?.m ?? 0}</td>
+        <td></td>
+        <td>{sizeCountsForInProductionDropSholder[color]?.L ?? 0}</td>
+        <td></td>
+        <td>{sizeCountsForInProductionDropSholder[color]?.XL ?? 0}</td>
+        <td></td>
+        <td>{sizeCountsForInProductionDropSholder[color]?.XXL ?? 0}</td>
+      </tr>
+    ))}
+  </tbody>
+  }  
+  {
+    selectProductType==="Hoodie" &&
+    <tbody>
+    {["black","nblue","green", "gray","red"].map((color) => (
+      <tr 
+        style={{
+          backgroundColor: color,
+          color: ["black", "nblue", "green","gray","red"].includes(color) ? "white" : "initial"
+        }}
+      >
+        <td>{(color)}</td>
+        <td>hoodie</td>
+        <td>{sizeCountsForInProductionHoodie[color]?.m ?? 0}</td>
+        <td></td>
+        <td>{sizeCountsForInProductionHoodie[color]?.L ?? 0}</td>
+        <td></td>
+        <td>{sizeCountsForInProductionHoodie[color]?.XL ?? 0}</td>
+        <td></td>
+        <td>{sizeCountsForInProductionHoodie[color]?.XXL ?? 0}</td>
+      </tr>
+    ))}
+  </tbody>
+  }
+
+</table>
+     
+                   
+                   </div>
+               <div>
+               
+               {/* <div  style={{display:"flex",justifyContent:"flex-end",padding:"0px 20px",marginTop:"35px"}}>
+                <div id="order-detail-totalTShirt"style={{position: 'absolute', left: '-10000px', top: '-10000px'}}>
+              <GetTotalTshirtDispatched countTotalTshirtDispatched={countTotalTshirtDispatched} whiteQuantity={whiteQuantity} blackQuantity={blackQuantity}/>
+          </div> 
+            
+                </div> */}
+               </div>
+              
+                
+                  
+               </div>
+              
+             
+
+             </div>
+             <div className="col-md-3">
+               
+               <div className="card stat-card" style={{height:"300px"}}>
+               
+                 <div className="card-body " >
+                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+    <h5 htmlFor="productType-filterPAC" style={{ marginBottom: "8px" }}>T-Shirt (PAC)</h5>
+    <select 
+        id="productType-filterPAC" 
+        value={selectProductTypePAC} 
+        className="form-control mr-5" 
+        onChange={(e) => handleInputChangeForPAC(e)} 
+        style={{ maxWidth: '150px' }}  // Adjust the width value accordingly
+    >
+        <option value='Round Neck'>Round Neck</option>
+        <option value="Drop Sholder">Drop Sholder</option>
+        <option value="Hoodie">Hoodie</option>
+    </select>
+</div>
+
+   
+
+
+                 {/* <div style={{display:"flex"}}>
+<div>
+<p className="float-right">M  - {sizeCountsForInProduction.white?.m?sizeCountsForInProduction.white?.m:0}</p>
+                    <p className="float-right">L  -  {sizeCountsForInProduction.white?.L?sizeCountsForInProduction.white?.L:0}</p>
+</div>
+<div style={{marginLeft:"20px"}}>
+<p className="float-right"> XL - {sizeCountsForInProduction.white?.XL?sizeCountsForInProduction.white?.XL:0}</p>
+                    <p className="float-right"> XXL  -  {sizeCountsForInProduction.white?.XXL?sizeCountsForInProduction.white?.XXL:0}</p>
+</div>
+                 </div> */}
+
+
+<table>
+  <thead>
+    <tr>
+      <th>Color</th>
+      <th></th>
+      <th>M</th>
+      <th></th>
+      <th>L</th>
+      <th></th>
+      <th>XL</th>
+      <th></th>
+      <th>XXL</th>
+    </tr>
+  </thead>
+
+  {
+  selectProductTypePAC === "Round Neck" &&
+  <tbody>
+    {["black", "white", "maroon", "green"].map((color) => {
+      // Calculate the sum for each size for the given color
+      const mCount = 
+        (sizeCountsForConfirmedOrdersRoundNeck[color]?.m ?? 0) + 
+        (sizeCountsForPendingOrdersRoundNeck[color]?.m ?? 0) + 
+        (sizeCountsForApprovedOrdersRoundNeck[color]?.m ?? 0);
+
+      const lCount = 
+        (sizeCountsForConfirmedOrdersRoundNeck[color]?.L ?? 0) + 
+        (sizeCountsForPendingOrdersRoundNeck[color]?.L ?? 0) + 
+        (sizeCountsForApprovedOrdersRoundNeck[color]?.L ?? 0);
+
+      const xlCount = 
+        (sizeCountsForConfirmedOrdersRoundNeck[color]?.XL ?? 0) + 
+        (sizeCountsForPendingOrdersRoundNeck[color]?.XL ?? 0) + 
+        (sizeCountsForApprovedOrdersRoundNeck[color]?.XL ?? 0);
+
+      const xxlCount = 
+        (sizeCountsForConfirmedOrdersRoundNeck[color]?.XXL ?? 0) + 
+        (sizeCountsForPendingOrdersRoundNeck[color]?.XXL ?? 0) + 
+        (sizeCountsForApprovedOrdersRoundNeck[color]?.XXL ?? 0);
+
+      return (
+        <tr 
+          style={{
+            backgroundColor: color,
+            color: ["black", "maroon", "green"].includes(color) ? "white" : "initial"
+          }}
+        >
+          <td>{color}</td>
+          <td>round neck</td>
+          <td>{mCount}</td>
+          <td></td>
+          <td>{lCount}</td>
+          <td></td>
+          <td>{xlCount}</td>
+          <td></td>
+          <td>{xxlCount}</td>
+        </tr>
+      );
+    })}
+  </tbody>
+}
+
+  {
+    selectProductTypePAC==="Drop Sholder" &&
+    <tbody>
+    {["black", "white", "maroon", "green"].map((color) => {
+      // Calculate the sum for each size for the given color
+      const mCount = 
+        (sizeCountsForConfirmedOrdersDropSholder[color]?.m ?? 0) + 
+        (sizeCountsForPendingOrdersDropSholder[color]?.m ?? 0) + 
+        (sizeCountsForApprovedOrdersDropSholder[color]?.m ?? 0);
+
+      const lCount = 
+        (sizeCountsForConfirmedOrdersDropSholder[color]?.L ?? 0) + 
+        (sizeCountsForPendingOrdersDropSholder[color]?.L ?? 0) + 
+        (sizeCountsForApprovedOrdersDropSholder[color]?.L ?? 0);
+
+      const xlCount = 
+        (sizeCountsForConfirmedOrdersDropSholder[color]?.XL ?? 0) + 
+        (sizeCountsForPendingOrdersDropSholder[color]?.XL ?? 0) + 
+        (sizeCountsForApprovedOrdersDropSholder[color]?.XL ?? 0);
+
+      const xxlCount = 
+        (sizeCountsForConfirmedOrdersDropSholder[color]?.XXL ?? 0) + 
+        (sizeCountsForPendingOrdersDropSholder[color]?.XXL ?? 0) + 
+        (sizeCountsForApprovedOrdersDropSholder[color]?.XXL ?? 0);
+
+      return (
+        <tr 
+          style={{
+            backgroundColor: color,
+            color: ["black", "maroon", "green"].includes(color) ? "white" : "initial"
+          }}
+        >
+          <td>{color}</td>
+          <td>round neck</td>
+          <td>{mCount}</td>
+          <td></td>
+          <td>{lCount}</td>
+          <td></td>
+          <td>{xlCount}</td>
+          <td></td>
+          <td>{xxlCount}</td>
+        </tr>
+      );
+    })}
+  </tbody>
+  }  
+  {
+    selectProductTypePAC==="Hoodie" &&
+    <tbody>
+    {["black","nblue","green", "gray","red"].map((color) => {
+      // Calculate the sum for each size for the given color
+      const mCount = 
+        (sizeCountsForConfirmedOrdersHoodie[color]?.m ?? 0) + 
+        (sizeCountsForPendingOrdersHoodie[color]?.m ?? 0) + 
+        (sizeCountsForApprovedOrdersHoodie[color]?.m ?? 0);
+
+      const lCount = 
+        (sizeCountsForConfirmedOrdersHoodie[color]?.L ?? 0) + 
+        (sizeCountsForPendingOrdersHoodie[color]?.L ?? 0) + 
+        (sizeCountsForApprovedOrdersHoodie[color]?.L ?? 0);
+
+      const xlCount = 
+        (sizeCountsForConfirmedOrdersHoodie[color]?.XL ?? 0) + 
+        (sizeCountsForPendingOrdersHoodie[color]?.XL ?? 0) + 
+        (sizeCountsForApprovedOrdersHoodie[color]?.XL ?? 0);
+
+      const xxlCount = 
+        (sizeCountsForConfirmedOrdersHoodie[color]?.XXL ?? 0) + 
+        (sizeCountsForPendingOrdersHoodie[color]?.XXL ?? 0) + 
+        (sizeCountsForApprovedOrdersHoodie[color]?.XXL ?? 0);
+
+      return (
+        <tr 
+          style={{
+            backgroundColor: color,
+            color: ["black","nblue","green", "gray","red"].includes(color) ? "white" : "initial"
+          }}
+        >
+          <td>{color}</td>
+          <td>round neck</td>
+          <td>{mCount}</td>
+          <td></td>
+          <td>{lCount}</td>
+          <td></td>
+          <td>{xlCount}</td>
+          <td></td>
+          <td>{xxlCount}</td>
+        </tr>
+      );
+    })}
+  </tbody>
+  }
+
+</table>
+     
+                   
+                   </div>
+               <div>
+               
+               {/* <div  style={{display:"flex",justifyContent:"flex-end",padding:"0px 20px",marginTop:"35px"}}>
+                <div id="order-detail-totalTShirt"style={{position: 'absolute', left: '-10000px', top: '-10000px'}}>
+              <GetTotalTshirtDispatched countTotalTshirtDispatched={countTotalTshirtDispatched} whiteQuantity={whiteQuantity} blackQuantity={blackQuantity}/>
+          </div> 
+            
+                </div> */}
+               </div>
+              
+                
+                  
+               </div>
+              
+             
+
+             </div>
+          
             </div>
 
           
