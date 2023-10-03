@@ -463,9 +463,6 @@ const handleInputChange = (event) => {
     case 'productType-filter':
       setSelectProductType(value);
       break; 
-       
-      
-  
     default:
       break;
   }
@@ -1011,13 +1008,10 @@ return (
                 
                   
                </div>
-              
-             
-
-             </div>
+               </div>
              <div className="col-md-3">
                
-               <div className="card stat-card" style={{height:"300px"}}>
+               <div className="card stat-card" style={{height:"325px"}}>
                
                  <div className="card-body " >
                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>

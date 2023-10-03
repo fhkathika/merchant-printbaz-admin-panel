@@ -112,53 +112,57 @@ const handleSubmitDeliveryList = (e) => {
                       </div>
                       
                       <div className="row">
-                       
-                        <div className="col-2">
-                          <div className="popup-title-02">
-                            <p >T-Shirt Color</p>
+                       <div className="col-2">
+                          <div className="popup-title-02" style={{textAlign:"center"}}>
+                            <p >Product Category</p>
                           </div>
                         </div>
                         <div className="col-2">
-                          <div className="popup-title-02">
+                          <div className="popup-title-02" style={{textAlign:"center"}}>
+                            <p >T-Shirt Color</p>
+                          </div>
+                        </div>
+                        <div className="col-1">
+                          <div className="popup-title-02" style={{textAlign:"center"}}>
                             <p >Total Cost
                             </p>
                           </div>
                         </div>
                         <div className="col-1">
-                          <div className="popup-title-02">
+                          <div className="popup-title-02" style={{textAlign:"center"}}>
                             <p >Size: S
                             </p>
                           </div>
                         </div> 
                        
                         <div className="col-1">
-                          <div className="popup-title-02">
+                          <div className="popup-title-02" style={{textAlign:"center"}}>
                             <p >Size: M</p>
                           </div>
                         </div>
                          <div className="col-1">
-                          <div className="popup-title-02">
+                          <div className="popup-title-02" style={{textAlign:"center"}}>
                             <p >Size: L</p>
                           </div>
                         </div>
                         <div className="col-1">
-                          <div className="popup-title-02">
+                          <div className="popup-title-02" style={{textAlign:"center"}}>
                             <p >Size: XL</p>
                           </div>
                         </div>
                         <div className="col-1">
-                          <div className="popup-title-02">
+                          <div className="popup-title-02" style={{textAlign:"center"}}>
                             <p >Size: XXL</p>
                           </div>
                         </div>
                          <div className="col-1">
-                          <div className="popup-title-02">
+                          <div className="popup-title-02" style={{textAlign:"center"}}>
                             <p >Per pcs</p>
                           </div>
                         </div>
                        
-                        <div className="col-2">
-                          <div className="popup-title-02">
+                        <div className="col-1">
+                          <div className="popup-title-02" style={{textAlign:"center"}}>
                             <p >Date</p>
                           </div>
                         </div>
@@ -170,116 +174,77 @@ const handleSubmitDeliveryList = (e) => {
                           return(
 <form onSubmit={handleSubmitDeliveryList}>
                     <div className="popupcontent">
-                     <div className="row">
-                          {/* <div className="col-lg-1 col-sm-12" >
-                            
-                          <DatePicker
-            selected={row?.date}
-            onChange={(date) => handleChangeStartDate(date, index)}
-          />
-                          </div> */}
-                          <div className="col-2">
-                          {/* <input
-                          style={{border: '1px solid #ececec', width: '100%', height: '50px', padding: '5px'}}
-          type="text"
-         
-          placeholder="T-Shirt Color"
-        /> */}
-
-<select id="status-filter" required style={{border: '1px solid #ececec', width: '100%', height: '50px', padding: '5px'}}  className="form-control"  value={item.tshirtColor || ""}
-          onChange={(e) => updateField(e, "tshirtColor", index)}>
-                  <option   value="" disabled>select color</option>
-                  <option   value="black">Black</option>
-                  <option value="white">White</option>
-                  <option value="others">Others</option>
-                 
-                  
-                </select>
-                          </div>
-                           <div className="col-2">
-                          <input
-                          style={{border: '1px solid #ececec', width: '100%', height: '50px', padding: '5px'}}
-          type="number"
-          value={item.totalCost|| ""}
-          onChange={(e) => updateField(e, "totalCost", index)}
-          placeholder="totalcost"
-          min="0"
-        />
-                          </div> 
-                           <div className="col-1">
-                          <input
-                          style={{border: '1px solid #ececec', width: '100%', height: '50px', padding: '5px'}}
-          type="number"
-          value="0"
-          onChange={(e) => updateField(e, "sizeS", index)}
-          placeholder="Size-S"
-          min="0"
-        />
-                          </div>
-                          
-                           <div className="col-1">
-                          <input
-                          style={{border: '1px solid #ececec', width: '100%', height: '50px', padding: '5px'}}
-          type="number"
-          value={item.sizeM || ""}
-          onChange={(e) => updateField(e, "sizeM", index)}
-          placeholder="Size-M"
-          min="0"
-        />
-                          </div> <div className="col-1">
-                          <input
-                          style={{border: '1px solid #ececec', width: '100%', height: '50px', padding: '5px'}}
-          type="number"
-          value={item.sizeL || ""}
-          onChange={(e) => updateField(e, "sizeL", index)}
-          placeholder="Size-L"
-          min="0"
-        />
-                          </div> <div className="col-1">
-                          <input
-                          style={{border: '1px solid #ececec', width: '100%', height: '50px', padding: '5px'}}
-          type="number"
-          value={item.sizeXL || ""}
-          onChange={(e) => updateField(e, "sizeXL", index)}
-          placeholder="Size-XL"
-          min="0"
-        />
-                          </div> 
-                          <div className="col-1">
-                          <input
-                          style={{border: '1px solid #ececec', width: '100%', height: '50px', padding: '5px'}}
-          type="number"
-          value={item.sizeXXL || ""}
-          onChange={(e) => updateField(e, "sizeXXL", index)}
-          placeholder="Size-XXL"
-          min="0"
-        />
-                          </div> 
-                           <div className="col-1">
-                          <input
-                          style={{border: '1px solid #ececec', width: '100%', height: '50px', padding: '5px'}}
-          type="number"
-          value={item.perpisCost || ""}
-          onChange={(e) => updateField(e, "perpisCost", index)}
-          placeholder="per pis cost"
-          min="0"
-        />
-                          </div> 
-                          <div className="col-2">
-                          <input
-                          style={{border: '1px solid #ececec', width: '100%', height: '50px', padding: '5px'}}
-          type="date"
-          value={item.date || ""}
-          onChange={(e) => updateField(e, "date", index)}
-          placeholder="Purchase date"
-          required
-        />
-                          </div>
-                        
+                    <div className="row">
+                    <div className="col-2">
+    <select id="status-filter" required style={{border: '1px solid #ececec', width: '100%', height: '50px', padding: '5px'}} className="form-control" value={item.category || ""} onChange={(e) => updateField(e, "category", index)}>
+      <option value="" disabled>select product type</option>
+      <option value="Round Neck">Round Neck</option>
+      <option value="Drop Sholder">Drop Sholder</option>
+      <option value="Hoodie">Hoodie</option>
+    </select>
+  </div>
+  <div className="col-2">
+    <select id="status-filter" required style={{border: '1px solid #ececec', width: '100%', height: '50px', padding: '5px'}} className="form-control" value={item.tshirtColor || ""} onChange={(e) => updateField(e, "tshirtColor", index)}>
+      <option value="" disabled>select color</option>
+      {
+        (item.category === "Round Neck" || item.category==="Drop Sholder")&&
+        <>
+           <option value="black">Black</option>
+        <option value="white">White</option>
+        <option value="maroon">Maroon</option>
+        <option value="green">Green</option>
+        </>
+     
+      }
+      {
+        item.category === "Hoodie" &&
+        <>
+           <option value="black">Black</option>
+        <option value="gray">Gray</option>
+        <option value="navy blue">Navy Blue</option>
+        <option value="green">Green</option>
+        <option value="green">Red</option>
+        </>
+     
+      }
    
-                        </div>
-                       
-                     
+    </select>
+  </div>
+
+  <div className="col-1">
+    <input style={{border: '1px solid #ececec', width: '100%', height: '50px', padding: '5px'}} type="number" value={item.totalCost|| ""} onChange={(e) => updateField(e, "totalCost", index)} placeholder="totalcost" min="0" />
+  </div>
+
+  <div className="col-1">
+    <input style={{border: '1px solid #ececec', width: '100%', height: '50px', padding: '5px'}} type="number" value="0" onChange={(e) => updateField(e, "sizeS", index)} placeholder="Size-S" min="0" />
+  </div>
+
+  <div className="col-1">
+    <input style={{border: '1px solid #ececec', width: '100%', height: '50px', padding: '5px'}} type="number" value={item.sizeM || ""} onChange={(e) => updateField(e, "sizeM", index)} placeholder="Size-M" min="0" />
+  </div>
+
+  <div className="col-1">
+    <input style={{border: '1px solid #ececec', width: '100%', height: '50px', padding: '5px'}} type="number" value={item.sizeL || ""} onChange={(e) => updateField(e, "sizeL", index)} placeholder="Size-L" min="0" />
+  </div>
+
+  <div className="col-1">
+    <input style={{border: '1px solid #ececec', width: '100%', height: '50px', padding: '5px'}} type="number" value={item.sizeXL || ""} onChange={(e) => updateField(e, "sizeXL", index)} placeholder="Size-XL" min="0" />
+  </div>
+
+  <div className="col-1">
+    <input style={{border: '1px solid #ececec', width: '100%', height: '50px', padding: '5px'}} type="number" value={item.sizeXXL || ""} onChange={(e) => updateField(e, "sizeXXL", index)} placeholder="Size-XXL" min="0" />
+  </div>
+
+  <div className="col-1">
+    <input style={{border: '1px solid #ececec', width: '100%', height: '50px', padding: '5px'}} type="number" value={item.perpisCost || ""} onChange={(e) => updateField(e, "perpisCost", index)} placeholder="per pis cost" min="0" />
+  </div>
+
+  <div className="col-1">
+    <input style={{border: '1px solid #ececec', width: '100%', height: '50px', padding: '5px'}} type="date" value={item.date || ""} onChange={(e) => updateField(e, "date", index)} placeholder="Purchase date" required />
+  </div>
+
+</div>
+
                       <div className="row">
                         <div className="col-12">
                           <button style={{marginTop: '30px'}} type="submit">Submit</button>

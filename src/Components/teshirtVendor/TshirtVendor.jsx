@@ -17,8 +17,12 @@ const TshirtVendor = () => {
   let   approvedOrders=orderAll?.filter(users=>users?.orderStatus==="Approved");
   let   confirmedOrders=orderAll?.filter(users=>users?.orderStatus==="confirmed");
   let inProductionOrders=orderAll?.filter(users=>users?.orderStatus==="in-production");
+  
+ 
+  const [selectProductTypeForPurchased, setSelectProductTypeForPurchased] = useState('Round Neck');
   const [tShirtDetail,setTshirtDetail]=useState([{
     tshirtColor:"",
+    category:"",
     sizeM:"",
     sizeL:"",
     sizeXL:"",
@@ -31,6 +35,18 @@ const TshirtVendor = () => {
   },
 
 ]) 
+console.log("getPurchaseTshirt",getPurchaseTshirt);
+const handleInputChangeTotalPurchased = (event) => {
+  const { id, value } = event.target;
+  switch (id) {
+    case 'productType-filterForPurchased':
+      setSelectProductTypeForPurchased(value);
+      break; 
+    default:
+      break;
+  }
+  
+};
 const handleAddDeliveryPopUp=()=>{
   setShowAlert(true)
   setTshirtDetail([{
@@ -50,6 +66,7 @@ const handleAddDeliveryPopUp=()=>{
   console.log("click delivery system popup",showAlert);
  
 } 
+
  const handleDamagePopUp=()=>{
   setShowDamage(true)
   console.log("click delivery system popup",showDamage);
@@ -85,6 +102,11 @@ const fetchDamagedThsirt = () => {
     console.error('Error:', error);
   });
 }
+
+let roundNeckFilter=getPurchaseTshirt?.filter(users=>users?.category==="Round Neck");
+let dropSholderFilter=getPurchaseTshirt?.filter(users=>users?.category==="Drop Sholder");
+let hoodiesFilter=getPurchaseTshirt?.filter(users=>users?.category==="Hoodie");
+
 let totalCostOfTshirt=0;
 getPurchaseTshirt.forEach((item)=>{
   totalCostOfTshirt+=item.totalCost
@@ -182,6 +204,11 @@ const countSizeForOrders = (orders) => {
     return (order?.orderDetailArr || []).reduce((innerAcc, item) => {
       const color = item.color.toLowerCase();
       
+      // Initialize innerAcc[color] if it doesn't exist
+      if (!innerAcc[color]) {
+        innerAcc[color] = {};
+      }
+      
       // Check if the teshirtSize is a string or an object
       if (typeof item.teshirtSize === 'string') {
         // Handle string case (old format)
@@ -198,10 +225,10 @@ const countSizeForOrders = (orders) => {
           innerAcc[color][size] += parseInt(quantity || 0);
         });
       }
-
+  
       return innerAcc;
     }, acc);
-  }, { white: {}, black: {} });
+  }, { white: {}, black: {},green:{},maroon:{},nBlue:{},gray:{},red:{} /* Initialize other colors as needed */ });
 };
 
 
@@ -518,22 +545,26 @@ return (
           fetchDamagedThsirt={ fetchDamagedThsirt}
           message="Your delivery list has been updated successfully."
           onClose={() => setShowDamage(false)}
-        
-          
-          
-          />
-          
-          
+        />
           )
-          
-          
-          }
+           }
                 </div>
               </div>
               <div className="col-xs-12 col-sm-6 col-md-6 col-lg-6">
                 <div className="lobipanel">
                   <div className="panel-title">
                     <h4>Total Tee Shirt Purchased<span style={{float: 'right'}}>{totalTshirtPurchased} PCS</span></h4>
+                    <select 
+        id="productType-filterForPurchased" 
+        value={selectProductTypeForPurchased} 
+        className="form-control mr-5" 
+        onChange={(e) => handleInputChangeTotalPurchased(e)} 
+        style={{ maxWidth: '150px' }}  // Adjust the width value accordingly
+    >
+        <option value="Round Neck">Round Neck</option>
+        <option value="Drop Sholder">Drop Sholder</option>
+        <option value="Hoodie">Hoodie</option>
+    </select>
                   </div>
                   <div className="panel-body">
                     <table className="table">
@@ -551,9 +582,27 @@ return (
                          
                         </tr>
                       </thead>
+                    
                       <tbody>
                         {
-                          getPurchaseTshirt?.slice(0,4)?.map(tshirt=>
+                          selectProductTypeForPurchased==="Round Neck" &&
+                          roundNeckFilter?.map(tshirt=>
+                            <tr className="info">
+                            <td>{tshirt?.date}</td>
+                            <td>{tshirt?.tshirtColor}</td>
+                            <td>{tshirt?.sizeS}</td>
+                            <td>{tshirt?.sizeM}</td>
+                            <td>{tshirt?.sizeL}</td>
+                            <td>{tshirt?.sizeXL}</td>
+                            <td>{tshirt?.sizeXXL}</td>
+                            <td>{tshirt?.perpisCost} tk</td>
+                            <td>{tshirt?.totalCost} tk</td>
+                          </tr>
+                            )
+                        }  
+                          {
+                          selectProductTypeForPurchased==="Hoodie" &&
+                          hoodiesFilter?.map(tshirt=>
                             <tr className="info">
                             <td>{tshirt?.date}</td>
                             <td>{tshirt?.tshirtColor}</td>
@@ -567,12 +616,29 @@ return (
                           </tr>
                             )
                         }
+                         {
+                          selectProductTypeForPurchased==="Drop Sholder" &&
+                          dropSholderFilter?.map(tshirt=>
+                            <tr className="info">
+                            <td>{tshirt?.date}</td>
+                            <td>{tshirt?.tshirtColor}</td>
+                            <td>{tshirt?.sizeS}</td>
+                            <td>{tshirt?.sizeM}</td>
+                            <td>{tshirt?.sizeL}</td>
+                            <td>{tshirt?.sizeXL}</td>
+                            <td>{tshirt?.sizeXXL}</td>
+                            <td>{tshirt?.perpisCost} tk</td>
+                            <td>{tshirt?.totalCost} tk</td>
+                          </tr>
+                            )
+                        }
+                       
 
                        </tbody>
                     </table>
                   </div>
                   <div className="panel-button">
-                    <button id="button" onClick={handleAddDeliveryPopUp}>Update55</button>
+                    <button id="button" onClick={handleAddDeliveryPopUp}>Update</button>
                     <button style={{float: 'right'}} onClick={handleaAllPurchasedTshirts}>View More</button>
                   </div>
                   {showAlert===true && (
