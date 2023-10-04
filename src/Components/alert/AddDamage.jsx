@@ -37,8 +37,8 @@ const handleSubmitDamageList = (e) => {
   // Set a loading state if you have one.
   // setLoading(true);
 
-  // fetch('http://localhost:5000/addDamagedTshirt', {
-  fetch('https://mserver.printbaz.com/addDamagedTshirt', {
+  fetch('http://localhost:5000/addDamagedTshirt', {
+  // fetch('https://mserver.printbaz.com/addDamagedTshirt', {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json'
@@ -112,10 +112,14 @@ const handleSubmitDamageList = (e) => {
                       </div>
                       
                       <div className="row">
-                       
+                      <div className="col-2">
+                          <div className="popup-title-02" style={{textAlign:"center"}}>
+                            <p >Product Category</p>
+                          </div>
+                        </div>
                         <div className="col-2">
-                          <div className="popup-title-02">
-                            <p >T-Shirt Color</p>
+                          <div className="popup-title-02" >
+                            <p > Color</p>
                           </div>
                         </div>
                         {/* <div className="col-2">
@@ -146,8 +150,8 @@ const handleSubmitDamageList = (e) => {
                             <p >Size: XL</p>
                           </div>
                         </div>
-                        <div className="col-1">
-                          <div className="popup-title-02">
+                        <div className="col-2">
+                          <div className="popup-title-02" >
                             <p >Size: XXL</p>
                           </div>
                         </div>
@@ -170,41 +174,41 @@ const handleSubmitDamageList = (e) => {
 <form onSubmit={handleSubmitDamageList}>
                     <div className="popupcontent">
                      <div className="row">
-                          {/* <div className="col-lg-1 col-sm-12" >
-                            
-                          <DatePicker
-            selected={row?.date}
-            onChange={(date) => handleChangeStartDate(date, index)}
-          />
-                          </div> */}
-                          <div className="col-2">
-                          {/* <input
-                          style={{border: '1px solid #ececec', width: '100%', height: '50px', padding: '5px'}}
-          type="text"
-         
-          placeholder="T-Shirt Color"
-        /> */}
-
-<select id="status-filter" required style={{border: '1px solid #ececec', width: '100%', height: '50px', padding: '5px'}}  className="form-control"  value={item.tshirtColor || ""}
-          onChange={(e) => updateField(e, "tshirtColor", index)}>
-                  <option   value="" disabled>select color</option>
-                  <option   value="black">Black</option>
-                  <option value="white">White</option>
-                  <option value="others">Others</option>
-                 
-                  
-                </select>
-                          </div>
-                           {/* <div className="col-2">
-                          <input
-                          style={{border: '1px solid #ececec', width: '100%', height: '50px', padding: '5px'}}
-          type="number"
-          value={totalcostOfTshirt || ""}
-          onChange={(e) => updateField(e, "totalCost", index)}
-          placeholder="totalcost"
-          min="0"
-        />
-                          </div>  */}
+                     <div className="col-2">
+    <select id="status-filter" required style={{border: '1px solid #ececec', width: '100%', height: '50px', padding: '5px'}} className="form-control" value={item.category || ""} onChange={(e) => updateField(e, "category", index)}>
+      <option value="" disabled>select product type</option>
+      <option value="Round Neck">Round Neck</option>
+      <option value="Drop Sholder">Drop Sholder</option>
+      <option value="Hoodie">Hoodie</option>
+    </select>
+  </div>
+  <div className="col-2">
+    <select id="status-filter" required style={{border: '1px solid #ececec', width: '100%', height: '50px', padding: '5px'}} className="form-control" value={item.tshirtColor || ""} onChange={(e) => updateField(e, "tshirtColor", index)}>
+      <option value="" disabled>select color</option>
+      {
+        (item.category === "Round Neck" || item.category==="Drop Sholder")&&
+        <>
+           <option value="black">Black</option>
+        <option value="white">White</option>
+        <option value="maroon">Maroon</option>
+        <option value="green">Green</option>
+        </>
+     
+      }
+      {
+        item.category === "Hoodie" &&
+        <>
+           <option value="black">Black</option>
+        <option value="gray">Gray</option>
+        <option value="navy blue">Navy Blue</option>
+        <option value="green">Green</option>
+        <option value="green">Red</option>
+        </>
+     
+      }
+   
+    </select>
+  </div>
                            <div className="col-1">
                           <input
                           style={{border: '1px solid #ececec', width: '100%', height: '50px', padding: '5px'}}
@@ -244,7 +248,7 @@ const handleSubmitDamageList = (e) => {
           min="0"
         />
                           </div> 
-                          <div className="col-1">
+                          <div className="col-2">
                           <input
                           style={{border: '1px solid #ececec', width: '100%', height: '50px', padding: '5px'}}
           type="number"

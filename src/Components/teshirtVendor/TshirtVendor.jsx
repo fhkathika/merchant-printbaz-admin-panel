@@ -20,6 +20,7 @@ const TshirtVendor = () => {
   
  
   const [selectProductTypeForPurchased, setSelectProductTypeForPurchased] = useState('Round Neck');
+  const [selectProductTypeForDamaged, setSelectProductTypeForDamaged] = useState('Round Neck');
   const [tShirtDetail,setTshirtDetail]=useState([{
     tshirtColor:"",
     category:"",
@@ -35,12 +36,22 @@ const TshirtVendor = () => {
   },
 
 ]) 
-console.log("getPurchaseTshirt",getPurchaseTshirt);
 const handleInputChangeTotalPurchased = (event) => {
   const { id, value } = event.target;
   switch (id) {
     case 'productType-filterForPurchased':
       setSelectProductTypeForPurchased(value);
+      break; 
+    default:
+      break;
+  }
+  
+};
+const handleInputChangeDamaged = (event) => {
+  const { id, value } = event.target;
+  switch (id) {
+    case 'productType-filterForPurchased':
+      setSelectProductTypeForDamaged(value);
       break; 
     default:
       break;
@@ -63,13 +74,11 @@ const handleAddDeliveryPopUp=()=>{
   },
 
 ])
-  console.log("click delivery system popup",showAlert);
  
 } 
 
  const handleDamagePopUp=()=>{
   setShowDamage(true)
-  console.log("click delivery system popup",showDamage);
  
 }
 const handleaAllPurchasedTshirts=()=>{
@@ -79,11 +88,11 @@ const handleaAllDamagedTshirts=()=>{
   navigate('/allDamagedTshirt')
 }
 const fetchData = () => {
-  // fetch('http://localhost:5000/getAllPurchasedTshirts')
-  fetch('https://mserver.printbaz.com/getAllPurchasedTshirts')
+  fetch('http://localhost:5000/getAllPurchasedTshirts')
+  // fetch('https://mserver.printbaz.com/getAllPurchasedTshirts')
   .then(response => response.json())
   .then(data => {
-    console.log("Fetched Data:", data);
+    // console.log("Fetched Data:", data);
     setGetPurchaseTshirt(data)
   })
   .catch(error => {
@@ -91,11 +100,11 @@ const fetchData = () => {
   });
 }
 const fetchDamagedThsirt = () => {
-  // fetch('http://localhost:5000/getAllDamagedTshirts')
-  fetch('https://mserver.printbaz.com/getAllDamagedTshirts')
+  fetch('http://localhost:5000/getAllDamagedTshirts')
+  // fetch('https://mserver.printbaz.com/getAllDamagedTshirts')
   .then(response => response.json())
   .then(data => {
-    console.log("Fetched Data:", data);
+    // console.log("Fetched Data:", data);
     setGetDamagedTshirt(data)
   })
   .catch(error => {
@@ -106,99 +115,34 @@ const fetchDamagedThsirt = () => {
 let roundNeckFilter=getPurchaseTshirt?.filter(users=>users?.category==="Round Neck");
 let dropSholderFilter=getPurchaseTshirt?.filter(users=>users?.category==="Drop Sholder");
 let hoodiesFilter=getPurchaseTshirt?.filter(users=>users?.category==="Hoodie");
+// for mage product  filter 
+let roundNeckDamageFilter=getDamagedTshirt?.filter(users=>users?.category==="Round Neck");
+let dropSholderDamageFilter=getDamagedTshirt?.filter(users=>users?.category==="Drop Sholder");
+let hoodiesDamageFilter=getDamagedTshirt?.filter(users=>users?.category==="Hoodie");
 
 let totalCostOfTshirt=0;
-getPurchaseTshirt.forEach((item)=>{
-  totalCostOfTshirt+=item.totalCost
-})
-console.log("totalCostOfTshirt",totalCostOfTshirt);
+
+  if (selectProductTypeForPurchased==="Round Neck") {
+    roundNeckFilter.forEach((item)=>{
+      totalCostOfTshirt+=item.totalCost
+    })
+  } if (selectProductTypeForPurchased==="Drop Sholder") {
+    dropSholderFilter.forEach((item)=>{
+      totalCostOfTshirt+=item.totalCost
+    })
+  } if (selectProductTypeForPurchased==="Hoodie") {
+    hoodiesFilter.forEach((item)=>{
+      totalCostOfTshirt+=item.totalCost
+    })
+  }
+ 
+
+
 useEffect(() => {
   fetchData();
   fetchDamagedThsirt()
 }, []);
 
- // Initialize counts
- let totalBlackSizeM = 0;
- let totalBlackSizeL = 0;
- let totalBlackSizeXL = 0;
- let totalBlackSizeXXL = 0;
- let totalBlackSizeS = 0; 
- let totalwhiteSizeM = 0;
- let totalwhiteSizeL = 0;
- let totalwhiteSizeXL = 0;
- let totalwhiteSizeXXL = 0;
- let totalwhiteSizeS = 0;
-  // Filter out the records for black t-shirts
-  const blackTshirts = getPurchaseTshirt.filter(record => record.tshirtColor === 'black');
-  const whiteTshirts = getPurchaseTshirt.filter(record => record.tshirtColor === 'white');
-  // Sum the counts
-  for (const record of blackTshirts) {
-    totalBlackSizeM += Number(record.sizeM || 0);
-    totalBlackSizeL += Number(record.sizeL || 0);
-    totalBlackSizeXL += Number(record.sizeXL || 0);
-    totalBlackSizeXXL += Number(record.sizeXXL || 0);
-    totalBlackSizeS += Number(record.sizeS || 0);
-  }
-  // Sum the counts
-  for (const record of whiteTshirts) {
-    totalwhiteSizeM += Number(record.sizeM || 0);
-    totalwhiteSizeL += Number(record.sizeL || 0);
-    totalwhiteSizeXL += Number(record.sizeXL || 0);
-    totalwhiteSizeXXL += Number(record.sizeXXL || 0);
-    totalwhiteSizeS += Number(record.sizeS || 0);
-  }
-//damage tshirt 
-   // Initialize counts
- let totalDamgBlackSizeM = 0;
- let totalDamgBlackSizeL = 0;
- let totalDamgBlackSizeXL = 0;
- let totalDamgBlackSizeXXL = 0;
- let totalDamgBlackSizeS = 0; 
- let totalDamgwhiteSizeM = 0;
- let totalDamgwhiteSizeL = 0;
- let totalDamgwhiteSizeXL = 0;
- let totalDamgwhiteSizeXXL = 0;
- let totalDamgwhiteSizeS = 0;
-  // Filter out the records for black t-shirts
-  const blackDmgTshirts = getDamagedTshirt.filter(record => record.tshirtColor === 'black');
-  const whiteDmgTshirts = getDamagedTshirt.filter(record => record.tshirtColor === 'white');
-  // Sum the counts
-  for (const record of blackDmgTshirts) {
-    totalDamgBlackSizeM += Number(record.sizeM || 0);
-    totalDamgBlackSizeL += Number(record.sizeL || 0);
-    totalDamgBlackSizeXL += Number(record.sizeXL || 0);
-    totalDamgBlackSizeXXL += Number(record.sizeXXL || 0);
-    totalDamgBlackSizeS += Number(record.sizeS || 0);
-  }
-  // Sum the counts
-  for (const record of whiteDmgTshirts) {
-    totalDamgwhiteSizeM += Number(record.sizeM || 0);
-    totalDamgwhiteSizeL += Number(record.sizeL || 0);
-    totalDamgwhiteSizeXL += Number(record.sizeXL || 0);
-    totalDamgwhiteSizeXXL += Number(record.sizeXXL || 0);
-    totalDamgwhiteSizeS += Number(record.sizeS || 0);
-  }
-
-console.log("totalDamgBlackSizeL",totalDamgBlackSizeL);
-console.log("totalDamgBlackSizeXL",totalDamgBlackSizeXL);
-console.log("totalDamgBlackSizeXXL",totalDamgBlackSizeXXL);
-console.log("totalDamgBlackSizeS",totalDamgBlackSizeS);
-console.log("totalDamgwhiteSizeM",totalDamgwhiteSizeM);
-console.log("totalDamgwhiteSizeL",totalDamgwhiteSizeL);
-console.log("totalDamgwhiteSizeXL",totalDamgwhiteSizeXL);
-console.log("totalDamgwhiteSizeXXL",totalDamgwhiteSizeXXL);
-console.log("totalDamgwhiteSizeS",totalDamgwhiteSizeS);
-const totalTshirtPurchased=
-totalBlackSizeM+
-totalBlackSizeL+
-totalBlackSizeXL+
-totalBlackSizeXXL+
-totalBlackSizeS+
-totalwhiteSizeM+
-totalwhiteSizeL+
-totalwhiteSizeXL+
-totalwhiteSizeXXL+
-totalwhiteSizeS
 const countSizeForOrders = (orders) => {
   return orders?.reduce((acc, order) => {
     return (order?.orderDetailArr || []).reduce((innerAcc, item) => {
@@ -256,36 +200,124 @@ const countSizeForOrders = (orders) => {
 
 const sizeCountsForInProduction = countSizeForOrders(inProductionOrders);
 
-console.log("sizeCountsForInProduction",sizeCountsForInProduction);
-const whiteM=Number(totalwhiteSizeM)-(Number(sizeCountsForInProduction.white?.m?sizeCountsForInProduction.white?.m:0)+Number(totalDamgwhiteSizeM))
-const whiteL= Number(totalwhiteSizeL)-(Number(sizeCountsForInProduction.white?.L?sizeCountsForInProduction.white?.L:0)+Number(totalDamgwhiteSizeL))
-const whiteXL=Number(totalwhiteSizeXL)-(Number(sizeCountsForInProduction.white?.XL?sizeCountsForInProduction.white?.XL:0)+Number(totalDamgwhiteSizeXL))
-const whiteXXL=Number(totalwhiteSizeXXL)-(Number(sizeCountsForInProduction.white?.XXL?sizeCountsForInProduction.white?.XXL:0)+Number(totalDamgwhiteSizeXXL))
-const blackM=Number(totalBlackSizeM)-(Number(sizeCountsForInProduction.black?.m?sizeCountsForInProduction.black?.m:0)+Number(totalDamgBlackSizeM))
-const bvlackL=Number(totalBlackSizeL)-(Number(sizeCountsForInProduction.black?.L?sizeCountsForInProduction.black?.L:0)+Number(totalDamgBlackSizeL))
-const blackXL= Number(totalBlackSizeXL)-(Number(sizeCountsForInProduction.black?.XL?sizeCountsForInProduction.black?.XL:0)+Number(totalDamgBlackSizeXL))
-const blackXXL=Number(totalBlackSizeXXL)-(Number(sizeCountsForInProduction.black?.XXL?sizeCountsForInProduction.black?.XXL:0)+Number(totalDamgBlackSizeXXL))
-console.log("Number(totalBlackSizeM)-Number(sizeCountsForInProduction.black?.m?sizeCountsForInProduction.black?.m:0+Number(totalDamgBlackSizeM))",Number(totalBlackSizeM)-(Number(sizeCountsForInProduction.black?.m?sizeCountsForInProduction.black?.m:0)+Number(totalDamgBlackSizeM)));
 
-const TotalDamageTshirt=
-totalDamgBlackSizeM+
-totalDamgBlackSizeL+
-totalDamgBlackSizeXL+
-totalDamgBlackSizeXXL+
-totalDamgBlackSizeS+
-totalDamgwhiteSizeM+
-totalDamgwhiteSizeL+
-totalDamgwhiteSizeXL+
-totalDamgwhiteSizeXXL+
-totalDamgwhiteSizeS
-const totalTshirtInventory=whiteM+
-whiteL+
-whiteXL+
-whiteXXL+
-blackM+
-bvlackL+
-blackXL+
-blackXXL;
+  let totalDamaged = 0;
+  const TotalDamageTshirt = (array) => {
+    array.forEach(damaged => {
+      totalDamaged += (
+        parseInt(damaged.sizeS || 0) + 
+        parseInt(damaged.sizeM || 0) + 
+        parseInt(damaged.sizeL || 0) + 
+        parseInt(damaged.sizeXL || 0) + 
+        parseInt(damaged.sizeXXL || 0)
+      );
+    });
+  }
+  if (selectProductTypeForDamaged === "Round Neck") {
+    TotalDamageTshirt(roundNeckDamageFilter);
+
+  } else if (selectProductTypeForDamaged === "Drop Sholder") {
+    TotalDamageTshirt(dropSholderDamageFilter);
+
+  } else if (selectProductTypeForDamaged === "Hoodie") {
+    TotalDamageTshirt(hoodiesDamageFilter);
+
+  }
+    let totalPurchased = 0;
+  const TotalPurchasedTshirt = (array) => {
+    array.forEach(purchased => {
+      totalPurchased += (
+        parseInt(purchased.sizeS || 0) + 
+        parseInt(purchased.sizeM || 0) + 
+        parseInt(purchased.sizeL || 0) + 
+        parseInt(purchased.sizeXL || 0) + 
+        parseInt(purchased.sizeXXL || 0)
+      );
+    });
+  }
+  if (selectProductTypeForPurchased === "Round Neck") {
+    TotalPurchasedTshirt(roundNeckFilter);
+
+  } else if (selectProductTypeForPurchased === "Drop Sholder") {
+    TotalPurchasedTshirt(dropSholderFilter);
+
+  } else if (selectProductTypeForPurchased === "Hoodie") {
+    TotalPurchasedTshirt(hoodiesFilter);
+
+  }
+  const availableColors = ["black", "white", "red", "nevy blue", "green"];
+  const availableSizes = [ "sizeS", "sizeM", "sizeXL", "sizeXXL"];
+
+// count tshirt based on color and size 
+const calculateTotalForColorAndSize = (data, color, sizeKey) => {
+  return data.reduce((acc, tshirt) => {
+    if (tshirt.tshirtColor === color) {
+      return acc + parseInt(tshirt[sizeKey] || 0);
+    }
+    return acc;
+  }, 0);
+};
+
+let COLORS = [];
+
+if (selectProductTypeForPurchased === "Round Neck" || selectProductTypeForPurchased === "Drop Sholder") {
+   COLORS = ['black', 'white', 'maroon', 'green'];
+} else if (selectProductTypeForPurchased === "Hoodie") {
+   COLORS = ['black', 'gray', 'red', 'green'];
+}
+
+const SIZES = ['sizeS', 'sizeM', 'sizeL', 'sizeXL', 'sizeXXL'];
+
+// Select data filter based on the product type
+const selectDataFilter = (type) => {
+  if (type === "Round Neck") {
+    return roundNeckFilter;
+  } else if (type === "Hoodie") {
+    return hoodiesFilter;
+  } else if (type === "Drop Sholder") {
+    return dropSholderFilter;
+  }
+  return [];
+}
+const selectDataDamagedFilter = (type) => {
+  if (type === "Round Neck") {
+    return roundNeckDamageFilter;
+  } else if (type === "Hoodie") {
+    return hoodiesDamageFilter;
+  } else if (type === "Drop Sholder") {
+    return dropSholderDamageFilter;
+  }
+  return [];
+}
+
+const dataFilter = selectDataFilter(selectProductTypeForPurchased);
+const damageDataFilter = selectDataDamagedFilter(selectProductTypeForDamaged);
+
+const totals = {};
+
+COLORS.forEach(color => {
+  totals[color] = {};
+  SIZES.forEach(size => {
+    const totalCount = calculateTotalForColorAndSize(dataFilter, color, size);
+    const DamageCount = calculateTotalForColorAndSize(damageDataFilter, color, size);
+    const inProductionCount = sizeCountsForInProduction[color] && sizeCountsForInProduction[color][size]
+      ? sizeCountsForInProduction[color][size]
+      : 0;
+    
+    totals[color][size] = totalCount - (inProductionCount+DamageCount );
+  });
+});
+console.log("dataFilter,",dataFilter);
+console.log("damageDataFilter,",damageDataFilter);
+
+// const totalTshirtInventory=whiteM+
+// whiteL+
+// whiteXL+
+// whiteXXL+
+// blackM+
+// bvlackL+
+// blackXL+
+// blackXXL;
 
 const sizeCountsForConfirmedOrders = countSizeForOrders(confirmedOrders);
 const sizeCountsForPendingOrders = countSizeForOrders(pendingOrders);
@@ -361,39 +393,32 @@ return (
               <div className="col-xs-12 col-sm-6 col-md-6 col-lg-6">
                 <div className="lobipanel m-0" style={{height: '374px'}}>
                   <div className="panel-title">
-                    <h4>Inventory<span style={{float: 'right'}}>{totalTshirtInventory} PCS</span></h4>
+                    {/* <h4>Inventory<span style={{float: 'right'}}>{totalTshirtInventory} PCS</span></h4> */}
                   </div>
                   <div className="panel-body">
-                    <table className="table">
-                      <thead>
-                        <tr>
-                          <th>T-Shirt Color</th>
-                          <th>Size: S</th>
-                          <th>Size: M</th>
-                          <th>Size: L</th>
-                          <th>Size: XL</th>
-                          <th>Size: XXL</th>
-                        </tr>
-                      </thead>
-                      <tbody>
-                        <tr className="info">
-                          <td>Black</td>
-                          <td>{totalBlackSizeS}</td>
-                          <td>{blackM}</td>
-                          <td>{bvlackL}</td>
-                          <td>{blackXL}</td>
-                          <td>{blackXXL}</td>
-                        </tr>
-                        <tr>
-                          <td>White</td>
-                          <td>{totalwhiteSizeS}</td>
-                          <td>{whiteM}</td>
-                          <td>{whiteL}</td>
-                          <td>{whiteXL}</td>
-                          <td>{whiteXXL}</td>
-                        </tr>
-                      </tbody>
-                    </table>
+                  <table className="table">
+  <thead>
+    <tr>
+      <th>T-Shirt Color</th>
+      <th>Size: S</th>
+      <th>Size: M</th>
+      <th>Size: L</th>
+      <th>Size: XL</th>
+      <th>Size: XXL</th>
+    </tr>
+  </thead>
+  <tbody>
+    {COLORS.map(color => (
+      <tr key={color} className="info">
+        <td>{color}</td>
+        {SIZES.map(size => (
+          <td key={size}>{totals[color][size]}</td>
+        ))}
+      </tr>
+    ))}
+  </tbody>
+</table>
+
                   </div>
                 </div>
               </div>
@@ -488,7 +513,18 @@ return (
               <div className="col-xs-12 col-sm-6 col-md-6 col-lg-6">
                 <div className="lobipanel">
                   <div className="panel-title">
-                    <h4>Damaged<span style={{float: 'right'}}>{TotalDamageTshirt} PCS</span></h4>
+                    <h4>Damaged<span style={{float: 'right'}}>{totalDamaged} PCS</span></h4>
+                    <select 
+        id="productType-filterForPurchased" 
+        value={selectProductTypeForDamaged} 
+        className="form-control mr-5" 
+        onChange={(e) => handleInputChangeDamaged(e)} 
+        style={{ maxWidth: '150px' }}  // Adjust the width value accordingly
+    >
+        <option value="Round Neck">Round Neck</option>
+        <option value="Drop Sholder">Drop Sholder</option>
+        <option value="Hoodie">Hoodie</option>
+    </select>
                   </div>
                   <div className="panel-body">
                     <table className="table">
@@ -506,7 +542,44 @@ return (
                       <tbody>
                     
                           {
-                            getDamagedTshirt?.slice(0,4)?.map(damaged=>
+                            selectProductTypeForDamaged==="Round Neck" &&
+                            roundNeckDamageFilter?.slice(0,4)?.map(damaged=>
+                              <tr className="info">
+                          <>
+                              </>
+                              <td>{damaged?.tshirtColor}</td>
+                              <td>{damaged?.sizeS}</td>
+                              <td>{damaged?.sizeM}</td>
+                              <td>{damaged?.sizeL}</td>
+                              <td>{damaged?.sizeXL}</td>
+                              <td>{damaged?.sizeXXL}</td>
+                              <td>{damaged?.date}</td>
+                              
+                                   
+                        </tr>
+                              )
+                            
+                          } {
+                            selectProductTypeForDamaged==="Drop Sholder" &&
+                            dropSholderDamageFilter?.slice(0,4)?.map(damaged=>
+                              <tr className="info">
+                          <>
+                              </>
+                              <td>{damaged?.tshirtColor}</td>
+                              <td>{damaged?.sizeS}</td>
+                              <td>{damaged?.sizeM}</td>
+                              <td>{damaged?.sizeL}</td>
+                              <td>{damaged?.sizeXL}</td>
+                              <td>{damaged?.sizeXXL}</td>
+                              <td>{damaged?.date}</td>
+                              
+                                   
+                        </tr>
+                              )
+                            
+                          } {
+                            selectProductTypeForDamaged==="Hoodie" &&
+                            hoodiesDamageFilter?.slice(0,4)?.map(damaged=>
                               <tr className="info">
                           <>
                               </>
@@ -530,7 +603,7 @@ return (
                     </table>
                   </div>
                   <div className="panel-button">
-                    <button id="button" onClick={handleDamagePopUp}>Update</button>
+                    <button id="button" onClick={handleDamagePopUp}>Update  Damage</button>
                     <button style={{float: 'right'}} onClick={handleaAllDamagedTshirts}>View More</button>
                   </div>
                 
@@ -553,7 +626,7 @@ return (
               <div className="col-xs-12 col-sm-6 col-md-6 col-lg-6">
                 <div className="lobipanel">
                   <div className="panel-title">
-                    <h4>Total Tee Shirt Purchased<span style={{float: 'right'}}>{totalTshirtPurchased} PCS</span></h4>
+                    <h4>Total Tee Shirt Purchased<span style={{float: 'right'}}>{totalPurchased} PCS</span></h4>
                     <select 
         id="productType-filterForPurchased" 
         value={selectProductTypeForPurchased} 
@@ -586,7 +659,7 @@ return (
                       <tbody>
                         {
                           selectProductTypeForPurchased==="Round Neck" &&
-                          roundNeckFilter?.map(tshirt=>
+                          roundNeckFilter?.slice(0,4)?.map(tshirt=>
                             <tr className="info">
                             <td>{tshirt?.date}</td>
                             <td>{tshirt?.tshirtColor}</td>
@@ -602,7 +675,7 @@ return (
                         }  
                           {
                           selectProductTypeForPurchased==="Hoodie" &&
-                          hoodiesFilter?.map(tshirt=>
+                          hoodiesFilter?.slice(0,4)?.map(tshirt=>
                             <tr className="info">
                             <td>{tshirt?.date}</td>
                             <td>{tshirt?.tshirtColor}</td>
@@ -618,7 +691,7 @@ return (
                         }
                          {
                           selectProductTypeForPurchased==="Drop Sholder" &&
-                          dropSholderFilter?.map(tshirt=>
+                          dropSholderFilter?.slice(0,4)?.map(tshirt=>
                             <tr className="info">
                             <td>{tshirt?.date}</td>
                             <td>{tshirt?.tshirtColor}</td>
