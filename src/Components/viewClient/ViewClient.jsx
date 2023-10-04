@@ -113,7 +113,7 @@ if (Array.isArray(orderSatatusReturned)) {
     
     // If totalReturn and deliveryFee exist and are numbers, add them to totalReturnAmountBase
    
-      totalReturnAmmountBase += (totalReturn + deliveryFee);
+      totalReturnAmmountBase += (totalReturn + deliveryFee+deliveryFee/2);
     
   }
 }
