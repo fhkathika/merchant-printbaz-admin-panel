@@ -473,9 +473,7 @@ const handleInputChange = (event) => {
     case 'productType-filterPAC':
       setSelectProductTypePAC(value);
       break; 
-       
-      
-  
+    
     default:
       break;
   }

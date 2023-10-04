@@ -10,6 +10,7 @@ const AllPurchasedTshirt = () => {
     const [showDamage, setShowDamage] = useState(false);
     const [getPurchaseTshirt, setGetPurchaseTshirt] = useState([]);
     const [getDamagedTshirt, setGetDamagedTshirt] = useState([]);
+    const [selectProductTypeForPurchased, setSelectProductTypeForPurchased] = useState('Round Neck');
     useEffect(()=>{
         fetchData()  
     },[])
@@ -25,50 +26,43 @@ const AllPurchasedTshirt = () => {
           console.error('Error:', error);
         });
       }
-   
-      // Initialize counts
- let totalBlackSizeM = 0;
- let totalBlackSizeL = 0;
- let totalBlackSizeXL = 0;
- let totalBlackSizeXXL = 0;
- let totalBlackSizeS = 0; 
- let totalwhiteSizeM = 0;
- let totalwhiteSizeL = 0;
- let totalwhiteSizeXL = 0;
- let totalwhiteSizeXXL = 0;
- let totalwhiteSizeS = 0;
-  // Filter out the records for black t-shirts
-  const blackTshirts = getPurchaseTshirt.filter(record => record.tshirtColor === 'black');
-  const whiteTshirts = getPurchaseTshirt.filter(record => record.tshirtColor === 'white');
-  // Sum the counts
-  for (const record of blackTshirts) {
-    totalBlackSizeM += Number(record.sizeM || 0);
-    totalBlackSizeL += Number(record.sizeL || 0);
-    totalBlackSizeXL += Number(record.sizeXL || 0);
-    totalBlackSizeXXL += Number(record.sizeXXL || 0);
-    totalBlackSizeS += Number(record.sizeS || 0);
-  }
-  // Sum the counts
-  for (const record of whiteTshirts) {
-    totalwhiteSizeM += Number(record.sizeM || 0);
-    totalwhiteSizeL += Number(record.sizeL || 0);
-    totalwhiteSizeXL += Number(record.sizeXL || 0);
-    totalwhiteSizeXXL += Number(record.sizeXXL || 0);
-    totalwhiteSizeS += Number(record.sizeS || 0);
-  }
+      const handleInputChangeTotalPurchased = (event) => {
+        const { id, value } = event.target;
+        switch (id) {
+          case 'productType-filterForPurchased':
+            setSelectProductTypeForPurchased(value);
+            break; 
+          default:
+            break;
+        }
+        
+      };
+      let roundNeckFilter=getPurchaseTshirt?.filter(users=>users?.category==="Round Neck");
+let dropSholderFilter=getPurchaseTshirt?.filter(users=>users?.category==="Drop Sholder");
+let hoodiesFilter=getPurchaseTshirt?.filter(users=>users?.category==="Hoodie");
 
-
-const totalTshirtPurchased=
-totalBlackSizeM+
-totalBlackSizeL+
-totalBlackSizeXL+
-totalBlackSizeXXL+
-totalBlackSizeS+
-totalwhiteSizeM+
-totalwhiteSizeL+
-totalwhiteSizeXL+
-totalwhiteSizeXXL+
-totalwhiteSizeS
+      let totalPurchased = 0;
+      const TotalPurchasedTshirt = (array) => {
+        array.forEach(purchased => {
+          totalPurchased += (
+            parseInt(purchased.sizeS || 0) + 
+            parseInt(purchased.sizeM || 0) + 
+            parseInt(purchased.sizeL || 0) + 
+            parseInt(purchased.sizeXL || 0) + 
+            parseInt(purchased.sizeXXL || 0)
+          );
+        });
+      }
+      if (selectProductTypeForPurchased === "Round Neck") {
+        TotalPurchasedTshirt(roundNeckFilter);
+    
+      } else if (selectProductTypeForPurchased === "Drop Sholder") {
+        TotalPurchasedTshirt(dropSholderFilter);
+    
+      } else if (selectProductTypeForPurchased === "Hoodie") {
+        TotalPurchasedTshirt(hoodiesFilter);
+    
+      }
     return (
         <div>
         <meta charSet="UTF-8" />
@@ -91,51 +85,95 @@ totalwhiteSizeS
         
           <div className="row input-bar-01">
           
-            <div className="col-xs-12 col-sm-6 col-md-12 col-lg-12">
-              <div className="lobipanel">
-                <div className="panel-title">
-                  <h4>Total Tee Shirt Purchased<span style={{float: 'right'}}>{totalTshirtPurchased} PCS</span></h4>
-                </div>
-                <div className="panel-body">
-                  <table className="table">
-                    <thead>
-                      <tr>
-                      <th>Date </th>
-                        <th>T-Shirt Color</th>
-                        <th>Size: S</th>
-                        <th>Size: M</th>
-                        <th>Size: L</th>
-                        <th>Size: XL</th>
-                        <th>Size: XXL</th>
-                        <th>Per pcs</th>
-                        <th>Total Cost</th>
-                       
-                      </tr>
-                    </thead>
-                    <tbody>
-                      {
-                        getPurchaseTshirt?.map(tshirt=>
-                          <tr className="info">
-                          <td>{tshirt?.date}</td>
-                          <td>{tshirt?.tshirtColor}</td>
-                          <td>{tshirt?.sizeS}</td>
-                          <td>{tshirt?.sizeM}</td>
-                          <td>{tshirt?.sizeL}</td>
-                          <td>{tshirt?.sizeXL}</td>
-                          <td>{tshirt?.sizeXXL}</td>
-                          <td>{tshirt?.perpisCost}</td>
-                          <td>{tshirt?.totalCost}</td>
+          <div className="col-xs-12 col-sm-12 col-md-12 col-lg-12">
+                <div className="lobipanel">
+                  <div className="panel-title">
+                    <h4>Total Tee Shirt Purchased<span style={{float: 'right'}}>{totalPurchased} PCS</span></h4>
+                    <select 
+        id="productType-filterForPurchased" 
+        value={selectProductTypeForPurchased} 
+        className="form-control mr-5" 
+        onChange={(e) => handleInputChangeTotalPurchased(e)} 
+        style={{ maxWidth: '150px' }}  // Adjust the width value accordingly
+    >
+        <option value="Round Neck">Round Neck</option>
+        <option value="Drop Sholder">Drop Sholder</option>
+        <option value="Hoodie">Hoodie</option>
+    </select>
+                  </div>
+                  <div className="panel-body">
+                    <table className="table">
+                      <thead>
+                        <tr>
+                        <th>Date </th>
+                          <th>T-Shirt Color</th>
+                          <th>Size: S</th>
+                          <th>Size: M</th>
+                          <th>Size: L</th>
+                          <th>Size: XL</th>
+                          <th>Size: XXL</th>
+                          <th>Per pcs</th>
+                          <th>Total Cost</th>
+                         
                         </tr>
-                          )
-                      }
+                      </thead>
+                    
+                      <tbody>
+                        {
+                          selectProductTypeForPurchased==="Round Neck" &&
+                          roundNeckFilter?.map(tshirt=>
+                            <tr className="info">
+                            <td>{tshirt?.date}</td>
+                            <td>{tshirt?.tshirtColor}</td>
+                            <td>{tshirt?.sizeS}</td>
+                            <td>{tshirt?.sizeM}</td>
+                            <td>{tshirt?.sizeL}</td>
+                            <td>{tshirt?.sizeXL}</td>
+                            <td>{tshirt?.sizeXXL}</td>
+                            <td>{tshirt?.perpisCost} tk</td>
+                            <td>{tshirt?.totalCost} tk</td>
+                          </tr>
+                            )
+                        }  
+                          {
+                          selectProductTypeForPurchased==="Hoodie" &&
+                          hoodiesFilter?.slice(0,4)?.map(tshirt=>
+                            <tr className="info">
+                            <td>{tshirt?.date}</td>
+                            <td>{tshirt?.tshirtColor}</td>
+                            <td>{tshirt?.sizeS}</td>
+                            <td>{tshirt?.sizeM}</td>
+                            <td>{tshirt?.sizeL}</td>
+                            <td>{tshirt?.sizeXL}</td>
+                            <td>{tshirt?.sizeXXL}</td>
+                            <td>{tshirt?.perpisCost} tk</td>
+                            <td>{tshirt?.totalCost} tk</td>
+                          </tr>
+                            )
+                        }
+                         {
+                          selectProductTypeForPurchased==="Drop Sholder" &&
+                          dropSholderFilter?.slice(0,4)?.map(tshirt=>
+                            <tr className="info">
+                            <td>{tshirt?.date}</td>
+                            <td>{tshirt?.tshirtColor}</td>
+                            <td>{tshirt?.sizeS}</td>
+                            <td>{tshirt?.sizeM}</td>
+                            <td>{tshirt?.sizeL}</td>
+                            <td>{tshirt?.sizeXL}</td>
+                            <td>{tshirt?.sizeXXL}</td>
+                            <td>{tshirt?.perpisCost} tk</td>
+                            <td>{tshirt?.totalCost} tk</td>
+                          </tr>
+                            )
+                        }
+                       
 
-                     </tbody>
-                  </table>
+                       </tbody>
+                    </table>
+                  </div>
                 </div>
-             
-            
               </div>
-            </div>
           </div>
         </section>
       </div>

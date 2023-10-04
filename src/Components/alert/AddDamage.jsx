@@ -37,8 +37,8 @@ const handleSubmitDamageList = (e) => {
   // Set a loading state if you have one.
   // setLoading(true);
 
-  fetch('http://localhost:5000/addDamagedTshirt', {
-  // fetch('https://mserver.printbaz.com/addDamagedTshirt', {
+  // fetch('http://localhost:5000/addDamagedTshirt', {
+  fetch('https://mserver.printbaz.com/addDamagedTshirt', {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json'
@@ -83,7 +83,27 @@ const handleSubmitDamageList = (e) => {
     // setLoading(false);
   });
 };
+const addNewTshirtDetail = () => {
+  // Get the last item's date and product category
+  const lastItem = tShirtDetail[tShirtDetail.length - 1];
+  const lastDate = lastItem?.date || ""; // default to empty string if not found
+  const lastCategory = lastItem?.category || "Round Neck"; // default to "Round Neck" if not found
 
+  // Create new item with the copied date and product category
+  const newItem = {
+      date: lastDate,
+      category: lastCategory,
+      // ... set other initial values if needed
+  };
+
+  // Add the new item to the tShirtDetail list
+  setTshirtDetail([...tShirtDetail, newItem]);
+};
+
+// remove field
+const removeField = (indexToRemove) => {
+setTshirtDetail(prevRows => prevRows.filter((_, index) => index !== indexToRemove));
+};
 
   return (
       <div>
@@ -93,6 +113,7 @@ const handleSubmitDamageList = (e) => {
                     <div >
                       <span id="popupclose" onClick={onClose}>X</span>
                     </div>
+                    <form onSubmit={handleSubmitDamageList}>
                     <div className="row ">
                         <div className="">
                           <div className="">
@@ -110,69 +131,29 @@ const handleSubmitDamageList = (e) => {
                      
                    
                       </div>
-                      
-                      <div className="row">
-                      <div className="col-2">
-                          <div className="popup-title-02" style={{textAlign:"center"}}>
-                            <p >Product Category</p>
-                          </div>
-                        </div>
-                        <div className="col-2">
-                          <div className="popup-title-02" >
-                            <p > Color</p>
-                          </div>
-                        </div>
-                        {/* <div className="col-2">
-                          <div className="popup-title-02">
-                            <p >Total Cost
-                            </p>
-                          </div>
-                        </div> */}
-                        <div className="col-1">
-                          <div className="popup-title-02">
-                            <p >Size: S
-                            </p>
-                          </div>
-                        </div> 
-                       
-                        <div className="col-1">
-                          <div className="popup-title-02">
-                            <p >Size: M</p>
-                          </div>
-                        </div>
-                         <div className="col-1">
-                          <div className="popup-title-02">
-                            <p >Size: L</p>
-                          </div>
-                        </div>
-                        <div className="col-1">
-                          <div className="popup-title-02">
-                            <p >Size: XL</p>
-                          </div>
-                        </div>
-                        <div className="col-2">
-                          <div className="popup-title-02" >
-                            <p >Size: XXL</p>
-                          </div>
-                        </div>
-                         {/* <div className="col-1">
-                          <div className="popup-title-02">
-                            <p >Per pcs</p>
-                          </div>
-                        </div> */}
-                       
-                        <div className="col-2">
-                          <div className="popup-title-02">
-                            <p >Date</p>
-                          </div>
-                        </div>
-                      </div>
+                    
+                      <div className="row mb-3">
+
+<div className="col-lg-11" style={{display:"flex",alignItem:"left"}}>
+
+</div> 
+<div className="col-lg-1" style={{display:"flex",alignItem:"left"}}>
+<Button style={{marginTop: '30px',backgroundColor:"#0b0e32",border:"none",fontWeight:"700",fontSize:"16px"}}onClick={addNewTshirtDetail}>+</Button>
+</div>
+
+</div>
                     {
                         tShirtDetail?.map((item,index)=>{
                          let totalcostOfTshirt=item.perpisCost*(Number(item.sizeS)+Number(item.sizeM)+Number(item.sizeL)+Number(item.sizeXL)+Number(item.sizeXXL))
                           return(
-<form onSubmit={handleSubmitDamageList}>
+
                     <div className="popupcontent">
+                                    <div className="row">
+                      <div className="col-lg-11" style={{display:"flex",alignItem:"left"}}>
+
+</div>               
+ 
+</div>
                      <div className="row">
                      <div className="col-2">
     <select id="status-filter" required style={{border: '1px solid #ececec', width: '100%', height: '50px', padding: '5px'}} className="form-control" value={item.category || ""} onChange={(e) => updateField(e, "category", index)}>
@@ -279,25 +260,27 @@ const handleSubmitDamageList = (e) => {
         />
                           </div>
                         
-   
+                          <div  className="col-1"  style={{alignItem:"left",width:"100px"}}>
+<Button style={{marginTop:'',marginBottom:"10px",marginLeft:"",color:"black",backgroundColor:"#dfdada",border:"none",fontWeight:"700",fontSize:"16px"}}onClick={()=>removeField(index)}>-</Button>
+</div>
                         </div>
                        
                      
-                      <div className="row">
-                        <div className="col-12">
-                          <button style={{marginTop: '30px'}} type="submit">Submit</button>
-                        </div>
-                      </div>
+                   
                  
                     </div>
-                    </form>
+                   
                           )
 
                           })
                     }
-                    
+                       <div className="row">
+                        <div className="col-12">
+                        <Button style={{width:"20%",marginTop: '30px',backgroundColor:"#0b0e32",border:"none"}} type="submit">Submit</Button>
+                        </div>
+                      </div>
                   
-         
+                    </form>
                  
       </div>
         {

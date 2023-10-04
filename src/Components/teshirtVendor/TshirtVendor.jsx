@@ -5,6 +5,7 @@ import AddDamage from '../alert/AddDamage';
 import AddDeliveryList from '../alert/AddDeliveryList';
 import AddTshirtPurchased from '../alert/AddTshirtPurchased';
 import Navigationbar from '../navigationBar/Navigationbar';
+import TShirtCardPAC from '../TShirtCardPAC';
 
 const TshirtVendor = () => {
   const { orderAll } = useGetMongoData();
@@ -88,8 +89,8 @@ const handleaAllDamagedTshirts=()=>{
   navigate('/allDamagedTshirt')
 }
 const fetchData = () => {
-  fetch('http://localhost:5000/getAllPurchasedTshirts')
-  // fetch('https://mserver.printbaz.com/getAllPurchasedTshirts')
+  // fetch('http://localhost:5000/getAllPurchasedTshirts')
+  fetch('https://mserver.printbaz.com/getAllPurchasedTshirts')
   .then(response => response.json())
   .then(data => {
     // console.log("Fetched Data:", data);
@@ -100,8 +101,8 @@ const fetchData = () => {
   });
 }
 const fetchDamagedThsirt = () => {
-  fetch('http://localhost:5000/getAllDamagedTshirts')
-  // fetch('https://mserver.printbaz.com/getAllDamagedTshirts')
+  // fetch('http://localhost:5000/getAllDamagedTshirts')
+  fetch('https://mserver.printbaz.com/getAllDamagedTshirts')
   .then(response => response.json())
   .then(data => {
     // console.log("Fetched Data:", data);
@@ -294,7 +295,7 @@ const dataFilter = selectDataFilter(selectProductTypeForPurchased);
 const damageDataFilter = selectDataDamagedFilter(selectProductTypeForDamaged);
 
 const totals = {};
-
+let totalQuantityNow=0
 COLORS.forEach(color => {
   totals[color] = {};
   SIZES.forEach(size => {
@@ -305,6 +306,7 @@ COLORS.forEach(color => {
       : 0;
     
     totals[color][size] = totalCount - (inProductionCount+DamageCount );
+    totalQuantityNow+= totals[color][size]
   });
 });
 console.log("dataFilter,",dataFilter);
@@ -340,14 +342,18 @@ const sumSizeAcrossOrdersWhite = (size) => {
   ].reduce((acc, sizeCounts) => acc + (sizeCounts.black?.[size] || 0), 0);
 };
 
-const whiteMNeeded = sumSizeAcrossOrdersWhite("m");
-const whiteLNeeded = sumSizeAcrossOrdersWhite("L");
-const whiteXlNeeded = sumSizeAcrossOrdersWhite("XL");
-const whiteXxlNeeded = sumSizeAcrossOrdersWhite("XXL");
-const blackMNeeded =  sumSizeAcrossOrdersBlack("m");
-const blackLNeeded =  sumSizeAcrossOrdersBlack("L");
-const blackXlNeeded = sumSizeAcrossOrdersBlack("XL");
-const blackXxlNeeded =sumSizeAcrossOrdersBlack("XXL");
+const onDelete = (index, filterArray) => {
+  if (window.confirm('Do you want to delete this item?')) {
+      // Remove the item from the filterArray based on the index
+      filterArray.splice(index, 1);
+
+      // Update the state (assuming you have a state management setup for roundNeckFilter, hoodiesFilter, etc.)
+      // For example, if you're using React's useState:
+      // setRoundNeckFilter([...roundNeckFilter]);  // if deleting from roundNeckFilter
+      // Modify as needed for other filters.
+  }
+}
+
 return (
         <div>
           <meta charSet="UTF-8" />
@@ -393,7 +399,7 @@ return (
               <div className="col-xs-12 col-sm-6 col-md-6 col-lg-6">
                 <div className="lobipanel m-0" style={{height: '374px'}}>
                   <div className="panel-title">
-                    {/* <h4>Inventory<span style={{float: 'right'}}>{totalTshirtInventory} PCS</span></h4> */}
+                    <h4>Inventory<span style={{float: 'right'}}>{totalQuantityNow} PCS</span></h4>
                   </div>
                   <div className="panel-body">
                   <table className="table">
@@ -424,86 +430,8 @@ return (
               </div>
                <div className="col-xs-12 col-sm-6 col-md-6 col-lg-6">
                  <div className='row'>
-               <div className="col-md-6">
-               
-               <div className="card stat-card" style={{height:"auto"}}>
-               <div className="" style={{display:"flex",justifyContent:"space-between",alignItem:"center"}}>
-                 <div className="card-body ">
-                 <h5 className="">White T-shirt Needed (PAC)</h5>
-                 <div style={{display:"flex"}}>
-<div>
-<p className="float-right">M  - {whiteMNeeded}</p>
- <p className="float-right">L  -  {whiteLNeeded}</p>
- <p className="float-right"> XL - {whiteXlNeeded}</p>
- <p className="float-right"> XXL  -  {whiteXxlNeeded}</p>
-</div>
-</div>
-
-                  
-                   
-                   </div>
-               <div>
-               <div className="card-body" style={{display:"flex",justifyContent:"center",height:"50%"}}>
-                  
-                  {/* <h4 className="float-right" style={{marginLeft:"40px",marginTop:"2px"}}>{countTotalTshirtDispatched}</h4> */}
-                  </div>
-               <div  style={{display:"flex",justifyContent:"flex-end",padding:"0px 20px",marginTop:"35px"}}>
-                  
-                  {/* <span style={{cursor:"pointer"}} onClick={downloadInfIntoXl} data-order-id="order-detail-totalTShirt"><img style={{width:"25px",hight:"25px"}} src="/images/download.png" alt='download'/></span> */}
-              {/* <div id="order-detail-totalTShirt"style={{position: 'absolute', left: '-10000px', top: '-10000px'}}>
-              <GetTotalTshirtDispatched countTotalTshirtDispatched={countTotalTshirtDispatched} whiteQuantity={whiteQuantity} blackQuantity={blackQuantity}/>
-          </div>  */}
-            
-                </div>
-               </div>
-              
-                   </div>
-                  
-               </div>
-              
-             
-
-             </div>
-              <div className="col-md-6">
-               
-               <div className="card stat-card" style={{height:"auto"}}>
-               <div className="" style={{display:"flex",justifyContent:"space-between",alignItem:"center"}}>
-                 <div className="card-body ">
-                 <h5 className="">Black T-shirt Needed (PAC)</h5>
-                 <div style={{display:"flex"}}>
-<div>
-
-<p className="float-right">M  - {blackMNeeded}</p>
-   <p className="float-right">L  -  {blackLNeeded}</p>
-   <p className="float-right"> XL - {blackXlNeeded}</p>
-  <p className="float-right"> XXL  -  {blackXxlNeeded}</p>
-</div>
-
-                 </div>
-                  
-                   
-                   </div>
-               <div>
-               <div className="card-body" style={{display:"flex",justifyContent:"center",height:"50%"}}>
-                  
-                  {/* <h4 className="float-right" style={{marginLeft:"40px",marginTop:"2px"}}>{countTotalTshirtDispatched}</h4> */}
-                  </div>
-               <div  style={{display:"flex",justifyContent:"flex-end",padding:"0px 20px",marginTop:"35px"}}>
-                  
-                  {/* <span style={{cursor:"pointer"}} onClick={downloadInfIntoXl} data-order-id="order-detail-totalTShirt"><img style={{width:"25px",hight:"25px"}} src="/images/download.png" alt='download'/></span> */}
-              {/* <div id="order-detail-totalTShirt"style={{position: 'absolute', left: '-10000px', top: '-10000px'}}>
-              <GetTotalTshirtDispatched countTotalTshirtDispatched={countTotalTshirtDispatched} whiteQuantity={whiteQuantity} blackQuantity={blackQuantity}/>
-          </div> 
-             */}
-                </div>
-               </div>
-              
-                   </div>
-                  
-               </div>
-              
-             
-
+             <div className="col-md-">
+             <TShirtCardPAC/>
              </div>
              </div>
               </div>
@@ -659,7 +587,7 @@ return (
                       <tbody>
                         {
                           selectProductTypeForPurchased==="Round Neck" &&
-                          roundNeckFilter?.slice(0,4)?.map(tshirt=>
+                          roundNeckFilter?.slice(0,4)?.map((tshirt,index)=>
                             <tr className="info">
                             <td>{tshirt?.date}</td>
                             <td>{tshirt?.tshirtColor}</td>
@@ -670,6 +598,9 @@ return (
                             <td>{tshirt?.sizeXXL}</td>
                             <td>{tshirt?.perpisCost} tk</td>
                             <td>{tshirt?.totalCost} tk</td>
+                            <td>
+                            {/* <button onClick={() => onDelete(index, roundNeckFilter)}>Delete</button> */}
+                        </td>
                           </tr>
                             )
                         }  
