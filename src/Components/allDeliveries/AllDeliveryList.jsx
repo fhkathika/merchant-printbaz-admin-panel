@@ -170,9 +170,7 @@ const AllDeliveryList = () => {
         return true;  // Return true if none of the conditions to return false are met
     
       }
-   
-  
-      return true;
+   return true;
     });
   };
   const deliveryMap=applyFilters()
@@ -279,7 +277,7 @@ const allPromises=orderAll.map(async (getSpecificOrderById) => {
   : 0; // Default value if none of the conditions match
 
   // console.log("deliveryFeeForOthers from funct", deliveryFeeOutSideDhakaForPathao); // make sure this logs the expected value
-   const returnValue=Number(getSpecificOrderById?.printbazcost)+Number(getSpecificOrderById?.deliveryFee)
+   const returnValue=Number(getSpecificOrderById?.printbazcost)+Number(getSpecificOrderById?.deliveryFee)+Number(getSpecificOrderById?.deliveryFee)/2
    const deliveryData = {
        orderId: getSpecificOrderById._id,
        statusDate: getSpecificOrderById.statusDate,
