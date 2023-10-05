@@ -4,6 +4,8 @@ import useGetMongoData from '../../hooks/useGetMongoData';
 import AddDamage from '../alert/AddDamage';
 import AddDeliveryList from '../alert/AddDeliveryList';
 import AddTshirtPurchased from '../alert/AddTshirtPurchased';
+import DeleteRoleAlert from '../alert/DeleteRoleAlert';
+import UpdateAlert from '../alert/UpdateAlert';
 import Navigationbar from '../navigationBar/Navigationbar';
 import TShirtCardPAC from '../TShirtCardPAC';
 
@@ -12,14 +14,16 @@ const TshirtVendor = () => {
   const [showAlert, setShowAlert] = useState(false);
   const [showDamage, setShowDamage] = useState(false);
   const [getPurchaseTshirt, setGetPurchaseTshirt] = useState([]);
+  const [getPurchaseTshirtById, setGetPurchaseTshirtById] = useState();
   const [getDamagedTshirt, setGetDamagedTshirt] = useState([]);
   const navigate=useNavigate()
   let pendingOrders = orderAll?.filter(users => users?.orderStatus === "Pending");
   let   approvedOrders=orderAll?.filter(users=>users?.orderStatus==="Approved");
   let   confirmedOrders=orderAll?.filter(users=>users?.orderStatus==="confirmed");
   let inProductionOrders=orderAll?.filter(users=>users?.orderStatus==="in-production");
-  
- 
+  const [clickedId, setClickedId] = useState();
+  const [deletepopUp, setDeletepopUp] = useState(false);
+  const [updatepopUp, setUpdatepopUp] = useState(false);
   const [selectProductTypeForPurchased, setSelectProductTypeForPurchased] = useState('Round Neck');
   const [selectProductTypeForDamaged, setSelectProductTypeForDamaged] = useState('Round Neck');
   const [tShirtDetail,setTshirtDetail]=useState([{
@@ -37,6 +41,28 @@ const TshirtVendor = () => {
   },
 
 ]) 
+const handleDeletePopUp=(id)=>{
+  // e.stopPropagation();
+  console.log("Received id:", id);
+  setDeletepopUp(true)
+  setClickedId(id)
+}
+const handleUpdatePopUp=(id)=>{
+  // e.stopPropagation();
+  console.log("Received id:", id);
+  setUpdatepopUp(true)
+  setClickedId(id)
+  fetch(`http://localhost:5000/editPurchasedItem/${id}`)
+  // fetch('https://mserver.printbaz.com/editPurchasedItem')
+  .then(response => response.json())
+  .then(data => {
+    // console.log("Fetched Data:", data);
+    setGetPurchaseTshirtById(data)
+  })
+  .catch(error => {
+    console.error('Error:', error);
+  });
+}
 const handleInputChangeTotalPurchased = (event) => {
   const { id, value } = event.target;
   switch (id) {
@@ -59,6 +85,71 @@ const handleInputChangeDamaged = (event) => {
   }
   
 };
+const handleDeleteModalClose=()=>{
+  setDeletepopUp(false)
+}
+const handleUpdateModalClose=()=>{
+  setUpdatepopUp(false)
+}
+const handleDeleteItem =(id)=>{
+  // e.preventDefault()
+  // e.stopPropagation();
+  setDeletepopUp(true)
+
+
+  // const proceed= window.confirm('Do you want to remove?')
+  if(deletepopUp){
+    fetch(`http://localhost:5000/deletePurchasedProduct/${id}`,{
+    // fetch(`https://mserver.printbaz.com/deletePurchasedProduct/${id}`,{
+      method : 'DELETE'
+    })
+    .then(res => res.json())
+    .then(data => {
+    
+      if(data?.deletedCount>0){
+      
+        // convert object into array
+        // const asArray = Object.entries(getAllRoles);
+       
+        setDeletepopUp(false)
+        fetchData();
+      }
+      
+    })
+  }
+ 
+  
+}
+const handleUpdateItem =(id)=>{
+  // e.preventDefault()
+  // e.stopPropagation();
+  setUpdatepopUp(true)
+
+
+  // const proceed= window.confirm('Do you want to remove?')
+  if(deletepopUp){
+    fetch(`http://localhost:5000/editPurchasedTshirt/${id}`,{
+    // fetch(`https://mserver.printbaz.com/editPurchasedTshirt/${id}`,{
+      method : 'DELETE'
+    })
+    .then(res => res.json())
+    .then(data => {
+    
+      if(data?.deletedCount>0){
+      
+        // convert object into array
+        // const asArray = Object.entries(getAllRoles);
+       
+        setDeletepopUp(false)
+        fetchData();
+      }
+      
+    })
+  }
+ 
+  
+}
+
 const handleAddDeliveryPopUp=()=>{
   setShowAlert(true)
   setTshirtDetail([{
@@ -89,8 +180,8 @@ const handleaAllDamagedTshirts=()=>{
   navigate('/allDamagedTshirt')
 }
 const fetchData = () => {
-  // fetch('http://localhost:5000/getAllPurchasedTshirts')
-  fetch('https://mserver.printbaz.com/getAllPurchasedTshirts')
+  fetch('http://localhost:5000/getAllPurchasedTshirts')
+  // fetch('https://mserver.printbaz.com/getAllPurchasedTshirts')
   .then(response => response.json())
   .then(data => {
     // console.log("Fetched Data:", data);
@@ -100,9 +191,12 @@ const fetchData = () => {
     console.error('Error:', error);
   });
 }
+
+
+
 const fetchDamagedThsirt = () => {
-  // fetch('http://localhost:5000/getAllDamagedTshirts')
-  fetch('https://mserver.printbaz.com/getAllDamagedTshirts')
+  fetch('http://localhost:5000/getAllDamagedTshirts')
+  // fetch('https://mserver.printbaz.com/getAllDamagedTshirts')
   .then(response => response.json())
   .then(data => {
     // console.log("Fetched Data:", data);
@@ -309,8 +403,6 @@ COLORS.forEach(color => {
     totalQuantityNow+= totals[color][size]
   });
 });
-console.log("dataFilter,",dataFilter);
-console.log("damageDataFilter,",damageDataFilter);
 
 // const totalTshirtInventory=whiteM+
 // whiteL+
@@ -465,6 +557,7 @@ return (
                           <th>Size: XL</th>
                           <th>Size: XXL</th>
                           <th>Date Added</th>
+                          <th>Action</th>
                         </tr>
                       </thead>
                       <tbody>
@@ -482,7 +575,12 @@ return (
                               <td>{damaged?.sizeXL}</td>
                               <td>{damaged?.sizeXXL}</td>
                               <td>{damaged?.date}</td>
-                              
+                              <td >
+                            <button onClick={()=> handleDeletePopUp(damaged?._id)} style={{borderRadius:"5px", border: 'none', color: 'white',backgroundColor:"none"}}><img style={{width:"20px"}} src="/images/delete.png" alt='delete'/></button>
+                            <DeleteRoleAlert isOpen={ deletepopUp} deleteId={clickedId} onClose={handleDeleteModalClose} onConfirm={()=>handleDeleteItem(clickedId)} />
+
+              
+                        </td>
                                    
                         </tr>
                               )
@@ -501,7 +599,12 @@ return (
                               <td>{damaged?.sizeXXL}</td>
                               <td>{damaged?.date}</td>
                               
-                                   
+                              <td >
+                            <button onClick={()=> handleDeletePopUp(damaged?._id)} style={{borderRadius:"5px", border: 'none', color: 'white',backgroundColor:"none"}}><img style={{width:"20px"}} src="/images/delete.png" alt='delete'/></button>
+                            <DeleteRoleAlert isOpen={ deletepopUp} deleteId={clickedId} onClose={handleDeleteModalClose} onConfirm={()=>handleDeleteItem(clickedId)} />
+
+              
+                        </td>    
                         </tr>
                               )
                             
@@ -519,7 +622,12 @@ return (
                               <td>{damaged?.sizeXXL}</td>
                               <td>{damaged?.date}</td>
                               
-                                   
+                              <td >
+                            <button onClick={()=> handleDeletePopUp(damaged?._id)} style={{borderRadius:"5px", border: 'none', color: 'white',backgroundColor:"none"}}><img style={{width:"20px"}} src="/images/delete.png" alt='delete'/></button>
+                            <DeleteRoleAlert isOpen={ deletepopUp} deleteId={clickedId} onClose={handleDeleteModalClose} onConfirm={()=>handleDeleteItem(clickedId)} />
+
+              
+                        </td>   
                         </tr>
                               )
                             
@@ -580,6 +688,7 @@ return (
                           <th>Size: XXL</th>
                           <th>Per pcs</th>
                           <th>Total Cost</th>
+                          <th>Action</th>
                          
                         </tr>
                       </thead>
@@ -587,8 +696,9 @@ return (
                       <tbody>
                         {
                           selectProductTypeForPurchased==="Round Neck" &&
-                          roundNeckFilter?.slice(0,4)?.map((tshirt,index)=>
-                            <tr className="info">
+                          roundNeckFilter?.slice(0,4)?.map((tshirt,index)=>{
+                        console.log("tshirt",tshirt?._id);
+                        return(<tr className="info">
                             <td>{tshirt?.date}</td>
                             <td>{tshirt?.tshirtColor}</td>
                             <td>{tshirt?.sizeS}</td>
@@ -599,10 +709,34 @@ return (
                             <td>{tshirt?.perpisCost} tk</td>
                             <td>{tshirt?.totalCost} tk</td>
                             <td>
-                            {/* <button onClick={() => onDelete(index, roundNeckFilter)}>Delete</button> */}
-                        </td>
+                            <button onClick={()=>{console.log("Button clicked with id:", tshirt._id); handleDeletePopUp(tshirt?._id)}} style={{borderRadius:"5px", border: 'none', color: 'white',backgroundColor:"none"}}><img style={{width:"20px"}} src="/images/delete.png" alt='delete'/></button>
+                            <DeleteRoleAlert isOpen={ deletepopUp} deleteId={clickedId} onClose={handleDeleteModalClose} onConfirm={()=>handleDeleteItem(clickedId)} />
+                          
+
+              
+                        </td>              
+                            <td>
+                            <button onClick={()=> handleUpdatePopUp(tshirt?._id)} style={{borderRadius:"5px", border: 'none', color: 'white',backgroundColor:"none"}}><img style={{width:"20px"}} src="/images/edit.png" alt='delete'/></button>
+                         </td>
+                         {
+                    updatepopUp === true &&
+                    <UpdateAlert
+                    fetchData={fetchData}
+                    getPurchaseTshirtById={getPurchaseTshirtById}
+                    setTshirtDetail={setTshirtDetail}
+                    tShirtDetail={tShirtDetail}
+                    updatepopUp={updatepopUp}
+                    message="Item has been updated successfully."
+                    onClose={() => setUpdatepopUp(false)}
+                  
+                    
+                    
+                    />
+
+                  }
                           </tr>
-                            )
+                          
+                          )}  )
                         }  
                           {
                           selectProductTypeForPurchased==="Hoodie" &&
@@ -617,6 +751,12 @@ return (
                             <td>{tshirt?.sizeXXL}</td>
                             <td>{tshirt?.perpisCost} tk</td>
                             <td>{tshirt?.totalCost} tk</td>
+                            <td >
+                            <button onClick={()=>{console.log("Button clicked with id:", tshirt._id); handleDeletePopUp(tshirt?._id)}} style={{borderRadius:"5px", border: 'none', color: 'white',backgroundColor:"none"}}><img style={{width:"20px"}} src="/images/delete.png" alt='delete'/></button>
+                            <DeleteRoleAlert isOpen={ deletepopUp} deleteId={clickedId} onClose={handleDeleteModalClose} onConfirm={()=>handleDeleteItem(clickedId)} />
+
+              
+                        </td>
                           </tr>
                             )
                         }
@@ -633,6 +773,12 @@ return (
                             <td>{tshirt?.sizeXXL}</td>
                             <td>{tshirt?.perpisCost} tk</td>
                             <td>{tshirt?.totalCost} tk</td>
+                            <td >
+                            <button onClick={()=>{console.log("Button clicked with id:", tshirt._id); handleDeletePopUp(tshirt?._id)}} style={{borderRadius:"5px", border: 'none', color: 'white',backgroundColor:"none"}}><img style={{width:"20px"}} src="/images/delete.png" alt='delete'/></button>
+                            <DeleteRoleAlert isOpen={ deletepopUp} deleteId={clickedId} onClose={handleDeleteModalClose} onConfirm={()=>handleDeleteItem(clickedId)} />
+
+              
+                        </td>
                           </tr>
                             )
                         }
@@ -645,6 +791,7 @@ return (
                     <button id="button" onClick={handleAddDeliveryPopUp}>Update</button>
                     <button style={{float: 'right'}} onClick={handleaAllPurchasedTshirts}>View More</button>
                   </div>
+             
                   {showAlert===true && (
           
           <AddTshirtPurchased

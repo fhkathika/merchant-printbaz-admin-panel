@@ -35,8 +35,6 @@ function App() {
      <Route path="/orderList"    element={<PrivateRoute><OrderList /> </PrivateRoute>} />
        <Route path="/viewOrder/:id"element={<PrivateRoute><ViewOrder /> </PrivateRoute>} />
       
-    
-      
        <Route path="/filemanager"  element={<PrivateRoute><Filemanager /> </PrivateRoute>} />
        <Route path="/liveChat"     element={<PrivateRoute><LiveChat /> </PrivateRoute>} />
        <Route path="/mailBox"      element={<PrivateRoute><Mailbox /> </PrivateRoute>} />

@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { Container } from 'react-bootstrap';
 import { Link } from 'react-router-dom';
 import useGetMongoData from '../../hooks/useGetMongoData';
+import DeleteRoleAlert from '../alert/DeleteRoleAlert';
 import Navigationbar from '../navigationBar/Navigationbar';
 
 const AllPurchasedTshirt = () => {
@@ -11,12 +12,14 @@ const AllPurchasedTshirt = () => {
     const [getPurchaseTshirt, setGetPurchaseTshirt] = useState([]);
     const [getDamagedTshirt, setGetDamagedTshirt] = useState([]);
     const [selectProductTypeForPurchased, setSelectProductTypeForPurchased] = useState('Round Neck');
+    const [deleteId, setDeleteId] = useState();
+    const [deletepopUp, setDeletepopUp] = useState(false);
     useEffect(()=>{
         fetchData()  
     },[])
     const fetchData = () => {
-        // fetch('http://localhost:5000/getAllPurchasedTshirts')
-        fetch('https://mserver.printbaz.com/getAllPurchasedTshirts')
+        fetch('http://localhost:5000/getAllPurchasedTshirts')
+        // fetch('https://mserver.printbaz.com/getAllPurchasedTshirts')
         .then(response => response.json())
         .then(data => {
           console.log("Fetched Data:", data);
@@ -62,6 +65,44 @@ let hoodiesFilter=getPurchaseTshirt?.filter(users=>users?.category==="Hoodie");
       } else if (selectProductTypeForPurchased === "Hoodie") {
         TotalPurchasedTshirt(hoodiesFilter);
     
+      }
+      const handleDeleteModalClose=()=>{
+        setDeletepopUp(false)
+      }
+      const handleDeletePopUp=(id)=>{
+        // e.stopPropagation();
+        console.log("Received id:", id);
+        setDeletepopUp(true)
+        setDeleteId(id)
+      }
+      const handleDeleteItem =(id)=>{
+        // e.preventDefault()
+        // e.stopPropagation();
+        setDeletepopUp(true)
+      
+      
+        // const proceed= window.confirm('Do you want to remove?')
+        if(deletepopUp){
+          fetch(`http://localhost:5000/deletePurchasedProduct/${id}`,{
+          // fetch(`https://mserver.printbaz.com/deletePurchasedProduct/${id}`,{
+            method : 'DELETE'
+          })
+          .then(res => res.json())
+          .then(data => {
+          
+            if(data?.deletedCount>0){
+            
+              // convert object into array
+              // const asArray = Object.entries(getAllRoles);
+             
+              setDeletepopUp(false)
+              fetchData();
+            }
+            
+          })
+        }
+       
+        
       }
     return (
         <div>
@@ -114,6 +155,7 @@ let hoodiesFilter=getPurchaseTshirt?.filter(users=>users?.category==="Hoodie");
                           <th>Size: XXL</th>
                           <th>Per pcs</th>
                           <th>Total Cost</th>
+                          <th>Action</th>
                          
                         </tr>
                       </thead>
@@ -132,6 +174,12 @@ let hoodiesFilter=getPurchaseTshirt?.filter(users=>users?.category==="Hoodie");
                             <td>{tshirt?.sizeXXL}</td>
                             <td>{tshirt?.perpisCost} tk</td>
                             <td>{tshirt?.totalCost} tk</td>
+                            <td >
+                            <button onClick={()=>{console.log("Button clicked with id:", tshirt._id); handleDeletePopUp(tshirt?._id)}} style={{borderRadius:"5px", border: 'none', color: 'white',backgroundColor:"none"}}><img style={{width:"20px"}} src="/images/delete.png" alt='delete'/></button>
+                            <DeleteRoleAlert isOpen={ deletepopUp} deleteId={deleteId} onClose={handleDeleteModalClose} onConfirm={()=>handleDeleteItem(deleteId)} />
+
+              
+                        </td>
                           </tr>
                             )
                         }  
@@ -148,6 +196,12 @@ let hoodiesFilter=getPurchaseTshirt?.filter(users=>users?.category==="Hoodie");
                             <td>{tshirt?.sizeXXL}</td>
                             <td>{tshirt?.perpisCost} tk</td>
                             <td>{tshirt?.totalCost} tk</td>
+                            <td>
+                            <button onClick={()=>{console.log("Button clicked with id:", tshirt._id); handleDeletePopUp(tshirt?._id)}} style={{borderRadius:"5px",float: 'right', border: 'none', color: 'white',backgroundColor:"none"}}><img style={{width:"20px"}} src="/images/delete.png" alt='delete'/></button>
+                            <DeleteRoleAlert isOpen={ deletepopUp} deleteId={deleteId} onClose={handleDeleteModalClose} onConfirm={()=>handleDeleteItem(deleteId)} />
+
+              
+                        </td>
                           </tr>
                             )
                         }
@@ -164,6 +218,12 @@ let hoodiesFilter=getPurchaseTshirt?.filter(users=>users?.category==="Hoodie");
                             <td>{tshirt?.sizeXXL}</td>
                             <td>{tshirt?.perpisCost} tk</td>
                             <td>{tshirt?.totalCost} tk</td>
+                            <td >
+                            <button onClick={()=>{console.log("Button clicked with id:", tshirt._id); handleDeletePopUp(tshirt?._id)}} style={{borderRadius:"5px", border: 'none', color: 'white',backgroundColor:"none"}}><img style={{width:"20px"}} src="/images/delete.png" alt='delete'/></button>
+                            <DeleteRoleAlert isOpen={ deletepopUp} deleteId={deleteId} onClose={handleDeleteModalClose} onConfirm={()=>handleDeleteItem(deleteId)} />
+
+              
+                        </td>
                           </tr>
                             )
                         }
