@@ -4,6 +4,9 @@ import React, { useEffect, useState } from 'react';
 import { Container } from 'react-bootstrap';
 import { Link } from 'react-router-dom';
 import useGetMongoData from '../../hooks/useGetMongoData';
+import DeleteRoleAlert from '../alert/DeleteRoleAlert';
+import UpdateAlert from '../alert/UpdateAlert';
+import UpdateDamage from '../alert/UpdateDamage';
 import Navigationbar from '../navigationBar/Navigationbar';
 
 const AllDamageTShirt = () => {
@@ -12,10 +15,35 @@ const AllDamageTShirt = () => {
     const [showDamage, setShowDamage] = useState(false);
     const [getPurchaseTshirt, setGetPurchaseTshirt] = useState([]);
     const [getDamagedTshirt, setGetDamagedTshirt] = useState([]);
+    const [clickedId, setClickedId] = useState();
+    const [damageDeletepopUp, setDamageDeletepopUp] = useState(false);
+    const [selectProductTypeForDamaged, setSelectProductTypeForDamaged] = useState('Round Neck');
+    const [updatepopUp, setUpdatepopUp] = useState(false);
+    const [getPurchaseTshirtById, setGetPurchaseTshirtById] = useState();
+    const [tShirtDetail,setTshirtDetail]=useState([{
+      tshirtColor:"",
+      category:"",
+      sizeM:"",
+      sizeL:"",
+      sizeXL:"",
+      sizeXXL:"",
+      sizeS:"",
+      perpisCost:"",
+      totalCost:"",
+      date:""
+      
+    },
+  
+  ]) 
     useEffect(()=>{
         fetchDamagedThsirt()
     },[])
-   
+    const handleDeletePopUp=(id)=>{
+      // e.stopPropagation();
+      console.log("Received id:", id);
+      setDamageDeletepopUp(true)
+      setClickedId(id)
+    }
       const fetchDamagedThsirt = () => {
         // fetch('http://localhost:5000/getAllDamagedTshirts')
         fetch('https://mserver.printbaz.com/getAllDamagedTshirts')
@@ -28,52 +56,92 @@ const AllDamageTShirt = () => {
           console.error('Error:', error);
         });
       }
+      const handleDeleteModalClose=()=>{
+        setDamageDeletepopUp(false)
+      }
+      const handleDamageDeleteItem =(id)=>{
+        // e.preventDefault()
+        // e.stopPropagation();
+        setDamageDeletepopUp(true)
+      // const proceed= window.confirm('Do you want to remove?')
+        if(damageDeletepopUp){
+          // fetch(`http://localhost:5000/deleteDamageProduct/${id}`,{
+          fetch(`https://mserver.printbaz.com/deleteDamageProduct/${id}`,{
+            method : 'DELETE'
+          })
+          .then(res => res.json())
+          .then(data => {
+          
+            if(data?.deletedCount>0){
+            
+              // convert object into array
+              // const asArray = Object.entries(getAllRoles);
+             
+              setDamageDeletepopUp(false)
+              fetchDamagedThsirt();
+            }
+            
+          })
+        }
+       
+        
+      }
+      let roundNeckDamageFilter=getDamagedTshirt?.filter(users=>users?.category==="Round Neck");
+let dropSholderDamageFilter=getDamagedTshirt?.filter(users=>users?.category==="Drop Sholder");
+let hoodiesDamageFilter=getDamagedTshirt?.filter(users=>users?.category==="Hoodie");
 
-     
-//damage tshirt 
-   // Initialize counts
- let totalDamgBlackSizeM = 0;
- let totalDamgBlackSizeL = 0;
- let totalDamgBlackSizeXL = 0;
- let totalDamgBlackSizeXXL = 0;
- let totalDamgBlackSizeS = 0; 
- let totalDamgwhiteSizeM = 0;
- let totalDamgwhiteSizeL = 0;
- let totalDamgwhiteSizeXL = 0;
- let totalDamgwhiteSizeXXL = 0;
- let totalDamgwhiteSizeS = 0;
-  // Filter out the records for black t-shirts
-  const blackDmgTshirts = getDamagedTshirt.filter(record => record.tshirtColor === 'black');
-  const whiteDmgTshirts = getDamagedTshirt.filter(record => record.tshirtColor === 'white');
-  // Sum the counts
-  for (const record of blackDmgTshirts) {
-    totalDamgBlackSizeM += Number(record.sizeM || 0);
-    totalDamgBlackSizeL += Number(record.sizeL || 0);
-    totalDamgBlackSizeXL += Number(record.sizeXL || 0);
-    totalDamgBlackSizeXXL += Number(record.sizeXXL || 0);
-    totalDamgBlackSizeS += Number(record.sizeS || 0);
-  }
-  // Sum the counts
-  for (const record of whiteDmgTshirts) {
-    totalDamgwhiteSizeM += Number(record.sizeM || 0);
-    totalDamgwhiteSizeL += Number(record.sizeL || 0);
-    totalDamgwhiteSizeXL += Number(record.sizeXL || 0);
-    totalDamgwhiteSizeXXL += Number(record.sizeXXL || 0);
-    totalDamgwhiteSizeS += Number(record.sizeS || 0);
-  }
-
-
-const TotalDamageTshirt=
-totalDamgBlackSizeM+
-totalDamgBlackSizeL+
-totalDamgBlackSizeXL+
-totalDamgBlackSizeXXL+
-totalDamgBlackSizeS+
-totalDamgwhiteSizeM+
-totalDamgwhiteSizeL+
-totalDamgwhiteSizeXL+
-totalDamgwhiteSizeXXL+
-totalDamgwhiteSizeS
+      let totalDamaged = 0;
+      const TotalDamageTshirt = (array) => {
+        array.forEach(damaged => {
+          totalDamaged += (
+            parseInt(damaged.sizeS || 0) + 
+            parseInt(damaged.sizeM || 0) + 
+            parseInt(damaged.sizeL || 0) + 
+            parseInt(damaged.sizeXL || 0) + 
+            parseInt(damaged.sizeXXL || 0)
+          );
+        });
+      }
+      if (selectProductTypeForDamaged === "Round Neck") {
+        TotalDamageTshirt(roundNeckDamageFilter);
+    
+      } else if (selectProductTypeForDamaged === "Drop Sholder") {
+        TotalDamageTshirt(dropSholderDamageFilter);
+    
+      } else if (selectProductTypeForDamaged === "Hoodie") {
+        TotalDamageTshirt(hoodiesDamageFilter);
+    
+      }
+      const handleInputChangeDamaged = (event) => {
+        const { id, value } = event.target;
+        switch (id) {
+          case 'productType-filterForPurchased':
+            setSelectProductTypeForDamaged(value);
+            break; 
+          default:
+            break;
+        }
+        
+      };
+      const handleUpdatePopUp=(id)=>{
+        // e.stopPropagation();
+        console.log("Received id:", id);
+        setUpdatepopUp(true)
+        setClickedId(id)
+        // fetch(`http://localhost:5000/editDamageItem/${id}`)
+        fetch(`https://mserver.printbaz.com/editDamageItem/${id}`)
+        .then(response => response.json())
+        .then(data => {
+          // console.log("Fetched Data:", data);
+          setGetPurchaseTshirtById(data)
+        })
+        .catch(error => {
+          console.error('Error:', error);
+        });
+      }
+      useEffect(()=>{
+        fetchDamagedThsirt()  
+    },[])
     return (
         <div>
         <meta charSet="UTF-8" />
@@ -97,8 +165,19 @@ totalDamgwhiteSizeS
           <div className="row input-bar-01">
           <div className="col-xs-12 col-sm-6 col-md-12 col-lg-12">
                 <div className="lobipanel">
-                  <div className="panel-title">
-                    <h4>Damaged<span style={{float: 'right'}}>{TotalDamageTshirt} PCS</span></h4>
+                <div className="panel-title">
+                    <h4>Damaged<span style={{float: 'right'}}>{totalDamaged} PCS</span></h4>
+                    <select 
+        id="productType-filterForPurchased" 
+        value={selectProductTypeForDamaged} 
+        className="form-control mr-5" 
+        onChange={(e) => handleInputChangeDamaged(e)} 
+        style={{ maxWidth: '150px' }}  // Adjust the width value accordingly
+    >
+        <option value="Round Neck">Round Neck</option>
+        <option value="Drop Sholder">Drop Sholder</option>
+        <option value="Hoodie">Hoodie</option>
+    </select>
                   </div>
                   <div className="panel-body">
                     <table className="table">
@@ -111,12 +190,14 @@ totalDamgwhiteSizeS
                           <th>Size: XL</th>
                           <th>Size: XXL</th>
                           <th>Date Added</th>
+                          <th>Action</th>
                         </tr>
                       </thead>
                       <tbody>
                     
-                          {
-                            getDamagedTshirt?.map(damaged=>
+                          { selectProductTypeForDamaged==="Round Neck" &&
+
+                            roundNeckDamageFilter?.map(damaged=>
                               <tr className="info">
                           <>
                               </>
@@ -127,7 +208,105 @@ totalDamgwhiteSizeS
                               <td>{damaged?.sizeXL}</td>
                               <td>{damaged?.sizeXXL}</td>
                               <td>{damaged?.date}</td>
-                              
+                              <td >
+                            <button onClick={()=> handleDeletePopUp(damaged?._id)} style={{borderRadius:"5px", border: 'none', color: 'white',backgroundColor:"none"}}><img style={{width:"20px"}} src="/images/delete.png" alt='delete'/></button>
+                            <DeleteRoleAlert isOpen={ damageDeletepopUp} deleteId={clickedId} onClose={handleDeleteModalClose} onConfirm={()=>handleDamageDeleteItem(clickedId)} />
+ <button onClick={()=> handleUpdatePopUp(damaged?._id)} style={{borderRadius:"5px", border: 'none', color: 'white',background:"none",marginleft:"5px"}}><img style={{width:"20px"}} src="/images/edit.png" alt='delete'/></button>
+                         </td>
+                         {
+                    updatepopUp === true &&
+                    <UpdateDamage
+                    fetchData={fetchDamagedThsirt}
+                    getPurchaseTshirtById={getPurchaseTshirtById}
+                    setTshirtDetail={setTshirtDetail}
+                    tShirtDetail={tShirtDetail}
+                    updatepopUp={updatepopUp}
+                    message="Item has been updated successfully."
+                    onClose={() => setUpdatepopUp(false)}
+                  
+                    
+                    
+                    />
+
+                  }
+                                   
+                        </tr>
+                              )
+                            
+                          }    
+                          { selectProductTypeForDamaged==="Drop Sholder" &&
+
+                            dropSholderDamageFilter?.map(damaged=>
+                              <tr className="info">
+                          <>
+                              </>
+                              <td>{damaged?.tshirtColor}</td>
+                              <td>{damaged?.sizeS}</td>
+                              <td>{damaged?.sizeM}</td>
+                              <td>{damaged?.sizeL}</td>
+                              <td>{damaged?.sizeXL}</td>
+                              <td>{damaged?.sizeXXL}</td>
+                              <td>{damaged?.date}</td>
+                              <td >
+                            <button onClick={()=> handleDeletePopUp(damaged?._id)} style={{borderRadius:"5px", border: 'none', color: 'white',backgroundColor:"none"}}><img style={{width:"20px"}} src="/images/delete.png" alt='delete'/></button>
+                            <DeleteRoleAlert isOpen={ damageDeletepopUp} deleteId={clickedId} onClose={handleDeleteModalClose} onConfirm={()=>handleDamageDeleteItem(clickedId)} />
+ <button onClick={()=> handleUpdatePopUp(damaged?._id)} style={{borderRadius:"5px", border: 'none', color: 'white',background:"none",marginleft:"5px"}}><img style={{width:"20px"}} src="/images/edit.png" alt='delete'/></button>
+                         </td>
+                         {
+                    updatepopUp === true &&
+                    <UpdateDamage
+                    fetchData={fetchDamagedThsirt}
+                    getPurchaseTshirtById={getPurchaseTshirtById}
+                    setTshirtDetail={setTshirtDetail}
+                    tShirtDetail={tShirtDetail}
+                    updatepopUp={updatepopUp}
+                    message="Item has been updated successfully."
+                    onClose={() => setUpdatepopUp(false)}
+                  
+                    
+                    
+                    />
+
+                  }
+                                   
+                        </tr>
+                              )
+                            
+                          }  
+                            { selectProductTypeForDamaged==="Hoodie" &&
+
+                            hoodiesDamageFilter?.map(damaged=>
+                              <tr className="info">
+                          <>
+                              </>
+                              <td>{damaged?.tshirtColor}</td>
+                              <td>{damaged?.sizeS}</td>
+                              <td>{damaged?.sizeM}</td>
+                              <td>{damaged?.sizeL}</td>
+                              <td>{damaged?.sizeXL}</td>
+                              <td>{damaged?.sizeXXL}</td>
+                              <td>{damaged?.date}</td>
+                              <td >
+                            <button onClick={()=> handleDeletePopUp(damaged?._id)} style={{borderRadius:"5px", border: 'none', color: 'white',backgroundColor:"none"}}><img style={{width:"20px"}} src="/images/delete.png" alt='delete'/></button>
+                            <DeleteRoleAlert isOpen={ damageDeletepopUp} deleteId={clickedId} onClose={handleDeleteModalClose} onConfirm={()=>handleDamageDeleteItem(clickedId)} />
+ <button onClick={()=> handleUpdatePopUp(damaged?._id)} style={{borderRadius:"5px", border: 'none', color: 'white',background:"none",marginleft:"5px"}}><img style={{width:"20px"}} src="/images/edit.png" alt='delete'/></button>
+                         </td>
+                         {
+                    updatepopUp === true &&
+                    <UpdateDamage
+                    fetchData={fetchDamagedThsirt}
+                    getPurchaseTshirtById={getPurchaseTshirtById}
+                    setTshirtDetail={setTshirtDetail}
+                    tShirtDetail={tShirtDetail}
+                    updatepopUp={updatepopUp}
+                    message="Item has been updated successfully."
+                    onClose={() => setUpdatepopUp(false)}
+                  
+                    
+                    
+                    />
+
+                  }
                                    
                         </tr>
                               )

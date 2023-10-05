@@ -156,6 +156,7 @@ setTshirtDetail(prevRows => prevRows.filter((_, index) => index !== indexToRemov
 </div>
                      <div className="row">
                      <div className="col-2">
+                     <label className="mb-2">Product Type</label>
     <select id="status-filter" required style={{border: '1px solid #ececec', width: '100%', height: '50px', padding: '5px'}} className="form-control" value={item.category || ""} onChange={(e) => updateField(e, "category", index)}>
       <option value="" disabled>select product type</option>
       <option value="Round Neck">Round Neck</option>
@@ -164,6 +165,7 @@ setTshirtDetail(prevRows => prevRows.filter((_, index) => index !== indexToRemov
     </select>
   </div>
   <div className="col-2">
+  <label className="mb-2">Color</label>
     <select id="status-filter" required style={{border: '1px solid #ececec', width: '100%', height: '50px', padding: '5px'}} className="form-control" value={item.tshirtColor || ""} onChange={(e) => updateField(e, "tshirtColor", index)}>
       <option value="" disabled>select color</option>
       {
@@ -191,6 +193,7 @@ setTshirtDetail(prevRows => prevRows.filter((_, index) => index !== indexToRemov
     </select>
   </div>
                            <div className="col-1">
+                           <label className="mb-2">Size: S</label>
                           <input
                           style={{border: '1px solid #ececec', width: '100%', height: '50px', padding: '5px'}}
           type="number"
@@ -202,6 +205,7 @@ setTshirtDetail(prevRows => prevRows.filter((_, index) => index !== indexToRemov
                           </div>
                           
                            <div className="col-1">
+                           <label className="mb-2">Size: M</label>
                           <input
                           style={{border: '1px solid #ececec', width: '100%', height: '50px', padding: '5px'}}
           type="number"
@@ -211,6 +215,7 @@ setTshirtDetail(prevRows => prevRows.filter((_, index) => index !== indexToRemov
           min="0"
         />
                           </div> <div className="col-1">
+                          <label className="mb-2">Size: L</label>
                           <input
                           style={{border: '1px solid #ececec', width: '100%', height: '50px', padding: '5px'}}
           type="number"
@@ -220,6 +225,7 @@ setTshirtDetail(prevRows => prevRows.filter((_, index) => index !== indexToRemov
           min="0"
         />
                           </div> <div className="col-1">
+                          <label className="mb-2">Size: XL</label>
                           <input
                           style={{border: '1px solid #ececec', width: '100%', height: '50px', padding: '5px'}}
           type="number"
@@ -230,6 +236,7 @@ setTshirtDetail(prevRows => prevRows.filter((_, index) => index !== indexToRemov
         />
                           </div> 
                           <div className="col-2">
+                          <label className="mb-2">Size: XXL</label>
                           <input
                           style={{border: '1px solid #ececec', width: '100%', height: '50px', padding: '5px'}}
           type="number"
@@ -250,6 +257,7 @@ setTshirtDetail(prevRows => prevRows.filter((_, index) => index !== indexToRemov
         />
                           </div>  */}
                           <div className="col-2">
+                          <label className="mb-2">Date</label>
                           <input
                           style={{border: '1px solid #ececec', width: '100%', height: '50px', padding: '5px'}}
           type="date"

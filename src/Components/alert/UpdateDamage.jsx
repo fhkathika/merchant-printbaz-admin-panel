@@ -7,7 +7,7 @@ import 'react-datepicker/dist/react-datepicker.css';
 import AlertMessage from "./AlertMessage";
 import DeliveryListAddedAlert from "./DeliveryListAddedAlert";
 import useGetDeliveryList from "../../hooks/useGetDeliveryList";
-const UpdateAlert = ({ fetchData,
+const UpdateDamage = ({ fetchData,
     getPurchaseTshirtById,
     setTshirtDetail,
     tShirtDetail,
@@ -25,8 +25,6 @@ const UpdateAlert = ({ fetchData,
         sizeXL: getPurchaseTshirtById?.sizeXL ,
         sizeXXL: getPurchaseTshirtById?.sizeXXL ,
         sizeS: getPurchaseTshirtById?.sizeS ,
-        perpisCost: getPurchaseTshirtById?.perpisCost ,
-        totalCost: getPurchaseTshirtById?.totalCost ,
         date: getPurchaseTshirtById?.date ,
         category: getPurchaseTshirtById?.category 
     });
@@ -66,8 +64,8 @@ console.log("tshirtDetail",tShirtDetail);
     // Assuming you have the ID of the T-shirt you want to update
     const tShirtId = getPurchaseTshirtById._id; 
 
-    fetch(`https://mserver.printbaz.com/editPurchasedTshirt/${tShirtId}`, {
-    // fetch(`http://localhost:5000/editPurchasedTshirt/${tShirtId}`, {
+    fetch(`https://mserver.printbaz.com/editDamageTshirt/${tShirtId}`, {
+    // fetch(`http://localhost:5000/editDamageTshirt/${tShirtId}`, {
         method: 'PUT',
         headers: {
             'Content-Type': 'application/json'
@@ -201,19 +199,7 @@ console.log("tshirtDetail",tShirtDetail);
     <input style={{border: '1px solid #ececec', width: '100%', height: '50px', padding: '5px'}} type="number" value={tShirtDetail?.sizeXXL || ""} onChange={(e) => updateField(e, "sizeXXL")} placeholder="Size-XXL" min="0" />
   </div>
 
-  <div className="col-1">
-  <label className="mb-2">Per pcs</label>
-    <input style={{border: '1px solid #ececec', width: '100%', height: '50px', padding: '5px'}} type="number" value={tShirtDetail?.perpisCost || ""} onChange={(e) => updateField(e, "perpisCost")} placeholder="per pis cost" min="0" />
-  </div>
-  <div className="col-1">
-  <label className="mb-2">Total cost</label>
-  <input style={{border: '1px solid #ececec', width: '100%', height: '50px', padding: '5px'}} 
-       type="number" 
-       value={tShirtDetail?.totalCost || 0}
-       readOnly  // This makes the input read-only
-       placeholder="totalcost" />
 
-  </div>
   <div className="row mb-3">
 
 <div className="col-lg-11" style={{display:"flex",alignItem:"left"}}>
@@ -256,4 +242,4 @@ onClose={onClose}
   );
 };
 
-export default UpdateAlert;
+export default UpdateDamage;

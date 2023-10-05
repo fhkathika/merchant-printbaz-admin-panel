@@ -3,6 +3,7 @@ import { Container } from 'react-bootstrap';
 import { Link } from 'react-router-dom';
 import useGetMongoData from '../../hooks/useGetMongoData';
 import DeleteRoleAlert from '../alert/DeleteRoleAlert';
+import UpdateAlert from '../alert/UpdateAlert';
 import Navigationbar from '../navigationBar/Navigationbar';
 
 const AllPurchasedTshirt = () => {
@@ -13,17 +14,51 @@ const AllPurchasedTshirt = () => {
     const [getDamagedTshirt, setGetDamagedTshirt] = useState([]);
     const [selectProductTypeForPurchased, setSelectProductTypeForPurchased] = useState('Round Neck');
     const [deleteId, setDeleteId] = useState();
+    const [clickedId, setClickedId] = useState();
+    const [tShirtDetail,setTshirtDetail]=useState([{
+      tshirtColor:"",
+      category:"",
+      sizeM:"",
+      sizeL:"",
+      sizeXL:"",
+      sizeXXL:"",
+      sizeS:"",
+      perpisCost:"",
+      totalCost:"",
+      date:""
+      
+    },
+  
+  ]) 
+    const [updatepopUp, setUpdatepopUp] = useState(false);
+    const [getPurchaseTshirtById, setGetPurchaseTshirtById] = useState();
     const [deletepopUp, setDeletepopUp] = useState(false);
     useEffect(()=>{
         fetchData()  
     },[])
     const fetchData = () => {
-        fetch('http://localhost:5000/getAllPurchasedTshirts')
-        // fetch('https://mserver.printbaz.com/getAllPurchasedTshirts')
+        // fetch('http://localhost:5000/getAllPurchasedTshirts')
+        fetch('https://mserver.printbaz.com/getAllPurchasedTshirts')
         .then(response => response.json())
         .then(data => {
           console.log("Fetched Data:", data);
           setGetPurchaseTshirt(data)
+        })
+        .catch(error => {
+          console.error('Error:', error);
+        });
+      }
+      const handleUpdatePopUp=(id)=>{
+        // e.stopPropagation();
+        console.log("Received id:", id);
+        setUpdatepopUp(true)
+        setClickedId(id)
+        // fetch(`http://localhost:5000/editPurchasedItem/${id}`)
+        fetch(`https://mserver.printbaz.com/editPurchasedItem/${id}`)
+        .then(response => response.json())
+        .then(data => {
+          // console.log("Fetched Data:", data);
+          setGetPurchaseTshirtById(data)
         })
         .catch(error => {
           console.error('Error:', error);
@@ -83,8 +118,8 @@ let hoodiesFilter=getPurchaseTshirt?.filter(users=>users?.category==="Hoodie");
       
         // const proceed= window.confirm('Do you want to remove?')
         if(deletepopUp){
-          fetch(`http://localhost:5000/deletePurchasedProduct/${id}`,{
-          // fetch(`https://mserver.printbaz.com/deletePurchasedProduct/${id}`,{
+          // fetch(`http://localhost:5000/deletePurchasedProduct/${id}`,{
+          fetch(`https://mserver.printbaz.com/deletePurchasedProduct/${id}`,{
             method : 'DELETE'
           })
           .then(res => res.json())
@@ -180,6 +215,25 @@ let hoodiesFilter=getPurchaseTshirt?.filter(users=>users?.category==="Hoodie");
 
               
                         </td>
+                        <td>
+                            <button onClick={()=> handleUpdatePopUp(tshirt?._id)} style={{borderRadius:"5px", border: 'none', color: 'white',backgroundColor:"none"}}><img style={{width:"20px"}} src="/images/edit.png" alt='delete'/></button>
+                         </td>
+                         {
+                    updatepopUp === true &&
+                    <UpdateAlert
+                    fetchData={fetchData}
+                    getPurchaseTshirtById={getPurchaseTshirtById}
+                    setTshirtDetail={setTshirtDetail}
+                    tShirtDetail={tShirtDetail}
+                    updatepopUp={updatepopUp}
+                    message="Item has been updated successfully."
+                    onClose={() => setUpdatepopUp(false)}
+                  
+                    
+                    
+                    />
+
+                  }
                           </tr>
                             )
                         }  
@@ -202,6 +256,25 @@ let hoodiesFilter=getPurchaseTshirt?.filter(users=>users?.category==="Hoodie");
 
               
                         </td>
+                        <td>
+                            <button onClick={()=> handleUpdatePopUp(tshirt?._id)} style={{borderRadius:"5px", border: 'none', color: 'white',backgroundColor:"none"}}><img style={{width:"20px"}} src="/images/edit.png" alt='delete'/></button>
+                         </td>
+                         {
+                    updatepopUp === true &&
+                    <UpdateAlert
+                    fetchData={fetchData}
+                    getPurchaseTshirtById={getPurchaseTshirtById}
+                    setTshirtDetail={setTshirtDetail}
+                    tShirtDetail={tShirtDetail}
+                    updatepopUp={updatepopUp}
+                    message="Item has been updated successfully."
+                    onClose={() => setUpdatepopUp(false)}
+                  
+                    
+                    
+                    />
+
+                  }
                           </tr>
                             )
                         }
@@ -224,6 +297,25 @@ let hoodiesFilter=getPurchaseTshirt?.filter(users=>users?.category==="Hoodie");
 
               
                         </td>
+                        <td>
+                            <button onClick={()=> handleUpdatePopUp(tshirt?._id)} style={{borderRadius:"5px", border: 'none', color: 'white',backgroundColor:"none"}}><img style={{width:"20px"}} src="/images/edit.png" alt='delete'/></button>
+                         </td>
+                         {
+                    updatepopUp === true &&
+                    <UpdateAlert
+                    fetchData={fetchData}
+                    getPurchaseTshirtById={getPurchaseTshirtById}
+                    setTshirtDetail={setTshirtDetail}
+                    tShirtDetail={tShirtDetail}
+                    updatepopUp={updatepopUp}
+                    message="Item has been updated successfully."
+                    onClose={() => setUpdatepopUp(false)}
+                  
+                    
+                    
+                    />
+
+                  }
                           </tr>
                             )
                         }
