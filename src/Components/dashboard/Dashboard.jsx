@@ -125,11 +125,10 @@ let inProductionOrdersRoundNeck = orderAll?.filter(order =>
   order?.orderStatus === "in-production" && 
   (!order.hasOwnProperty("category") || order?.category === "Custom Round Neck" || order?.category === "Blank Round Neck")
 );
-
+console.log("inProductionOrdersRoundNeck",inProductionOrdersRoundNeck);
 let inProductionOrdersDropSholder=orderAll?.filter(users=>users?.orderStatus==="in-production" &&(users?.category==="Custom Drop Sholder" || users?.category==="Blank Drop Sholder"));
 let inProductionOrdersHoodie=orderAll?.filter(users=>users?.orderStatus==="in-production" && (users?.category==="Custom Hoodie" || users?.category==="Blank Hoodie"));
-let inProductionOrders=orderAll?.filter(users=>users?.orderStatus==="in-production" && (users?.category==="Custom Round Neck" || users?.category==="Blank Round Neck"));
-
+let inProductionOrders=orderAll?.filter(users=>users?.orderStatus==="in-production" &&(!users.hasOwnProperty("category") || users?.category === "Custom Round Neck" || users?.category === "Blank Round Neck"))
 console.log("pendingOrdersRoundNeck",pendingOrdersRoundNeck);
 let outForDeliveryOrders=orderAll?.filter(users=>users?.orderStatus==="out for delivery");
 let deliveredOrders=orderAll?.filter(users=>users?.orderStatus==="delivered");
