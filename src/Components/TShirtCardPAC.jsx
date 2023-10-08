@@ -128,7 +128,7 @@ return (
    }}
  >
    <td>{color}</td>
-   <td>round neck</td>
+   <td></td>
    <td>{mCount}</td>
    <td></td>
    <td>{lCount}</td>
@@ -175,7 +175,7 @@ return (
    }}
  >
    <td>{color}</td>
-   <td>round neck</td>
+   <td></td>
    <td>{mCount}</td>
    <td></td>
    <td>{lCount}</td>
@@ -191,7 +191,7 @@ return (
 {
 selectProductTypePAC==="Hoodie" &&
 <tbody>
-{["black","navy blue","green", "gray","red"].map((color) => {
+{["black","darkblue","green", "gray","red"].map((color) => {
 // Calculate the sum for each size for the given color
 const mCount = 
  (sizeCountsForConfirmedOrdersHoodie[color]?.m ?? 0) + 
@@ -217,11 +217,11 @@ return (
  <tr 
    style={{
      backgroundColor: color,
-     color: ["black","nblue","green", "gray","red"].includes(color) ? "white" : "initial"
+     color: ["black","darkblue","green", "gray","red"].includes(color) ? "white" : "initial"
    }}
  >
    <td>{color}</td>
-   <td>round neck</td>
+   <td></td>
    <td>{mCount}</td>
    <td></td>
    <td>{lCount}</td>

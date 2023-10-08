@@ -7,7 +7,6 @@ import Navigationbar from '../navigationBar/Navigationbar';
 import { useRoleAsignData } from '../../hooks/useRoleAsignData';
 
 const OrderList = () => {
-
   const { orderAll } = useGetMongoData();
   const [allMerchant,setAllMerchant]=useState([])
   const {value_count}=useRoleAsignData()

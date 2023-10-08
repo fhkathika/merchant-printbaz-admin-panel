@@ -929,7 +929,7 @@ return (
         }}
       >
         <td>{(color)}</td>
-        <td>round neck</td>
+        <td></td>
         <td>{sizeCountsForInProductionRoundNeck[color]?.m ?? 0}</td>
         <td></td>
         <td>{sizeCountsForInProductionRoundNeck[color]?.L ?? 0}</td>
@@ -952,7 +952,6 @@ return (
         }}
       >
         <td>{(color)}</td>
-        <td>drop sholder</td>
         <td>{sizeCountsForInProductionDropSholder[color]?.m ?? 0}</td>
         <td></td>
         <td>{sizeCountsForInProductionDropSholder[color]?.L ?? 0}</td>

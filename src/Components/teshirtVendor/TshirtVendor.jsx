@@ -8,7 +8,6 @@ import DeleteRoleAlert from '../alert/DeleteRoleAlert';
 import UpdateAlert from '../alert/UpdateAlert';
 import Navigationbar from '../navigationBar/Navigationbar';
 import TShirtCardPAC from '../TShirtCardPAC';
-
 const TshirtVendor = () => {
   const { orderAll } = useGetMongoData();
   const [showAlert, setShowAlert] = useState(false);
@@ -18,8 +17,8 @@ const TshirtVendor = () => {
   const [getDamagedTshirt, setGetDamagedTshirt] = useState([]);
   const navigate=useNavigate()
   let pendingOrders = orderAll?.filter(users => users?.orderStatus === "Pending");
-  let   approvedOrders=orderAll?.filter(users=>users?.orderStatus==="Approved");
-  let   confirmedOrders=orderAll?.filter(users=>users?.orderStatus==="confirmed");
+  let approvedOrders=orderAll?.filter(users=>users?.orderStatus==="Approved");
+  let confirmedOrders=orderAll?.filter(users=>users?.orderStatus==="confirmed");
   let inProductionOrders=orderAll?.filter(users=>users?.orderStatus==="in-production");
   const [clickedId, setClickedId] = useState();
   const [deletepopUp, setDeletepopUp] = useState(false);
@@ -38,7 +37,6 @@ const TshirtVendor = () => {
     perpisCost:"",
     totalCost:"",
     date:""
-    
   },
 
 ]) 
@@ -273,8 +271,6 @@ const countSizeForOrders = (orders) => {
     }, acc);
   }, { white: {}, black: {},green:{},maroon:{},nBlue:{},gray:{},red:{} /* Initialize other colors as needed */ });
 };
-
-
 // previous function 
 // const countSizeForOrders = (orders, size) => {
 //   return orders?.reduce((acc, order) => {
@@ -298,8 +294,6 @@ const countSizeForOrders = (orders) => {
 // };
 
 const sizeCountsForInProduction = countSizeForOrders(inProductionOrders);
-
-
   let totalDamaged = 0;
   const TotalDamageTshirt = (array) => {
     array.forEach(damaged => {
