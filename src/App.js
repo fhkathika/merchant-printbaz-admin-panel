@@ -26,6 +26,7 @@ import TshirtVendor from './Components/teshirtVendor/TshirtVendor';
 import AllPurchasedTshirt from './Components/AllPurchasedTshirt/AllPurchasedTshirt';
 import AllDamageTShirt from './Components/allDamageTshirt/AllDamageTShirt';
 import AllSoldTshirt from './Components/allSoldTshirts/AllSoldTshirt';
+import AllRcvAmount from './Components/allRcvAmount/AllRcvAmount';
 function App() {
   return (
     <div className="">
@@ -55,6 +56,7 @@ function App() {
        <Route path="/AllPurchasedTshirt" element={<AllPurchasedTshirt/>} />
        <Route path="/allDamagedTshirt" element={<AllDamageTShirt/>} />
        <Route path="/allSoldTshirts" element={<AllSoldTshirt/>} />
+       <Route path="/allRcvAmount" element={<AllRcvAmount/>} />
        <Route
   path="/registerAdminPage"
   element={

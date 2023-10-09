@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { Link } from 'react-router-dom';
 import countSizePerDay from '../../Formulas/countSizePerDay';
 import useOutForDelievry from '../../hooks/useOutForDelievry';
 import Navigationbar from '../navigationBar/Navigationbar';
@@ -53,7 +54,11 @@ sizeCountsForOutForDelievryRoundNeck.forEach(record => {
               <div className="col-xs-12 col-sm-12 col-md-10 col-lg-12 ">
                 <div className="lobipanel">
                   <div className="panel-title">
-                    <h4>Total Number Of Tee Shirts Sold <span style={{float: 'right'}}>{grandTotalSoldtshirt} PCS</span></h4>
+                    <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:"20px"}}>
+                    <Link to="/salesReport" style={{borderRadius:"5px",color:"#09224f",fontSize:"16px",display:"flex",justifyContent:"space-between"}}><img style={{width:"30px",height:"30px"}} src="/images/left-arrow.png" alt="" /><h4 >Total Number Of Tee Shirts Sold</h4></Link> 
+                    <h4> <span style={{float: 'right'}}>{grandTotalSoldtshirt} PCS</span></h4>
+                    </div>
+                 
                     <select 
         id="productType-filter" 
         value={selectProductType} 

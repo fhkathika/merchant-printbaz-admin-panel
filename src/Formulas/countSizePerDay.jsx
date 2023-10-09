@@ -7,7 +7,7 @@ const getTodayDateString = () => {
 const countSizePerDay = (orders) => {
     const dailyCounts = [];
     const todayString = getTodayDateString();
-    const colors = ['white', 'black', 'green', 'maroon', 'nBlue', 'gray', 'red'];
+    const colors = ['white', 'black', 'bottle green', 'maroon', 'nBlue', 'gray', 'red'];
   
     // Find today's record or create a new one
     let todayRecord = dailyCounts.find(record => record.date === todayString);
