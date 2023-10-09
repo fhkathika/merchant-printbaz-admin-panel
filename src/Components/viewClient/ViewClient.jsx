@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useContext, useEffect, useState } from "react";
 import { Form, Link, useLocation } from "react-router-dom";
 import "../../css/style.css";
 import useGetMongoData from "../../hooks/useGetMongoData";
@@ -8,16 +8,18 @@ import SendUserApproveMail from "../sendUserApproveMail/SendUserApproveMail";
 import * as XLSX from 'xlsx';
 import GetMercahntOrderXl from "../GetMercahntOrderXl";
 import useSingleMercahntorder from "../../hooks/useSingleMercahntorder";
+import { AuthContext } from "../../authProvider/AuthProvider";
 const ViewClient = () => {
   const { orderAll } = useGetMongoData();
   const { merchantOrder } = useSingleMercahntorder();
   const location = useLocation();
   const viewClient = location.state ? location?.state?.merchants : null;
   const [getUserById, setGetUserById] = useState();
+  const [paymentReleasedInput, setPaymentReleasedInput] = useState();
   const {value_count}=useRoleAsignData()
+  const {adminUser}=useContext(AuthContext);
 
-
-  const downloadInfIntoXl = (event) => {
+const downloadInfIntoXl = (event) => {
     const dynmamicId = event.currentTarget.dataset.orderId;
     console.log("downloadInfIntoXl", dynmamicId);
       const shippingDetailElement = document.getElementById(dynmamicId);
@@ -48,8 +50,55 @@ const ViewClient = () => {
       window.URL.revokeObjectURL(url);
       document.body.removeChild(a);
   }
+  const [dueAmount, setDueAmount] = useState(0); // This is just a placeholder. You might be fetching the value from somewhere else
   
-  
+  const [rows, setRows] = useState([]);
+  // merchant payment released 
+
+  const handleMerchPaymentReleasedInputChange = async (e) => {
+    const newDueAmount = parseFloat(e.target.value);
+    const newDueAmountNow = Number(totalDues - newDueAmount);
+    setDueAmount(newDueAmount);
+
+    if (newDueAmountNow > 1000) {
+        const currentDate = new Date().toLocaleDateString();
+        setRows(prevRows => [...prevRows, { date: currentDate, dueAmountNow: newDueAmountNow }]);
+    }
+
+    try {
+        const response = await fetch(
+          //  `https://mserver.printbaz.com/updateMercahntPaymentRecvable/${adminUser?._id}`, {
+           `http://localhost:5000/updateMercahntPaymentRecvable/${adminUser?._id}`, {
+            method: "PUT",
+            headers: {
+                "Content-Type": "application/json",
+            },
+            body: JSON.stringify({
+                totalDues: totalDues,
+                paymentRelasedAmount: newDueAmount,
+                dueAmountNow: newDueAmountNow,
+                paymentReleasedBy: adminUser?.email,
+                paymentReleasedArr: [...rows, { date: new Date().toLocaleDateString(), dueAmountNow: newDueAmountNow }]
+            }),
+        });
+
+        if (!response.ok) {
+            console.error('Status Error:', response);
+        }
+    } catch (error) {
+        console.error('Error:', error.message);
+    }
+};
+
+// let totalDues=Number(statusPaidbase-(totalReceiveBase+totalReturnAmmountBase))
+let totalDues=1200
+useEffect(() => {
+  if (totalDues > 1000) {
+    const currentDate = new Date().toLocaleDateString();
+    setRows(prevRows => [...prevRows, { date: currentDate, dueAmountNow: dueAmount }]);
+  }
+}, []);
+
   // Payment Released
    const orderStatusPaymentReleased=orderAll
   ?.filter(order => order.userMail === viewClient?.email && order.orderStatus==="payment-released" ) 
@@ -132,13 +181,17 @@ const returnValueFilter=orderAll?.filter(order =>  order.userMail === viewClient
 let statusPaidbase=0; let totalpaid
 for(let i=0;i<PaymentStausPaid?.length;i++){
    totalpaid=Number(PaymentStausPaid[i]?.recvMoney);
-  statusPaidbase =statusPaidbase+totalpaid;
+  statusPaidbase =Number(statusPaidbase)+totalpaid;
  
   // setTotalBill(totalBill+totalpaid);
 
 }
-  let dueAmount=statusPaidbase-(totalReceiveBase+totalReturnAmmountBase)
-console.log("totalReturnAmmountBase",totalReturnAmmountBase);
+
+// let totalDues=Number(statusPaidbase-(totalReceiveBase+totalReturnAmmountBase))
+
+
+
+console.log("totalpaid",totalpaid);
 useEffect(()=>{
   const getOrderById=async()=>{
            // Fetch the updated order details
@@ -556,7 +609,33 @@ useEffect(()=>{
                   </div>
                 </div>
               </div>
-              <div className="col-lg-9 col-sm-12">
+               <div className="col-lg-9 col-sm-12">
+               <div className="panel-body">
+               <table className="table">
+        <thead>
+          <tr>
+            <th>Date</th>
+            <th>Merchant Receivable</th>
+            <th>Merchant P Released</th>
+            <th>Due Amount Now</th>
+          </tr>
+        </thead>
+        <tbody>
+          {rows.map((row, index) => (
+            <tr className="info" key={index}>
+              <td>{row.date}</td>
+              <td><p style={{padding:"5px",width:"150px",textAlign:"center",borderRadius:"5px"}}>{totalDues}</p> </td>
+              <td><input type="number" min="0" value={dueAmount} onChange={handleMerchPaymentReleasedInputChange}/></td>
+            
+              <td> <p style={{padding:"5px",backgroundColor:"orange",color:"white",width:"150px",textAlign:"center",borderRadius:"5px"}}>{totalDues}</p></td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+                  </div>
+
+               </div>
+              {/* <div className="col-lg-9 col-sm-12">
              
                 {
                   value_count?.orderList &&
@@ -627,7 +706,7 @@ useEffect(()=>{
                 </div>
                 }
               
-              </div>
+              </div> */}
             </div>
           </div>
         </div>
