@@ -13,8 +13,8 @@ function LoginPage() {
   const loginUser = async (e) => {
     e.preventDefault();
     try {
-      // const res = await axios.post("http://localhost:5000/loginFromAdminPanel", { email,password });
-      const res = await axios.post("https://mserver.printbaz.com/loginFromAdminPanel", {  email,password });
+      const res = await axios.post("http://localhost:5000/loginFromAdminPanel", { email,password });
+      // const res = await axios.post("https://mserver.printbaz.com/loginFromAdminPanel", {  email,password });
       // If login successful, store the user token in local storage
       if(res.data.token) {
         localStorage.setItem("token", res.data.token);

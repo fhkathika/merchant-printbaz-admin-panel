@@ -1,5 +1,5 @@
 import React, { useContext, useEffect, useState } from "react";
-import { Form, Link, useLocation } from "react-router-dom";
+import { Form, Link, useLocation, useNavigate } from "react-router-dom";
 import "../../css/style.css";
 import useGetMongoData from "../../hooks/useGetMongoData";
 import { useRoleAsignData } from "../../hooks/useRoleAsignData";
@@ -9,19 +9,47 @@ import * as XLSX from 'xlsx';
 import GetMercahntOrderXl from "../GetMercahntOrderXl";
 import useSingleMercahntorder from "../../hooks/useSingleMercahntorder";
 import { AuthContext } from "../../authProvider/AuthProvider";
+import { Button } from "react-bootstrap";
+import PaymentReleasedPopUp from "../alert/PaymentReleasedPopUp";
+import axios from "axios";
 const ViewClient = () => {
   const { orderAll } = useGetMongoData();
   const { merchantOrder } = useSingleMercahntorder();
   const location = useLocation();
   const viewClient = location.state ? location?.state?.merchants : null;
   const [getUserById, setGetUserById] = useState();
-  const [paymentReleasedInput, setPaymentReleasedInput] = useState();
+  const [paymentReleasedPopUp, setPaymentReleasedPopUp] = useState(false);
   const {value_count}=useRoleAsignData()
   const {adminUser}=useContext(AuthContext);
+  const navigate=useNavigate()
+  const [registeredInfo,setRegisteredInfo]=useState({
+      _id: adminUser?._id,
+      name: adminUser?.name,
+      fbPageLink: adminUser?.fbPageLink,
+      fbAccount:adminUser?.fbAccount,
+      phone: adminUser?.phone,
+      whatsapp: adminUser?.whatsapp,
+      address: adminUser?.address,
+      email: adminUser?.email,
+      password: adminUser?.password,
+      businessDuration: adminUser?.businessDuration,
+      brandName: adminUser?.brandName,
+      bankName:adminUser?.bankName,
+      accountName: adminUser?.accountName,
+      accountNumber: adminUser?.accountNumber,
+      routingNumber: adminUser?.routingNumber,
+      branchName: adminUser?.branchName,
+      bkashAccount: adminUser?.bkashAccount,
+      nagadAccount:adminUser?.nagadAccount,
+      rocketAccount:adminUser?.rocketAccount,
+      brandLogo:adminUser?.brandLogo,
+      brandLogoURL:adminUser?.brandLogoURL,
+      approval: adminUser?.approval
+    
+  })
 
 const downloadInfIntoXl = (event) => {
     const dynmamicId = event.currentTarget.dataset.orderId;
-    console.log("downloadInfIntoXl", dynmamicId);
       const shippingDetailElement = document.getElementById(dynmamicId);
   
       // Assume the element contains a table. 
@@ -50,54 +78,36 @@ const downloadInfIntoXl = (event) => {
       window.URL.revokeObjectURL(url);
       document.body.removeChild(a);
   }
-  const [dueAmount, setDueAmount] = useState(0); // This is just a placeholder. You might be fetching the value from somewhere else
-  
-  const [rows, setRows] = useState([]);
+
   // merchant payment released 
 
-  const handleMerchPaymentReleasedInputChange = async (e) => {
-    const newDueAmount = parseFloat(e.target.value);
-    const newDueAmountNow = Number(totalDues - newDueAmount);
-    setDueAmount(newDueAmount);
+//   const handleMerchPaymentReleasedInputChange = async (e) => {
+  
+//     try {
+//           const response = await fetch(
+//           //  `https://mserver.printbaz.com/updateMercahntPaymentRecvable/${adminUser?._id}`, {
+//            `http://localhost:5000/updateMercahntPaymentRecvable/${adminUser?._id}`, {
+//             method: "PUT",
+//             headers: {
+//                 "Content-Type": "application/json",
+//             },
+//             // body: JSON.stringify({
+//             //     totalDues: totalDues,
+//             //     paymentRelasedAmount: newDueAmount,
+//             //     dueAmountNow: newDueAmountNow,
+//             //     paymentReleasedBy: adminUser?.email,
+//             //     paymentReleasedArr: [...rows, { date: new Date().toLocaleDateString(), dueAmountNow: newDueAmountNow }]
+//             // }),
+//         });
 
-    if (newDueAmountNow > 1000) {
-        const currentDate = new Date().toLocaleDateString();
-        setRows(prevRows => [...prevRows, { date: currentDate, dueAmountNow: newDueAmountNow }]);
-    }
+//         if (!response.ok) {
+//             console.error('Status Error:', response);
+//         }
+//     } catch (error) {
+//         console.error('Error:', error.message);
+//     }
+// };
 
-    try {
-        const response = await fetch(
-          //  `https://mserver.printbaz.com/updateMercahntPaymentRecvable/${adminUser?._id}`, {
-           `http://localhost:5000/updateMercahntPaymentRecvable/${adminUser?._id}`, {
-            method: "PUT",
-            headers: {
-                "Content-Type": "application/json",
-            },
-            body: JSON.stringify({
-                totalDues: totalDues,
-                paymentRelasedAmount: newDueAmount,
-                dueAmountNow: newDueAmountNow,
-                paymentReleasedBy: adminUser?.email,
-                paymentReleasedArr: [...rows, { date: new Date().toLocaleDateString(), dueAmountNow: newDueAmountNow }]
-            }),
-        });
-
-        if (!response.ok) {
-            console.error('Status Error:', response);
-        }
-    } catch (error) {
-        console.error('Error:', error.message);
-    }
-};
-
-// let totalDues=Number(statusPaidbase-(totalReceiveBase+totalReturnAmmountBase))
-let totalDues=1200
-useEffect(() => {
-  if (totalDues > 1000) {
-    const currentDate = new Date().toLocaleDateString();
-    setRows(prevRows => [...prevRows, { date: currentDate, dueAmountNow: dueAmount }]);
-  }
-}, []);
 
   // Payment Released
    const orderStatusPaymentReleased=orderAll
@@ -107,11 +117,11 @@ useEffect(() => {
     const orderSatatusReturned=orderAll
   ?.filter(order =>order.userMail === viewClient?.email && order.orderStatus==="returned" )
   // console.log("orderStatus pament released",orderStatusPaymentReleased);
-console.log("orderSatatusReturned",orderSatatusReturned);
+
 
 const merchOrders=orderAll
 ?.filter(order =>order.userMail === viewClient?.email  )
-  console.log("merchOrders",merchOrders);
+
 
 
   const updateReturnedAmount = async (orderId, returnedAmount) => {
@@ -142,8 +152,9 @@ const merchOrders=orderAll
   
   let totalReceiveBase=0,totalReturnAmmountBase=0;
 for(let i=0;i<orderStatusPaymentReleased?.length;i++){
-  let totalReceive=orderStatusPaymentReleased[i]?.recvMoney;
-  totalReceiveBase +=totalReceive;
+  let totalReceive=Number(orderStatusPaymentReleased[i]?.recvMoney);
+ 
+  totalReceiveBase =totalReceiveBase+totalReceive;
 // console.log("totalReceiveBase",totalReceiveBase);
 }
 // for(let i=0;i<orderSatatusReturned?.length;i++){
@@ -168,7 +179,6 @@ if (Array.isArray(orderSatatusReturned)) {
 }
 
 // Now, totalReturnAmountBase contains the sum of all returnedAmounts and their associated deliveryFees
-console.log("Total Return Amount (with delivery fees): ", totalReturnAmmountBase);
 
 
 //patmnet status =paid,orderstatus :delivered
@@ -186,17 +196,13 @@ for(let i=0;i<PaymentStausPaid?.length;i++){
   // setTotalBill(totalBill+totalpaid);
 
 }
+let dueAmount=Number(statusPaidbase-(totalReceiveBase+totalReturnAmmountBase))
 
-// let totalDues=Number(statusPaidbase-(totalReceiveBase+totalReturnAmmountBase))
-
-
-
-console.log("totalpaid",totalpaid);
 useEffect(()=>{
   const getOrderById=async()=>{
            // Fetch the updated order details
-  await fetch(`https://mserver.printbaz.com/getUser/${viewClient?._id}`)
-  // await fetch(`http://localhost:5000/getUser/${viewClient?._id}`)
+  // await fetch(`https://mserver.printbaz.com/getUser/${viewClient?._id}`)
+  await fetch(`http://localhost:5000/getUser/${viewClient?._id}`)
   .then(res=>res.json())
   .then(data => {setGetUserById(data)})
     
@@ -205,7 +211,6 @@ useEffect(()=>{
        getOrderById()
       },[getUserById])
 
-      console.log("getUserById",getUserById);
   const handleInputChange = async (e) => {
     const status = e.target.value; // the new status
     // status === "request" && setApprovalRequest("request");
@@ -232,7 +237,6 @@ useEffect(()=>{
         // Update the approval status in the viewClient object
         viewClient.approval = status;
   
-        console.log("Success:", viewClient);
         SendUserApproveMail({email:viewClient?.email,requestStatus:viewClient?.approval})
         // Update your state or perform any other necessary operations with the updated viewClient object
       } else {
@@ -257,7 +261,13 @@ useEffect(()=>{
     // you can add more conditions here or just return a default color
     return "defaultColor";
   };
-
+const handleDoPaymentPopUp=()=>{
+  setPaymentReleasedPopUp(true)
+}
+const handlePaymentHistory=()=>{
+  const merchantId = viewClient?._id;
+  navigate(`/paymentHistory/${merchantId}`);
+}
   return (
     <div>
       <meta charSet="UTF-8" />
@@ -606,36 +616,29 @@ useEffect(()=>{
                    
                       
                     </div>
+                    <div className="flex mt-3">
+                  <Button onClick={handleDoPaymentPopUp} style={{width:"40%",backgroundColor:"orange",border:"none"}}>Pay</Button>
+                  <Button style={{width:"40%",backgroundColor:"#0c0c30",border:"none"}}  onClick={handlePaymentHistory}>Payment History</Button>
+                {
+                  paymentReleasedPopUp===true &&
+                  <PaymentReleasedPopUp
+                  paymentReleasedPopUp={paymentReleasedPopUp}
+                  setPaymentReleasedPopUp={setPaymentReleasedPopUp}
+                  dueAmount={dueAmount}
+                  totalReturnAmmountBase={totalReturnAmmountBase}
+                  totalBill={statusPaidbase}
+                  totalReceiveBase={totalReceiveBase}
+                  merchantsId={viewClient?._id}
+                  onClose={() => setPaymentReleasedPopUp(false)}
+                  />
+                }
+                </div>
                   </div>
                 </div>
+              
               </div>
-               <div className="col-lg-9 col-sm-12">
-               <div className="panel-body">
-               <table className="table">
-        <thead>
-          <tr>
-            <th>Date</th>
-            <th>Merchant Receivable</th>
-            <th>Merchant P Released</th>
-            <th>Due Amount Now</th>
-          </tr>
-        </thead>
-        <tbody>
-          {rows.map((row, index) => (
-            <tr className="info" key={index}>
-              <td>{row.date}</td>
-              <td><p style={{padding:"5px",width:"150px",textAlign:"center",borderRadius:"5px"}}>{totalDues}</p> </td>
-              <td><input type="number" min="0" value={dueAmount} onChange={handleMerchPaymentReleasedInputChange}/></td>
-            
-              <td> <p style={{padding:"5px",backgroundColor:"orange",color:"white",width:"150px",textAlign:"center",borderRadius:"5px"}}>{totalDues}</p></td>
-            </tr>
-          ))}
-        </tbody>
-      </table>
-                  </div>
-
-               </div>
-              {/* <div className="col-lg-9 col-sm-12">
+             
+              <div className="col-lg-9 col-sm-12">
              
                 {
                   value_count?.orderList &&
@@ -706,7 +709,7 @@ useEffect(()=>{
                 </div>
                 }
               
-              </div> */}
+              </div>
             </div>
           </div>
         </div>

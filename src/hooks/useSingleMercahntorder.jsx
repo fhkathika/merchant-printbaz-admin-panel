@@ -5,7 +5,6 @@ const useSingleMercahntorder = () => {
     const [merchantOrder,setMerchantOrder]=useState([])
     const {user}=useContext(AuthContext);
     const userEmail=user?.email;
-    console.log("userEmail",userEmail);
     useEffect(()=>{
         const getOrders = async () => {
          await fetch(`https://mserver.printbaz.com/getmyorder/${userEmail}`) //for main site

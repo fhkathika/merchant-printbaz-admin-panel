@@ -92,8 +92,8 @@ const validatePassword = (password) => {
         event.preventDefault();
         try {
             // POST request to your server
-            // const response = await axios.post('http://localhost:5000/registerForAdminPanel', formData);
-            const response = await axios.post('https://mserver.printbaz.com/registerForAdminPanel', formData);
+            const response = await axios.post('http://localhost:5000/registerForAdminPanel', formData);
+            // const response = await axios.post('https://mserver.printbaz.com/registerForAdminPanel', formData);
     
             if (response.status !== 200) {
                 throw new Error('HTTP error ' + response.status);
