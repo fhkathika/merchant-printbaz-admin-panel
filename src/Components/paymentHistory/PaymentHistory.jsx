@@ -177,7 +177,7 @@ const PaymentHistory = (props) => {
  
            <div  className="row col-lg-12 col-sm-12   mr-3"style={{display:"flex",marginLeft:"150px",marginTop:"70px"}}>
           <div style={{marginBottom:"30px"}}>
-          <Link to={`/viewClient/${merchantId}`} style={{borderRadius:"5px",color:"#09224f",fontSize:"16px",marginBottom:"10px", display: 'inline-block'}}>
+          <Link to={`/viewClient/${merchantId}`}  state={{getDataById}} style={{borderRadius:"5px",color:"#09224f",fontSize:"16px",marginBottom:"10px", display: 'inline-block'}}>
     <img style={{width:"30px", height:"30px", verticalAlign: 'middle', display: 'inline-block'}} src="/images/left-arrow.png" alt="" />
     <h3 style={{display:"inline-block", textAlign:"center",fontWidth:"800", margin: "10px", verticalAlign: 'middle'}}>PAYMENT HISTORY</h3>
 </Link>

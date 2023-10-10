@@ -16,7 +16,7 @@ const ViewClient = () => {
   const { orderAll } = useGetMongoData();
   const { merchantOrder } = useSingleMercahntorder();
   const location = useLocation();
-  const viewClient = location.state ? location?.state?.merchants : null;
+  const viewClient = location.state ? location?.state?.merchants :location.state ? location?.state?.getDataById : null;
   const [getUserById, setGetUserById] = useState();
   const [paymentReleasedPopUp, setPaymentReleasedPopUp] = useState(false);
   const {value_count}=useRoleAsignData()
