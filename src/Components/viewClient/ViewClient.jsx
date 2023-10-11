@@ -22,6 +22,8 @@ const ViewClient = () => {
   const {value_count}=useRoleAsignData()
   const {adminUser}=useContext(AuthContext);
   const navigate=useNavigate()
+
+  // console.log("getUserById",getUserById);
   const [registeredInfo,setRegisteredInfo]=useState({
       _id: adminUser?._id,
       name: adminUser?.name,
@@ -184,7 +186,6 @@ if (Array.isArray(orderSatatusReturned)) {
 //patmnet status =paid,orderstatus :delivered
 const PaymentStausPaid=orderAll
 ?.filter(order => order.userMail === viewClient?.email && order.paymentStatus==="paid" && order?.orderStatus==="delivered")
-
 const returnValueFilter=orderAll?.filter(order =>  order.userMail === viewClient?.email&& order?.orderStatus==="returned")
 
 
@@ -196,20 +197,65 @@ for(let i=0;i<PaymentStausPaid?.length;i++){
   // setTotalBill(totalBill+totalpaid);
 
 }
+
+console.log("totalbill",statusPaidbase);
 let dueAmount=Number(statusPaidbase-(totalReceiveBase+totalReturnAmmountBase))
+
+
+
+useEffect(() => {
+  const getOrderById = async () => {
+      // Ensure there's an ID before making a request
+      if (viewClient?._id) {
+          try {
+            console.log("totalBill test",statusPaidbase);
+              const response = await fetch(
+                  `https://mserver.printbaz.com/updateBill/${viewClient._id}`,
+                  // `http://localhost:5000/updateBill/${viewClient._id}`,
+                  {
+                      method: "PUT",
+                      headers: {
+                          "Content-Type": "application/json",
+                      },
+                      body: JSON.stringify({ totalBill: statusPaidbase }),
+                  }
+              );
+
+              const data = await response.json();
+              if (response.status === 200) {
+                  // Handle success, for instance:
+                  console.log("Total bill updated successfully:", data);
+              } else {
+                  // Handle error
+                  console.error("Error updating the bill:", data.message);
+              }
+
+          } catch (error) {
+              console.error("Network or server error:", error);
+          }
+      }
+  };
+
+  getOrderById();
+
+}, [viewClient?._id, statusPaidbase]);
+
 
 useEffect(()=>{
   const getOrderById=async()=>{
            // Fetch the updated order details
-  // await fetch(`https://mserver.printbaz.com/getUser/${viewClient?._id}`)
-  await fetch(`http://localhost:5000/getUser/${viewClient?._id}`)
+  await fetch(`https://mserver.printbaz.com/getUser/${viewClient?._id}`)
+  // await fetch(`http://localhost:5000/getUser/${viewClient?._id}`)
   .then(res=>res.json())
   .then(data => {setGetUserById(data)})
-    
-  
-       }
+    }
        getOrderById()
       },[getUserById])
+     
+   let  lastPayementDetail= getUserById?.payments && getUserById.payments.length > 0 ? getUserById?.payments[getUserById?.payments?.length-1] :null
+  //  console.log("lastPayementDetail",lastPayementDetail);
+
+  
 
   const handleInputChange = async (e) => {
     const status = e.target.value; // the new status
@@ -598,26 +644,34 @@ const handlePaymentHistory=()=>{
                       <h3 className="all-title">Payments</h3>
                       <div className='flex'>
                       <h6>Total Payment Released:</h6>
-                      <span style={{marginTop:"10px",color:"orange",fontSize:'16px'}}>{totalReceiveBase} TK</span>
+                      <span style={{marginTop:"10px",color:"orange",fontSize:'16px'}}>{lastPayementDetail?.paymentReleasedAmount?lastPayementDetail?.paymentReleasedAmount:0} TK</span>
                       </div>
                       <div className='flex'>
                       <h6>Total Bill:</h6>
-                      <span style={{marginTop:"10px",color:"orange",fontSize:'16px'}}>{parseInt(statusPaidbase)} TK</span>
+                      {/* <span style={{marginTop:"10px",color:"orange",fontSize:'16px'}}>{parseInt(lastPayementDetail?.totalBill?lastPayementDetail?.totalBill :statusPaidbase)} TK</span> */}
+                      <span style={{marginTop:"10px",color:"orange",fontSize:'16px'}}>{parseInt(getUserById?.totalBill?getUserById?.totalBill :statusPaidbase)} TK</span>
                       </div> 
                       <div className='flex'>
                       <h6>Return Value:</h6>
-                      <span style={{marginTop:"10px",color:"orange",fontSize:'16px'}}> {Number(totalReturnAmmountBase)} TK</span>
+                      <span style={{marginTop:"10px",color:"orange",fontSize:'16px'}}> {Number(lastPayementDetail?.totalReturnAmmountBase?lastPayementDetail?.totalReturnAmmountBase :totalReturnAmmountBase)} TK</span>
                       </div> 
                       <div className='flex'>
                       
                       <h6>Due Amount:</h6>
-                      <span style={{marginTop:"10px",color:"orange",fontSize:'16px'}}>{dueAmount.toFixed(2)} TK</span>
+                      <span style={{marginTop:"10px",color:"orange",fontSize:'16px'}}>{Math.floor(getUserById?.dueAmountNow ? getUserById?.dueAmountNow : dueAmount)} TK</span>
                       </div>
                    
                       
                     </div>
                     <div className="flex mt-3">
-                  <Button onClick={handleDoPaymentPopUp} style={{width:"40%",backgroundColor:"orange",border:"none"}}>Pay</Button>
+                    {/* <Button onClick={handleDoPaymentPopUp} style={{width:"40%",backgroundColor:"orange",border:"none"}}>Pay</Button> */}
+                      {
+                        getUserById?.dueAmountNow<1000 || dueAmount<1000 ?
+                        <Button onClick={handleDoPaymentPopUp} style={{width:"40%",backgroundColor:"gray",border:"none", cursor: "not-allowed"}} disabled>Pay</Button>
+                        :
+                        <Button onClick={handleDoPaymentPopUp} style={{width:"40%",backgroundColor:"orange",border:"none"}}>Pay</Button>
+                      }
+                  
                   <Button style={{width:"40%",backgroundColor:"#0c0c30",border:"none"}}  onClick={handlePaymentHistory}>Payment History</Button>
                 {
                   paymentReleasedPopUp===true &&

@@ -8,9 +8,11 @@ import useOutForDelievry from '../../hooks/useOutForDelievry';
 import usePaidOrders from '../../hooks/usePaidOrders';
 import usePaymnetReleasedOrder from '../../hooks/usePaymnetReleasedOrder';
 import Navigationbar from '../navigationBar/Navigationbar';
+import useAllMerchants from '../../hooks/useAllMerchants';
 
 const SalesReport = () => {
   const {orderPaymentRelased}=usePaymnetReleasedOrder()
+  const {allMercahnts}=useAllMerchants() 
   const {outForOutForDelivery}=useOutForDelievry()
   const {deliveryList}=useDeliveryList()
   const paymentReleasedOrder=orderPaymentRelased.filter((order) => order?.orderStatus==="payment-released")
@@ -18,7 +20,8 @@ const SalesReport = () => {
   const totalPaymentReleased= paymentReleasedOrder?.reduce((acc, curr) => acc +parseFloat (curr.recvMoney || 0), 0);
   const totalReceived=paidOrderDelivList?.reduce((acc, curr) => acc +parseFloat (curr.printBazRcvable || 0), 0);
  
-  console.log("totalReceived",totalReceived);
+  console.log("allMercahnts",allMercahnts);
+  const dueAbove1000=allMercahnts?.filter(merchant =>  merchant.dueAmountNow>=1000)
   const [selectProductType, setSelectProductType] = useState('Round Neck');
   const [inputRcvAmount, setInputRcvAmount] = useState('');
   const navigation=useNavigate()
@@ -33,6 +36,9 @@ const SalesReport = () => {
     }
     
   };  
+  const sumOfDuesAbove1000 = allMercahnts?.filter(merchant => merchant.dueAmountNow >= 1000)
+                                       .reduce((acc, merchant) => acc + merchant.dueAmountNow, 0);
+
   const handleRcvInput = (event) => {
     const { id, value } = event.target;
     switch (id) {
@@ -291,35 +297,43 @@ return (
               <div className="col-xs-12 col-sm-6 col-md-6 col-lg-6">
                 <div className="lobipanel">
                   <div className="panel-title">
-                    <h4>Brand Payment released<span style={{float: 'right'}}>{totalPaymentReleased}৳</span></h4>
+                    <h4>Brand Payment released<span style={{float: 'right'}}>{ Math.floor(sumOfDuesAbove1000)}৳</span></h4>
                   </div>
                   <div className="panel-body">
-                    <table className="table">
-                      <thead>
-                        <tr>
-                          
-                          <th>Date </th>
-                          <th>Order Id </th>
-                          <th>Delivery Status </th>
-                          <th>Amount</th>
-                        </tr>
-                      </thead>
-                      <tbody>
-                        {
-                          paymentReleasedOrder?.map(releasedOrders=>
-                            <tr className="info">
-                             <td>{releasedOrders?.statusDate}</td>
-                            <td><a href={`/viewOrder/${releasedOrders?._id}`} target="_blank" rel="noreferrer">{releasedOrders?._id}</a></td>
-                            <td><p style={{background:"orange" ,width:"140px",padding:"5px",borderRadius:"5px",color:"white"}}>{releasedOrders?.orderStatus}</p></td>
-                            <td>{releasedOrders?.recvMoney} tk</td>
-                           
-                          </tr>
-                            )
-                        }
-                       
-                       
-                      </tbody>
-                    </table>
+                  <table className="table">
+            <thead>
+                <tr>
+                    <th>Date</th>
+                    <th>Brand</th>
+                    <th>Contact</th>
+                    <th>Payment Released Amount</th>
+                    <th>Due Amount</th>
+                </tr>
+            </thead>
+            <tbody>
+    {dueAbove1000?.map(merchant => {
+        if (!merchant?.payments || merchant.payments.length === 0) {
+            // This merchant has no payments, so return null or a placeholder row
+            return null;
+        }
+        
+        const lastPayment = merchant.payments[merchant.payments.length - 1];
+        return (
+            <tr className="info" key={lastPayment.paymentReleasedDate}>
+                <td>{lastPayment.paymentReleasedDate}</td>
+                <td>
+                       {merchant.brandName}
+                 
+                </td>
+                <td>{merchant.phone}</td>
+                <td style={{textAlign:"center"}}>{lastPayment.paymentReleasedAmount}</td>
+                <td>{merchant.dueAmountNow}</td>
+            </tr>
+        );
+    })}
+</tbody>
+
+        </table>
                   </div>
                   {/* <div className="panel-button-tr">
                     <input type="text" placeholder="Type ammount & update" style={{paddingLeft: '5px'}} />

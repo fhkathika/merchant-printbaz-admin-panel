@@ -11,8 +11,8 @@ const AuthProvider = ({ children }) => {
 const navigate=useNavigate()
 const fetchUserData = async (token) => {
   try {
-      const response = await fetch("http://localhost:5000/adminuser",   
-      // const response = await fetch("https://mserver.printbaz.com/adminuser",   
+      // const response = await fetch("http://localhost:5000/adminuser",   
+      const response = await fetch("https://mserver.printbaz.com/adminuser",   
       {
           headers: {
               Authorization: `Bearer ${token}`,

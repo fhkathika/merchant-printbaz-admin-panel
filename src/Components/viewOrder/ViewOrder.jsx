@@ -17,6 +17,7 @@ import ReactDOMServer from 'react-dom/server';
 import { useRoleAsignData } from '../../hooks/useRoleAsignData';
 import useGetMongoData from '../../hooks/useGetMongoData';
 import { AuthContext } from '../../authProvider/AuthProvider';
+import axios from 'axios';
 const ViewOrder = () => {
   let { id } = useParams();
   const {orderAll}=useGetMongoData()
@@ -79,7 +80,8 @@ setTrackingId(e.target.value)
   }
  
  const statusChangeTimeRecord=new Date().toLocaleString("en-US", { month: 'long', day: 'numeric', year: 'numeric', hour: 'numeric', minute: 'numeric' })
-  
+
+ 
  console.log("statusChangeTimeRecord",statusChangeTimeRecord);
  const handleInputChange = async (e) => {
     const status = e.target.value;
@@ -800,7 +802,7 @@ setTrackingId(e.target.value)
                            {orderStatus=== "in-production"&& "In Production" }
                            {orderStatus=== "out for delivery"&& "Out for delivery" }
                            {orderStatus=== "delivered"&& "Delivered" }
-                           {orderStatus=== "payment-released"&& "Payment Released" }
+                           {/* {orderStatus=== "payment-released"&& "Payment Released" } */}
                            {orderStatus=== "returned"&& "Returned" }
                            {orderStatus=== "on hold artwork issue"&& "On hold -Artwork issue" }
                            {orderStatus=== "on hold billing issue"&& "On hold - Billing issue" }
@@ -819,7 +821,7 @@ setTrackingId(e.target.value)
                              <option value="in-production">In Production</option>
                              <option value="out for delivery">Out for delivery</option>
                              <option value="delivered">Delivered</option>
-                             <option value="payment-released">Payment Released</option>
+                             {/* <option value="payment-released">Payment Released</option> */}
                              <option value="returned">Returned</option>
                              <option value="cancel">Cancel</option>
                            </>
@@ -836,7 +838,7 @@ setTrackingId(e.target.value)
                              <option value="in-production">In Production</option>
                              <option value="out for delivery">Out for delivery</option>
                              <option value="delivered">Delivered</option>
-                             <option value="payment-released">Payment Released</option>
+                             {/* <option value="payment-released">Payment Released</option> */}
                              <option value="returned">Returned</option>
                              <option value="cancel">Cancel</option>
                            </>
@@ -851,7 +853,7 @@ setTrackingId(e.target.value)
                              <option value="in-production">In Production</option>
                              <option value="out for delivery">Out for delivery</option>
                              <option value="delivered">Delivered</option>
-                             <option value="payment-released">Payment Released</option>
+                             {/* <option value="payment-released">Payment Released</option> */}
                              <option value="returned">Returned</option>
                              <option value="cancel">Cancel</option>
                            </>
@@ -867,7 +869,7 @@ setTrackingId(e.target.value)
                             <option value="confirmed">Confirmed</option>
                              <option value="out for delivery">Out for delivery</option>
                              <option value="delivered">Delivered</option>
-                             <option value="payment-released">Payment Released</option>
+                             {/* <option value="payment-released">Payment Released</option> */}
                              <option value="returned">Returned</option>
                              <option value="cancel">Cancel</option>
                            </>
@@ -883,7 +885,7 @@ setTrackingId(e.target.value)
                             <option value="confirmed">Confirmed</option>
                             <option value="in-production">In Production</option>
                              <option value="delivered">Delivered</option>
-                             <option value="payment-released">Payment Released</option>
+                             {/* <option value="payment-released">Payment Released</option> */}
                              <option value="returned">Returned</option>
                              <option value="cancel">Cancel</option>
                            </>
@@ -899,7 +901,7 @@ setTrackingId(e.target.value)
                             <option value="confirmed">Confirmed</option>
                             <option value="in-production">In Production</option>
                             <option value="out for delivery">Out for delivery</option>
-                             <option value="payment-released">Payment Released</option>
+                             {/* <option value="payment-released">Payment Released</option> */}
                              <option value="returned">Returned</option>
                              <option value="cancel">Cancel</option>
                            </>
@@ -932,7 +934,7 @@ setTrackingId(e.target.value)
                             <option value="in-production">In Production</option>
                             <option value="out for delivery">Out for delivery</option>
                             <option value="delivered">Delivered</option>
-                            <option value="payment-released">Payment Released</option>
+                            {/* <option value="payment-released">Payment Released</option> */}
                             <option value="cancel">Cancel</option>
                             
                            </>
@@ -949,7 +951,7 @@ setTrackingId(e.target.value)
                              <option value="in-production">In Production</option>
                              <option value="out for delivery">Out for delivery</option>
                              <option value="delivered">Delivered</option>
-                             <option value="payment-released">Payment Released</option>
+                             {/* <option value="payment-released">Payment Released</option> */}
                              <option value="returned">Returned</option>
                              <option value="cancel">Cancel</option>
                            </>
@@ -966,7 +968,7 @@ setTrackingId(e.target.value)
                              <option value="in-production">In Production</option>
                              <option value="out for delivery">Out for delivery</option>
                              <option value="delivered">Delivered</option>
-                             <option value="payment-released">Payment Released</option>
+                             {/* <option value="payment-released">Payment Released</option> */}
                              <option value="returned">Returned</option>
                              <option value="cancel">Cancel</option>
                            </>
@@ -983,7 +985,7 @@ setTrackingId(e.target.value)
                              <option value="in-production">In Production</option>
                              <option value="out for delivery">Out for delivery</option>
                              <option value="delivered">Delivered</option>
-                             <option value="payment-released">Payment Released</option>
+                             {/* <option value="payment-released">Payment Released</option> */}
                              <option value="returned">Returned</option>
                              <option value="cancel">Cancel</option>
                            </>
@@ -1001,7 +1003,7 @@ setTrackingId(e.target.value)
                              <option value="in-production">In Production</option>
                              <option value="out for delivery">Out for delivery</option>
                              <option value="delivered">Delivered</option>
-                             <option value="payment-released">Payment Released</option>
+                             {/* <option value="payment-released">Payment Released</option> */}
                              <option value="returned">Returned</option>
                              
                            </>
@@ -1028,7 +1030,7 @@ onChange={(e) => handleInputChange(e)}
   {orderStatus=== "in-production"&& "In Production" }
   {orderStatus=== "out for delivery"&& "Out for delivery" }
   {orderStatus=== "delivered"&& "Delivered" }
-  {orderStatus=== "payment-released"&& "Payment Released" }
+  {/* {orderStatus=== "payment-released"&& "Payment Released" } */}
   {orderStatus=== "returned"&& "Returned" }
   {orderStatus=== "on hold artwork issue"&& "On hold -Artwork issue" }
   {orderStatus=== "on hold billing issue"&& "On hold - Billing issue" }
@@ -1047,7 +1049,7 @@ onChange={(e) => handleInputChange(e)}
     <option value="in-production">In Production</option>
     <option value="out for delivery">Out for delivery</option>
     <option value="delivered">Delivered</option>
-    <option value="payment-released">Payment Released</option>
+    {/* <option value="payment-released">Payment Released</option> */}
     <option value="returned">Returned</option>
     <option value="cancel">Cancel</option>
   </>
@@ -1064,7 +1066,7 @@ onChange={(e) => handleInputChange(e)}
     <option value="in-production">In Production</option>
     <option value="out for delivery">Out for delivery</option>
     <option value="delivered">Delivered</option>
-    <option value="payment-released">Payment Released</option>
+    {/* <option value="payment-released">Payment Released</option> */}
     <option value="returned">Returned</option>
     <option value="cancel">Cancel</option>
   </>
@@ -1079,7 +1081,7 @@ onChange={(e) => handleInputChange(e)}
     <option value="in-production">In Production</option>
     <option value="out for delivery">Out for delivery</option>
     <option value="delivered">Delivered</option>
-    <option value="payment-released">Payment Released</option>
+    {/* <option value="payment-released">Payment Released</option> */}
     <option value="returned">Returned</option>
     <option value="cancel">Cancel</option>
   </>
@@ -1095,7 +1097,7 @@ onChange={(e) => handleInputChange(e)}
    <option value="confirmed">Confirmed</option>
     <option value="out for delivery">Out for delivery</option>
     <option value="delivered">Delivered</option>
-    <option value="payment-released">Payment Released</option>
+    {/* <option value="payment-released">Payment Released</option> */}
     <option value="returned">Returned</option>
     <option value="cancel">Cancel</option>
   </>
@@ -1111,7 +1113,7 @@ onChange={(e) => handleInputChange(e)}
    <option value="confirmed">Confirmed</option>
    <option value="in-production">In Production</option>
     <option value="delivered">Delivered</option>
-    <option value="payment-released">Payment Released</option>
+    {/* <option value="payment-released">Payment Released</option> */}
     <option value="returned">Returned</option>
     <option value="cancel">Cancel</option>
   </>
@@ -1127,7 +1129,7 @@ onChange={(e) => handleInputChange(e)}
    <option value="confirmed">Confirmed</option>
    <option value="in-production">In Production</option>
    <option value="out for delivery">Out for delivery</option>
-    <option value="payment-released">Payment Released</option>
+    {/* <option value="payment-released">Payment Released</option> */}
     <option value="returned">Returned</option>
     <option value="cancel">Cancel</option>
   </>
@@ -1160,7 +1162,7 @@ onChange={(e) => handleInputChange(e)}
    <option value="in-production">In Production</option>
    <option value="out for delivery">Out for delivery</option>
    <option value="delivered">Delivered</option>
-   <option value="payment-released">Payment Released</option>
+   {/* <option value="payment-released">Payment Released</option> */}
    <option value="cancel">Cancel</option>
    
   </>
@@ -1177,7 +1179,7 @@ onChange={(e) => handleInputChange(e)}
     <option value="in-production">In Production</option>
     <option value="out for delivery">Out for delivery</option>
     <option value="delivered">Delivered</option>
-    <option value="payment-released">Payment Released</option>
+    {/* <option value="payment-released">Payment Released</option> */}
     <option value="returned">Returned</option>
     <option value="cancel">Cancel</option>
   </>
@@ -1194,7 +1196,7 @@ onChange={(e) => handleInputChange(e)}
     <option value="in-production">In Production</option>
     <option value="out for delivery">Out for delivery</option>
     <option value="delivered">Delivered</option>
-    <option value="payment-released">Payment Released</option>
+    {/* <option value="payment-released">Payment Released</option> */}
     <option value="returned">Returned</option>
     <option value="cancel">Cancel</option>
   </>
@@ -1211,7 +1213,7 @@ onChange={(e) => handleInputChange(e)}
     <option value="in-production">In Production</option>
     <option value="out for delivery">Out for delivery</option>
     <option value="delivered">Delivered</option>
-    <option value="payment-released">Payment Released</option>
+    {/* <option value="payment-released">Payment Released</option> */}
     <option value="returned">Returned</option>
     <option value="cancel">Cancel</option>
   </>
@@ -1229,7 +1231,7 @@ onChange={(e) => handleInputChange(e)}
     <option value="in-production">In Production</option>
     <option value="out for delivery">Out for delivery</option>
     <option value="delivered">Delivered</option>
-    <option value="payment-released">Payment Released</option>
+    {/* <option value="payment-released">Payment Released</option> */} 
     <option value="returned">Returned</option>
     
   </>

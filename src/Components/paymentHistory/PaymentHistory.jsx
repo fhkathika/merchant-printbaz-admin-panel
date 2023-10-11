@@ -182,10 +182,7 @@ const PaymentHistory = (props) => {
     <h3 style={{display:"inline-block", textAlign:"center",fontWidth:"800", margin: "10px", verticalAlign: 'middle'}}>PAYMENT HISTORY</h3>
 </Link>
           </div>
-          
-      
-
-           <div className="col-lg-2 col-sm-12 ">
+          <div className="col-lg-2 col-sm-12 ">
               <label htmlFor="byEmail-filter" className="form-label">Payment Released By:</label>
               <input type="text" id="byEmail-filter" value={filterByEmail} className="form-control" onChange={(e) =>  handleInputChange(e)} />
             </div> 
@@ -202,9 +199,7 @@ const PaymentHistory = (props) => {
                 
                   </div>   
                    <div className="col-lg-2 col-sm-12">
-               
-                 
-                  <label style={{textAlign:"start"}} htmlFor="endDate" className="form-label">End Date</label>
+               <label style={{textAlign:"start"}} htmlFor="endDate" className="form-label">End Date</label>
                   <DatePicker className='form-control' selected={endDate} value={endDate} onChange={handleChangeEndDate} selectsEnd startDate={startDate} endDate={endDate} minDate={startDate} />
                   </div>
            

@@ -334,7 +334,7 @@ const actualIndexOfLastItem = indexOfLastItem > orderMap.length ? orderMap.lengt
                   <option value="in-production">In Production</option>
                   <option value="out for delivery">Out for delivery</option>
                  <option value="delivered">Delivered</option>
-                  <option value="payment-released">Payment Released</option>
+                  {/* <option value="payment-released">Payment Released</option> */}
                   <option value="returned">Returned</option>
                   <option value="cancel">Cancel</option>
                   

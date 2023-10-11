@@ -72,7 +72,8 @@ console.log(formattedCurrentDate); // Outputs something like: "September 6, 2023
 
     };
   
-    fetch(`http://localhost:5000/updateUserbyReleasedPay/${merchantsId}`, {
+    // fetch(`http://localhost:5000/updateUserbyReleasedPay/${merchantsId}`, {
+    fetch(`https://mserver.printbaz.com/updateUserbyReleasedPay/${merchantsId}`, {
       method: 'PUT',
       headers: {
         'Content-Type': 'application/json'
