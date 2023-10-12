@@ -62,8 +62,8 @@ const PaymentHistory = (props) => {
     useEffect(()=>{
         const getUserById=async()=>{
                  // Fetch the updated order details
-        // await fetch(`https://mserver.printbaz.com/getUser/${merchantId}`)
-        await fetch(`http://localhost:5000/getUser/${merchantId}`)
+        await fetch(`https://mserver.printbaz.com/getUser/${merchantId}`)
+        // await fetch(`http://localhost:5000/getUser/${merchantId}`)
         .then(res=>res.json())
         .then(data => {setGetDataById(data)})
           

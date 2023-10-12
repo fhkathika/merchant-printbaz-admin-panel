@@ -80,9 +80,107 @@ setTrackingId(e.target.value)
   }
  
  const statusChangeTimeRecord=new Date().toLocaleString("en-US", { month: 'long', day: 'numeric', year: 'numeric', hour: 'numeric', minute: 'numeric' })
-
+  // Payment Released
+  const orderStatusPaymentReleased=orderAll
+  ?.filter(order => order.userMail === viewClient?.email && order.orderStatus==="payment-released" ) 
+ let totalReceiveBase=0,totalReturnAmmountBase=0;
+ for(let i=0;i<orderStatusPaymentReleased?.length;i++){
+   let totalReceive=Number(orderStatusPaymentReleased[i]?.recvMoney);
+  
+   totalReceiveBase =totalReceiveBase+totalReceive;
+ // console.log("totalReceiveBase",totalReceiveBase);
+ }
+ // for(let i=0;i<orderSatatusReturned?.length;i++){
+ //   let totalReturn=orderSatatusReturned[i]?.returnedAmount;
+ //   if(totalReturn){
+ //     totalReturnAmmountBase +=totalReturn;
+ //   }
  
- console.log("statusChangeTimeRecord",statusChangeTimeRecord);
+ 
+ // }
+ // Check if orderStatusReturned is an array before looping
+ const orderSatatusReturned=orderAll
+ ?.filter(order =>order.userMail === viewClient?.email && order.orderStatus==="returned" )
+ // console.log("orderStatus pament released",orderStatusPaymentReleased);
+
+ if (Array.isArray(orderSatatusReturned)) {
+   for (let i = 0; i < orderSatatusReturned.length; i++) {
+     const totalReturn = Number(orderSatatusReturned[i]?.returnedAmount);
+     const deliveryFee = Number(orderSatatusReturned[i]?.deliveryFee);
+     
+     // If totalReturn and deliveryFee exist and are numbers, add them to totalReturnAmountBase
+    
+       totalReturnAmmountBase += (totalReturn + deliveryFee+deliveryFee/2);
+     
+   }
+ }
+ 
+ // Now, totalReturnAmountBase contains the sum of all returnedAmounts and their associated deliveryFees
+ 
+ 
+ //patmnet status =paid,orderstatus :delivered
+ const PaymentStausPaid=orderAll
+ ?.filter(order => order.userMail === viewClient?.email && order.paymentStatus==="paid" && order?.orderStatus==="delivered")
+ const returnValueFilter=orderAll?.filter(order =>  order.userMail === viewClient?.email&& order?.orderStatus==="returned")
+ 
+ 
+ let statusPaidbase=0; let totalpaid
+ for(let i=0;i<PaymentStausPaid?.length;i++){
+    totalpaid=Number(PaymentStausPaid[i]?.recvMoney);
+   statusPaidbase =Number(statusPaidbase)+totalpaid;
+  
+ 
+ }
+ 
+ let dueAmount=Number(statusPaidbase-(totalReceiveBase+totalReturnAmmountBase))
+ 
+ const getOrderById = async () => {
+  // Ensure there's an ID before making a request
+ 
+  if (viewClient?._id) {
+      try {
+    
+          const response = await fetch(
+              `https://mserver.printbaz.com/updateBill/${viewClient._id}`,
+              // `http://localhost:5000/updateBill/${viewClient._id}`,
+              {
+                method: "PUT",
+                headers: {
+                    "Content-Type": "application/json",
+                },
+                body: JSON.stringify({ 
+                    totalBill: statusPaidbase, 
+                    totalReceiveBase: totalReceiveBase,
+                    totalReturnAmmountBase: totalReturnAmmountBase,
+                    dueAmount: dueAmount
+                }),
+            }
+          );
+
+          const data = await response.json();
+          if (response.status === 200) {
+              // Handle success, for instance:
+              console.log("Total bill updated successfully:", data);
+          } else {
+              // Handle error
+              console.error("Error updating the bill:", data.message);
+          }
+
+      } catch (error) {
+          console.error("Network or server error:", error);
+      }
+  }
+};
+ 
+ useEffect(() => {
+  if (getSpecificOrderById?.paymentStatus === "paid" && getSpecificOrderById?.orderStatus === "delivered") {
+    getOrderById();
+}
+
+  getOrderById();
+
+}, [viewClient?._id,statusPaidbase, totalReceiveBase, totalReturnAmmountBase, dueAmount]);
+
  const handleInputChange = async (e) => {
     const status = e.target.value;
     try {

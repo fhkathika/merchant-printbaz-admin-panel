@@ -20,7 +20,7 @@ const SalesReport = () => {
   const totalPaymentReleased= paymentReleasedOrder?.reduce((acc, curr) => acc +parseFloat (curr.recvMoney || 0), 0);
   const totalReceived=paidOrderDelivList?.reduce((acc, curr) => acc +parseFloat (curr.printBazRcvable || 0), 0);
  
-  console.log("allMercahnts",allMercahnts);
+  console.log("paidOrderDelivList",paidOrderDelivList);
   const dueAbove1000=allMercahnts?.filter(merchant =>  merchant.dueAmountNow>=1000)
   const [selectProductType, setSelectProductType] = useState('Round Neck');
   const [inputRcvAmount, setInputRcvAmount] = useState('');
@@ -36,8 +36,21 @@ const SalesReport = () => {
     }
     
   };  
-  const sumOfDuesAbove1000 = allMercahnts?.filter(merchant => merchant.dueAmountNow >= 1000)
+  const sumOfDuesAmount = allMercahnts?.filter(merchant => merchant.dueAmountNow)
                                        .reduce((acc, merchant) => acc + merchant.dueAmountNow, 0);
+
+                                       const sumOfPaymentReleased = allMercahnts
+                                       .map(item => {
+                                         // check if the payments array exists and has a length greater than 0
+                                         if (item.payments && item.payments.length > 0) {
+                                           return item.payments[item.payments.length - 1].totalReleasedAmount || 0;
+                                         }
+                                         return 0;
+                                       })
+                                       .reduce((acc, curr) => acc + curr, 0);
+                                     
+                                     console.log("sumOfPaymentReleased",sumOfPaymentReleased);  // This will print the sum of the last index of totalReleasedAmount for all objects
+
 
   const handleRcvInput = (event) => {
     const { id, value } = event.target;
@@ -114,19 +127,19 @@ return (
               </div>
             </div>
             <div className="row non-input-bar-01">
-              <div className="col-xs-12 col-sm-6 col-md-6 col-lg-3">
+              <div className="col-xs-12 col-sm-6 col-md-6 col-lg-4">
                 <div id="cardbox1">
                   <div className="statistic-box">
                     <h3>Total Sales</h3>
                     <div className="counter-number pull-right">
-                      <span className="count-number">11,350</span>
+                      <span className="count-number">{Math.floor(totalReceived)}</span>
                       <span className="slight" style={{fontWeight: 'bolder'}}>৳</span>
                     </div>
                   </div>
                 
                 </div>
               </div>
-              <div className="col-xs-12 col-sm-6 col-md-6 col-lg-3">
+              {/* <div className="col-xs-12 col-sm-6 col-md-6 col-lg-3">
                 <div id="cardbox1">
                   <div className="statistic-box">
                     <h3> Amount Receivable From Courier</h3>
@@ -136,24 +149,24 @@ return (
                     </div>
                   </div>
                 </div>
-              </div>
-              <div className="col-xs-12 col-sm-6 col-md-6 col-lg-3">
+              </div> */}
+              <div className="col-xs-12 col-sm-6 col-md-6 col-lg-4">
                 <div id="cardbox1">
                   <div className="statistic-box">
-                    <h3>Brand Cost</h3>
+                    <h3>Brand Cost Released Payment</h3>
                     <div className="counter-number pull-right">
-                      <span className="count-number">21,560</span>
+                      <span className="count-number">{ Math.floor(sumOfPaymentReleased)}</span>
                       <span className="slight" style={{fontWeight: 'bolder'}}>৳</span>
                     </div>
                   </div>
                 </div>
               </div>
-              <div className="col-xs-12 col-sm-6 col-md-6 col-lg-3">
+              <div className="col-xs-12 col-sm-6 col-md-6 col-lg-4">
                 <div id="cardbox1">
                   <div className="statistic-box">
                     <h3>Amount Payable</h3>
                     <div className="counter-number pull-right">
-                      <span className="count-number">8,550</span>
+                      <span className="count-number">{Math.floor(sumOfDuesAmount)}</span>
                       <span className="slight" style={{fontWeight: 'bolder'}}>৳</span>
                     </div>
                   </div>
@@ -161,7 +174,7 @@ return (
               </div>
             </div>
             <div className="row input-bar-01">
-              <div className="col-xs-12 col-sm-6 col-md-6 col-lg-6">
+              {/* <div className="col-xs-12 col-sm-6 col-md-6 col-lg-6">
                 <div className="lobipanel">
                   <div className="panel-title">
                     <h4>Total Number Of Tee Shirts Sold <span style={{float: 'right'}}>{grandTotalSoldtshirt} PCS</span></h4>
@@ -251,15 +264,15 @@ return (
                   </div>
                   <div className="panel-button">
                     <button id="button" onClick={handleGotoTotalSoldThsirt} sizeCountsForOutForDelievryHoodie={sizeCountsForOutForDelievryHoodie}sizeCountsForOutForDelievryDropSholder={sizeCountsForOutForDelievryDropSholder} sizeCountsForOutForDelievryRoundNeck={sizeCountsForOutForDelievryRoundNeck}>View More</button>
-                    {/* <button style={{float: 'right'}}>View More</button> */}
+                 
                   </div>
                
                 </div>
-              </div>
+              </div> */}
               <div className="col-xs-12 col-sm-6 col-md-6 col-lg-6">
                 <div className="lobipanel">
                   <div className="panel-title">
-                    <h4>Total Received<span style={{float: 'right'}}>{totalReceived} ৳</span></h4>
+                    <h4>Total Received<span style={{float: 'right'}}>{Math.floor(totalReceived)} ৳</span></h4>
                   </div>
                   <div className="panel-body">
                     <table className="table">
@@ -274,13 +287,13 @@ return (
                       </thead>
                       <tbody>
                         {
-                          paidOrdersRoundNeck?.slice(0,4).map(paidOrders=>
+                          paidOrderDelivList?.slice(0,4).map(paidOrders=>
                             <tr className="info">
                             <td>{paidOrders?.statusDate}</td>
                             <td><a href={`/viewOrder/${paidOrders?.orderId}`} target="_blank" rel="noreferrer">{paidOrders?.orderId}</a></td>
                             <td><p style={{padding:"5px",backgroundColor:"green",color:"white",width:"150px",textAlign:"center",borderRadius:"5px"}}>{paidOrders?.orderStatus}</p> </td>
                             <td> <p style={{padding:"5px",backgroundColor:"orange",color:"white",width:"150px",textAlign:"center",borderRadius:"5px"}}>{paidOrders?.deliveryAssignTo}</p></td>
-                            <td>{paidOrders?.printBazRcvable} tk</td>
+                            <td>{Math.floor(paidOrders?.printBazRcvable)}  tk</td>
                           </tr>
                             )
                         }
@@ -297,7 +310,7 @@ return (
               <div className="col-xs-12 col-sm-6 col-md-6 col-lg-6">
                 <div className="lobipanel">
                   <div className="panel-title">
-                    <h4>Brand Payment released<span style={{float: 'right'}}>{ Math.floor(sumOfDuesAbove1000)}৳</span></h4>
+                    <h4>Brand Payment released<span style={{float: 'right'}}>{ Math.floor(sumOfPaymentReleased)}৳</span></h4>
                   </div>
                   <div className="panel-body">
                   <table className="table">
@@ -327,7 +340,7 @@ return (
                 </td>
                 <td>{merchant.phone}</td>
                 <td style={{textAlign:"center"}}>{lastPayment.paymentReleasedAmount}</td>
-                <td>{merchant.dueAmountNow}</td>
+                <td>{Math.floor(merchant.dueAmountNow)}</td>
             </tr>
         );
     })}

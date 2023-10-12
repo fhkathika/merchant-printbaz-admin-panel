@@ -9,17 +9,18 @@ import DeliveryListAddedAlert from "./DeliveryListAddedAlert";
 import useGetDeliveryList from "../../hooks/useGetDeliveryList";
 import { AuthContext } from "../../authProvider/AuthProvider";
 const PaymentReleasedPopUp = ({ 
-    paymentReleasedPopUp,
+  paymentReleasedPopUp,
 setPaymentReleasedPopUp,
-    dueAmount,
-    merchantsId,
-    totalReturnAmmountBase,
-    totalBill,
-    totalReceiveBase,
-    onClose}) => {
+dueAmount,
+mercahantDetail,
+totalReturnAmmountBase,
+totalBill,
+totalReceiveBase,
+merchantsId,
+onClose}) => {
   const {adminUser}=useContext(AuthContext);
   const [delSuccessAlert, setDelSuccessAlert] = useState(false);
-  const [inputValue, setInputValue] = useState('');
+  const [inputValue, setInputValue] = useState();
   if (!paymentReleasedPopUp) return null;
 
 // Create a new date object for the current date and time
@@ -50,8 +51,27 @@ console.log(formattedCurrentDate); // Outputs something like: "September 6, 2023
   const handleInputChange = (event) => {
       setInputValue(event.target.value);
   }
+  console.log("mercahantDetail", mercahantDetail);
 
+  const parsedInputValue = parseInt(inputValue) || 0; // If inputValue is NaN or undefined, default to 0.
+
+  let totalReleasedAmount = 0;
   
+  if (mercahantDetail && Array.isArray(mercahantDetail.payments)) {
+      totalReleasedAmount = mercahantDetail.payments.reduce((sum, payment) => {
+          const amount = parseInt(payment.paymentReleasedAmount);
+          return sum + (isNaN(amount) ? 0 : amount); // If amount is NaN, add 0, else add the amount.
+      }, 0);
+  }
+  
+  // Add the inputValue to the totalReleasedAmount
+  totalReleasedAmount += parsedInputValue;
+  
+  console.log(totalReleasedAmount);
+  
+
+ 
+  console.log(totalReleasedAmount);
   const handlePayReleased = (e) => {
     e.preventDefault();
   
@@ -61,6 +81,7 @@ console.log(formattedCurrentDate); // Outputs something like: "September 6, 2023
       totalBill: totalBill,
       totalReceiveBase: totalReceiveBase,
       paymentReleasedAmount: inputValue,
+      totalReleasedAmount:totalReleasedAmount,
       paymentReleasedBy: adminUser?.email,
       paymentReleasedDate:formattedCurrentDate
     };

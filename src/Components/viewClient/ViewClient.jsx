@@ -198,48 +198,19 @@ for(let i=0;i<PaymentStausPaid?.length;i++){
 
 }
 
-console.log("totalbill",statusPaidbase);
 let dueAmount=Number(statusPaidbase-(totalReceiveBase+totalReturnAmmountBase))
 
-
-
-useEffect(() => {
-  const getOrderById = async () => {
-      // Ensure there's an ID before making a request
-      if (viewClient?._id) {
-          try {
-            console.log("totalBill test",statusPaidbase);
-              const response = await fetch(
-                  `https://mserver.printbaz.com/updateBill/${viewClient._id}`,
-                  // `http://localhost:5000/updateBill/${viewClient._id}`,
-                  {
-                      method: "PUT",
-                      headers: {
-                          "Content-Type": "application/json",
-                      },
-                      body: JSON.stringify({ totalBill: statusPaidbase }),
-                  }
-              );
-
-              const data = await response.json();
-              if (response.status === 200) {
-                  // Handle success, for instance:
-                  console.log("Total bill updated successfully:", data);
-              } else {
-                  // Handle error
-                  console.error("Error updating the bill:", data.message);
-              }
-
-          } catch (error) {
-              console.error("Network or server error:", error);
-          }
-      }
-  };
-
-  getOrderById();
-
-}, [viewClient?._id, statusPaidbase]);
-
+let  lastPayementDetail= getUserById?.payments && getUserById.payments.length > 0 ? getUserById?.payments[getUserById?.payments?.length-1] :null
+console.log("lastPayementDetail",lastPayementDetail);
+let grandDueNow;
+console.log("getUserById?.dueAmountNow",getUserById?.dueAmountNow);
+if (lastPayementDetail && lastPayementDetail.paymentReleasedAmount) {
+    grandDueNow = dueAmount - lastPayementDetail.paymentReleasedAmount;
+console.log( " getUserById?.dueAmountNow - lastPayementDetail.paymentReleasedAmount",grandDueNow);
+  } else {
+    grandDueNow = dueAmount;
+    console.log( "grandDueNow = dueAmount",grandDueNow);
+}
 
 useEffect(()=>{
   const getOrderById=async()=>{
@@ -251,10 +222,54 @@ useEffect(()=>{
     }
        getOrderById()
       },[getUserById])
-     
-   let  lastPayementDetail= getUserById?.payments && getUserById.payments.length > 0 ? getUserById?.payments[getUserById?.payments?.length-1] :null
-  //  console.log("lastPayementDetail",lastPayementDetail);
-
+   
+   useEffect(() => {
+    const getOrderById = async () => {
+        // Ensure there's an ID before making a request
+        console.log("totalBill test",statusPaidbase);
+        console.log("dueAmount test",dueAmount);
+        console.log("totalReceiveBase test",totalReceiveBase);
+        console.log("totalReturnAmmountBase test",totalReturnAmmountBase);
+        console.log("totalReturnAmmountBase test",totalReturnAmmountBase);
+        if (viewClient?._id) {
+            try {
+          
+                const response = await fetch(
+                    `https://mserver.printbaz.com/updateBill/${viewClient._id}`,
+                    // `http://localhost:5000/updateBill/${viewClient._id}`,
+                    {
+                      method: "PUT",
+                      headers: {
+                          "Content-Type": "application/json",
+                      },
+                      body: JSON.stringify({ 
+                          totalBill: statusPaidbase, 
+                          totalReceiveBase: totalReceiveBase,
+                          totalReturnAmmountBase: totalReturnAmmountBase,
+                          dueAmount:  grandDueNow 
+                      }),
+                  }
+                );
+  
+                const data = await response.json();
+                if (response.status === 200) {
+                    // Handle success, for instance:
+                    console.log("Total bill updated successfully:", data);
+                } else {
+                    // Handle error
+                    console.error("Error updating the bill:", data.message);
+                }
+  
+            } catch (error) {
+                console.error("Network or server error:", error);
+            }
+        }
+    };
+  
+    getOrderById();
+  
+  }, [viewClient?._id,statusPaidbase, totalReceiveBase, totalReturnAmmountBase, dueAmount]);
+  
   
 
   const handleInputChange = async (e) => {
@@ -644,21 +659,21 @@ const handlePaymentHistory=()=>{
                       <h3 className="all-title">Payments</h3>
                       <div className='flex'>
                       <h6>Total Payment Released:</h6>
-                      <span style={{marginTop:"10px",color:"orange",fontSize:'16px'}}>{lastPayementDetail?.paymentReleasedAmount?lastPayementDetail?.paymentReleasedAmount:0} TK</span>
+                      <span style={{marginTop:"10px",color:"orange",fontSize:'16px'}}>{lastPayementDetail?.totalReleasedAmount?lastPayementDetail?.totalReleasedAmount:0} TK</span>
                       </div>
                       <div className='flex'>
                       <h6>Total Bill:</h6>
-                      {/* <span style={{marginTop:"10px",color:"orange",fontSize:'16px'}}>{parseInt(lastPayementDetail?.totalBill?lastPayementDetail?.totalBill :statusPaidbase)} TK</span> */}
-                      <span style={{marginTop:"10px",color:"orange",fontSize:'16px'}}>{parseInt(getUserById?.totalBill?getUserById?.totalBill :statusPaidbase)} TK</span>
+                      <span style={{marginTop:"10px",color:"orange",fontSize:'16px'}}>{parseInt(lastPayementDetail?.totalBill)} TK</span>
+                      {/* <span style={{marginTop:"10px",color:"orange",fontSize:'16px'}}>{parseInt(getUserById?.totalBill?getUserById?.totalBill :statusPaidbase)} TK</span> */}
                       </div> 
                       <div className='flex'>
                       <h6>Return Value:</h6>
-                      <span style={{marginTop:"10px",color:"orange",fontSize:'16px'}}> {Number(lastPayementDetail?.totalReturnAmmountBase?lastPayementDetail?.totalReturnAmmountBase :totalReturnAmmountBase)} TK</span>
+                      <span style={{marginTop:"10px",color:"orange",fontSize:'16px'}}> {Number(lastPayementDetail?.totalReturnAmmountBase)} TK</span>
                       </div> 
                       <div className='flex'>
                       
                       <h6>Due Amount:</h6>
-                      <span style={{marginTop:"10px",color:"orange",fontSize:'16px'}}>{Math.floor(getUserById?.dueAmountNow ? getUserById?.dueAmountNow : dueAmount)} TK</span>
+                      <span style={{marginTop:"10px",color:"orange",fontSize:'16px'}}>{Math.floor(getUserById?.dueAmountNow )} TK</span>
                       </div>
                    
                       
@@ -678,7 +693,8 @@ const handlePaymentHistory=()=>{
                   <PaymentReleasedPopUp
                   paymentReleasedPopUp={paymentReleasedPopUp}
                   setPaymentReleasedPopUp={setPaymentReleasedPopUp}
-                  dueAmount={dueAmount}
+                  dueAmount={grandDueNow}
+                  mercahantDetail={getUserById}
                   totalReturnAmmountBase={totalReturnAmmountBase}
                   totalBill={statusPaidbase}
                   totalReceiveBase={totalReceiveBase}
@@ -753,7 +769,7 @@ const handlePaymentHistory=()=>{
                           </p>
                         </div>
                         <div className="col-lg-2 col-sm-12">
-                          <p>{orderInfo?.recvMoney}TK</p>
+                          <p>{Math.floor(orderInfo?.recvMoney)}TK</p>
                         </div>
                         <div className="col-lg-1 col-sm-12">
                           <p className="status-btn">{orderInfo?.orderStatus}</p>
