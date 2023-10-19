@@ -1,7 +1,8 @@
 
 import React, { useContext, useEffect, useState } from 'react';
 import { AuthContext } from '../authProvider/AuthProvider';
-
+import useGetMongoData from './useGetMongoData';
+import useSingleMercahntorder from './useSingleMercahntorder';
 const useAllMerchants = () => {
     const [merchant,setMerchant]=useState([])
    
@@ -22,7 +23,7 @@ const useAllMerchants = () => {
             return acc;
         }
       }, []);
-    return {allMercahnts};
+return {allMercahnts};
 };
+ export default useAllMerchants;
 
-export default useAllMerchants;

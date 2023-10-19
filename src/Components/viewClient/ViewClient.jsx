@@ -198,19 +198,24 @@ for(let i=0;i<PaymentStausPaid?.length;i++){
 
 }
 
-let dueAmount=Number(statusPaidbase-(totalReceiveBase+totalReturnAmmountBase))
+// Calculate initial due amount
+let dueAmount = Number(statusPaidbase - (totalReceiveBase + totalReturnAmmountBase));
 
-let  lastPayementDetail= getUserById?.payments && getUserById.payments.length > 0 ? getUserById?.payments[getUserById?.payments?.length-1] :null
-console.log("lastPayementDetail",lastPayementDetail);
-let grandDueNow;
-console.log("getUserById?.dueAmountNow",getUserById?.dueAmountNow);
+// Fetch the latest payment made by user
+let lastPayementDetail = getUserById?.payments?.length > 0 ? 
+                         getUserById.payments[getUserById.payments.length-1] : null;
+
+// Calculate the grand due amount
+let grandDueNow = dueAmount;
+
 if (lastPayementDetail && lastPayementDetail.paymentReleasedAmount) {
-    grandDueNow = dueAmount - lastPayementDetail.paymentReleasedAmount;
-console.log( " getUserById?.dueAmountNow - lastPayementDetail.paymentReleasedAmount",grandDueNow);
-  } else {
-    grandDueNow = dueAmount;
-    console.log( "grandDueNow = dueAmount",grandDueNow);
+    grandDueNow -= lastPayementDetail.totalReleasedAmount;
 }
+
+console.log("Initial dueAmount:", dueAmount);
+console.log("Last payment amount:", lastPayementDetail?.paymentReleasedAmount || 0);
+console.log("Grand Due Amount:", grandDueNow);
+
 
 useEffect(()=>{
   const getOrderById=async()=>{
@@ -673,7 +678,7 @@ const handlePaymentHistory=()=>{
                       <div className='flex'>
                       
                       <h6>Due Amount:</h6>
-                      <span style={{marginTop:"10px",color:"orange",fontSize:'16px'}}>{Math.floor(getUserById?.dueAmountNow )} TK</span>
+                      <span style={{marginTop:"10px",color:"orange",fontSize:'16px'}}>{Math.floor(getUserById?.dueAmountNow)} TK</span>
                       </div>
                    
                       

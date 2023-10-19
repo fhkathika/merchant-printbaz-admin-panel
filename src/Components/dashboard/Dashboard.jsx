@@ -12,7 +12,10 @@ import GetTotalTshirtDispatched from '../GetTotalTshirtDispatched';
 import useGetAllTickets from '../../hooks/useGetAllTickets';
 import GetTodaysOutForDeliveryOrders from '../GetTodaysOutForDeliveryOrders';
 import { Form } from 'react-bootstrap';
+import useAllMerchants from '../../hooks/useAllMerchants';
 const Dashboard = () => {
+  const {merchant}=useAllMerchants()
+  console.log("all merchants update bill",merchant);
   const {adminUser,loading,loginAdminUser,currentUser}=useContext(AuthContext);
   const { orderAll } = useGetMongoData();
   const {fetchAllTicket}=useGetAllTickets()

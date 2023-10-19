@@ -8,7 +8,9 @@ import * as XLSX from 'xlsx';
 import queryString from 'query-string';
 import MerchantList from '../MerchantList';
 import useGetMongoData from '../../hooks/useGetMongoData';
+import useAllMerchants from '../../hooks/useAllMerchants';
 const AllMerchants = () => {
+
   const navigate = useNavigate();
   const { orderAll } = useGetMongoData();
   const location = useLocation();
