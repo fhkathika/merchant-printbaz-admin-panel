@@ -10,7 +10,7 @@ const Navigationbar = () => {
     const[fetchAllTicket,setFetchAllTicket]=useState([])
     const {value_count}=useRoleAsignData()
     let getAdminEmail=fetchAllTicket?.filter(ticket=>ticket.uniqueAdminEmails?.includes(adminUser?.email)|| ticket?.ticketStatus==="pending(created by client)")
-    // console.log("getAdminEmail navigation bar",getAdminEmail);
+    console.log("getAdminEmail navigation bar",getAdminEmail);
 
     useEffect(()=>{
       fetchTickets();
@@ -94,13 +94,15 @@ const Navigationbar = () => {
               {
    getAdminEmail?.forEach(readMsg => {
     //  <p>{readMsg?.ticketStatus} fgfdg</p>
-    if(readMsg?.ticketStatus === "pending"){
-  
-      msgCount++
-   }  if(readMsg?.ticketStatus === "pending(created by client)"){
+    if(readMsg?.ticketStatus === "pending" || readMsg?.ticketStatus=== "pending(created by client)")
+      {
   
       msgCount++
    }
+  //    if(readMsg?.ticketStatus === "pending(created by client)"){
+  
+  //     msgCount++
+  //  }
 
   })
    }

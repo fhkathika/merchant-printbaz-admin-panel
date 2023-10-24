@@ -137,7 +137,7 @@ let outForDeliveryOrders=orderAll?.filter(users=>users?.orderStatus==="out for d
 let deliveredOrders=orderAll?.filter(users=>users?.orderStatus==="delivered");
 
 let returnOrders=orderAll?.filter(users=>users?.orderStatus==="returned");
-let pendingTickets=fetchAllTicket?.filter(ticket=>ticket?.ticketStatus==="pending");
+let pendingTickets=fetchAllTicket?.filter(ticket=>ticket?.ticketStatus==="pending"|| ticket?.ticketStatus==="pending(created by client)");
 let repliedTickets=fetchAllTicket?.filter(ticket=>ticket?.ticketStatus==="replied");
 let openTickets=fetchAllTicket?.filter(ticket=>ticket?.ticketStatus==="open");
 let paidAndDeliveredOrders=orderAll?.filter(payment=>payment?.paymentStatus==="paid" && payment?.orderStatus==="delivered" );

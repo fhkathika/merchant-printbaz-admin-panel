@@ -46,7 +46,11 @@ console.log("adminUser?.email",adminUser?.email);
     const { id, value } = event.target;
     switch (id) {
       case 'status-filter':
-        setFilterStatus(value);
+     if(value === 'pending') {
+          setFilterStatus(['pending', 'pending(created by client)']);
+        } else {
+          setFilterStatus(value);
+        }
         break; 
          case 'ticketIssue-filter':
         setFilterTicketIssue(value);
@@ -69,9 +73,11 @@ console.log("adminUser?.email",adminUser?.email);
     return fetchAllTicket.filter((ticket) => {
       console.log("order from applyFilters",ticket?.trackingId);
       // Filter by status
-      if (filterStatus !== 'all' && ticket.ticketStatus !== filterStatus) {
+      if ((filterStatus !== 'all' && filterStatus.length > 0 )&& !filterStatus.includes(ticket.ticketStatus)) {
         return false;
       }
+     
+
    // Filter by delivery assign
       if (filterTicketIssue !== '' && ticket.ticketIssue !== filterTicketIssue) {
         return false;
@@ -280,7 +286,7 @@ return (
               }
                     // Define the filter condition
       const shouldShowNotification =
-      allTicket?.ticketStatus === "pending"  &&
+      allTicket?.ticketStatus === "pending"   &&
       // allTicket.adminUser === adminUser?.email;
       allTicket?.uniqueAdminEmails?.includes(adminUser?.email); 
 
