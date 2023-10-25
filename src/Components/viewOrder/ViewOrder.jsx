@@ -45,8 +45,8 @@ const ViewOrder = () => {
   useEffect(()=>{
     const getOrderById=async()=>{
              // Fetch the updated order details
-    await fetch(`https://mserver.printbaz.com/getorder/${id}`)
-    // await fetch(`http://localhost:5000/getorder/${id}`)
+    // await fetch(`https://mserver.printbaz.com/getorder/${id}`)
+    await fetch(`http://localhost:5000/getorder/${id}`)
     .then(res=>res.json())
     .then(data => {setGetSpecificOrderById(data)
       setOrderStatus(data.orderStatus);
@@ -141,8 +141,8 @@ setTrackingId(e.target.value)
       try {
     
           const response = await fetch(
-              `https://mserver.printbaz.com/updateBill/${viewClient._id}`,
-              // `http://localhost:5000/updateBill/${viewClient._id}`,
+              // `https://mserver.printbaz.com/updateBill/${viewClient._id}`,
+              `http://localhost:5000/updateBill/${viewClient._id}`,
               {
                 method: "PUT",
                 headers: {
@@ -185,8 +185,8 @@ setTrackingId(e.target.value)
     const status = e.target.value;
     try {
         const response = await fetch(
-           `https://mserver.printbaz.com/updateOrderStatus/${id}`,{ 
-      // `http://localhost:5000/updateOrderStatus/${id}`, {
+          //  `https://mserver.printbaz.com/updateOrderStatus/${id}`,{ 
+      `http://localhost:5000/updateOrderStatus/${id}`, {
             method: "PUT",
             headers: {
                 "Content-Type": "application/json",
@@ -210,8 +210,8 @@ setTrackingId(e.target.value)
           if(orderReturmed===true){
             try {
               const response = await fetch(
-                // `http://localhost:5000/returnOrderAddition/${id}`,
-                `https://mserver.printbaz.com/returnOrderAddition/${id}`,
+                `http://localhost:5000/returnOrderAddition/${id}`,
+                // `https://mserver.printbaz.com/returnOrderAddition/${id}`,
                 {
                   method: "PUT",
                   headers: {
@@ -258,8 +258,8 @@ setTrackingId(e.target.value)
                 };
 
                 // Add/update the data in the DeliveryList
-                const deliveryResponse = await fetch('https://mserver.printbaz.com/addOrUpdateDeliveryList', {
-                  // const deliveryResponse = await fetch('http://localhost:5000/addOrUpdateDeliveryList', {
+                // const deliveryResponse = await fetch('https://mserver.printbaz.com/addOrUpdateDeliveryList', {
+                  const deliveryResponse = await fetch('http://localhost:5000/addOrUpdateDeliveryList', {
                     method: 'PUT',
                     headers: {
                         'Content-Type': 'application/json',
@@ -273,8 +273,8 @@ setTrackingId(e.target.value)
             }
             else if (status.toLowerCase() === 'cancel') {
               // Delete the order from the delivery list
-              const deleteResponse = await fetch(`https://mserver.printbaz.com/deleteFromDeliveryList/${id}`, {
-              // const deleteResponse = await fetch(`http://localhost:5000/deleteFromDeliveryList/${id}`, {
+              // const deleteResponse = await fetch(`https://mserver.printbaz.com/deleteFromDeliveryList/${id}`, {
+              const deleteResponse = await fetch(`http://localhost:5000/deleteFromDeliveryList/${id}`, {
                   method: 'DELETE',
                   headers: {
                       'Content-Type': 'application/json',
@@ -303,8 +303,8 @@ setTrackingId(e.target.value)
     try {
       const response = await fetch(
         
-        `https://mserver.printbaz.com/updatePaymentStatus/${id}`,
-      // `http://localhost:5000/updatePaymentStatus/${id}`,
+        // `https://mserver.printbaz.com/updatePaymentStatus/${id}`,
+      `http://localhost:5000/updatePaymentStatus/${id}`,
         {
           method: "PUT",
           headers: {
@@ -337,8 +337,8 @@ setTrackingId(e.target.value)
       };
       if (['out for delivery', 'delivered', 'returned'].includes(getSpecificOrderById?.orderStatus.toLowerCase())) {
       // Add/update the data in the DeliveryList
-      const deliveryResponse = await fetch('https://mserver.printbaz.com/addOrUpdateDeliveryList', {
-        // const deliveryResponse = await fetch('http://localhost:5000/addOrUpdateDeliveryList', {
+      // const deliveryResponse = await fetch('https://mserver.printbaz.com/addOrUpdateDeliveryList', {
+        const deliveryResponse = await fetch('http://localhost:5000/addOrUpdateDeliveryList', {
           method: 'PUT',
           headers: {
               'Content-Type': 'application/json',
@@ -369,8 +369,8 @@ setTrackingId(e.target.value)
     try {
       const response = await fetch(
         
-        `https://mserver.printbaz.com/deliveryAssignTo/${id}`,
-      // `http://localhost:5000/deliveryAssignTo/${id}`,
+        // `https://mserver.printbaz.com/deliveryAssignTo/${id}`,
+      `http://localhost:5000/deliveryAssignTo/${id}`,
         {
           method: "PUT",
           headers: {
@@ -403,8 +403,8 @@ setTrackingId(e.target.value)
       };
       if (['out for delivery', 'delivered', 'returned'].includes(getSpecificOrderById?.orderStatus.toLowerCase())) {
       // Add/update the data in the DeliveryList
-      const deliveryResponse = await fetch('https://mserver.printbaz.com/addOrUpdateDeliveryList', {
-        // const deliveryResponse = await fetch('http://localhost:5000/addOrUpdateDeliveryList', {
+      // const deliveryResponse = await fetch('https://mserver.printbaz.com/addOrUpdateDeliveryList', {
+        const deliveryResponse = await fetch('http://localhost:5000/addOrUpdateDeliveryList', {
           method: 'PUT',
           headers: {
               'Content-Type': 'application/json',
@@ -437,8 +437,8 @@ setTrackingId(e.target.value)
     try {
       const response = await fetch(
         
-        `https://mserver.printbaz.com/addTrackingID/${id}`,
-      // `http://localhost:5000/addTrackingID/${id}`,
+        // `https://mserver.printbaz.com/addTrackingID/${id}`,
+      `http://localhost:5000/addTrackingID/${id}`,
         {
           method: "PUT",
           headers: {
@@ -472,8 +472,8 @@ setTrackingId(e.target.value)
       };
       if (['out for delivery', 'delivered', 'returned'].includes(getSpecificOrderById?.orderStatus.toLowerCase())) {
       // Add/update the data in the DeliveryList
-      const deliveryResponse = await fetch('https://mserver.printbaz.com/addOrUpdateDeliveryList', {
-        // const deliveryResponse = await fetch('http://localhost:5000/addOrUpdateDeliveryList', {
+      // const deliveryResponse = await fetch('https://mserver.printbaz.com/addOrUpdateDeliveryList', {
+        const deliveryResponse = await fetch('http://localhost:5000/addOrUpdateDeliveryList', {
           method: 'PUT',
           headers: {
               'Content-Type': 'application/json',

@@ -3,16 +3,19 @@
 import React, { useEffect, useState } from 'react';
 import PropTypes from 'prop-types';
 import "../../css/style.css"
-import { Button, Form, OverlayTrigger, ProgressBar, Spinner, Tooltip } from 'react-bootstrap';
+import { Button, Card, Col, Form, ListGroup, OverlayTrigger, ProgressBar, Row, Spinner, Tooltip } from 'react-bootstrap';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { useGetData } from '../../hooks/useGetData';
 import teeShirtFormula from '../../Formulas/teeShirtFormula';
 import AlertMessage from '../alert/AlertMessage';
 import OrderUpdateAlert from '../alert/OrderUpdateAlert';
 import DeleteRoleAlert from '../alert/DeleteRoleAlert';
+import axios from 'axios';
+import deliveryCharge from '../../Formulas/deliveryCharge';
+import tshirtFormulaCustomDropSholder from '../../Formulas/tshirtFormulaCustomDropSholder';
 
 const UpdateOrder = ({ onClose,viewOrder,viewClient,getSpecificOrderById,setGetSpecificOrderById }) => {
-  console.log("getSpecificOrderById gdfgdf",getSpecificOrderById); 
+  console.log("getSpecificOrderById from edit order page",getSpecificOrderById); 
   // console.log("viewOrder",viewOrder);
     const [selectedFile, setSelectedFile] = useState(null);
     const [previewUrl, setPreviewUrl] = useState('');
@@ -69,7 +72,12 @@ console.log("getSpecificOrderById out side delete func",getSpecificOrderById);
         address: getSpecificOrderById?.address,
         instruction: getSpecificOrderById?.instruction,
         collectAmount: getSpecificOrderById?.collectAmount,
-        area: getSpecificOrderById?.area,
+        areas: getSpecificOrderById?.areas,
+        zones: getSpecificOrderById?.zones,
+        districts: getSpecificOrderById?.districts,
+        printbazcost: getSpecificOrderById?.printbazcost,
+        quantity: getSpecificOrderById?.quantity,
+        deliveryFee: getSpecificOrderById?.deliveryFee,
         orderDetailArr:  getSpecificOrderById?.orderDetailArr?.map(order => {
         
            return order
@@ -90,6 +98,10 @@ console.log("getSpecificOrderById out side delete func",getSpecificOrderById);
        const [printSide, setPrintSide] = useState('');
        const [addbrandLogo, setAddBrandLogo] = useState('');
        const [file, setFile] = useState();
+       const [districts, setDistricts] = useState([]);
+       const [zones, setZones] = useState([]);
+       const [areas, setAreas] = useState([]);
+       const [deliveryAreas, setDeliveryAreas] = useState('');
        const { fetchedData, searchProduct, setSearchProduct } = useGetData(
          idPrice,
          collectionsPrice,
@@ -104,7 +116,63 @@ console.log("getSpecificOrderById out side delete func",getSpecificOrderById);
       const [showCreateRole, setShowCreateRole] = useState(false);
       const [deletepopUp, setDeletepopUp] = useState(false);
       const [deleteId, setDeleteId] = useState();
-    
+      const [addBrandLogoArray, setAddBrandLogoArray] = useState([]);
+    // Fetch unique districts when the component mounts
+  useEffect(() => {
+    axios.get('http://localhost:5000/unique-districts')
+    // axios.get('https://mserver.printbaz.com/unique-districts')
+      .then(response => {
+        setDistricts(response.data);
+      })
+      .catch(error => {
+        console.error('Error fetching unique districts:', error);
+      });
+  }, []);
+  useEffect(() => {
+    if (formData?.districts) {
+      axios.get(`http://localhost:5000/zones?district=${encodeURIComponent(formData?.districts)}`)
+      // axios.get(`https://mserver.printbaz.com/zones?district=${encodeURIComponent(formData?.districts)}`)
+        .then(response => {
+          setZones(response.data);
+          // console.log("response.data", response.data);
+        })
+        .catch(error => {
+          console.error('Error fetching zones:', error);
+          setZones([]);  // Optionally, clear zones if the fetch fails
+        });
+    } else {
+      setZones([]); // Clear zones if the district is not selected
+      setAreas([]); // Clear areas as well, as they depend on the zone
+    }
+  }, [formData?.districts]);
+  
+    // Fetch areas based on selected zone
+    useEffect(() => {
+      if (formData?.zones) {
+        axios.get(`http://localhost:5000/areas/${encodeURIComponent(formData?.zones)}`)
+        // axios.get(`https://mserver.printbaz.com/areas/${encodeURIComponent(formData?.zones)}`)
+          .then(response => {
+            setAreas(response.data);
+          })
+          .catch(error => {
+            console.error('Error fetching areas:', error);
+            setAreas([]);  // Optionally, clear areas if the fetch fails
+          });
+      } else {
+        setAreas([]); // Clear areas if the zone is not selected
+      }
+    }, [formData?.zones]);
+ // fetch delievryArea 
+ useEffect(() => {
+  if (formData?.districts && formData?.zones && formData?.areas) {
+    axios.get(`http://localhost:5000/deliveryAreaByLocation?District=${formData?.districts}&Zone=${formData?.zones}&Area=${formData?.areas}`)
+    // axios.get(`https://mserver.printbaz.com/deliveryAreaByLocation?District=${formData?.districts}&Zone=${formData?.zones}&Area=${formData?.areas}`)
+      .then((res) => setDeliveryAreas(res.data.deliveryArea))
+      .catch((error) => console.error('Error fetching deliveryArea:', error));
+  }
+}, [formData?.districts ,formData?.zones , formData?.areas]);
+
+
       const d = new Date();
         const options = { month: "long", day: "numeric", year: "numeric" };
         const formattedDate = d.toLocaleDateString("en-US", options);
@@ -146,218 +214,411 @@ console.log("getSpecificOrderById out side delete func",getSpecificOrderById);
         const location=useLocation()
         const [inputs, setInputs] = useState([{ value: '' }]);
     
-    
-      const handleInputChange = (event, index) => {
-        const { name, value } = event.target;
-        if (name==="color" || name==="teshirtSize" || name==="quantity" || name==="printSize"|| name==="printSide" || name==="printSizeBack") {
-       
-          // const fieldName = name.split('.')[1];
-          const newOrderDetailArr = [...formData.orderDetailArr];
-          newOrderDetailArr[index][event.target.name]=event.target.value;
-          setFormData({ ...formData, orderDetailArr: newOrderDetailArr });
-       
-          }
-       else {
-            setFormData({ ...formData, [name]: value });
-            // setSum(formData.reduce((total, input) => total + Number(input.value), 0));
-          
-          }
-        } 
-        const handleFileChange = (event, orderIndex, fileIndex) => {
-         
-          const { name, files } = event.target;
-         
-          if (files.length > 0) {
-              setFormData(prevState => {
-                  const newOrderDetailArr = prevState.orderDetailArr.map((item, index) => {
-                      if (index === orderIndex) {
-                          let updatedFilesOrImages;
-                          if (name === "file") {
-                              updatedFilesOrImages = [...item.file]; // Create a copy of the file array
-                              updatedFilesOrImages[fileIndex] = files[0]; // Update the file at the specified index
-                              return { ...item, file: updatedFilesOrImages }; // Update the file array in the item
-                          } else if (name === "image") {
-                              updatedFilesOrImages = [...item.image]; // Create a copy of the image array
-                              updatedFilesOrImages[fileIndex] = files[0]; // Update the image at the specified index
-                              return { ...item, image: updatedFilesOrImages }; // Update the image array in the item
-                          }
-                      }
-                      return item;
-                  });
-                  return { ...prevState, orderDetailArr: newOrderDetailArr }; // Update the orderDetailArr in the formData state
-              });
-          }
+        const safeParseInt = (str) => {
+          const value = parseInt(str);
+          return isNaN(value) ? 0 : value;
       };
       
-
-    let updatedPrintbazcost=0
-      let printbazcost=0;
-      let printbazcostbase;
-      for  (var i = 0; i < formData?.orderDetailArr?.length; i++) {
-        if (
-          formData?.orderDetailArr[i]?.quantity &&
-          formData?.orderDetailArr[i]?.printSize &&
-          price1to9_10x14 &&
-          price10to19_10x14 &&
-          price20to29_10x14 &&
-          price30to40_10x14 &&
-          price41to49_10x14 &&
-          price50Plus_10x14 &&
-          price1to9_10x10 &&
-          price10to19_10x10 &&
-          price20to29_10x10 &&
-          price30to40_10x10 &&
-          price41to49_10x10 &&
-          price50Plus_10x10 &&
-          price1to9_10x5 &&
-          price10to19_10x5 &&
-          price20to29_10x5 &&
-          price30to40_10x5 &&
-          price41to49_10x5 &&
-          price50Plus_10x5 &&
-          price1to9_5X5 &&
-          price10to19_5X5 &&
-          price20to29_5X5 &&
-          price30to40_5X5 &&
-          price41to49_5X5 &&
-          price50Plus_5X5 &&
-          price1to9_2p5X5 &&
-          price10to19_2p5X5 &&
-          price20to29_2p5X5 &&
-          price30to40_2p5X5 &&
-          price41to49_2p5X5 &&
-          price50Plus_2p5X5
-        ) 
-        {
-          const totalPrice = teeShirtFormula(
-            formData?.orderDetailArr[i]?.quantity,
-            formData?.orderDetailArr[i]?.printSize,
-            price1to9_10x14,
-            price10to19_10x14,
-            price20to29_10x14,
-            price30to40_10x14,
-            price41to49_10x14,
-            price50Plus_10x14,
-            price1to9_10x10,
-            price10to19_10x10,
-            price20to29_10x10,
-            price30to40_10x10,
-            price41to49_10x10,
-            price50Plus_10x10,
-            price1to9_10x5,
-            price10to19_10x5,
-            price20to29_10x5,
-            price30to40_10x5,
-            price41to49_10x5,
-            price50Plus_10x5,
-            price1to9_5X5,
-            price10to19_5X5,
-            price20to29_5X5,
-            price30to40_5X5,
-            price41to49_5X5,
-            price50Plus_5X5,
-            price1to9_2p5X5,
-            price10to19_2p5X5,
-            price20to29_2p5X5,
-            price30to40_2p5X5,
-            price41to49_2p5X5,
-            price50Plus_2p5X5
-          ).totalPrice;
-          let backSidePrintCost=0
-          if(formData?.orderDetailArr[i]?.printSizeBack==="10 x 14"){
-            backSidePrintCost= formData?.orderDetailArr[i]?.quantity * 130
+     
+        const handleInputChange = (event, index) => {
+          const { name, value } = event.target;
+          const color = event.target.getAttribute('data-color');
+          const size = event.target.getAttribute('data-size');
+          const newOrderDetailArr = [...formData.orderDetailArr];
+      
+          let itemIndex = newOrderDetailArr.findIndex(item => item.color === color);
+      console.log("printSIde",value)
+          if (name==="color" || name==="teshirtSize" || name==="quantityM" ||  name==="quantityL"|| name==="quantityXL"||  name==="quantityXXL"|| name==="printSize"|| name==="printSide" || name==="printSizeBack") {
+              if (size) {
+                  newOrderDetailArr[itemIndex].teshirtSize = { ...newOrderDetailArr[itemIndex].teshirtSize, [size]: value };
+              }
+              newOrderDetailArr[itemIndex][name] = value;
+          } else {
+              setFormData({ ...formData, [name]: value });
+              return;
           }
-          else if(formData?.orderDetailArr[i]?.printSizeBack==="10 x 10"){
-            backSidePrintCost= formData?.orderDetailArr[i]?.quantity * 100
-          } else if(formData?.orderDetailArr[i]?.printSizeBack==="10 x 5"){
-            backSidePrintCost= formData?.orderDetailArr[i]?.quantity * 50
-          } else if(formData?.orderDetailArr[i]?.printSizeBack==="5 X 5"){
-            backSidePrintCost= formData?.orderDetailArr[i]?.quantity * 30
-          }
-          else if(formData?.orderDetailArr[i]?.printSizeBack==="2.5 X 5"){
-            backSidePrintCost= formData?.orderDetailArr[i]?.quantity * 15
-          }
-         
-    
-      printbazcostbase = Number(totalPrice)+backSidePrintCost;
-      printbazcost += printbazcostbase;
-      // console.log("printbazcost",Number(printbazcost),"+",printbazcostbase)
-    
-          
-                
-       
-        } else {
-          if(printbazcostbase){
-            printbazcost= printbazcostbase;
-          }
-          else{
-            printbazcost=0;
-          }
-          // or any default value you want to set
-        }
-      }
-        let deliveryFeeInsideDhaka = 0;
-        const baseDeliveryFee = 70;
-        const additionalDeliveryFee = 15;
-        let QuantityBase=0
-        let totalQuantity=0;
-    
-        let deliveryFeeOutSideDhaka = 0;
-        const baseDeliveryFeeOutSideDhaka = 100;
-        const additionalDeliveryFeeOutSideDhaka = 25;
-        for  (var j = 0; j < formData?.orderDetailArr?.length; j++) {
-          QuantityBase=Number( formData?.orderDetailArr[j]?.quantity)
-          totalQuantity =Number(QuantityBase+totalQuantity)
         
+          // Compute grand total based on the newOrderDetailArr
+          const newGrandQuantity = newOrderDetailArr.reduce((acc, item) => 
+        acc + safeParseInt(item.quantityM) + 
+              safeParseInt(item.quantityL) + 
+              safeParseInt(item.quantityXL) + 
+              safeParseInt(item.quantityXXL), 
+      0);
+          
+          // Update state
+          setFormData(prevState => ({
+              ...prevState,
+              orderDetailArr: newOrderDetailArr,
+              quantity: parseInt(newGrandQuantity)
+          }));
+      }
+      //   const handleFileChange = (event, orderIndex, fileIndex) => {
+         
+      //     const { name, files } = event.target;
+         
+      //     if (files.length > 0) {
+      //         setFormData(prevState => {
+      //             const newOrderDetailArr = prevState.orderDetailArr.map((item, index) => {
+      //                 if (index === orderIndex) {
+      //                     let updatedFilesOrImages;
+      //                     if (name === "file") {
+      //                         updatedFilesOrImages = [...item.file]; // Create a copy of the file array
+      //                         updatedFilesOrImages[fileIndex] = files[0]; // Update the file at the specified index
+      //                         return { ...item, file: updatedFilesOrImages }; // Update the file array in the item
+      //                     } else if (name === "image") {
+      //                         updatedFilesOrImages = [...item.image]; // Create a copy of the image array
+      //                         updatedFilesOrImages[fileIndex] = files[0]; // Update the image at the specified index
+      //                         return { ...item, image: updatedFilesOrImages }; // Update the image array in the item
+      //                     }
+      //                 }
+      //                 return item;
+      //             });
+      //             return { ...prevState, orderDetailArr: newOrderDetailArr }; // Update the orderDetailArr in the formData state
+      //         });
+      //     }
+      // };
+      const handleFileChange = (event, index) => {
+        const { name, files } = event.target;
+        const updatedBrandLogoArray = [...addBrandLogoArray];
+        if (name==="file" || name==="image" || name==="brandLogo") {
+          if (name === "brandLogo") {
+            updatedBrandLogoArray[index] = files && files.length > 0;;
+            setAddBrandLogoArray(updatedBrandLogoArray);
+        }
+          // const fieldName = name.split('.')[1];
+          const newOrderDetailArr = [...formData.orderDetailArr];
+           // Change from a single file to an array of files
+          newOrderDetailArr[index][[event.target.name]] =Array.from(files);
+          setFormData({ ...formData, orderDetailArr: newOrderDetailArr });
+      
+        }
+      };
+    const price_10x14CRoundNeck=358
+    const price_10x10CRoundNeck=301
+    const price_10x5CRoundNeck=272
+    const price_5X5CRoundNeck=257
+    const price_2p5X5CRoundNeck=250
+    const price_2p5X2p5CRoundNeck=247
+
+    // custom drop sholder 
+    const price_11p7x16p5CDropSholder=433
+    const price_10x14CDropSholder=398
+    const price_10x10CDropSholder=341
+    const price_10x5CDropSholder=312
+    const price_5X5CDropSholder=297
+    const price_2p5X5CDropSholder=290
+    const price_2p5X2p5CDropSholder=287
+
+
+    // custom drop sholder 
+
+   const price_11p7x16p5CHoodie=568
+   const price_10x14CHoodie=533
+   const price_10x10CHoodie=476
+   const price_10x5CHoodie=447
+   const price_5X5CHoodie=432
+   const price_2p5X5CHoodie=425
+   const price_2p5X2p5CHoodie=422
+
+   formData?.orderDetailArr.forEach(item => {
+    item.totalQuantity = safeParseInt(item.quantityM) + 
+                         safeParseInt(item.quantityL) + 
+                         safeParseInt(item.quantityXL) + 
+                         safeParseInt(item.quantityXXL);
+  });
+    let updatedPrintbazcost=0
+    let printbazcost=0;
+    let printbazcostbase=0;
+    for  (var i = 0; i < formData?.orderDetailArr?.length; i++) {
+      if ( getSpecificOrderById?.productType==="custom Round Neck" &&
+        formData?.quantity &&
+        formData?.orderDetailArr[i]?.totalQuantity &&
+        formData?.orderDetailArr[i]?.printSize &&
+        price_10x14CRoundNeck &&
+        price_10x10CRoundNeck &&
+        price_10x5CRoundNeck &&
+        price_5X5CRoundNeck &&
+        price_2p5X5CRoundNeck &&
+        price_2p5X2p5CRoundNeck 
        
-        if (formData?.orderDetailArr[j]?.quantity > 0) {
-          // Calculate the number of groups of 5 items in the order
-          const groups = Math.floor(totalQuantity/ 5);
-      
-          // Calculate the remainder
-          const remainder = totalQuantity % 5;
-      
-          // Calculate the delivery fee
-          if (groups === 0) {
-            deliveryFeeInsideDhaka = baseDeliveryFee;
-          } else if (remainder === 0) {
-            deliveryFeeInsideDhaka =
-              baseDeliveryFee + (groups - 1) * additionalDeliveryFee;
-          } else {
-            deliveryFeeInsideDhaka = baseDeliveryFee + groups * additionalDeliveryFee;
-          }
+      ) 
+      {
+        const totalPrice = teeShirtFormula(
+          formData?.quantity,
+          formData?.orderDetailArr[i]?.totalQuantity,
+          formData?.orderDetailArr[i]?.printSize,
+          price_10x14CRoundNeck,
+          price_10x10CRoundNeck,
+          price_10x5CRoundNeck,
+          price_5X5CRoundNeck,
+          price_2p5X5CRoundNeck,
+          price_2p5X2p5CRoundNeck
+        ).totalPrice;
+        let backSidePrintCost = 0;
+        let totalQuantity = formData?.orderDetailArr[i]?.totalQuantity;
+        // backSidePrintCost += totalQuantity * 130;
+        if(formData?.orderDetailArr[i]?.printSizeBack==="10 x 14" || (formData?.orderDetailArr[i]?.printSide==="bothSide" && formData?.orderDetailArr[i]?.printSize==="10 x 14")){
+          backSidePrintCost+= formData?.orderDetailArr[i]?.totalQuantity * 125
+        }
+        else if(formData?.orderDetailArr[i]?.printSizeBack==="10 x 10"||(formData?.orderDetailArr[i]?.printSide==="bothSide" && formData?.orderDetailArr[i]?.printSize==="10 x 10")){
+          backSidePrintCost+= formData?.orderDetailArr[i]?.totalQuantity * 68
+        } else if(formData?.orderDetailArr[i]?.printSizeBack==="10 x 5"|| (formData?.orderDetailArr[i]?.printSide==="bothSide" && formData?.orderDetailArr[i]?.printSize==="10 x 5")){
+          backSidePrintCost+= formData?.orderDetailArr[i]?.totalQuantity * 39
+        } else if(formData?.orderDetailArr[i]?.printSizeBack==="5 X 5"|| (formData?.orderDetailArr[i]?.printSide==="bothSide" && formData?.orderDetailArr[i]?.printSize==="5 X 5")){
+          backSidePrintCost+= formData?.orderDetailArr[i]?.totalQuantity * 25
+        }
+        else if(formData?.orderDetailArr[i]?.printSizeBack==="2.5 X 5"|| (formData?.orderDetailArr[i]?.printSide==="bothSide" && formData?.orderDetailArr[i]?.printSize==="2.5 X 5")){
+          backSidePrintCost+= formData?.orderDetailArr[i]?.totalQuantity * 18
+        }
+          else if(formData?.orderDetailArr[i]?.printSizeBack==="2.5 X 2.5"|| (formData?.orderDetailArr[i]?.printSide==="bothSide" && formData?.orderDetailArr[i]?.printSize==="2.5 X 2.5")){
+          backSidePrintCost+= formData?.orderDetailArr[i]?.totalQuantity * 14
+        }
+        
+        // At this point, backSidePrintCost contains the total cost for the current item's back side print
+        
+        if(addBrandLogoArray[i]){
+          // printbazcost=parseInt(printbazcostbase+5)
+          let brandLogoCost=5*formData?.orderDetailArr[i]?.totalQuantity
+          printbazcostbase = Number(totalPrice)+backSidePrintCost+brandLogoCost;
+          console.log("brandLogoCost",brandLogoCost);
+          console.log("prinbazcostbaze", Number(totalPrice)+backSidePrintCost ,"+",brandLogoCost);
+          printbazcost += printbazcostbase;
+          const test=printbazcost+backSidePrintCost
+        console.log("addbrandLogo",addbrandLogo);
+        }
+        else{
+          printbazcostbase = Number(totalPrice) + Number(backSidePrintCost);
+          printbazcost += printbazcostbase;
+        
+          console.log("printbazcost",printbazcost)
+          console.log("printbazcostbase",printbazcostbase)
+          console.log("backSidePrintCost",backSidePrintCost)
+          console.log("totalPrice",totalPrice)
+        }
+  
+   
+      }
+
+      else  if (getSpecificOrderById?.productType==="custom Drop Sholder" &&
+        formData?.quantity &&
+        formData?.orderDetailArr[i]?.totalQuantity &&
+        formData?.orderDetailArr[i]?.printSize &&
+        price_11p7x16p5CDropSholder &&
+        price_10x14CDropSholder &&
+        price_10x10CDropSholder &&
+        price_10x5CDropSholder &&
+        price_5X5CDropSholder &&
+        price_2p5X5CDropSholder &&
+        price_2p5X2p5CDropSholder 
+       
+      ) 
+      {
+        const totalPrice = tshirtFormulaCustomDropSholder(
+          formData?.quantity,
+          formData?.orderDetailArr[i]?.totalQuantity,
+          formData?.orderDetailArr[i]?.printSize,
+          price_11p7x16p5CDropSholder,
+          price_10x14CDropSholder,
+          price_10x10CDropSholder,
+          price_10x5CDropSholder,
+          price_5X5CDropSholder,
+          price_2p5X5CDropSholder,
+          price_2p5X2p5CDropSholder
+        ).totalPrice;
+        let backSidePrintCost = 0;
+        let totalQuantity = formData?.orderDetailArr[i]?.totalQuantity;
+        // backSidePrintCost += totalQuantity * 130;
+        if(formData?.orderDetailArr[i]?.printSizeBack==="11.7 x 16.5" || (formData?.orderDetailArr[i]?.printSide==="bothSide" && formData?.orderDetailArr[i]?.printSize==="11.7 x 16.5")){
+          backSidePrintCost+= formData?.orderDetailArr[i]?.totalQuantity * 160
+        } 
+        if(formData?.orderDetailArr[i]?.printSizeBack==="10 x 14" || (formData?.orderDetailArr[i]?.printSide==="bothSide" && formData?.orderDetailArr[i]?.printSize==="10 x 14")){
+          backSidePrintCost+= formData?.orderDetailArr[i]?.totalQuantity * 125
+        }
+        else if(formData?.orderDetailArr[i]?.printSizeBack==="10 x 10"||(formData?.orderDetailArr[i]?.printSide==="bothSide" && formData?.orderDetailArr[i]?.printSize==="10 x 10")){
+          backSidePrintCost+= formData?.orderDetailArr[i]?.totalQuantity * 68
+        } else if(formData?.orderDetailArr[i]?.printSizeBack==="10 x 5"|| (formData?.orderDetailArr[i]?.printSide==="bothSide" && formData?.orderDetailArr[i]?.printSize==="10 x 5")){
+          backSidePrintCost+= formData?.orderDetailArr[i]?.totalQuantity * 39
+        } else if(formData?.orderDetailArr[i]?.printSizeBack==="5 X 5"|| (formData?.orderDetailArr[i]?.printSide==="bothSide" && formData?.orderDetailArr[i]?.printSize==="5 X 5")){
+          backSidePrintCost+= formData?.orderDetailArr[i]?.totalQuantity * 25
+        }
+        else if(formData?.orderDetailArr[i]?.printSizeBack==="2.5 X 5"|| (formData?.orderDetailArr[i]?.printSide==="bothSide" && formData?.orderDetailArr[i]?.printSize==="2.5 X 5")){
+          backSidePrintCost+= formData?.orderDetailArr[i]?.totalQuantity * 18
+        }  else if(formData?.orderDetailArr[i]?.printSizeBack==="2.5 X 2.5"|| (formData?.orderDetailArr[i]?.printSide==="bothSide" && formData?.orderDetailArr[i]?.printSize==="2.5 X 2.5")){
+          backSidePrintCost+= formData?.orderDetailArr[i]?.totalQuantity * 14
+        }
+        
+        
+  
+        if(addBrandLogoArray[i]){
+          // printbazcost=parseInt(printbazcostbase+5)
+          let brandLogoCost=5*formData?.orderDetailArr[i]?.totalQuantity
+          printbazcostbase = Number(totalPrice)+backSidePrintCost+brandLogoCost;
+          console.log("brandLogoCost",brandLogoCost);
+          console.log("prinbazcostbaze", Number(totalPrice)+backSidePrintCost ,"+",brandLogoCost);
+          printbazcost += printbazcostbase;
+          const test=printbazcost+backSidePrintCost
+        console.log("addbrandLogo",addbrandLogo);
+        }
+        else{
+          printbazcostbase = Number(totalPrice) + Number(backSidePrintCost);
+          printbazcost += printbazcostbase;
+        
+          console.log("printbazcost",printbazcost)
+          console.log("printbazcostbase",printbazcostbase)
+          console.log("backSidePrintCost",backSidePrintCost)
+          console.log("totalPrice",totalPrice)
         }
       
-      // outside dhaka
+      //  else {
+      //   if(printbazcostbase){
+        
+      //     printbazcost= printbazcostbase;
+      //   }
+      //   else{
+      //     printbazcost=0;
+      //   }
+      //   // or any default value you want to set
+      // }
+    }
+    else  if (getSpecificOrderById?.productType==="custom Hoodie" &&
+      formData?.quantity &&
+      formData?.orderDetailArr[i]?.totalQuantity &&
+      formData?.orderDetailArr[i]?.printSize &&
+      price_11p7x16p5CHoodie &&
+      price_10x14CHoodie &&
+      price_10x10CHoodie &&
+      price_10x5CHoodie &&
+      price_5X5CHoodie &&
+      price_2p5X5CHoodie &&
+      price_2p5X2p5CHoodie 
+     
+    ) 
+    {
+      const totalPrice = tshirtFormulaCustomDropSholder(
+        formData?.quantity,
+        formData?.orderDetailArr[i]?.totalQuantity,
+        formData?.orderDetailArr[i]?.printSize,
+        price_11p7x16p5CHoodie,
+        price_10x14CHoodie,
+        price_10x10CHoodie,
+        price_10x5CHoodie,
+        price_5X5CHoodie,
+        price_2p5X5CHoodie,
+        price_2p5X2p5CHoodie
+      ).totalPrice;
+      let backSidePrintCost = 0;
+      let totalQuantity = formData?.orderDetailArr[i]?.totalQuantity;
+      // backSidePrintCost += totalQuantity * 130;
+      if(formData?.orderDetailArr[i]?.printSizeBack==="11.7 x 16.5" || (formData?.orderDetailArr[i]?.printSide==="bothSide" && formData?.orderDetailArr[i]?.printSize==="11.7 x 16.5")){
+        backSidePrintCost+= formData?.orderDetailArr[i]?.totalQuantity * 160
+      }
+      if(formData?.orderDetailArr[i]?.printSizeBack==="10 x 14" || (formData?.orderDetailArr[i]?.printSide==="bothSide" && formData?.orderDetailArr[i]?.printSize==="10 x 14")){
+        backSidePrintCost+= formData?.orderDetailArr[i]?.totalQuantity * 125
+      }
+      else if(formData?.orderDetailArr[i]?.printSizeBack==="10 x 10"||(formData?.orderDetailArr[i]?.printSide==="bothSide" && formData?.orderDetailArr[i]?.printSize==="10 x 10")){
+        backSidePrintCost+= formData?.orderDetailArr[i]?.totalQuantity * 68
+      } else if(formData?.orderDetailArr[i]?.printSizeBack==="10 x 5"|| (formData?.orderDetailArr[i]?.printSide==="bothSide" && formData?.orderDetailArr[i]?.printSize==="10 x 5")){
+        backSidePrintCost+= formData?.orderDetailArr[i]?.totalQuantity * 39
+      } else if(formData?.orderDetailArr[i]?.printSizeBack==="5 X 5"|| (formData?.orderDetailArr[i]?.printSide==="bothSide" && formData?.orderDetailArr[i]?.printSize==="5 X 5")){
+        backSidePrintCost+= formData?.orderDetailArr[i]?.totalQuantity * 25
+      }
+      else if(formData?.orderDetailArr[i]?.printSizeBack==="2.5 X 5"|| (formData?.orderDetailArr[i]?.printSide==="bothSide" && formData?.orderDetailArr[i]?.printSize==="2.5 X 5")){
+        backSidePrintCost+= formData?.orderDetailArr[i]?.totalQuantity * 18
+      }
+       else if(formData?.orderDetailArr[i]?.printSizeBack==="2.5 X 2.5"|| (formData?.orderDetailArr[i]?.printSide==="bothSide" && formData?.orderDetailArr[i]?.printSize==="2.5 X 2.5")){
+        backSidePrintCost+= formData?.orderDetailArr[i]?.totalQuantity * 15
+      }
       
-        if (formData?.orderDetailArr[j]?.quantity > 0) {
-          // Calculate the number of groups of 5 items in the order
-          const groups = Math.floor(totalQuantity / 5);
+      // At this point, backSidePrintCost contains the total cost for the current item's back side print
       
-          // Calculate the remainder
-          const remainder = totalQuantity % 5;
+      // if(addbrandLogo===true){
+      //   // printbazcost=parseInt(printbazcostbase+5)
+        
+      //   printbazcostbase = Number(totalPrice)+backSidePrintCost+(5*formData?.orderDetailArr[i]?.totalQuantity);
+      //   printbazcost += printbazcostbase;
+      //   const test=printbazcost+backSidePrintCost
+      //   console.log("printbazcost",printbazcost)
+      //   console.log("backSidePrintCost",backSidePrintCost)
+      //   console.log("test",test)
+      // }
+      // else{
+      //   printbazcostbase = Number(totalPrice) + backSidePrintCost;
+      //   printbazcost +=printbazcostbase;
       
-          // Calculate the delivery fee
-          if (groups === 0) {
-            deliveryFeeOutSideDhaka = baseDeliveryFeeOutSideDhaka;
-          } else if (remainder === 0) {
-            deliveryFeeOutSideDhaka =
-              baseDeliveryFeeOutSideDhaka +
-              (groups - 1) * additionalDeliveryFeeOutSideDhaka;
-          } else {
-            deliveryFeeOutSideDhaka =
-              baseDeliveryFeeOutSideDhaka +
-              groups * additionalDeliveryFeeOutSideDhaka;
-          }
-        }
-        }
-        let deliveryFee;
-        if (formData.area === "outside dhaka") {
-          deliveryFee = deliveryFeeOutSideDhaka;
-        } else {
-          deliveryFee = deliveryFeeInsideDhaka;
-        }
+      //   console.log("printbazcost",printbazcost)
+      //   console.log("backSidePrintCost",backSidePrintCost)
+      // }
+      if(addBrandLogoArray[i]){
+        // printbazcost=parseInt(printbazcostbase+5)
+        let brandLogoCost=5*formData?.orderDetailArr[i]?.totalQuantity
+        printbazcostbase = Number(totalPrice)+backSidePrintCost+brandLogoCost;
+        console.log("brandLogoCost",brandLogoCost);
+        console.log("prinbazcostbaze", Number(totalPrice)+backSidePrintCost ,"+",brandLogoCost);
+        printbazcost += printbazcostbase;
+        const test=printbazcost+backSidePrintCost
+      console.log("addbrandLogo",addbrandLogo);
+      }
+      else{
+        printbazcostbase = Number(totalPrice) + Number(backSidePrintCost);
+        printbazcost += printbazcostbase;
       
+        console.log("printbazcost",printbazcost)
+        console.log("printbazcostbase",printbazcostbase)
+        console.log("backSidePrintCost",backSidePrintCost)
+        console.log("totalPrice",totalPrice)
+      }
+ 
+    }
+      //  else {
+      //   if(printbazcostbase){
+        
+      //     printbazcost= printbazcostbase;
+      //   }
+      //   else{
+      //     printbazcost=0;
+      //   }
+      //   // or any default value you want to set
+      // }
+    }
+      // charge based on weight 
+    // inside dhaka 
+    const chargeForInSideZeroToP5=70;
+    const chargeForInSidep5To1=80;
+    const chargeForInSideoneTo2=90;
+    const chargeForInSidetwoTo3=115;
+    // outside dhaka 
+    const chargeForOutSideZeroToP5=100;
+    const chargeForOutSidep5To1=120;
+    const chargeForOutSideoneTo2=150;
+    const chargeForOutSidetwoTo3=175;
+    const weightPerShirt=0.18;
+    const extraInSideDhakaChange=15
+    const extraOutSideDhakaChange=25
+    let grandQuantity=formData?.quantity
+  
+    let deliveryFee = 0; // Initialize fees as 0
+  
+    // Check if grandQuantity is defined and greater than 0
+    if (grandQuantity && grandQuantity > 0) {
+      deliveryFee = deliveryCharge({
+        grandQuantity: grandQuantity,
+        weightPerShirt: weightPerShirt,
+        chargeForInSideZeroToP5: chargeForInSideZeroToP5,
+        chargeForInSidep5To1: chargeForInSidep5To1,
+        chargeForInSideoneTo2: chargeForInSideoneTo2,
+        chargeForInSidetwoTo3: chargeForInSidetwoTo3,
+        chargeForOutSideZeroToP5: chargeForOutSideZeroToP5,
+        chargeForOutSidep5To1: chargeForOutSidep5To1,
+        chargeForOutSideoneTo2: chargeForOutSideoneTo2,
+        chargeForOutSidetwoTo3: chargeForOutSidetwoTo3,
+        extraInSideDhakaChange: extraInSideDhakaChange,
+        extraOutSideDhakaChange: extraOutSideDhakaChange,
+        deliveryAreas: deliveryAreas
+      }).deliveryFee;
+    }
+    console.log("deliveryFee",deliveryFee)
+   
         let recvMoney = 0;
         let costHandlingfee;
         let recvMoneyWithouthandling = 0;
@@ -416,108 +677,220 @@ console.log("getSpecificOrderById out side delete func",getSpecificOrderById);
         };
         
        
-        const handleUpdate = async (e) => {
-            e.preventDefault()
+  //       const handleUpdate = async (e) => {
+  //           e.preventDefault()
+  //           setIsLoading(true)
+  //           // Validate the form here
+  //           if (validateForm()) {
+  //             setIsLoading(false) // Set loading status to false if form is invalid
+  //             return; // Exit the function if form is invalid
+  //           }
+  //           try {
+  //             const formData2 = new FormData();
+  //             const orderDetailArr = formData.orderDetailArr || [];
+  //             const filesAndImagesArr = [];
+  //         // console.log("formData.orderDetailArr",formData.orderDetailArr);
+  //             orderDetailArr?.forEach((item, index) => {
+  //               const fileAndImageData = {};
+  //              // Only append 'file' and 'image' fields if they have been updated:
+  //              if (item.file && item.file.length > 0) {
+  //               // console.log("item.file.length",item.file.length);
+  //               item.file.forEach((file, fileIndex) => {
+  //                 if (file instanceof File) {
+  //                   formData2.append(`file${index}_${fileIndex}`, file); // Append each file
+  //                 } else {
+  //                   // console.error(`item.file[${fileIndex}] is not a File object:`, file);
+  //                 }
+  //               });
+  //             }
+          
+  //               if (item.image && item.image.length > 0) {
+  //                 item.image.forEach((image, imageIndex) => {
+  //                   formData2.append(`image${index}_${imageIndex}`, image); // Append each image
+  //                 });
+  //               }
+          
+  //               // Append brandLogo
+  //               if (item.brandLogo ) {
+  //                 // console.log("item.brandLogo",item.brandLogo);
+  //                 formData2.append(`brandLogo${index}`, item.brandLogo);
+  //             }
+          
+  //               if (Object.keys(fileAndImageData).length) {
+  //                 filesAndImagesArr.push(fileAndImageData);
+  //               }
+          
+  //               formData2.append(`color${index}`, item.color);
+  //               formData2.append(`teshirtSize${index}`, item.teshirtSize);
+  //               formData2.append(`quantity${index}`, item.quantity);
+  //               formData2.append(`printSize${index}`, item.printSize);
+  //               formData2.append(`printSide${index}`, item.printSide);
+          
+  //               return item;
+  //             });
+  //          // Only append 'orderDetailArr' if it has been updated:
+  //   if (orderDetailArr.length > 0) {
+  //     formData2.append('orderDetailArr', JSON.stringify(orderDetailArr));
+  //   }
+  //             formData2.append('filesAndImages', JSON.stringify(filesAndImagesArr)); // Append the filesAndImagesArr as a JSON string
+          
+  //             // Append the remaining form data
+  //             // formData2.append('orderDetailArr', JSON.stringify(orderDetailArr));
+  //             formData2.append('name', formData.name);
+  //             formData2.append('phone', formData.phone);
+  //             formData2.append('address', formData.address);
+  //             formData2.append('instruction', formData.instruction);
+  //             formData2.append('area', formData.areas);
+  //             formData2.append('collectAmount', formData.collectAmount);
+  //             formData2.append('printbazcost', printbazcost);
+  //             formData2.append('deliveryFee', deliveryFee);
+  //             formData2.append('recvMoney', recvMoney);
+  //             formData2.append('userMail', getSpecificOrderById?.userMail);
+  //             // formData2.append('orderDetailArr', JSON.stringify(formData.orderDetailArr));  // Use the updated orderDetailArr
+  //             // const response = await fetch(`https://mserver.printbaz.com/updateorder/${viewOrder?._id}`, {
+  //             const response = await fetch(`http://localhost:5000/updateorder/${viewOrder?._id}`, {
+  //               method: "PUT",
+  //               body: formData2,
+  //             });
+          
+  //             if (response.ok) {
+  //               const result = await response.json();
+  //               // console.log("Success:", result);
+  //               // console.log('API response:', response);
+            
+  //            // Fetch the updated order details
+  // // const orderResponse = await fetch(`https://mserver.printbaz.com/getorder/${viewOrder?._id}`);
+  // const orderResponse = await fetch(`http://localhost:5000/getorder/${viewOrder?._id}`);
+  // if (orderResponse.ok) {
+  //   const updatedOrder = await orderResponse.json();
+  //   // console.log('Updated order:', updatedOrder);
+  // } 
+  // else {
+  //   throw new Error('Order fetch error: ' + orderResponse.status);
+  // }
+
+  //               setShowAlert(true);
+  //             } else {
+  //               throw new Error('API error: ' + response.status);
+  //             }
+  //           } catch (error) {
+  //             console.error('API error:', error.message);
+  //           }
+  //           finally {
+  //             setIsLoading(false); // Set loading status to false
+  //           }
+  //         };
+
+          const handleUpdate = async (e) => {
+            e.preventDefault();
             setIsLoading(true)
-            // Validate the form here
-            if (validateForm()) {
-              setIsLoading(false) // Set loading status to false if form is invalid
-              return; // Exit the function if form is invalid
-            }
+              // Validate the form here
+              if (validateForm()) {
+                setIsLoading(false) // Set loading status to false if form is invalid
+                return; // Exit the function if form is invalid
+              }
+            
             try {
               const formData2 = new FormData();
               const orderDetailArr = formData.orderDetailArr || [];
               const filesAndImagesArr = [];
-          // console.log("formData.orderDetailArr",formData.orderDetailArr);
+          
               orderDetailArr?.forEach((item, index) => {
                 const fileAndImageData = {};
-               // Only append 'file' and 'image' fields if they have been updated:
-               if (item.file && item.file.length > 0) {
-                // console.log("item.file.length",item.file.length);
-                item.file.forEach((file, fileIndex) => {
-                  if (file instanceof File) {
+                // console.log("item.brandLogo",item.brandLogo);
+                if (item.file) {
+                  item.file.forEach((file, fileIndex) => {
                     formData2.append(`file${index}_${fileIndex}`, file); // Append each file
-                  } else {
-                    // console.error(`item.file[${fileIndex}] is not a File object:`, file);
-                  }
-                });
-              }
-          
-                if (item.image && item.image.length > 0) {
+                  });
+                }
+                
+                if (item.image) {
                   item.image.forEach((image, imageIndex) => {
                     formData2.append(`image${index}_${imageIndex}`, image); // Append each image
                   });
+                }    if (item.brandLogo) {
+                  item.brandLogo.forEach((brandLogo, brandLogoIndex) => {
+                    formData2.append(`brandLogo${index}_${brandLogoIndex}`, brandLogo); // Append each image
+                  });
                 }
+                  // Append brandLogo
           
-                // Append brandLogo
-                if (item.brandLogo ) {
-                  // console.log("item.brandLogo",item.brandLogo);
-                  formData2.append(`brandLogo${index}`, item.brandLogo);
-              }
-          
-                if (Object.keys(fileAndImageData).length) {
+          //   if (item.brandLogo) {
+          //     formData2.append(`brandLogo${index}`, item.brandLogo);
+          // }
+            if (Object.keys(fileAndImageData).length) {
                   filesAndImagesArr.push(fileAndImageData);
                 }
           
                 formData2.append(`color${index}`, item.color);
                 formData2.append(`teshirtSize${index}`, item.teshirtSize);
-                formData2.append(`quantity${index}`, item.quantity);
+                // Handle different sizes for quantity
+            formData2.append(`quantityM${index}`, item.quantityM);
+            formData2.append(`quantityL${index}`, item.quantityL);
+            formData2.append(`quantityXL${index}`, item.quantityXL);
+            formData2.append(`quantityXXL${index}`, item.quantityXXL);
+            
                 formData2.append(`printSize${index}`, item.printSize);
                 formData2.append(`printSide${index}`, item.printSide);
+            
+          
           
                 return item;
               });
-           // Only append 'orderDetailArr' if it has been updated:
-    if (orderDetailArr.length > 0) {
-      formData2.append('orderDetailArr', JSON.stringify(orderDetailArr));
-    }
+          
               formData2.append('filesAndImages', JSON.stringify(filesAndImagesArr)); // Append the filesAndImagesArr as a JSON string
           
               // Append the remaining form data
-              // formData2.append('orderDetailArr', JSON.stringify(orderDetailArr));
+              formData2.append('orderDetailArr', JSON.stringify(orderDetailArr));
               formData2.append('name', formData.name);
               formData2.append('phone', formData.phone);
               formData2.append('address', formData.address);
               formData2.append('instruction', formData.instruction);
-              formData2.append('area', formData.area);
+              formData2.append('districts', formData.districts);
+              formData2.append('zones', formData.zones);
+              formData2.append('areas', formData.areas);
               formData2.append('collectAmount', formData.collectAmount);
+              formData2.append('quantity', formData.quantity);
               formData2.append('printbazcost', printbazcost);
               formData2.append('deliveryFee', deliveryFee);
-              formData2.append('recvMoney', recvMoney);
+              formData2.append('recvMoney', Math.floor(recvMoney));
+              // formData2.append('id',orderId);
               formData2.append('userMail', getSpecificOrderById?.userMail);
-              // formData2.append('orderDetailArr', JSON.stringify(formData.orderDetailArr));  // Use the updated orderDetailArr
-              const response = await fetch(`https://mserver.printbaz.com/updateorder/${viewOrder?._id}`, {
-              // const response = await fetch(`http://localhost:5000/updateorder/${viewOrder?._id}`, {
-                method: "PUT",
-                body: formData2,
-              });
-          
-              if (response.ok) {
-                const result = await response.json();
-                // console.log("Success:", result);
-                // console.log('API response:', response);
+       // formData2.append('orderDetailArr', JSON.stringify(formData.orderDetailArr));  // Use the updated orderDetailArr
+              // const response = await fetch(`https://mserver.printbaz.com/updateorder/${viewOrder?._id}`, {
+                const response = await fetch(`http://localhost:5000/updateorder/${viewOrder?._id}`, {
+                  method: "PUT",
+                  body: formData2,
+                });
             
-             // Fetch the updated order details
-  const orderResponse = await fetch(`https://mserver.printbaz.com/getorder/${viewOrder?._id}`);
-  // const orderResponse = await fetch(`http://localhost:5000/getorder/${viewOrder?._id}`);
-  if (orderResponse.ok) {
-    const updatedOrder = await orderResponse.json();
-    // console.log('Updated order:', updatedOrder);
-  } else {
-    throw new Error('Order fetch error: ' + orderResponse.status);
-  }
-
-                setShowAlert(true);
-              } else {
-                throw new Error('API error: ' + response.status);
+                if (response.ok) {
+                  const result = await response.json();
+                  // console.log("Success:", result);
+                  // console.log('API response:', response);
+              
+               // Fetch the updated order details
+    // const orderResponse = await fetch(`https://mserver.printbaz.com/getorder/${viewOrder?._id}`);
+    const orderResponse = await fetch(`http://localhost:5000/getorder/${viewOrder?._id}`);
+    if (orderResponse.ok) {
+      const updatedOrder = await orderResponse.json();
+      // console.log('Updated order:', updatedOrder);
+    } 
+    else {
+      throw new Error('Order fetch error: ' + orderResponse.status);
+    }
+  
+                  setShowAlert(true);
+                } else {
+                  throw new Error('API error: ' + response.status);
+                }
+              } catch (error) {
+                console.error('API error:', error.message);
               }
-            } catch (error) {
-              console.error('API error:', error.message);
-            }
-            finally {
-              setIsLoading(false); // Set loading status to false
-            }
+              finally {
+                setIsLoading(false); // Set loading status to false
+              }
           };
+          
           const handleDeletePopUp=(e,index)=>{
             // e.stopPropagation();
           e.preventDefault()
@@ -548,219 +921,112 @@ console.log("getSpecificOrderById out side delete func",getSpecificOrderById);
       <div className="alert-overlay" onClick={onClose} />
       <div className="alert-box-updateOrder">
         {/* <img src='/images/checked.png' alt='alert message'/> */}
-        <Form onSubmit={handleUpdate}  className="mb-4">
-                <div className="row mt-5">
-                  {/* 1st Column */}
-                  <div className="col-md-4">
-                    <h3>Recipient Details</h3>
-      
-                    <Form.Group className="mb-3">
-                      <Form.Label>Recipient's Name</Form.Label>
-                      <Form.Control
-                        type="text"
-                        name="name"
-                        value={formData.name}
-                        className="form-control"
-                        id="recipientName"
-                        onChange={(e) =>  handleInputChange(e)}
-                        required
-                        placeholder="Enter Name"
-                      />
-                    </Form.Group>
-      
-                    <Form.Group className="mb-3">
-                      <Form.Label>Recipient's Phone</Form.Label>
-                      <Form.Control
-                        type="tel"
-                        pattern="[0-9]{11}"
-                        name="phone"
-                        value={formData.phone}
-                        onChange={(e) =>  handleInputChange(e)}
-                        className="form-control"
-                        id="recipientPhone"
-                        required
-                        placeholder="Enter recipient number"
-                      />
-                    </Form.Group>
-                    <Form.Group
-                      className="mb-3 Print Side w-100"
-                   
-                    >
-                      <Form.Label className="pr-2">Delivery Area</Form.Label>
-                      <Form.Control
-                        as="select"
-                        name="area"
-                        value={formData.area}
-                        onChange={(e) =>  handleInputChange(e)}
-                        required
-                      >
-                        <option value="">select area</option>
-                        <option value="inside dhaka">Inside Dhaka</option>
-                        <option value="outside dhaka">Outside Dhaka</option>
-                      </Form.Control>
-                    </Form.Group>
-                    <Form.Group className="mb-3 ">
-                      <Form.Label>Recipient's/Delivery Address</Form.Label>
-                      <Form.Control
-                        type="text"
-                        name="address"
-                        value={formData.address}
-                        onChange={(e) =>  handleInputChange(e)}
-                        className="form-control"
-                        id="recipientAddress"
-                        required
-                        placeholder="Enter recipient address"
-                      />
-                    </Form.Group>
-                    <Form.Group className="mb-3">
-                      <Form.Label> Special Instructions</Form.Label>
-                      {["bottom"].map((placement) => (
-                        <OverlayTrigger
-                          key={placement}
-                          placement={placement}
-                          overlay={
-                            <Tooltip id={`tooltip-${placement}`}>
-                              Any specific request for
-                              production, branding or delivery
-                            </Tooltip>
-                          }
-                        >
-                          <span variant="secondary" className="info_icon">
-                            <img
-                              style={{
-                                marginLeft: "5px",
-                                width: "15px",
-                                height: "15px",
-                              }}
-                              src="/images/info.png"
-                              alt="info"
-                            />
-                          </span>
-                        </OverlayTrigger>
-                      ))}
-                      <Form.Control
-                        as="textarea"
-                        type="text"
-                        name="instruction"
-                        value={formData.instruction}
-                        onChange={(e) =>  handleInputChange(e)}
-                        className="form-control"
-                        id="recipientAddress"
-                        style={{ height: "150px" }}
-                        placeholder=""
-                      />
-                    </Form.Group>
-                  </div>
-                  {/* 2nd Column */}
-                  <div className="col-md-4">
-                    <div className="costOrder_Style">
-                    <h3>Order Details</h3>
-                  
-                    </div>
-                 
-                    {formData?.orderDetailArr?.map((item, index) => (
-                      <>
-                      
-                      <div className='flex'>
-                      <h4 style={{textAlign:"start",color:"orange"}}>Line Item : {index+1}</h4>
-                      <div>
-                 <button onClick={(e)=>handleDeletePopUp(e,index)} style={{borderRadius:"5px",padding: '10px 20px',float: 'right', background: 'transparent', border: 'none', color: 'red', fontSize: '18px'}}><i className="fa fa-trash" aria-hidden="true" /></button>
-                
-              
-                 </div>
-                      </div>
-                      
-                  <Form.Group
+     
+              <Form onSubmit={handleUpdate}  className="mb-4">
+
+
+
+<Row  className="g-2 m45 m_1responsive700">
+
+{formData.orderDetailArr.map((item, index) => (
+  <Col xs={6} md={3}>
+   <Card >
+       <Card.Title className='m-auto p-3' style={{backgroundColor:"#001846",color:"white",width:"100%",textAlign:"center"}}>{item.color}
+           <input data-color={item.color} name="color" type="hidden" value={item.color} />
+       </Card.Title>
+   
+       <ListGroup className="list-group-flush pl-0 pr-0">
+           <ListGroup.Item className="d-flex align-items-center  ">
+               <span value="m">M</span>
+               <input 
+                   data-size="m"
+                   data-color={item.color}
+                   name="quantityM"
+                   type="number"
+                   value={item.quantityM}
+                   style={{marginLeft:"auto",height:"30px",border:"1px solid #ddd8d8"}}
+                   onChange={(e) => handleInputChange(e, index)}
+               />
+           </ListGroup.Item>
+           <ListGroup.Item className="d-flex align-items-center">
+               <span value="L">L</span>
+               <input 
+                   data-size="L"
+                   data-color={item.color}
+                   name="quantityL"
+                   type="number"
+                   value={item.quantityL}
+                   style={{marginLeft:"auto",height:"30px",border:"1px solid #ddd8d8"}}
+                   onChange={(e) => handleInputChange(e, index)}
+               />
+           </ListGroup.Item> 
+            <ListGroup.Item className="d-flex align-items-center">
+               <span value="XL">XL</span>
+               <input 
+                   data-size="XL"
+                   data-color={item.color}
+                   name="quantityXL"
+                   type="number"
+                   value={item.quantityXL}
+                   style={{marginLeft:"auto",height:"30px",border:"1px solid #ddd8d8"}}
+                   onChange={(e) => handleInputChange(e, index)}
+               />
+           </ListGroup.Item>
+           <ListGroup.Item className="d-flex align-items-center">
+               <span value="XXL">XXL</span>
+               <input 
+                   data-size="XXL"
+                   data-color={item.color}
+                   name="quantityXXL"
+                   type="number"
+                   value={item.quantityXXL}
+                   style={{marginLeft:"auto",height:"30px",border:"1px solid #ddd8d8"}}
+                   onChange={(e) => handleInputChange(e, index)}
+               />
+           </ListGroup.Item>  
+       </ListGroup>
+       <Card.Body>
+       <Form.Group
                       className="mb-3 Print Side w-100 m-auto"
-                     
-                    >
-                      <Form.Label className="pr-2">Color</Form.Label>
-                      <Form.Control
-                        as="select"
-                        name="color"
-                        required
-                        value={item.color}
-                        onChange={(e) =>  handleInputChange(e,index)}
-                      >
-                        <option value="">select color</option>
-                        <option value="black">Black</option>
-                        <option value="white">White</option>
-                      </Form.Control>
-                    </Form.Group>
-      
-                    <Form.Group
-                      className="mb-3 Print Side w-100 m-auto"
-                     
-                    >
-                      <Form.Label className="pr-2">Tee Shirt Size</Form.Label>
-                      <Form.Control
-                        as="select"
-                        value={item.teshirtSize}
-                        required
-                        onChange={(e) =>  handleInputChange(e,index)}
-                        name="teshirtSize"
-                      >
-                        <option value="">select tee shirt size</option>
-                        <option value="m">M</option>
-                        <option value="L">L</option>
-                        <option value="XL">XL</option>
-                        <option value="XXL">XXL</option>
-                      </Form.Control>
-                    </Form.Group>
-      
-                    <Form.Group
-                      className="mb-3 Quantity w-100 m-auto"
-                    
-                    >
-                      <Form.Label>Quantity</Form.Label>
-      
-                      <Form.Control
-                        name="quantity"
-                        type="number"
-                        value={item.quantity}
-                        onChange={(e) => {
-                           handleInputChange(e,index)
-                        }}
-                        required
-                        placeholder="Enter Quantity"
-                        min="1"
-                      />
-                    </Form.Group>
-                    <Form.Group
-                      className="mb-3 Print Side w-100 m-auto"
-                   
+                      controlId="wccalcPrintSide"
                     >
                       <Form.Label className="pr-2">Print side</Form.Label>
-                      <Form.Control
+                    
+                      <Form.Control  
                         as="select"
+                        data-color={item.color}
                         value={item.printSide}
                         onChange={(e) => {
                            handleInputChange(e,index);
                         }}
                         name="printSide"
-                        required
+                        required={item.quantityM || item.quantityL || item.quantityXL || item.quantityXXL}
+                        
+                        
                       >
                        <option value="">select print side</option> 
                         <option value="frontSide">Front Side</option>
                         <option value="backSide">Back Side</option>
                         <option value="bothSide">Both Side</option>
                       </Form.Control>
+                    
                     </Form.Group>
-                    {
-                     ( item.printSide==="frontSide" || item.printSide==="backSide") &&
+                   {
+                      item.printSide === "backSide" &&
                       <Form.Group
                       className="mb-3 Print Side w-100 m-auto"
-                     
+                      controlId="wccalcPrintSide"
                     >
                       <Form.Label className="pr-2">Print Size</Form.Label>
                       <Form.Control
                         as="select"
+                        data-color={item.color}
                         value={item.printSize}
                         onChange={(e) => {
                            handleInputChange(e,index);
                         }}
                         name="printSize"
-                        required
+                        required={item.quantityM || item.quantityL || item.quantityXL || item.quantityXXL}
                       >
                        <option value="">select print size</option> 
                         <option value="10 x 14">10″ x 14″</option>
@@ -768,26 +1034,57 @@ console.log("getSpecificOrderById out side delete func",getSpecificOrderById);
                         <option value="10 x 5">10″ x 5″</option>
                         <option value="5 X 5">5″ x 5″</option>
                         <option value="2.5 X 5">2.5″ x 5″</option>
+                        <option value="2.5 X 2.5">2.5″ x 2.5″</option>
                       </Form.Control>
                     </Form.Group>
 }
+                    {
+                      item.printSide==="frontSide"  &&
+                      <Form.Group
+                      className="mb-3 Print Side w-100 m-auto"
+                      controlId="wccalcPrintSide"
+                    >
+                      <Form.Label className="pr-2">Print Size</Form.Label>
+                      <Form.Control
+                        as="select"
+                        data-color={item.color}
+                        value={item.printSize}
+                        onChange={(e) => {
+                           handleInputChange(e,index);
+                        }}
+                        name="printSize"
+                        required={item.quantityM || item.quantityL || item.quantityXL || item.quantityXXL}
+                      >
+                       <option value="">select print size</option> 
+                        <option value="10 x 14">10″ x 14″</option>
+                        <option value="10 x 10">10″ x 10″</option>
+                        <option value="10 x 5">10″ x 5″</option>
+                        <option value="5 X 5">5″ x 5″</option>
+                        <option value="2.5 X 5">2.5″ x 5″</option>
+                        <option value="2.5 X 2.5">2.5″ x 2.5″</option>
+                      </Form.Control>
+                    </Form.Group>
+}
+
+
                     {
                       item.printSide==="bothSide" && 
                       <>
 
 <Form.Group
                       className="mb-3 Print Side w-100 m-auto"
-                    
+                      controlId="wccalcPrintSide"
                     >
                       <Form.Label className="pr-2">Print Size front</Form.Label>
                       <Form.Control
                         as="select"
+                        data-color={item.color}
                         value={item.printSize}
                         onChange={(e) => {
                            handleInputChange(e,index);
                         }}
                         name="printSize"
-                        required
+                        required={item.quantityM || item.quantityL || item.quantityXL || item.quantityXXL}
                       >
                        <option value="">select print size</option> 
                         <option value="10 x 14">10″ x 14″</option>
@@ -795,21 +1092,24 @@ console.log("getSpecificOrderById out side delete func",getSpecificOrderById);
                         <option value="10 x 5">10″ x 5″</option>
                         <option value="5 X 5">5″ x 5″</option>
                         <option value="2.5 X 5">2.5″ x 5″</option>
+                        <option value="2.5 X 2.5">2.5″ x 2.5″</option>
                       </Form.Control>
                     </Form.Group>
                     <Form.Group
                     className="mb-3 Print Side w-100 m-auto"
-                
+                    controlId="wccalcPrintSide"
                   >
                     <Form.Label className="pr-2">Print Size back</Form.Label>
                     <Form.Control
                       as="select"
-                      value={item.printSizeBack}
+                      data-color={item.color}
+                      name="printSizeBack"
+                      value={item?.printSizeBack}
                       onChange={(e) => {
                          handleInputChange(e,index);
                       }}
-                      name="printSizeBack"
-                      required
+                     
+                      required={item.quantityM || item.quantityL || item.quantityXL || item.quantityXXL}
                     >
                      <option value="">select print size</option> 
                       <option value="10 x 14">10″ x 14″</option>
@@ -817,14 +1117,13 @@ console.log("getSpecificOrderById out side delete func",getSpecificOrderById);
                       <option value="10 x 5">10″ x 5″</option>
                       <option value="5 X 5">5″ x 5″</option>
                       <option value="2.5 X 5">2.5″ x 5″</option>
+                      <option value="2.5 X 2.5">2.5″ x 2.5″</option>
                     </Form.Control>
                   </Form.Group>
                       </>
                      
                     }
-                   
-          {/* ///upload file section  */}
-          <Form.Group  className="">
+                 <Form.Group  className="">
   <Form.Label>Upload Main File</Form.Label>
   {item?.file?.map((singleFile, fileIndex) => {
     let fileId, filePreviewURLDrive,filePreviewURL;
@@ -858,7 +1157,7 @@ console.log("getSpecificOrderById out side delete func",getSpecificOrderById);
           name="file"
           id={`fileInput-${fileIndex}`}
          
-          style={{position:"absolute",height:"45px",display:"" }}
+          style={{position:"absolute",width:"85%",margin:"auto",display:"" }}
           onChange={(e) => handleFileChange(e, index, fileIndex)}// Pass the correct index
           accept=".ai,.eps,.psd,.pdf,.svg,.png"
           multiple
@@ -868,18 +1167,9 @@ console.log("getSpecificOrderById out side delete func",getSpecificOrderById);
   })}
   <span style={{ color: "gray" }}>upload .ai, .eps,.psd,.pdf,.svg, .png file</span>
 </Form.Group>
-
-
-
-
-
-
-                    {fileprogress === 0 ? null : (
-         <ProgressBar now={fileprogress} label={`${fileprogress}%`} />
-          )}
-         {/* image upload  */}
+  {/* image upload  */}
                     
-                    <Form.Group  className="mb-3">
+  <Form.Group  className="mb-3">
                       <Form.Label>Upload Mockup/T-Shirt Demo Picture</Form.Label>
                       {
                            item?.image?.map((singleImage,imageIndex)=>{
@@ -916,63 +1206,13 @@ console.log("getSpecificOrderById out side delete func",getSpecificOrderById);
                                 name="image"
                                 id={`imageInput-${imageIndex}`}
                                
-                                style={{position:"absolute",height:"45px",display:"" }}
+                                style={{position:"absolute",width:"85%",display:"" }}
                                 onChange={(e) => handleFileChange(e, index, imageIndex)}// Pass the correct index
                                 accept=".ai,.eps,.psd,.pdf,.svg,.png"
                                 multiple
                               />
                             </div>
-  //                               <div style={{ position: "relative", marginBottom: "5px", height: "150px", width: "100%" }} key={imageIndex}>
-  //    <iframe
-  //   src={imagePreviewURL}
-  //   style={{
-  //     position: "absolute",
-  //     top: 0,
-  //     left: 0,
-  //     width: "100%",
-  //     height: "100%",
-  //     border: "none",
-  //   }}
-  //   title={`image-${imageIndex}`}
-  // ></iframe>
-  //   <label 
-  //   htmlFor={`imageInput-${imageIndex}`} 
-  //   style={{ 
-  //     position: "absolute", 
-  //     top: "50%", 
-  //     left: "50%", 
-  //     transform: "translate(-50%, -50%)",  
-  //     cursor: "pointer", 
-  //     width: "50%", 
-  //     height: "40px", 
-  //     display: "flex", 
-  //     justifyContent: "center", 
-  //     alignItems: "center", 
-  //     color: "black",
-  //     textAlign: "center",
-  //     transition: "background-color 0.2s"
-  //   }}
-  //   onMouseOver={(e) => {
-  //     e.target.innerHTML = "Choose file"
-  //     e.target.style.backgroundColor = "rgba(255,255,255,0.8)"
-  //   }}
-  //   onMouseOut={(e) => {
-  //     e.target.innerHTML = ""
-  //     e.target.style.backgroundColor = "transparent"
-  //   }}
-  // >
-  // </label>
-  //                          <Form.Control
-  //                       type="file"
-  //                       id={`imageInput-${imageIndex}`}
-  //                       name="image"
-  //                       style={{ display: "none" }}
-  //                       onChange={(e) => handleFileChange(e, index, imageIndex)}
-                       
-  //                       accept="image/*"
-  //                       multiple
-  //                     />
-  //                               </div>
+                            
                             )
                                 }
                              ) }
@@ -1063,34 +1303,219 @@ console.log("getSpecificOrderById out side delete func",getSpecificOrderById);
   
 </Form.Group>
 
+{/* <Form.Group controlId="formBrandLogo" className="mb-3">
+<Form.Label>Upload Your Brand Logo (optional)</Form.Label>
+<Form.Control
+type="file"
+name="brandLogo"
+accept="image/jpeg, image/png"
+onChange={(e) => handleFileChange(e, index)}
+/>
+</Form.Group> */}
+       </Card.Body>
+   </Card>
+   </Col>
+))}
 
-                     </>
-                     ))}
-                  </div>
-                
-                  {/* 3rd Column */}
-                  <div className="col-md-4">
+
+</Row>
+<div className='row m45 m_12responsive700'>
+<div className="col-md-12">
+                    <h3>Recipient Details</h3>
+      <Row xs={12} md={2}>
+                    <Form.Group className="mb-3">
+                      <Form.Label>Recipient's Name</Form.Label>
+                      <Form.Control
+                        type="text"
+                        name="name"
+                        value={formData.name}
+                        className="form-control"
+                        id="recipientName"
+                        onChange={(e) =>  handleInputChange(e)}
+                        required
+                        placeholder="Enter Name"
+                      />
+                    </Form.Group>
+      
+                    <Form.Group className="mb-3">
+                      <Form.Label>Recipient's Phone</Form.Label>
+                      <Form.Control
+                        type="tel"
+                        pattern="[0-9]{11}"
+                        name="phone"
+                        value={formData.phone}
+                        onChange={(e) =>  handleInputChange(e)}
+                        className="form-control"
+                        id="recipientPhone"
+                        required
+                        placeholder="Enter recipient number"
+                      />
+                    </Form.Group>
+                    </Row>
+                   <Row xs={12} md={3} >
+                   <Form.Group
+                      className="mb-3 Print Side w-100"
+                      controlId="wccalcPrintSide"
+                    >
+                      <Form.Label className="pr-2">District</Form.Label>
+                      <Form.Control
+                        as="select"
+                        name="districts"
+                        value={formData.districts}
+                        onChange={(e) =>  handleInputChange(e)}
+                        required
+                      >
+                       
+        <option value="">Select District</option>
+        {districts.map(d => <option key={d} value={d}>{d}</option>)}
+                      </Form.Control>
+                    </Form.Group>
+           <Form.Group
+                      className="mb-3 Print Side w-100"
+                      controlId="wccalcPrintSide"
+                    >
+                      <Form.Label className="pr-2">Zone</Form.Label>
+                      <Form.Control
+                        as="select"
+                        name="zones"
+                        value={formData.zones}
+                        onChange={(e) =>  handleInputChange(e)}
+                        required
+                      >
+                       
+        <option value="">Select Zone</option>
+        {zones.map(d => <option key={d} value={d}>{d}</option>)}
+                      </Form.Control>
+                    </Form.Group>
+<Form.Group
+                      className="mb-3 Print Side w-100"
+                      controlId="wccalcPrintSide"
+                    >
+                      <Form.Label className="pr-2">Area</Form.Label>
+                      <Form.Control
+                        as="select"
+                        name="areas"
+                        value={formData.areas}
+                        onChange={(e) =>  handleInputChange(e)}
+                        required
+                      >
+                       
+        <option value="">Select Area</option>
+        {areas.map(d => <option key={d} value={d}>{d}</option>)}
+                      </Form.Control>
+                    </Form.Group>
+
+
+                   </Row>
+                 
+
+                    <Form.Group className="mb-3 ">
+                      <Form.Label>Recipient's/Delivery Address</Form.Label>
+                      <Form.Control
+                        type="text"
+                        name="address"
+                        value={formData.address}
+                        onChange={(e) =>  handleInputChange(e)}
+                        className="form-control"
+                        id="recipientAddress"
+                        required
+                        placeholder="Enter recipient address"
+                      />
+                    </Form.Group>
+                    <Form.Group className="mb-3">
+                      <Form.Label> Special Instructions</Form.Label>
+                      {["bottom"].map((placement) => (
+                        <OverlayTrigger
+                          key={placement}
+                          placement={placement}
+                          overlay={
+                            <Tooltip id={`tooltip-${placement}`}>
+                              Any specific request for
+                              production, branding or delivery
+                            </Tooltip>
+                          }
+                        >
+                          <span variant="secondary" className="info_icon">
+                            <img
+                              style={{
+                                marginLeft: "5px",
+                                width: "15px",
+                                height: "15px",
+                              }}
+                              src="/images/info.png"
+                              alt="info"
+                            />
+                          </span>
+                        </OverlayTrigger>
+                      ))}
+                      <Form.Control
+                        as="textarea"
+                        type="text"
+                        name="instruction"
+                        value={formData.instruction}
+                        onChange={(e) =>  handleInputChange(e)}
+                        className="form-control"
+                        id="recipientAddress"
+                        style={{ height: "150px" }}
+                        placeholder=""
+                      />
+                    </Form.Group>
+                  </div> 
+                  {/* <hr /> */}
+                  <div className="col-md-12 d-flex flex-column align-items-center ">            
+<div style={{ width: '100%' }}>
                     <h3>Cost Of Order</h3>
                     <div className="costOrder_Style">
-                      <label htmlFor="printbazCost">Printbaz Cost</label>
+                      <label htmlFor="printbazCost">Total Quantity</label>
       
                       <h3>
                         {" "}
-                        <span style={{ fontSize: "" }}>&#2547;</span> {addbrandLogo ?parseInt(printbazcost+5):printbazcost}
+                        {/* <span style={{ fontSize: "" }}>&#2547;</span> {addbrandLogo ?parseInt(printbazcost+5):printbazcost} */}
+                        <span style={{ fontSize: "" }}>{formData?.quantity}</span> 
                       </h3>
+                    </div> <div className="costOrder_Style">
+                    <Form.Label>Printbaz Cost</Form.Label>
+                       <Form.Group className="mb-3 ">
+                     
+                   
+                      <Form.Control
+                        type="number"
+                        name="printbazcost"
+                        value={printbazcost?printbazcost:formData.printbazcost}
+                        className="form-control"
+                        onChange={(e) => {
+                           handleInputChange(e);;
+                        }}
+                        required
+                        placeholder=""
+                      />
+                    </Form.Group>
                     </div>
       
                     <div className="costOrder_Style">
-                      <label htmlFor="printbazCost">Delivery Fee</label>
-      
-                      <h3>
-                        {" "}
-                        <span style={{ fontSize: "" }}>&#2547;</span>{" "}
-                        {formData.area === "outside dhaka"
-                          ? deliveryFeeOutSideDhaka
-                          : deliveryFeeInsideDhaka}
-                      </h3>
+                     
+
+                      <Form.Label>Delivery Fee</Form.Label>
+                       <Form.Group className="mb-3 ">
+                     
+                   
+                      <Form.Control
+                        type="number"
+                        name="deliveryFee"
+                        value={deliveryFee?deliveryFee :formData.deliveryFee}
+                        className="form-control"
+                        onChange={(e) => {
+                           handleInputChange(e);;
+                        }}
+                        required
+                        placeholder=""
+                      />
+                    </Form.Group>
                     </div>
+                    <div>
+
+                    <Row  className="costOrder_Style">
+                      <Col xs={12} md={6}>
                     <Form.Group className="mb-3 ">
                       <Form.Label>Amount to Collect</Form.Label>
                       {["bottom"].map((placement) => (
@@ -1117,6 +1542,7 @@ console.log("getSpecificOrderById out side delete func",getSpecificOrderById);
                           </span>
                         </OverlayTrigger>
                       ))}
+                    
                       <Form.Control
                         type="number"
                         name="collectAmount"
@@ -1129,26 +1555,35 @@ console.log("getSpecificOrderById out side delete func",getSpecificOrderById);
                         placeholder=""
                       />
                     </Form.Group>
-                    <Form.Group className="mb-3 ">
+                    </Col>
+                    <Col xs={12} md={6}>
+                           <Form.Group className="mb-3 ">
                            <Form.Label>Minimum Amount to Collect</Form.Label>
                           
                            <Form.Control
                              type="number"
                              name="collectAmount"
-                             value={ printbazcost && ( deliveryFeeOutSideDhaka ||deliveryFeeInsideDhaka) && suggestedCollectAmount ?suggestedCollectAmount : '' }
+                             value={ printbazcost && (  {deliveryFee}) && suggestedCollectAmount ?suggestedCollectAmount : '' }
                              readOnly
                            />
                          </Form.Group>
+                         </Col>
+                    
+                   
+                     
+                      </Row>
+                    </div>
+                    
                     <div className="costOrder_Style">
                       <label htmlFor="printbazCost">Cash Handling fee</label>{" "}
-                      <h3> 2%</h3>
+                      <h3> 3%</h3>
                     </div>
       
-                    {formData?.orderDetailArr[0]?.quantity && formData?.orderDetailArr[0]?.printSize && formData?.collectAmount && (
+                    {/* {formData?.quantity && formData?.orderDetailArr[0]?.printSize && formData?.collectAmount && ( */}
                       <div >
                         <div className="costOrder_Style">
                         <label htmlFor="printbazCost">You will receive</label>
-                        <h3> {parseInt(recvMoney)}</h3>
+                        <h3> {recvMoney>0 && Math.floor(recvMoney)}</h3>
                         </div>
                        
                       
@@ -1156,21 +1591,23 @@ console.log("getSpecificOrderById out side delete func",getSpecificOrderById);
     <p style={{color:"red",textAlign:"right"}}>{recvAmount}</p>
   }
                        
+             
+                  {/* <Button  className='ordercancel_btn' type="submit">
+        Cancel
+      </Button> */}
                       </div>
-                    )}
-                      <div className="row mt-5">
-                  <div className="col-12">
-                    <Button type="submit" style={{ backgroundColor: "#124" }}>
-                      Update
-                    </Button>
-      
-                    <Button
+                    {/* )} */}
+                  </div>
+                  <Button  className='orderSubmit_btn' type="submit">
+        Submit
+      </Button>
+
+      {/* <Button
                       type="reset"
                       style={{ backgroundColor: "gray", marginLeft: "10px" }}
-                  
-                  onClick={onClose}>
+                    >
                       Cancel
-                    </Button>
+                    </Button> */}
                     {
   isLoading===true &&(
     <>
@@ -1184,16 +1621,12 @@ console.log("getSpecificOrderById out side delete func",getSpecificOrderById);
     </>
   )
   
-}
+} 
                   </div>
-                </div>
-                  </div>
-                </div>
-                {/* <div className="row mt-5">1st Column</div> */}
-      
-              
-              </Form>
+</div>
 
+
+</Form> 
               {
                     setIndexNumber && (
                       <DeleteRoleAlert isOpen={ deletepopUp} deleteId={indexNumber} onClose={handleDeleteModalClose} onConfirm={()=>handleDeleteItem(indexNumber)} />
