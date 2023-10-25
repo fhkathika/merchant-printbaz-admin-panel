@@ -4,7 +4,7 @@
 import axios from 'axios';
 import React, { useContext, useEffect, useRef, useState } from 'react';
 import ReactMarkdown from 'react-markdown';
-import { Link, unstable_HistoryRouter, useLocation, useNavigate } from 'react-router-dom';
+import { Link, unstable_HistoryRouter, useLocation, useNavigate, useParams } from 'react-router-dom';
 import AlertMessage from '../alert/AlertMessage';
 import { useQuill } from 'react-quilljs';
 import BlotFormatter from 'quill-blot-formatter';
@@ -24,17 +24,18 @@ const ViewTicket = () => {
     const [usersStoredTickets, setUsersStoredTickets] = useState([]);
     const [selectedFiles, setSelectedFiles] = useState([]);
     const [ticketClose, setTicketClose] = useState(false);
-    const [ticketStatus, setTicketStatus] = useState(viewTicketDetail?.ticketStatus);
+ 
     const [showAlert, setShowAlert] = useState(false);
     const [showMailTooltip, setShowMailTooltip] = useState(false);
     const [getUserById, setGetUserById] = useState();
+    const [fetchTicketById, setFetchTicketById] = useState();
     const {value_count}=useRoleAsignData()
+    let { id } = useParams();
   const target = useRef(null);
   const {adminUser,loading,loginAdminUser,currentUser}=useContext(AuthContext);
     const [formatType, setFormatType] = useState({});
-    console.log("viewTicketDetail",viewTicketDetail);
-    console.log("openTextBox",openTextBox);
-    console.log("ticketStatus",ticketStatus);
+    // console.log("viewTicketDetail",viewTicketDetail);
+    console.log("usersStoredTickets",usersStoredTickets);
   
 
     const { quill, quillRef, Quill } = useQuill({
@@ -77,24 +78,36 @@ const ViewTicket = () => {
     }, [quill, Quill]);
     console.log("formatType",formatType);
 
-
+    const fetchTicketFromDbById = async () => {
+      try {
+        // const response = await axios.get(`http://localhost:5000/getTicketById/${id}`);
+        const response = await axios.get(`https://mserver.printbaz.com/getTicketById/${id}`);
+        setFetchTicketById(response.data);
+     
+      } catch (err) {
+        console.error(err);
+      }
+    };
+    const [ticketStatus, setTicketStatus] = useState(fetchTicketById?.ticketStatus);
     useEffect(() => {
  // Fetch the chat log from the server when the component mounts
-       
+ fetchTicketFromDbById()
         fetchOrderIddata();
         fetchUserIddata()
+     
             // Fetch the chat log every 10 seconds
       const intervalId = setInterval(fetchOrderIddata, 10000);
 
       // Clean up the interval on unmount
-      return () => clearInterval(intervalId);
+      return () => clearInterval(intervalId); 
       }, [messagesEndRef.current?.scrollIntoView({ behavior: "smooth" })]);
-
+console.log("fetchTicketById",fetchTicketById)
+    
       console.log("getUserById",getUserById);
       const fetchOrderIddata = async () => {
         try {
-          // const response = await axios.get(`http://localhost:5000/getOrderIdmessages/${viewTicketDetail?.orderId}`);
-          const response = await axios.get(`https://mserver.printbaz.com/getOrderIdmessages/${viewTicketDetail?.orderId}`);
+          // const response = await axios.get(`http://localhost:5000/getOrderIdmessages/${fetchTicketById?.orderId}`);
+          const response = await axios.get(`https://mserver.printbaz.com/getOrderIdmessages/${fetchTicketById?.orderId}`);
  
           setUsersStoredTickets(response.data.messages);
        
@@ -104,8 +117,8 @@ const ViewTicket = () => {
       };
       const fetchUserIddata = async () => {
         try {
-          // const response = await axios.get(`http://localhost:5000/getuesrIdmessages/${viewTicketDetail?.userId}`);
-          const response = await axios.get(`https://mserver.printbaz.com/getuesrIdmessages/${viewTicketDetail?.userId}`);
+          // const response = await axios.get(`http://localhost:5000/getuesrIdmessages/${fetchTicketById?.userId}`);
+          const response = await axios.get(`https://mserver.printbaz.com/getuesrIdmessages/${fetchTicketById?.userId}`);
  
           setUsersStoredTickets(response.data.messages);
        
@@ -114,7 +127,7 @@ const ViewTicket = () => {
         }
       };
 
-      let filterByTicketId=usersStoredTickets?.find(ticket=>ticket.ticketId===viewTicketDetail?.ticketId)
+      let filterByTicketId=usersStoredTickets?.find(ticket=>ticket.ticketId===fetchTicketById?.ticketId)
       const SendTicketCopy = (ticketCopy) => {
         console.log("SendTicketCopy clicked");
         // axios.post('http://localhost:5000/sendTicketCopy', ticketCopy)
@@ -148,8 +161,8 @@ const ViewTicket = () => {
          try {
           const response = await fetch(
             
-            `https://mserver.printbaz.com/TicketCloseStatus/${viewTicketDetail?.ticketId}`,
-          // `http://localhost:5000/TicketCloseStatus/${viewTicketDetail?.ticketId}`,
+            `https://mserver.printbaz.com/TicketCloseStatus/${fetchTicketById?.ticketId}`,
+          // `http://localhost:5000/TicketCloseStatus/${fetchTicketById?.ticketId}`,
             {
               method: "PUT",
               headers: {
@@ -192,14 +205,14 @@ const ViewTicket = () => {
             formData.append('files',file)
           })
           const newMessage = {
-             ticketId: viewTicketDetail?.ticketId,
-             ticketIssue: viewTicketDetail?.ticketIssue,
+             ticketId: fetchTicketById?.ticketId,
+             ticketIssue: fetchTicketById?.ticketIssue,
              ticketStatus:"replied",
              unread:true,
-             userEmail:viewTicketDetail?.userEmail,
-             userName:viewTicketDetail?.userName,
-             userOrderId:viewTicketDetail?.orderId,
-             userId:viewTicketDetail?.userId,
+             userEmail:fetchTicketById?.userEmail,
+             userName:fetchTicketById?.userName,
+             userOrderId:fetchTicketById?.orderId,
+             userId:fetchTicketById?.userId,
              adminUser:adminUser?.email,
               user: 'Printbaz',
                content: newMsg };
@@ -248,6 +261,7 @@ const ViewTicket = () => {
           setNewMsg('');
           fetchOrderIddata()
           fetchUserIddata()
+          fetchTicketFromDbById()
           console.log("chatLog",chatLog);
         } catch (err) {
           console.error(err);
@@ -339,93 +353,51 @@ const ViewTicket = () => {
               <div className="ticket-info">
                 <img src="https://media.discordapp.net/attachments/1069579536842379305/1117395441697443860/pngegg_15.png" alt="" />
                
-                <h2>{viewTicketDetail?.ticketIssue==="onHold out of stock" &&
+                <h2>{fetchTicketById?.ticketIssue==="onHold out of stock" &&
                " Out of Stock"
                 
                 }</h2>  
-                <h2>{viewTicketDetail?.ticketIssue==="onHold artwork issue" &&
+                <h2>{fetchTicketById?.ticketIssue==="onHold artwork issue" &&
                "Artwork Issue"
                 
                 }</h2>  
-                <h2>{viewTicketDetail?.ticketIssue==="onHold billing issue" &&
+                <h2>{fetchTicketById?.ticketIssue==="onHold billing issue" &&
                "Billing Issue"
                 
                 }</h2>
-                  <h2>{viewTicketDetail?.ticketIssue==="returned" &&
+                  <h2>{fetchTicketById?.ticketIssue==="returned" &&
                "Returned"
                 
                 }</h2> 
-                <h2>{viewTicketDetail?.ticketIssue==="cancellation" &&
+                <h2>{fetchTicketById?.ticketIssue==="cancellation" &&
                "Cancellation"
                 
                 }</h2>
-                <h2>{viewTicketDetail?.ticketIssue==="general query" &&
+                <h2>{fetchTicketById?.ticketIssue==="general query" &&
                "General Query"
                 
                 }</h2>
                  {
-                  viewTicketDetail?.orderId ?
-                  <p>Order ID: <Link to={`/viewOrder/${viewTicketDetail?.orderId}`}>{viewTicketDetail?.orderId}</Link> </p>
+                  fetchTicketById?.orderId ?
+                  <p>Order ID: <Link to={`/viewOrder/${fetchTicketById?.orderId}`}>{fetchTicketById?.orderId}</Link> </p>
                      :
-                     <p> Phone Number: {viewTicketDetail?.userId}</p>
+                     <p> Phone Number: {fetchTicketById?.userId}</p>
                 }
                
-                <p>Ticket ID: {viewTicketDetail?.ticketId}</p>
+                <p>Ticket ID: {fetchTicketById?.ticketId}</p>
               </div>
             </div>
           </div>
           <div className="" style={{overflow:"scroll",maxHeight:"30rem"}}>
               {
-                  filterByTicketId?.messages?.map(viewTick=>
+                  fetchTicketById?.messages?.map(viewTick=>
                   
                     <div className="col-12">
                 {/* clent messages  */}
-                {
-                viewTick.admin===viewTicketDetail?.userName && 
-           
-                <div className="col-12">
-                <div className="mer-info">
-                <img src="/images/profile.jpg" alt="" />
-                  {
-                    getUserById?.clientbrandLogoURL &&
-                    <img src={getUserById?.clientbrandLogoURL} alt="" />
-                    
-//                     <div style={{display:"flex",justifyContent:"center",alignItems:"center",marginLeft:'10px'}}>
-//  <svg id="Layer_2" height="30" viewBox="0 0 512 512" width="30" xmlns="http://www.w3.org/2000/svg"><g><g><g><circle cx="256" cy="256" fill="#6e83b7" r="246"/></g><g><ellipse cx="256" cy="356" fill="#edeff1" rx="173.237" ry="100"/></g><g><circle cx="256" cy="156" fill="#edeff1" r="100"/></g></g><g><path d="m256 376 80.714-103.039c-24.687-10.903-51.992-16.961-80.714-16.961s-56.027 6.058-80.714 16.961z" fill="#d3d3d3"/></g></g></svg>
-
-//                     </div>
-                   
-
-                }
-                 
-                  <h2 >{viewTicketDetail?.userName}</h2>
-                  <h3 >{timeSince(new Date(viewTick?.timestamp))} ({new Date(viewTick?.timestamp).toLocaleString("en-US", { month: 'long', day: 'numeric', year: 'numeric', hour: 'numeric', minute: 'numeric' })})</h3>
-                  <hr className='hr_lineStyle'/>
               
-                  {/* <p>   {viewTick.content}</p> */}
-                  <div dangerouslySetInnerHTML={{ __html: viewTick.content }} />
-                
-                  {/* // upload image  */}
-                  {
-  viewTick?.files?.map(adminFile => {
-    const fileId = adminFile.split('/d/')[1].split('/view')[0];
-    const previewURL = `https://drive.google.com/file/d/${fileId}/preview`;
-    return (
-      <>
-        
-          <iframe src={previewURL}  style={{width: "auto", height: "auto",alignItems:"center"}}></iframe>
-      </>
-    )
-  })
-} 
-
-                
-                </div>
-              </div>
-              }
-                 
+              
               {
-                viewTick.admin==="Printbaz" && 
+                viewTick?.admin==="Printbaz" ?
                 <div className="col-12">
                 <div className="mer-info">
                   <img src="https://media.discordapp.net/attachments/1069579536842379305/1107191553501450260/Logo-01.jpg?width=616&height=616" alt="" />
@@ -463,6 +435,48 @@ const ViewTicket = () => {
 
  </div>
               </div>
+:
+
+  <div className="col-12">
+  <div className="mer-info">
+  <img src="/images/profile.jpg" alt="" />
+    {
+      getUserById?.clientbrandLogoURL &&
+      <img src={getUserById?.clientbrandLogoURL} alt="" />
+      
+//                     <div style={{display:"flex",justifyContent:"center",alignItems:"center",marginLeft:'10px'}}>
+//  <svg id="Layer_2" height="30" viewBox="0 0 512 512" width="30" xmlns="http://www.w3.org/2000/svg"><g><g><g><circle cx="256" cy="256" fill="#6e83b7" r="246"/></g><g><ellipse cx="256" cy="356" fill="#edeff1" rx="173.237" ry="100"/></g><g><circle cx="256" cy="156" fill="#edeff1" r="100"/></g></g><g><path d="m256 376 80.714-103.039c-24.687-10.903-51.992-16.961-80.714-16.961s-56.027 6.058-80.714 16.961z" fill="#d3d3d3"/></g></g></svg>
+
+//                     </div>
+     
+
+  }
+   
+    <h2 >{fetchTicketById?.userName} </h2>
+    <h3 >{timeSince(new Date(viewTick?.timestamp))} ({new Date(viewTick?.timestamp).toLocaleString("en-US", { month: 'long', day: 'numeric', year: 'numeric', hour: 'numeric', minute: 'numeric' })})</h3>
+    <hr className='hr_lineStyle'/>
+
+    {/* <p>   {viewTick.content}</p> */}
+    <div dangerouslySetInnerHTML={{ __html: viewTick.content }} />
+  
+    {/* // upload image  */}
+    {
+viewTick?.files?.map(adminFile => {
+const fileId = adminFile.split('/d/')[1].split('/view')[0];
+const previewURL = `https://drive.google.com/file/d/${fileId}/preview`;
+return (
+<>
+
+<iframe src={previewURL}  style={{width: "auto", height: "auto",alignItems:"center"}}></iframe>
+</>
+)
+})
+} 
+
+  
+  </div>
+</div>
+
               }
 
              
