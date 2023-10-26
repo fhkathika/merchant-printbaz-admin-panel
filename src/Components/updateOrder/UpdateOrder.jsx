@@ -16,6 +16,7 @@ import tshirtFormulaCustomDropSholder from '../../Formulas/tshirtFormulaCustomDr
 
 const UpdateOrder = ({ onClose,viewOrder,viewClient,getSpecificOrderById,setGetSpecificOrderById }) => {
   console.log("getSpecificOrderById from edit order page",getSpecificOrderById); 
+  console.log("viewOrder",viewOrder); 
   // console.log("viewOrder",viewOrder);
     const [selectedFile, setSelectedFile] = useState(null);
     const [previewUrl, setPreviewUrl] = useState('');
@@ -78,10 +79,10 @@ console.log("getSpecificOrderById out side delete func",getSpecificOrderById);
         printbazcost: getSpecificOrderById?.printbazcost,
         quantity: getSpecificOrderById?.quantity,
         deliveryFee: getSpecificOrderById?.deliveryFee,
-        dsicount: '',
-        additionalCost:'',
-        discountNote:'',
-        additionalCostNote:'',
+        dsicount: getSpecificOrderById?.dsicount?  getSpecificOrderById?.dsicount:'',
+        additionalCost:getSpecificOrderById?.additionalCost?getSpecificOrderById?.additionalCost:'',
+        discountNote:getSpecificOrderById?.discountNote?getSpecificOrderById?.discountNote:'',
+        additionalCostNote:getSpecificOrderById?.additionalCostNote?getSpecificOrderById?.additionalCostNote:'',
         orderDetailArr:  getSpecificOrderById?.orderDetailArr?.map(order => {
         
            return order
@@ -90,6 +91,7 @@ console.log("getSpecificOrderById out side delete func",getSpecificOrderById);
       });
    
       console.log("orderDetailArr",formData?.orderDetailArr);
+      console.log("formData",formData);
     
         let id = "resellerOrdersId";
        let collections = "resellerInfo";
@@ -123,8 +125,8 @@ console.log("getSpecificOrderById out side delete func",getSpecificOrderById);
       const [addBrandLogoArray, setAddBrandLogoArray] = useState([]);
     // Fetch unique districts when the component mounts
   useEffect(() => {
-    axios.get('http://localhost:5000/unique-districts')
-    // axios.get('https://mserver.printbaz.com/unique-districts')
+    // axios.get('http://localhost:5000/unique-districts')
+    axios.get('https://mserver.printbaz.com/unique-districts')
       .then(response => {
         setDistricts(response.data);
       })
@@ -134,8 +136,8 @@ console.log("getSpecificOrderById out side delete func",getSpecificOrderById);
   }, []);
   useEffect(() => {
     if (formData?.districts) {
-      axios.get(`http://localhost:5000/zones?district=${encodeURIComponent(formData?.districts)}`)
-      // axios.get(`https://mserver.printbaz.com/zones?district=${encodeURIComponent(formData?.districts)}`)
+      // axios.get(`http://localhost:5000/zones?district=${encodeURIComponent(formData?.districts)}`)
+      axios.get(`https://mserver.printbaz.com/zones?district=${encodeURIComponent(formData?.districts)}`)
         .then(response => {
           setZones(response.data);
           // console.log("response.data", response.data);
@@ -153,8 +155,8 @@ console.log("getSpecificOrderById out side delete func",getSpecificOrderById);
     // Fetch areas based on selected zone
     useEffect(() => {
       if (formData?.zones) {
-        axios.get(`http://localhost:5000/areas/${encodeURIComponent(formData?.zones)}`)
-        // axios.get(`https://mserver.printbaz.com/areas/${encodeURIComponent(formData?.zones)}`)
+        // axios.get(`http://localhost:5000/areas/${encodeURIComponent(formData?.zones)}`)
+        axios.get(`https://mserver.printbaz.com/areas/${encodeURIComponent(formData?.zones)}`)
           .then(response => {
             setAreas(response.data);
           })
@@ -169,8 +171,8 @@ console.log("getSpecificOrderById out side delete func",getSpecificOrderById);
  // fetch delievryArea 
  useEffect(() => {
   if (formData?.districts && formData?.zones && formData?.areas) {
-    axios.get(`http://localhost:5000/deliveryAreaByLocation?District=${formData?.districts}&Zone=${formData?.zones}&Area=${formData?.areas}`)
-    // axios.get(`https://mserver.printbaz.com/deliveryAreaByLocation?District=${formData?.districts}&Zone=${formData?.zones}&Area=${formData?.areas}`)
+    // axios.get(`http://localhost:5000/deliveryAreaByLocation?District=${formData?.districts}&Zone=${formData?.zones}&Area=${formData?.areas}`)
+    axios.get(`https://mserver.printbaz.com/deliveryAreaByLocation?District=${formData?.districts}&Zone=${formData?.zones}&Area=${formData?.areas}`)
       .then((res) => setDeliveryAreas(res.data.deliveryArea))
       .catch((error) => console.error('Error fetching deliveryArea:', error));
   }
@@ -238,6 +240,7 @@ console.log("getSpecificOrderById out side delete func",getSpecificOrderById);
               }
               newOrderDetailArr[itemIndex][name] = value;
           } else {
+           
               setFormData({ ...formData, [name]: value });
               return;
           }
@@ -257,6 +260,7 @@ console.log("getSpecificOrderById out side delete func",getSpecificOrderById);
               quantity: parseInt(newGrandQuantity)
           }));
       }
+
       //   const handleFileChange = (event, orderIndex, fileIndex) => {
          
       //     const { name, files } = event.target;
@@ -283,22 +287,41 @@ console.log("getSpecificOrderById out side delete func",getSpecificOrderById);
       //     }
       // };
     
+      // const handleFileChange = (event, index) => {
+      //   const { name, files } = event.target;
+      //   const updatedBrandLogoArray = [...addBrandLogoArray];
+      //   if (name==="file" || name==="image" || name==="brandLogo") {
+      //     if (name === "brandLogo") {
+      //       updatedBrandLogoArray[index] = files && files.length > 0;;
+      //       setAddBrandLogoArray(updatedBrandLogoArray);
+      //   }
+      //     // const fieldName = name.split('.')[1];
+      //     const newOrderDetailArr = [...formData.orderDetailArr];
+      //      // Change from a single file to an array of files
+      //     newOrderDetailArr[index][[event.target.name]] =Array.from(files);
+      //     setFormData({ ...formData, orderDetailArr: newOrderDetailArr });
+      
+      //   }
+      // };
       const handleFileChange = (event, index) => {
         const { name, files } = event.target;
-        const updatedBrandLogoArray = [...addBrandLogoArray];
-        if (name==="file" || name==="image" || name==="brandLogo") {
-          if (name === "brandLogo") {
-            updatedBrandLogoArray[index] = files && files.length > 0;;
-            setAddBrandLogoArray(updatedBrandLogoArray);
+        const newOrderDetailArr = [...formData.orderDetailArr];
+    
+        if (name === "file" || name === "image" || name === "brandLogo") {
+            if (name === "brandLogo") {
+                const updatedBrandLogoArray = [...addBrandLogoArray];
+                updatedBrandLogoArray[index] = files && files.length > 0;
+                setAddBrandLogoArray(updatedBrandLogoArray);
+    
+                newOrderDetailArr[index].brandLogo = files[0]; // Assuming brandLogo is a single file not an array of files
+            } else {
+                newOrderDetailArr[index][name] = Array.from(files);
+            }
         }
-          // const fieldName = name.split('.')[1];
-          const newOrderDetailArr = [...formData.orderDetailArr];
-           // Change from a single file to an array of files
-          newOrderDetailArr[index][[event.target.name]] =Array.from(files);
-          setFormData({ ...formData, orderDetailArr: newOrderDetailArr });
-      
-        }
-      };
+    
+        setFormData({ ...formData, orderDetailArr: newOrderDetailArr });
+    };
+    
    
     const price_10x14CRoundNeck=358
     const price_10x10CRoundNeck=301
@@ -337,7 +360,7 @@ console.log("getSpecificOrderById out side delete func",getSpecificOrderById);
     let printbazcost=0;
     let printbazcostbase=0;
     for  (var i = 0; i < formData?.orderDetailArr?.length; i++) {
-      if ( getSpecificOrderById?.productType==="custom Round Neck" &&
+      if (( getSpecificOrderById?.productType==="Custom Round Neck" ||  getSpecificOrderById?.category==="Custom Round Neck") &&
         formData?.quantity &&
         formData?.orderDetailArr[i]?.totalQuantity &&
         formData?.orderDetailArr[i]?.printSize &&
@@ -383,7 +406,7 @@ console.log("getSpecificOrderById out side delete func",getSpecificOrderById);
         
         // At this point, backSidePrintCost contains the total cost for the current item's back side print
         
-        if(addBrandLogoArray[i]){
+        if(addBrandLogoArray[i] || formData?.orderDetailArr[i]?.brandLogo!==""){
           // printbazcost=parseInt(printbazcostbase+5)
           let brandLogoCost=5*formData?.orderDetailArr[i]?.totalQuantity
           printbazcostbase = Number(totalPrice)+backSidePrintCost+brandLogoCost;
@@ -407,7 +430,7 @@ console.log("getSpecificOrderById out side delete func",getSpecificOrderById);
    
       }
 
-      else  if (getSpecificOrderById?.productType==="custom Drop Sholder" &&
+      else  if (getSpecificOrderById?.category==="Custom Drop Sholder" &&
         formData?.quantity &&
         formData?.orderDetailArr[i]?.totalQuantity &&
         formData?.orderDetailArr[i]?.printSize &&
@@ -457,7 +480,7 @@ console.log("getSpecificOrderById out side delete func",getSpecificOrderById);
         
         
   
-        if(addBrandLogoArray[i]){
+        if(addBrandLogoArray[i]|| formData?.orderDetailArr[i]?.brandLogo!==""){
           // printbazcost=parseInt(printbazcostbase+5)
           let brandLogoCost=5*formData?.orderDetailArr[i]?.totalQuantity
           printbazcostbase = Number(totalPrice)+backSidePrintCost+brandLogoCost;
@@ -489,7 +512,7 @@ console.log("getSpecificOrderById out side delete func",getSpecificOrderById);
       //   // or any default value you want to set
       // }
     }
-    else  if (getSpecificOrderById?.productType==="custom Hoodie" &&
+    else  if (getSpecificOrderById?.category==="Custom Hoodie" &&
       formData?.quantity &&
       formData?.orderDetailArr[i]?.totalQuantity &&
       formData?.orderDetailArr[i]?.printSize &&
@@ -557,7 +580,7 @@ console.log("getSpecificOrderById out side delete func",getSpecificOrderById);
       //   console.log("printbazcost",printbazcost)
       //   console.log("backSidePrintCost",backSidePrintCost)
       // }
-      if(addBrandLogoArray[i]){
+      if(addBrandLogoArray[i]|| formData?.orderDetailArr[i]?.brandLogo!==""){
         // printbazcost=parseInt(printbazcostbase+5)
         let brandLogoCost=5*formData?.orderDetailArr[i]?.totalQuantity
         printbazcostbase = Number(totalPrice)+backSidePrintCost+brandLogoCost;
@@ -592,7 +615,7 @@ console.log("getSpecificOrderById out side delete func",getSpecificOrderById);
     }
     if(formData.dsicount
       ){
-      printbazcost=printbazcost+Number(formData?.dsicount)
+      printbazcost=printbazcost-Number(formData?.dsicount)
     }
     
     if(formData.additionalCost){
@@ -802,12 +825,14 @@ console.log("getSpecificOrderById out side delete func",getSpecificOrderById);
 
           const handleUpdate = async (e) => {
             e.preventDefault();
+            console.log("call function")
             setIsLoading(true)
               // Validate the form here
               if (validateForm()) {
-                setIsLoading(false) // Set loading status to false if form is invalid
-                return; // Exit the function if form is invalid
+                setIsLoading(false);
+                return; 
               }
+              
             
             try {
               const formData2 = new FormData();
@@ -827,11 +852,20 @@ console.log("getSpecificOrderById out side delete func",getSpecificOrderById);
                   item.image.forEach((image, imageIndex) => {
                     formData2.append(`image${index}_${imageIndex}`, image); // Append each image
                   });
-                }    if (item.brandLogo) {
-                  item.brandLogo.forEach((brandLogo, brandLogoIndex) => {
-                    formData2.append(`brandLogo${index}_${brandLogoIndex}`, brandLogo); // Append each image
-                  });
-                }
+                }   
+                //  if (item.brandLogo) {
+                //   item.brandLogo.forEach((brandLogo, brandLogoIndex) => {
+                //     formData2.append(`brandLogo${index}_${brandLogoIndex}`, brandLogo); // Append each image
+                //   });
+                // }
+               
+                // Append brandLogo
+                if (item.brandLogo ) {
+                  // console.log("item.brandLogo",item.brandLogo);
+                  formData2.append(`brandLogo${index}`, item.brandLogo);
+              }
+          
+               
                   // Append brandLogo
           
           //   if (item.brandLogo) {
@@ -880,8 +914,8 @@ console.log("getSpecificOrderById out side delete func",getSpecificOrderById);
               formData2.append('discountNote', formData?.discountNote)
               formData2.append('additionalCostNote', formData?.additionalCostNote)
        // formData2.append('orderDetailArr', JSON.stringify(formData.orderDetailArr));  // Use the updated orderDetailArr
-              // const response = await fetch(`https://mserver.printbaz.com/updateorder/${viewOrder?._id}`, {
-                const response = await fetch(`http://localhost:5000/updateorder/${viewOrder?._id}`, {
+              const response = await fetch(`https://mserver.printbaz.com/updateorder/${getSpecificOrderById?._id}`, {
+                // const response = await fetch(`http://localhost:5000/updateorder/${getSpecificOrderById?._id}`, {
                   method: "PUT",
                   body: formData2,
                 });
@@ -892,10 +926,10 @@ console.log("getSpecificOrderById out side delete func",getSpecificOrderById);
                   // console.log('API response:', response);
               
                // Fetch the updated order details
-    // const orderResponse = await fetch(`https://mserver.printbaz.com/getorder/${viewOrder?._id}`);
-    const orderResponse = await fetch(`http://localhost:5000/getorder/${viewOrder?._id}`);
+    const orderResponse = await fetch(`https://mserver.printbaz.com/getorder/${getSpecificOrderById?._id}`);
+    // const orderResponse = await fetch(`http://localhost:5000/getorder/${getSpecificOrderById?._id}`);
     if (orderResponse.ok) {
-      const updatedOrder = await orderResponse.json();
+     await orderResponse.json();
       // console.log('Updated order:', updatedOrder);
     } 
     else {
@@ -913,7 +947,7 @@ console.log("getSpecificOrderById out side delete func",getSpecificOrderById);
                 setIsLoading(false); // Set loading status to false
               }
           };
-          
+         
           const handleDeletePopUp=(e,index)=>{
             // e.stopPropagation();
           e.preventDefault()
@@ -924,7 +958,23 @@ console.log("getSpecificOrderById out side delete func",getSpecificOrderById);
           const handleDeleteModalClose=()=>{
             setDeletepopUp(false)
           }
-   
+          const numObjects = formData?.orderDetailArr.length;
+
+          // Define default values for xs and md
+          let xs ;
+          let md ;
+        
+          // Adjust xs and md values based on the number of objects
+          if (numObjects === 1) {
+            xs = 12; // If there's only one object, make it full width on xs
+            md = 6;  // On md, it can take half the width
+          } else if (numObjects === 2) {
+            xs = 6;  // Two objects can take half the width on xs
+            md = 6;  // On md, it can take half the width
+          } else if (numObjects === 3) {
+            xs = 6;  // Three objects can take half the width on xs
+            md = 4;  // On md, it can take one-third of the width
+          }
           
   return (
     <>
@@ -952,7 +1002,8 @@ console.log("getSpecificOrderById out side delete func",getSpecificOrderById);
 <Row  className="g-2 m45 m_1responsive700">
 
 {formData.orderDetailArr.map((item, index) => (
-  <Col xs={6} md={3}>
+  item?.printSide  &&
+  <Col xs={xs} md={md}>
    <Card >
        <Card.Title className='m-auto p-3' style={{backgroundColor:"#001846",color:"white",width:"100%",textAlign:"center"}}>{item.color}
            <input data-color={item.color} name="color" type="hidden" value={item.color} />
@@ -1245,9 +1296,80 @@ console.log("getSpecificOrderById out side delete func",getSpecificOrderById);
          <ProgressBar now={imageprogress} label={`${imageprogress}%`} />
           )}
 
+<Form.Group  className="mb-3">
+  <Form.Label>Upload Your Brand Logo (optional)</Form.Label>
+  {(() => {
+    let fileId, brandLogoPreviewURL;
+    if (typeof item?.brandLogo === 'string') {
+      fileId = item?.brandLogo?.split('/d/')[1]?.split('/view')[0];
+      brandLogoPreviewURL = `https://drive.google.com/file/d/${fileId}/preview`;
+    } else if (item?.brandLogo instanceof Blob || item?.brandLogo instanceof File) {
+      brandLogoPreviewURL = URL.createObjectURL(item?.brandLogo);
+    } else {
+      brandLogoPreviewURL = null;
+    }
+        
+      // const fileId = item?.brandLogo?.split('/d/')[1].split('/view')[0];
+      // const previewURL = `https://drive.google.com/file/d/${fileId}/preview`;
+        
+      return (
+        <div style={{ position: "relative", marginBottom: "5px", height: "150px", width: "100%" }}>
+            <iframe src={brandLogoPreviewURL}    style={{
+              position: "absolute",
+              top: 0,
+              left: 0,
+              width: "100%",
+              height: "100%",
+              border: "none",
+          
+            }} title="update brandlogo"></iframe>
+            <label 
+htmlFor={`brandlogo-${index}`} 
+    style={{ 
+      position: "absolute", 
+      top: "50%", 
+      left: "50%", 
+      transform: "translate(-50%, -50%)",  
+      cursor: "pointer", 
+      width: "50%", 
+      height: "40px", 
+      display: "flex", 
+      justifyContent: "center", 
+      alignItems: "center", 
+      color: "black",
+      textAlign: "center",
+      transition: "background-color 0.2s"
+    }}
+    onMouseOver={(e) => {
+      e.target.innerHTML = "Choose file"
+      e.target.style.backgroundColor = "rgba(255,255,255,0.8)"
+    }}
+    onMouseOut={(e) => {
+      e.target.innerHTML = ""
+      e.target.style.backgroundColor = "transparent"
+    }}
+  >
+  </label>
+  <Form.Control
+          type="file"
+          id={`brandlogo-${index}`}
+          name="brandLogo"
+          style={{ display: "none" }}
+          accept="image/jpeg, image/png"
+          onChange={(e) => handleFileChange(e, index)}
+        />
+        </div>
+      )
+    })()
 
+  }
+  
+  {/* <iframe src={individualOrder?.brandLogo} height="200" width="300" title="Iframe Example"></iframe> */}
+ 
+  
+</Form.Group>
 
- <Form.Group controlId="formBrandLogo" className="mb-3">
+ {/* <Form.Group controlId="formBrandLogo" className="mb-3">
 <Form.Label>Upload Your Brand Logo (optional)</Form.Label>
 <Form.Control
 type="file"
@@ -1255,7 +1377,9 @@ name="brandLogo"
 accept="image/jpeg, image/png"
 onChange={(e) => handleFileChange(e, index)}
 />
-</Form.Group> 
+</Form.Group>  */}
+
+
        </Card.Body>
    </Card>
    </Col>
@@ -1435,6 +1559,7 @@ onChange={(e) => handleFileChange(e, index)}
                         required
                         placeholder=""
                       />
+                      
                     </Form.Group>
                     </div>
                     <hr />
@@ -1492,7 +1617,7 @@ onChange={(e) => handleFileChange(e, index)}
                         onChange={(e) => {
                            handleInputChange(e);;
                         }}
-                        required
+                        
                         placeholder=""
                       />
                     </Form.Group>
@@ -1513,7 +1638,7 @@ onChange={(e) => handleFileChange(e, index)}
                         onChange={(e) => {
                            handleInputChange(e);;
                         }}
-                        required
+                        
                         placeholder=""
                       />
                     </Form.Group>
@@ -1661,7 +1786,10 @@ onChange={(e) => handleFileChange(e, index)}
                     )
                    
                   }
-              {showAlert===true && (
+          
+      </div>
+
+      {showAlert===true && (
           
           <OrderUpdateAlert
           message="Your order has been updated successfully."
@@ -1676,7 +1804,6 @@ onChange={(e) => handleFileChange(e, index)}
           
           
           }
-      </div>
   
     </>
   );

@@ -14,7 +14,7 @@ const OrderUpdateAlert = ({ message, onClose }) => {
 
   return (
     <>
-      <div className="" onClick={onClose} />
+      <div className="alert-overlay " onClick={onClose} />
       <div className="alert-box">
         <img style={{height:"30px",width:'30px'}} src='/images/checked.png' alt='alert message'/>
         <h2>{message}</h2>
