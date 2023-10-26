@@ -78,6 +78,10 @@ console.log("getSpecificOrderById out side delete func",getSpecificOrderById);
         printbazcost: getSpecificOrderById?.printbazcost,
         quantity: getSpecificOrderById?.quantity,
         deliveryFee: getSpecificOrderById?.deliveryFee,
+        dsicount: '',
+        additionalCost:'',
+        discountNote:'',
+        additionalCostNote:'',
         orderDetailArr:  getSpecificOrderById?.orderDetailArr?.map(order => {
         
            return order
@@ -278,6 +282,7 @@ console.log("getSpecificOrderById out side delete func",getSpecificOrderById);
       //         });
       //     }
       // };
+    
       const handleFileChange = (event, index) => {
         const { name, files } = event.target;
         const updatedBrandLogoArray = [...addBrandLogoArray];
@@ -294,6 +299,7 @@ console.log("getSpecificOrderById out side delete func",getSpecificOrderById);
       
         }
       };
+   
     const price_10x14CRoundNeck=358
     const price_10x10CRoundNeck=301
     const price_10x5CRoundNeck=272
@@ -384,13 +390,14 @@ console.log("getSpecificOrderById out side delete func",getSpecificOrderById);
           console.log("brandLogoCost",brandLogoCost);
           console.log("prinbazcostbaze", Number(totalPrice)+backSidePrintCost ,"+",brandLogoCost);
           printbazcost += printbazcostbase;
+       
           const test=printbazcost+backSidePrintCost
         console.log("addbrandLogo",addbrandLogo);
         }
         else{
           printbazcostbase = Number(totalPrice) + Number(backSidePrintCost);
           printbazcost += printbazcostbase;
-        
+       
           console.log("printbazcost",printbazcost)
           console.log("printbazcostbase",printbazcostbase)
           console.log("backSidePrintCost",backSidePrintCost)
@@ -457,6 +464,7 @@ console.log("getSpecificOrderById out side delete func",getSpecificOrderById);
           console.log("brandLogoCost",brandLogoCost);
           console.log("prinbazcostbaze", Number(totalPrice)+backSidePrintCost ,"+",brandLogoCost);
           printbazcost += printbazcostbase;
+        
           const test=printbazcost+backSidePrintCost
         console.log("addbrandLogo",addbrandLogo);
         }
@@ -556,6 +564,7 @@ console.log("getSpecificOrderById out side delete func",getSpecificOrderById);
         console.log("brandLogoCost",brandLogoCost);
         console.log("prinbazcostbaze", Number(totalPrice)+backSidePrintCost ,"+",brandLogoCost);
         printbazcost += printbazcostbase;
+     
         const test=printbazcost+backSidePrintCost
       console.log("addbrandLogo",addbrandLogo);
       }
@@ -581,6 +590,16 @@ console.log("getSpecificOrderById out side delete func",getSpecificOrderById);
       //   // or any default value you want to set
       // }
     }
+    if(formData.dsicount
+      ){
+      printbazcost=printbazcost+Number(formData?.dsicount)
+    }
+    
+    if(formData.additionalCost){
+      printbazcost=printbazcost+Number(formData?.additionalCost)
+    }
+   
+
       // charge based on weight 
     // inside dhaka 
     const chargeForInSideZeroToP5=70;
@@ -856,6 +875,10 @@ console.log("getSpecificOrderById out side delete func",getSpecificOrderById);
               formData2.append('recvMoney', Math.floor(recvMoney));
               // formData2.append('id',orderId);
               formData2.append('userMail', getSpecificOrderById?.userMail);
+              formData2.append('dsicount', formData?.dsicount);
+              formData2.append('additionalCost', formData?.additionalCost);
+              formData2.append('discountNote', formData?.discountNote)
+              formData2.append('additionalCostNote', formData?.additionalCostNote)
        // formData2.append('orderDetailArr', JSON.stringify(formData.orderDetailArr));  // Use the updated orderDetailArr
               // const response = await fetch(`https://mserver.printbaz.com/updateorder/${viewOrder?._id}`, {
                 const response = await fetch(`http://localhost:5000/updateorder/${viewOrder?._id}`, {
@@ -1222,88 +1245,9 @@ console.log("getSpecificOrderById out side delete func",getSpecificOrderById);
          <ProgressBar now={imageprogress} label={`${imageprogress}%`} />
           )}
 
-<Form.Group  className="mb-3">
-  <Form.Label>Upload Your Brand Logo (optional)</Form.Label>
-  {  (() => {
-        let fileId, brandLogoPreviewURL;
-     if (typeof item?.brandLogo === 'string') { // singleFile is a URL string
-      fileId = item?.brandLogo?.split('/d/')[1]?.split('/view')[0];
-      brandLogoPreviewURL =`https://drive.google.com/file/d/${fileId}/preview`;
-    }else if (item?.brandLogo instanceof Blob || item?.brandLogo instanceof File) { // singleFile is a file object
-      brandLogoPreviewURL = URL.createObjectURL(item?.brandLogo);
-    } else {
-      // Handle the case when item?.brandLogo is neither a string nor a file object
-      // Set brandLogoPreviewURL to some default or null
-      brandLogoPreviewURL = null;
-    }
-      // const fileId = item?.brandLogo?.split('/d/')[1].split('/view')[0];
-      // const previewURL = `https://drive.google.com/file/d/${fileId}/preview`;
-        
-      return (
-        <div style={{ position: "relative", marginBottom: "5px", height: "150px", width: "100%" }}>
-            <iframe src={brandLogoPreviewURL}    style={{
-              position: "absolute",
-              top: 0,
-              left: 0,
-              width: "100%",
-              height: "100%",
-              border: "none",
-          
-            }} title="update brandlogo"></iframe>
-            <label 
-    htmlFor={`brandlogo-${item?.brandLogo}`} 
-    style={{ 
-      position: "absolute", 
-      top: "50%", 
-      left: "50%", 
-      transform: "translate(-50%, -50%)",  
-      cursor: "pointer", 
-      width: "50%", 
-      height: "40px", 
-      display: "flex", 
-      justifyContent: "center", 
-      alignItems: "center", 
-      color: "black",
-      textAlign: "center",
-      transition: "background-color 0.2s"
-    }}
-    onMouseOver={(e) => {
-      e.target.innerHTML = "Choose file"
-      e.target.style.backgroundColor = "rgba(255,255,255,0.8)"
-    }}
-    onMouseOut={(e) => {
-      e.target.innerHTML = ""
-      e.target.style.backgroundColor = "transparent"
-    }}
-  >
-  </label>
-            <Form.Control
-    type="file"
-    id={`brandlogo-${item?.brandLogo}`}
-    name="brandLogo"
-    style={{ display: "none" }}
-    accept="image/jpeg, image/png"
-    onChange={(e) => {
-      const orderDetailArrCopy = [...formData.orderDetailArr];
-      orderDetailArrCopy[0].brandLogo = e.target.files[0];  // Change 0 with the index of the order detail item being updated
-      const hasBrandLogo = e.target.files.length > 0;
-      setAddBrandLogo(hasBrandLogo)
-   
-      setFormData({ ...formData, orderDetailArr: orderDetailArrCopy });
-    }}
-  />
-        </div>
-      )
-    })()
 
-  }
-  
-  {/* <iframe src={individualOrder?.brandLogo} height="200" width="300" title="Iframe Example"></iframe> */}
- 
-  
-</Form.Group>
 
-{/* <Form.Group controlId="formBrandLogo" className="mb-3">
+ <Form.Group controlId="formBrandLogo" className="mb-3">
 <Form.Label>Upload Your Brand Logo (optional)</Form.Label>
 <Form.Control
 type="file"
@@ -1311,7 +1255,7 @@ name="brandLogo"
 accept="image/jpeg, image/png"
 onChange={(e) => handleFileChange(e, index)}
 />
-</Form.Group> */}
+</Form.Group> 
        </Card.Body>
    </Card>
    </Col>
@@ -1473,7 +1417,9 @@ onChange={(e) => handleFileChange(e, index)}
                         {/* <span style={{ fontSize: "" }}>&#2547;</span> {addbrandLogo ?parseInt(printbazcost+5):printbazcost} */}
                         <span style={{ fontSize: "" }}>{formData?.quantity}</span> 
                       </h3>
-                    </div> <div className="costOrder_Style">
+                    </div> 
+                    <hr />
+                    <div className="costOrder_Style">
                     <Form.Label>Printbaz Cost</Form.Label>
                        <Form.Group className="mb-3 ">
                      
@@ -1481,7 +1427,7 @@ onChange={(e) => handleFileChange(e, index)}
                       <Form.Control
                         type="number"
                         name="printbazcost"
-                        value={printbazcost?printbazcost:formData.printbazcost}
+                        value={printbazcost}
                         className="form-control"
                         onChange={(e) => {
                            handleInputChange(e);;
@@ -1491,7 +1437,88 @@ onChange={(e) => handleFileChange(e, index)}
                       />
                     </Form.Group>
                     </div>
-      
+                    <hr />
+                    <div className="costOrder_Style">
+                    <Form.Label>Discount</Form.Label>
+                       <Form.Group className="mb-3 ">
+                     
+                   
+                      <Form.Control
+                        type="number"
+                       
+                        name="dsicount"
+                        value={formData?.dsicount}
+                        className="form-control"
+                        onChange={(e) => {
+                           handleInputChange(e);;
+                        }}
+                        
+                        placeholder=""
+                      />
+                    </Form.Group>
+                    </div>
+                    <hr />
+                    <div className="costOrder_Style">
+                    <Form.Label>Discount Note</Form.Label>
+                       <Form.Group className="mb-3 ">
+                     
+                   
+                      <Form.Control
+                      as="textarea"
+                        type="number"
+                        style={{width:"220px"}}
+                        name="discountNote"
+                        value={formData?.discountNote}
+                        className="form-control"
+                        onChange={(e) => {
+                           handleInputChange(e);;
+                        }}
+                        
+                        placeholder=""
+                      />
+                    </Form.Group>
+                    </div>
+                    <hr />
+                    <div className="costOrder_Style">
+                    <Form.Label>Additional Cost</Form.Label>
+                       <Form.Group className="mb-3 ">
+                     
+                   
+                      <Form.Control
+                        type="number"
+                        name="additionalCost"
+                        value={formData.additionalCost}
+                        className="form-control"
+                        onChange={(e) => {
+                           handleInputChange(e);;
+                        }}
+                        required
+                        placeholder=""
+                      />
+                    </Form.Group>
+                    </div>
+                    <hr />
+                    <div className="costOrder_Style">
+                    <Form.Label>Additional Cost note</Form.Label>
+                       <Form.Group className="mb-3 ">
+                     
+                   
+                      <Form.Control
+                      as="textarea"
+                        type="number"
+                        name="additionalCostNote"
+                        style={{width:"220px"}}
+                        value={formData.additionalCostNote}
+                        className="form-control"
+                        onChange={(e) => {
+                           handleInputChange(e);;
+                        }}
+                        required
+                        placeholder=""
+                      />
+                    </Form.Group>
+                    </div>
+      <hr />
                     <div className="costOrder_Style">
                      
 
@@ -1502,7 +1529,7 @@ onChange={(e) => handleFileChange(e, index)}
                       <Form.Control
                         type="number"
                         name="deliveryFee"
-                        value={deliveryFee?deliveryFee :formData.deliveryFee}
+                        value={deliveryFee}
                         className="form-control"
                         onChange={(e) => {
                            handleInputChange(e);;
@@ -1512,6 +1539,7 @@ onChange={(e) => handleFileChange(e, index)}
                       />
                     </Form.Group>
                     </div>
+                    <hr />
                     <div>
 
                     <Row  className="costOrder_Style">
