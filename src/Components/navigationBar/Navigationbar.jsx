@@ -254,19 +254,20 @@ const Navigationbar = () => {
                   
                         </li>
                  } */}
-                  
-                    <li className="nav-item">
-                     <Link className="nav-link active" aria-current="page" to="/invitaionPage">Send Invitation</Link>
-             
-                   </li>
-                   <li className="nav-item">
-                     <Link className="nav-link active" aria-current="page" to="/role">Role</Link>
-             
-                   </li>
-                   <li className="nav-item">
-                     <Link className="nav-link active" aria-current="page" to="/login">Log in</Link>
-             
-                   </li> 
+                     <li class="nav-item dropdown">
+                    <a class="nav-link dropdown-toggle" href="#" id="navbarDropdownMenuLink" role="button">
+                      More
+                    </a>
+                    <ul class="dropdown-menu nav-dropdown-menu">
+                   
+                      <li>  <Link className="dropdown-item nav-dropdown-item" aria-current="page" to="/invitaionPage">Send Invitation</Link></li>
+                      <li>  <Link className="dropdown-item nav-dropdown-item" aria-current="page" to="/role">Role</Link></li>
+                      <li><Link class="dropdown-item nav-dropdown-item" to="/addBlogs">Blog</Link></li>
+                      <li>   <Link className="dropdown-item nav-dropdown-item" aria-current="page" to="/login">Log out</Link></li>
+                     
+                    </ul>
+                  </li>
+               
                     </>
             
          

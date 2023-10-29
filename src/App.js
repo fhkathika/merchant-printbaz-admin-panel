@@ -28,6 +28,7 @@ import AllDamageTShirt from './Components/allDamageTshirt/AllDamageTShirt';
 import AllSoldTshirt from './Components/allSoldTshirts/AllSoldTshirt';
 import AllRcvAmount from './Components/allRcvAmount/AllRcvAmount';
 import PaymentHistory from './Components/paymentHistory/PaymentHistory';
+import AddBlogs from './Components/addBlogs/AddBlogs';
 function App() {
   return (
     <div className="">
@@ -52,6 +53,7 @@ function App() {
        <Route path="/login" element={<LoginPage/>} />
        <Route path="/role" element={<Role/>} />
        <Route path="/analytics" element={<Analytics/>} />
+       <Route path="/addBlogs" element={<AddBlogs/>} />
        <Route path="/salesReport" element={<SalesReport/>} />
        <Route path="/teshirtVendor" element={<TshirtVendor/>} />
        <Route path="/AllPurchasedTshirt" element={<AllPurchasedTshirt/>} />
