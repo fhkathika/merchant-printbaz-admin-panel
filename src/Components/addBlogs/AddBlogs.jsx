@@ -141,6 +141,7 @@ const AddBlogs = () => {
                   className="btn "
                   type="file"
                   name="image"
+                  required
                 style={{height:"100%",weight:"100%",marginRight:"15px",padding:"8px 0px"}}
                   
                   
