@@ -387,20 +387,20 @@ console.log("getSpecificOrderById out side delete func",getSpecificOrderById);
         let backSidePrintCost = 0;
         let totalQuantity = formData?.orderDetailArr[i]?.totalQuantity;
         // backSidePrintCost += totalQuantity * 130;
-        if(formData?.orderDetailArr[i]?.printSizeBack==="10 x 14" || (formData?.orderDetailArr[i]?.printSide==="bothSide" && formData?.orderDetailArr[i]?.printSize==="10 x 14")){
+        if((formData?.orderDetailArr[i]?.printSide==="bothSide" && formData?.orderDetailArr[i]?.printSizeBack==="10 x 14")){
           backSidePrintCost+= formData?.orderDetailArr[i]?.totalQuantity * 125
         }
-        else if(formData?.orderDetailArr[i]?.printSizeBack==="10 x 10"||(formData?.orderDetailArr[i]?.printSide==="bothSide" && formData?.orderDetailArr[i]?.printSize==="10 x 10")){
+        else if((formData?.orderDetailArr[i]?.printSide==="bothSide" && formData?.orderDetailArr[i]?.printSizeBack==="10 x 10")){
           backSidePrintCost+= formData?.orderDetailArr[i]?.totalQuantity * 68
-        } else if(formData?.orderDetailArr[i]?.printSizeBack==="10 x 5"|| (formData?.orderDetailArr[i]?.printSide==="bothSide" && formData?.orderDetailArr[i]?.printSize==="10 x 5")){
+        } else if( (formData?.orderDetailArr[i]?.printSide==="bothSide" && formData?.orderDetailArr[i]?.printSizeBack==="10 x 5")){
           backSidePrintCost+= formData?.orderDetailArr[i]?.totalQuantity * 39
-        } else if(formData?.orderDetailArr[i]?.printSizeBack==="5 X 5"|| (formData?.orderDetailArr[i]?.printSide==="bothSide" && formData?.orderDetailArr[i]?.printSize==="5 X 5")){
+        } else if((formData?.orderDetailArr[i]?.printSide==="bothSide" && formData?.orderDetailArr[i]?.printSizeBack==="5 X 5")){
           backSidePrintCost+= formData?.orderDetailArr[i]?.totalQuantity * 25
         }
-        else if(formData?.orderDetailArr[i]?.printSizeBack==="2.5 X 5"|| (formData?.orderDetailArr[i]?.printSide==="bothSide" && formData?.orderDetailArr[i]?.printSize==="2.5 X 5")){
+        else if((formData?.orderDetailArr[i]?.printSide==="bothSide" && formData?.orderDetailArr[i]?.printSizeBack==="2.5 X 5")){
           backSidePrintCost+= formData?.orderDetailArr[i]?.totalQuantity * 18
         }
-          else if(formData?.orderDetailArr[i]?.printSizeBack==="2.5 X 2.5"|| (formData?.orderDetailArr[i]?.printSide==="bothSide" && formData?.orderDetailArr[i]?.printSize==="2.5 X 2.5")){
+          else if((formData?.orderDetailArr[i]?.printSide==="bothSide" && formData?.orderDetailArr[i]?.printSizeBack==="2.5 X 2.5")){
           backSidePrintCost+= formData?.orderDetailArr[i]?.totalQuantity * 14
         }
         
@@ -459,22 +459,22 @@ console.log("getSpecificOrderById out side delete func",getSpecificOrderById);
         let backSidePrintCost = 0;
         let totalQuantity = formData?.orderDetailArr[i]?.totalQuantity;
         // backSidePrintCost += totalQuantity * 130;
-        if(formData?.orderDetailArr[i]?.printSizeBack==="11.7 x 16.5" || (formData?.orderDetailArr[i]?.printSide==="bothSide" && formData?.orderDetailArr[i]?.printSize==="11.7 x 16.5")){
+        if((formData?.orderDetailArr[i]?.printSide==="bothSide" && formData?.orderDetailArr[i]?.printSizeBack==="11.7 x 16.5")){
           backSidePrintCost+= formData?.orderDetailArr[i]?.totalQuantity * 160
         } 
-        if(formData?.orderDetailArr[i]?.printSizeBack==="10 x 14" || (formData?.orderDetailArr[i]?.printSide==="bothSide" && formData?.orderDetailArr[i]?.printSize==="10 x 14")){
+        if((formData?.orderDetailArr[i]?.printSide==="bothSide" && formData?.orderDetailArr[i]?.printSizeBack==="10 x 14")){
           backSidePrintCost+= formData?.orderDetailArr[i]?.totalQuantity * 125
         }
-        else if(formData?.orderDetailArr[i]?.printSizeBack==="10 x 10"||(formData?.orderDetailArr[i]?.printSide==="bothSide" && formData?.orderDetailArr[i]?.printSize==="10 x 10")){
+        else if((formData?.orderDetailArr[i]?.printSide==="bothSide" && formData?.orderDetailArr[i]?.printSizeBack==="10 x 10")){
           backSidePrintCost+= formData?.orderDetailArr[i]?.totalQuantity * 68
-        } else if(formData?.orderDetailArr[i]?.printSizeBack==="10 x 5"|| (formData?.orderDetailArr[i]?.printSide==="bothSide" && formData?.orderDetailArr[i]?.printSize==="10 x 5")){
+        } else if((formData?.orderDetailArr[i]?.printSide==="bothSide" && formData?.orderDetailArr[i]?.printSizeBack==="10 x 5")){
           backSidePrintCost+= formData?.orderDetailArr[i]?.totalQuantity * 39
-        } else if(formData?.orderDetailArr[i]?.printSizeBack==="5 X 5"|| (formData?.orderDetailArr[i]?.printSide==="bothSide" && formData?.orderDetailArr[i]?.printSize==="5 X 5")){
+        } else if((formData?.orderDetailArr[i]?.printSide==="bothSide" && formData?.orderDetailArr[i]?.printSizeBack==="5 X 5")){
           backSidePrintCost+= formData?.orderDetailArr[i]?.totalQuantity * 25
         }
-        else if(formData?.orderDetailArr[i]?.printSizeBack==="2.5 X 5"|| (formData?.orderDetailArr[i]?.printSide==="bothSide" && formData?.orderDetailArr[i]?.printSize==="2.5 X 5")){
+        else if( (formData?.orderDetailArr[i]?.printSide==="bothSide" && formData?.orderDetailArr[i]?.printSizeBack==="2.5 X 5")){
           backSidePrintCost+= formData?.orderDetailArr[i]?.totalQuantity * 18
-        }  else if(formData?.orderDetailArr[i]?.printSizeBack==="2.5 X 2.5"|| (formData?.orderDetailArr[i]?.printSide==="bothSide" && formData?.orderDetailArr[i]?.printSize==="2.5 X 2.5")){
+        }  else if((formData?.orderDetailArr[i]?.printSide==="bothSide" && formData?.orderDetailArr[i]?.printSizeBack==="2.5 X 2.5")){
           backSidePrintCost+= formData?.orderDetailArr[i]?.totalQuantity * 14
         }
         
@@ -541,23 +541,23 @@ console.log("getSpecificOrderById out side delete func",getSpecificOrderById);
       let backSidePrintCost = 0;
       let totalQuantity = formData?.orderDetailArr[i]?.totalQuantity;
       // backSidePrintCost += totalQuantity * 130;
-      if(formData?.orderDetailArr[i]?.printSizeBack==="11.7 x 16.5" || (formData?.orderDetailArr[i]?.printSide==="bothSide" && formData?.orderDetailArr[i]?.printSize==="11.7 x 16.5")){
+      if( (formData?.orderDetailArr[i]?.printSide==="bothSide" && formData?.orderDetailArr[i]?.printSizeBack==="11.7 x 16.5")){
         backSidePrintCost+= formData?.orderDetailArr[i]?.totalQuantity * 160
       }
-      if(formData?.orderDetailArr[i]?.printSizeBack==="10 x 14" || (formData?.orderDetailArr[i]?.printSide==="bothSide" && formData?.orderDetailArr[i]?.printSize==="10 x 14")){
+      if((formData?.orderDetailArr[i]?.printSide==="bothSide" && formData?.orderDetailArr[i]?.printSizeBack==="10 x 14")){
         backSidePrintCost+= formData?.orderDetailArr[i]?.totalQuantity * 125
       }
-      else if(formData?.orderDetailArr[i]?.printSizeBack==="10 x 10"||(formData?.orderDetailArr[i]?.printSide==="bothSide" && formData?.orderDetailArr[i]?.printSize==="10 x 10")){
+      else if((formData?.orderDetailArr[i]?.printSide==="bothSide" && formData?.orderDetailArr[i]?.printSizeBack==="10 x 10")){
         backSidePrintCost+= formData?.orderDetailArr[i]?.totalQuantity * 68
-      } else if(formData?.orderDetailArr[i]?.printSizeBack==="10 x 5"|| (formData?.orderDetailArr[i]?.printSide==="bothSide" && formData?.orderDetailArr[i]?.printSize==="10 x 5")){
+      } else if((formData?.orderDetailArr[i]?.printSide==="bothSide" && formData?.orderDetailArr[i]?.printSizeBack==="10 x 5")){
         backSidePrintCost+= formData?.orderDetailArr[i]?.totalQuantity * 39
-      } else if(formData?.orderDetailArr[i]?.printSizeBack==="5 X 5"|| (formData?.orderDetailArr[i]?.printSide==="bothSide" && formData?.orderDetailArr[i]?.printSize==="5 X 5")){
+      } else if( (formData?.orderDetailArr[i]?.printSide==="bothSide" && formData?.orderDetailArr[i]?.printSizeBack==="5 X 5")){
         backSidePrintCost+= formData?.orderDetailArr[i]?.totalQuantity * 25
       }
-      else if(formData?.orderDetailArr[i]?.printSizeBack==="2.5 X 5"|| (formData?.orderDetailArr[i]?.printSide==="bothSide" && formData?.orderDetailArr[i]?.printSize==="2.5 X 5")){
+      else if((formData?.orderDetailArr[i]?.printSide==="bothSide" && formData?.orderDetailArr[i]?.printSizeBack==="2.5 X 5")){
         backSidePrintCost+= formData?.orderDetailArr[i]?.totalQuantity * 18
       }
-       else if(formData?.orderDetailArr[i]?.printSizeBack==="2.5 X 2.5"|| (formData?.orderDetailArr[i]?.printSide==="bothSide" && formData?.orderDetailArr[i]?.printSize==="2.5 X 2.5")){
+       else if( (formData?.orderDetailArr[i]?.printSide==="bothSide" && formData?.orderDetailArr[i]?.printSizeBack==="2.5 X 2.5")){
         backSidePrintCost+= formData?.orderDetailArr[i]?.totalQuantity * 15
       }
       
