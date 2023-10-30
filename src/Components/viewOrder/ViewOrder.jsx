@@ -18,6 +18,7 @@ import { useRoleAsignData } from '../../hooks/useRoleAsignData';
 import useGetMongoData from '../../hooks/useGetMongoData';
 import { AuthContext } from '../../authProvider/AuthProvider';
 import axios from 'axios';
+import UpdateOrderBlankProduct from '../updateOrderBlankProduct/UpdateOrderBlankProduct';
 const ViewOrder = () => {
   let { id } = useParams();
   const {orderAll}=useGetMongoData()
@@ -35,7 +36,7 @@ const ViewOrder = () => {
   const viewClient = location.state?.matchingMerchant;
   const {value_count}=useRoleAsignData()
   const {adminUser}=useContext(AuthContext);
-  console.log("adminUser",adminUser?.email);
+  console.log("getSpecificOrderById?.category",getSpecificOrderById?.category);
   const handleBack = () => {
     console.log("back btn");
     navigate(previousPathLocation); // Go back to the previous page
@@ -65,6 +66,7 @@ const ViewOrder = () => {
   const [paymentStatus, setPaymentStatus] = useState();
   const [deliverAssign, setDeliverAssign] = useState();
   const [updateOrder, setUpdateOrder] = useState(false);
+  const [updateOrderBlank, setUpdateOrderBlank] = useState(false);
   const [show, setShow] = useState(false);
   const target = useRef(null);
   console.log("deliverAssign",deliverAssign);
@@ -496,6 +498,7 @@ setTrackingId(e.target.value)
     e.preventDefault()
 
     setUpdateOrder(true)
+    setUpdateOrderBlank(true)
     // console.log("setUpdateOrder",updateOrder);
   }
   const downloadShippingDetail = async () => {
@@ -1520,20 +1523,20 @@ onChange={(e) => handleInputChange(e)}
                   
                       <div className='flex'>
                       <h6>Receivable Amount</h6>
-                      <span style={{marginTop:"10px"}}>{parseInt(getSpecificOrderById?.recvMoney)}BDT</span>
+                      <span style={{marginTop:"10px"}}>{parseInt(getSpecificOrderById?.recvMoney)} BDT</span>
                       </div>
                       {
                         getSpecificOrderById?.dsicount &&
                         <div className='flex'>
                         <h6>Discount</h6>
-                        <span style={{marginTop:"10px"}}>{parseInt(getSpecificOrderById?.dsicount)}BDT</span>
+                        <span style={{marginTop:"10px"}}>{parseInt(getSpecificOrderById?.dsicount)} BDT</span>
                         </div>
                       }
                       {
                         getSpecificOrderById?.additionalCost &&
                         <div className='flex'>
                         <h6>Additional Cost</h6>
-                        <span style={{marginTop:"10px"}}>{parseInt(getSpecificOrderById?.additionalCost)}BDT</span>
+                        <span style={{marginTop:"10px"}}>{parseInt(getSpecificOrderById?.additionalCost)} BDT</span>
                         </div>
                       }
                     
@@ -1580,7 +1583,9 @@ onChange={(e) => handleInputChange(e)}
                 </div>
               </div>
 <div className='row'>
-<div className="col-lg-6 col-md-6 mb-3">
+  {
+    getSpecificOrderById?.discountNote &&
+    <div className="col-lg-6 col-md-6 mb-3">
                 <div className="rec-info bg-white p-4 shadow-sm">
                   <div className="row">
                     <div className="col-12">
@@ -1599,7 +1604,11 @@ onChange={(e) => handleInputChange(e)}
                  
                 </div>
               </div>
-              <div className="col-lg-6 col-md-6 mb-3">
+  }
+
+              {
+                getSpecificOrderById?.additionalCostNote &&
+                <div className="col-lg-6 col-md-6 mb-3">
                 <div className="rec-info bg-white p-4 shadow-sm">
                   <div className="row">
                     <div className="col-12">
@@ -1618,6 +1627,8 @@ onChange={(e) => handleInputChange(e)}
                  
                 </div>
               </div>
+              }
+           
 </div>
              
              
@@ -1663,7 +1674,7 @@ onChange={(e) => handleInputChange(e)}
     
     {
       getSpecificOrderById?.orderDetailArr?.map((orderDetail,orderIndex)=>
-      orderDetail?.printSide  &&
+      (orderDetail?.printSide || ((getSpecificOrderById?.category==="blankRoundNeck"|| getSpecificOrderById?.category==="Blank Round Neck"|| getSpecificOrderById?.category==="Blank Drop Sholder"|| getSpecificOrderById?.category==="Blank Hoodie") && (orderDetail?.quantityL!=='' || orderDetail?.quantityM!=='' || orderDetail?.quantityXL!=='' || orderDetail?.quantityXXL!=='') )) &&
       <>
         <div className="row order-tab d-none-phone " key={orderIndex}>
         <h3 style={{color:"orange"}}>Line Item: {orderIndex+1}</h3>
@@ -2032,8 +2043,16 @@ orderDetail?.brandLogo ?
             </div>
           </div>
           {
-            updateOrder===true &&
+            (updateOrder===true && (getSpecificOrderById?.category!=="blankRoundNeck"&& getSpecificOrderById?.category!=="Blank Round Neck" && getSpecificOrderById?.category!=="Blank Drop Sholder"&& getSpecificOrderById?.category!=="Blank Hoodie")) &&
             <UpdateOrder onClose={() => setUpdateOrder(false)}
+            viewOrder={viewOrder}
+            getSpecificOrderById={getSpecificOrderById}
+            setGetSpecificOrderById={setGetSpecificOrderById}
+            viewClient={viewClient}/>
+          }
+          {
+            (updateOrderBlank===true && (getSpecificOrderById?.category==="blankRoundNeck"|| getSpecificOrderById?.category==="Blank Round Neck"|| getSpecificOrderById?.category==="Blank Drop Sholder"|| getSpecificOrderById?.category==="Blank Hoodie"))&&
+            <UpdateOrderBlankProduct onClose={() => setUpdateOrderBlank(false)}
             viewOrder={viewOrder}
             getSpecificOrderById={getSpecificOrderById}
             setGetSpecificOrderById={setGetSpecificOrderById}

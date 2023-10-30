@@ -360,7 +360,7 @@ console.log("getSpecificOrderById out side delete func",getSpecificOrderById);
     let printbazcost=0;
     let printbazcostbase=0;
     for  (var i = 0; i < formData?.orderDetailArr?.length; i++) {
-      if (( getSpecificOrderById?.productType==="Custom Round Neck" ||  getSpecificOrderById?.category==="Custom Round Neck") &&
+      if (( getSpecificOrderById?.category==="customRoundNeck" || getSpecificOrderById?.category==="Custom Round Neck") &&
         formData?.quantity &&
         formData?.orderDetailArr[i]?.totalQuantity &&
         formData?.orderDetailArr[i]?.printSize &&
@@ -430,7 +430,7 @@ console.log("getSpecificOrderById out side delete func",getSpecificOrderById);
    
       }
 
-      else  if (getSpecificOrderById?.category==="Custom Drop Sholder" &&
+      else  if (getSpecificOrderById?.category==="customDropSholder" || getSpecificOrderById?.category==="Custom Drop Sholder" &&
         formData?.quantity &&
         formData?.orderDetailArr[i]?.totalQuantity &&
         formData?.orderDetailArr[i]?.printSize &&
@@ -512,7 +512,7 @@ console.log("getSpecificOrderById out side delete func",getSpecificOrderById);
       //   // or any default value you want to set
       // }
     }
-    else  if (getSpecificOrderById?.category==="Custom Hoodie" &&
+    else  if ((getSpecificOrderById?.category==="Custom Hoodie" || getSpecificOrderById?.category==="customHoodie") &&
       formData?.quantity &&
       formData?.orderDetailArr[i]?.totalQuantity &&
       formData?.orderDetailArr[i]?.printSize &&
@@ -1103,6 +1103,8 @@ console.log("getSpecificOrderById out side delete func",getSpecificOrderById);
                         required={item.quantityM || item.quantityL || item.quantityXL || item.quantityXXL}
                       >
                        <option value="">select print size</option> 
+                       {(getSpecificOrderById?.category==="Custom Hoodie" || getSpecificOrderById?.category==="customHoodie" || getSpecificOrderById?.category==="customDropSholder" || getSpecificOrderById?.category==="Custom Drop Sholder") &&    <option value="11.7 x 16.5">11.7″ x 16.5″</option> }
+                     
                         <option value="10 x 14">10″ x 14″</option>
                         <option value="10 x 10">10″ x 10″</option>
                         <option value="10 x 5">10″ x 5″</option>
@@ -1130,6 +1132,7 @@ console.log("getSpecificOrderById out side delete func",getSpecificOrderById);
                         required={item.quantityM || item.quantityL || item.quantityXL || item.quantityXXL}
                       >
                        <option value="">select print size</option> 
+                       {(getSpecificOrderById?.category==="Custom Hoodie" || getSpecificOrderById?.category==="customHoodie" || getSpecificOrderById?.category==="customDropSholder" || getSpecificOrderById?.category==="Custom Drop Sholder") &&    <option value="11.7 x 16.5">11.7″ x 16.5″</option> }
                         <option value="10 x 14">10″ x 14″</option>
                         <option value="10 x 10">10″ x 10″</option>
                         <option value="10 x 5">10″ x 5″</option>
@@ -1161,12 +1164,13 @@ console.log("getSpecificOrderById out side delete func",getSpecificOrderById);
                         required={item.quantityM || item.quantityL || item.quantityXL || item.quantityXXL}
                       >
                        <option value="">select print size</option> 
+                   
                         <option value="10 x 14">10″ x 14″</option>
                         <option value="10 x 10">10″ x 10″</option>
                         <option value="10 x 5">10″ x 5″</option>
                         <option value="5 X 5">5″ x 5″</option>
                         <option value="2.5 X 5">2.5″ x 5″</option>
-                        <option value="2.5 X 2.5">2.5″ x 2.5″</option>
+                        <option value="2.5 X 2.5">2.5″ x 2.5″</option>    {(getSpecificOrderById?.category==="Custom Hoodie" || getSpecificOrderById?.category==="customHoodie" || getSpecificOrderById?.category==="customDropSholder" || getSpecificOrderById?.category==="Custom Drop Sholder") &&    <option value="11.7 x 16.5">11.7″ x 16.5″</option> }
                       </Form.Control>
                     </Form.Group>
                     <Form.Group
@@ -1185,7 +1189,8 @@ console.log("getSpecificOrderById out side delete func",getSpecificOrderById);
                      
                       required={item.quantityM || item.quantityL || item.quantityXL || item.quantityXXL}
                     >
-                     <option value="">select print size</option> 
+                     <option value="">select print size</option>
+                     {(getSpecificOrderById?.category==="Custom Hoodie" || getSpecificOrderById?.category==="customHoodie" || getSpecificOrderById?.category==="customDropSholder" || getSpecificOrderById?.category==="Custom Drop Sholder") &&    <option value="11.7 x 16.5">11.7″ x 16.5″</option> } 
                       <option value="10 x 14">10″ x 14″</option>
                       <option value="10 x 10">10″ x 10″</option>
                       <option value="10 x 5">10″ x 5″</option>
@@ -1567,7 +1572,7 @@ onChange={(e) => handleFileChange(e, index)}
                     <Form.Label>Discount</Form.Label>
                        <Form.Group className="mb-3 ">
                      
-                   
+                    
                       <Form.Control
                         type="number"
                        
@@ -1580,10 +1585,23 @@ onChange={(e) => handleFileChange(e, index)}
                         
                         placeholder=""
                       />
+                         <Form.Control
+                      as="textarea"
+                        type="number"
+                        style={{width:"220px"}}
+                        name="discountNote"
+                        value={formData?.discountNote}
+                        className="form-control"
+                        onChange={(e) => {
+                           handleInputChange(e);;
+                        }}
+                        
+                        placeholder="note.."
+                      />
                     </Form.Group>
                     </div>
                     <hr />
-                    <div className="costOrder_Style">
+                    {/* <div className="costOrder_Style">
                     <Form.Label>Discount Note</Form.Label>
                        <Form.Group className="mb-3 ">
                      
@@ -1603,7 +1621,7 @@ onChange={(e) => handleFileChange(e, index)}
                       />
                     </Form.Group>
                     </div>
-                    <hr />
+                    <hr /> */}
                     <div className="costOrder_Style">
                     <Form.Label>Additional Cost</Form.Label>
                        <Form.Group className="mb-3 ">
@@ -1620,10 +1638,25 @@ onChange={(e) => handleFileChange(e, index)}
                         
                         placeholder=""
                       />
+                        <Form.Control
+                      as="textarea"
+                        type="number"
+                        name="additionalCostNote"
+                        style={{width:"220px"}}
+                        value={formData.additionalCostNote}
+                        className="form-control"
+                        onChange={(e) => {
+                           handleInputChange(e);;
+                        }}
+                        
+                        placeholder="note.."
+                      />
                     </Form.Group>
+                    
+                  
                     </div>
                     <hr />
-                    <div className="costOrder_Style">
+                    {/* <div className="costOrder_Style">
                     <Form.Label>Additional Cost note</Form.Label>
                        <Form.Group className="mb-3 ">
                      
@@ -1643,7 +1676,7 @@ onChange={(e) => handleFileChange(e, index)}
                       />
                     </Form.Group>
                     </div>
-      <hr />
+      <hr /> */}
                     <div className="costOrder_Style">
                      
 
