@@ -478,8 +478,6 @@ console.log("getSpecificOrderById out side delete func",getSpecificOrderById);
           backSidePrintCost+= formData?.orderDetailArr[i]?.totalQuantity * 14
         }
         
-        
-  
         if(addBrandLogoArray[i]|| formData?.orderDetailArr[i]?.brandLogo!==""){
           // printbazcost=parseInt(printbazcostbase+5)
           let brandLogoCost=5*formData?.orderDetailArr[i]?.totalQuantity

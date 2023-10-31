@@ -5,14 +5,21 @@ import Navigationbar from '../navigationBar/Navigationbar';
 import CustomAlert from '../alert/CustomAlert';
 import BlotFormatter from 'quill-blot-formatter';
 import { useQuill } from 'react-quilljs';
+function Tag({ label, onRemove }) {
+  return (
+      <span className="tag">
+          {label}
+          <button onClick={() => onRemove(label)}>X</button>
+      </span>
+  );
+}
 
 const AddBlogs = () => {
-  const [newMsg, setNewMsg] = useState('');
     const [formData, setFormData] = useState({
         title: '',
         description: '',
         postTime: new Date(), // You may want to use a date picker for better UX
-        productType: ''
+        productType: [],
       });
       console.log("formData?.description")
       const [blogImage, setBlogImage] = useState(null);
@@ -130,6 +137,7 @@ const AddBlogs = () => {
                   required  
                  />
                </Form.Group>
+               
 
                <div className="flex-grow-0 py-3 px-2  border-top phone-py-0 " >
                     <div >

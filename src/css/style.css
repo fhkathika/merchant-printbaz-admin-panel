@@ -454,3 +454,29 @@ tr:nth-child(even) {
     text-align: center;
    
   }
+
+  .tags-input {
+    display: flex;
+    flex-wrap: wrap;
+    border: 1px solid #ccc;
+    padding: 4px;
+}
+
+.tag {
+    background-color: #333;
+    color: #fff;
+    margin: 2px;
+    padding: 2px 4px;
+    border-radius: 4px;
+    display: flex;
+    align-items: center;
+}
+
+.tag button {
+    background: none;
+    border: none;
+    color: #fff;
+    margin-left: 4px;
+    cursor: pointer;
+}
+
