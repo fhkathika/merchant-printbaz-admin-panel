@@ -29,6 +29,7 @@ import AllSoldTshirt from './Components/allSoldTshirts/AllSoldTshirt';
 import AllRcvAmount from './Components/allRcvAmount/AllRcvAmount';
 import PaymentHistory from './Components/paymentHistory/PaymentHistory';
 import AddBlogs from './Components/addBlogs/AddBlogs';
+import AllBlogs from './Components/allBlogs/AllBlogs';
 function App() {
   return (
     <div className="">
@@ -49,11 +50,12 @@ function App() {
       <Route path="/deliverySystem"element={<PrivateRoute><AllDeliveryList/></PrivateRoute>} />
       <Route path="/alldeliveries"element={<PrivateRoute><AllDeliveryList/> </PrivateRoute>} />
       <Route path="/allRcvMoney"element={<PrivateRoute><AllRcvList/> </PrivateRoute>} />
-       <Route path="/invitaionPage"element={<SendInvitationPage/> } />
+       <Route path="/invitaionPage"element={<PrivateRoute><SendInvitationPage/></PrivateRoute> } />
        <Route path="/login" element={<LoginPage/>} />
        <Route path="/role" element={<Role/>} />
        <Route path="/analytics" element={<Analytics/>} />
-       <Route path="/addBlogs" element={<AddBlogs/>} />
+       <Route path="/addBlogs" element={<PrivateRoute><AddBlogs/></PrivateRoute>} />
+       <Route path="/allBlogs" element={<PrivateRoute><AllBlogs/></PrivateRoute>} />
        <Route path="/salesReport" element={<SalesReport/>} />
        <Route path="/teshirtVendor" element={<TshirtVendor/>} />
        <Route path="/AllPurchasedTshirt" element={<AllPurchasedTshirt/>} />
