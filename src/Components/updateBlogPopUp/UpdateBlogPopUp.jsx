@@ -138,14 +138,14 @@ setIsOpenUpdatePopUp,
         <div>
             <div className="alert-overlay"  >
                 <div className="alert-box-blog">
-             <div style={{height:"30px"}}></div>
+             <div style={{height:"10px"}}></div>
                 <form onSubmit={handleSubmit}> 
             
             <Row className="g-2 m-auto">
              
-              <Col xs={12} md={8} className='m-auto'>
+              <Col xs={12} md={8} className='m-auto '>
              
-               <Card style={{ position: 'relative' }}>
+               <Card className='scrollable-card' style={{ position: 'relative' }}>
                <div style={{ 
                 cursor:"pointer",
         position: 'absolute', 
@@ -154,7 +154,7 @@ setIsOpenUpdatePopUp,
     }}>  
         <span id="popupclose" onClick={onClose}>X</span>     
     </div>
-                   <Card.Body style={{paddingBottom:"2px"}} >
+                   <Card.Body className='scrollable-card-body' style={{paddingBottom:"2px"}} >
                   
                            <Form.Group controlId="formFile" className="mb-3">
                              <Form.Label>Product Title</Form.Label>
@@ -199,7 +199,7 @@ setIsOpenUpdatePopUp,
                               
                               
                               onChange={handleFileChange}
-                              required
+                           
                             />
                          
                              
@@ -213,11 +213,12 @@ setIsOpenUpdatePopUp,
                        
                
                    </Card.Body>
-               </Card>
-            
-               <Button  className='m-auto p-3' style={{backgroundColor:"#001846",color:"white",width:"100%",textAlign:"center"}} type="submit">
+                   <Button  className='m-auto p-3' style={{backgroundColor:"#001846",color:"white",width:"100%",textAlign:"center"}} type="submit">
             Update Blog
                   </Button>
+               </Card>
+            
+              
                </Col>
             
             

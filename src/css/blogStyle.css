@@ -134,7 +134,7 @@ p {
    
   }
   .ql-editor {
-    height: 250px;  /* or any other value that suits your design */
+    height: 150px;  /* or any other value that suits your design */
     overflow-y: auto;  /* allows vertical scrolling when the content exceeds the height */
 }
 
@@ -368,5 +368,14 @@ a:focus {
     padding-bottom: 0px;
   }
 }
-
+@media (max-width: 767px) {
+  .scrollable-card{
+    width: 95%;
+  }
+  .scrollable-card-body {
+      height: 590px;
+      width: auto;
+      overflow-y: auto;
+  }
+}
 /*# sourceMappingURL=maps/style.css.map */
