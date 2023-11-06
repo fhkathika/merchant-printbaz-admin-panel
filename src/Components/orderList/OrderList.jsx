@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import { Link,useLocation,useNavigate } from 'react-router-dom';
 import useGetMongoData from '../../hooks/useGetMongoData';
 import DatePicker from 'react-datepicker';
@@ -248,6 +248,25 @@ const getViewClientColor = (status) => {
 };
 
 const actualIndexOfLastItem = indexOfLastItem > orderMap.length ? orderMap.length : indexOfLastItem;
+  // Memoize sorted orders
+  const sortedOrders = useMemo(() => {
+    return orderMap
+      .sort((a, b) => {
+        const statusDateA = new Date(a.updatedAt || a.statusDate?.replace(" at ", " "));
+        const statusDateB = new Date(b.updatedAt || b.statusDate?.replace(" at ", " "));
+        const createdAtA = new Date(a.createdAt);
+        const createdAtB = new Date(b.createdAt);
+
+        const latestA = statusDateA > createdAtA ? statusDateA : createdAtA;
+        const latestB = statusDateB > createdAtB ? statusDateB : createdAtB;
+
+        return latestB - latestA; // Descending sort
+      });
+  }, [orderMap]);
+
+  // Sliced array for pagination
+  const currentOrders = sortedOrders.slice(indexOfFirstItem, indexOfLastItem);
+
    return (
         <div>
           <meta charSet="UTF-8" />
@@ -343,7 +362,9 @@ const actualIndexOfLastItem = indexOfLastItem > orderMap.length ? orderMap.lengt
               
                
                  <div style={{textAlign:"right"}}>
-                 <span style={{marginRight:"20px"}}>{indexOfFirstItem + 1} - {actualIndexOfLastItem < 30 ? orderMap.length :actualIndexOfLastItem} of {orderMap.length}</span>
+                 <span style={{ marginRight: "20px" }}>
+        {indexOfFirstItem + 1} - {indexOfLastItem > orderMap.length ? orderMap.length : indexOfLastItem} of {orderMap.length}
+      </span>
            <button style={{marginRight:"20px",border:"none"}} onClick={() => setCurrentPage(currentPage - 1)} disabled={currentPage === 1} ><img style={{height:"10px",width:"15px"}} src='images/left-arrow.png' alt="left arrow"/></button>
            <button style={{height:"40px",border:"none"}} onClick={() => setCurrentPage(currentPage + 1)} disabled={currentPage === Math.ceil(orderAll.length / itemsPerPage)}><img style={{height:"10px",width:"15px"}} src='images/right-arrow.png' alt="right arrow"/></button>
           
@@ -380,11 +401,8 @@ const actualIndexOfLastItem = indexOfLastItem > orderMap.length ? orderMap.lengt
               </div>
            
               {
-              orderMap
-              ?.slice(indexOfFirstItem, indexOfLastItem)
-              .sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt))
-              .sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt))
-              .map((orders,index)=>{ 
+              currentOrders
+              ?.map((orders,index)=>{ 
                 matchingMerchant = allMerchant.find(merchant => merchant?.email === orders?.userMail)
             let  totalPrintBazCostWithoutDeliveryFee=Number(orders?.collectAmount)
                  return (

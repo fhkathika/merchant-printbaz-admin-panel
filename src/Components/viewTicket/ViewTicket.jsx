@@ -347,7 +347,7 @@ console.log("fetchTicketById",fetchTicketById)
         </div>
       </div>
       <div className="row">
-        <div className="col-8">
+        <div className="col-12">
           <div className="row">
             <div className="col-12">
               <div className="ticket-info">
@@ -561,7 +561,7 @@ return (
            
           </div>
         </div>
-        <div className="col-2">
+        {/* <div className="col-2">
           <div className="filter-section">
             <div className="filter-text">
               <h2>Open<i className="fa fa-circle" aria-hidden="true" style={{color: 'rgb(0, 194, 0)', marginLeft: '5px', fontSize: '16px'}} /></h2>
@@ -581,11 +581,11 @@ return (
               </ul>
             </div>
             
-            {/* <div className="filter-update-button">
+            <div className="filter-update-button">
               <button>Update</button>
-            </div> */}
+            </div>
           </div>
-        </div>
+        </div> */}
         {/* <div className="col-2">
           <div className="profile-section">
             <img src="https://media.discordapp.net/attachments/1069579536842379305/1107191553501450260/Logo-01.jpg?width=616&height=616" alt="" />

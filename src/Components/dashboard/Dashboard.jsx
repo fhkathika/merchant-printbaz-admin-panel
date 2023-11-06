@@ -505,11 +505,11 @@ return (
                     <div className="flex">
                     <h5 className="">Last Orders</h5>
                               {/* Pagination controls */}
-      <div className="pagination-controls" style={{ display: "flex", justifyContent: "flex-end",alignItems:"center",marginBottom:"10px" }}>
+      {/* <div className="pagination-controls" style={{ display: "flex", justifyContent: "flex-end",alignItems:"center",marginBottom:"10px" }}>
         <button style={{marginRight:"10px",padding:"3px",color:"black",borderRadius:"5px"}} onClick={goToPreviousPage} disabled={currentPage === 1}>Previous</button>
         <span style={{marginRight:"10px"}}>Page {currentPage} of {totalPages}</span>
         <button style={{marginRight:"10px",padding:"3px",color:"black",borderRadius:"5px"}} onClick={goToNextPage} disabled={currentPage === totalPages}>Next</button>
-      </div>
+      </div> */}
                     </div>
                     <hr />
                     
@@ -535,7 +535,8 @@ return (
                     </div>
                     {
                           
-                            pendingOrdersAll?.map((pendingOrders,index)=>{ 
+                            pendingOrdersAll?.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt))
+                            .map((pendingOrders,index)=>{ 
                             let createDate = new Date(pendingOrders?.createdAt); 
                             let updateDate = new Date(pendingOrders?.updatedAt); 
                             let options = { year: 'numeric', month: 'long', day: 'numeric' }; 
