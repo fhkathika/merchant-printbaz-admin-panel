@@ -13,6 +13,7 @@ import useGetAllTickets from '../../hooks/useGetAllTickets';
 import GetTodaysOutForDeliveryOrders from '../GetTodaysOutForDeliveryOrders';
 import { Form } from 'react-bootstrap';
 import useAllMerchants from '../../hooks/useAllMerchants';
+import DashboardCards from './dashboardCards/DashboardCards';
 const Dashboard = () => {
   const {merchant}=useAllMerchants()
   console.log("all merchants update bill",merchant);
@@ -131,7 +132,7 @@ let inProductionOrdersRoundNeck = orderAll?.filter(order =>
 console.log("inProductionOrdersRoundNeck",inProductionOrdersRoundNeck);
 let inProductionOrdersDropSholder=orderAll?.filter(users=>users?.orderStatus==="in-production" &&(users?.category==="Custom Drop Sholder" || users?.category==="Blank Drop Sholder"));
 let inProductionOrdersHoodie=orderAll?.filter(users=>users?.orderStatus==="in-production" && (users?.category==="Custom Hoodie" || users?.category==="Blank Hoodie"));
-let inProductionOrders=orderAll?.filter(users=>users?.orderStatus==="in-production" &&(!users.hasOwnProperty("category") || users?.category === "Custom Round Neck" || users?.category === "Blank Round Neck"))
+let inProductionOrders=orderAll?.filter(users=>users?.orderStatus==="in-production" &&(!users.hasOwnProperty("category") || users?.category === "Custom Round Neck" || users?.category === "Blank Round Neck" || users?.category === "Custom Hoodie" || users?.category === "Blank Hoodie" || users?.category==="Custom Drop Sholder" || users?.category==="Blank Drop Sholder"))
 console.log("pendingOrdersRoundNeck",pendingOrdersRoundNeck);
 let outForDeliveryOrders=orderAll?.filter(users=>users?.orderStatus==="out for delivery");
 let deliveredOrders=orderAll?.filter(users=>users?.orderStatus==="delivered");
@@ -143,7 +144,7 @@ let openTickets=fetchAllTicket?.filter(ticket=>ticket?.ticketStatus==="open");
 let paidAndDeliveredOrders=orderAll?.filter(payment=>payment?.paymentStatus==="paid" && payment?.orderStatus==="delivered" );
 // filter  sum of total quantity tshirt
 const tShirtQuantityForOutFOrDelivery= outForDeliveryOrders?.reduce((sum, order) => {
-  return sum + (order?.orderDetailArr?.reduce((innerSum, item) => innerSum + parseInt(item.quantity || 0), 0));
+  return sum + (order?.orderDetailArr?.reduce((innerSum, item) => innerSum + parseInt(item.quantity? item?.quantity :item?.totalQuantity || 0), 0));
 }, 0);
 const tShirtQuantityForDeliveredOrders= deliveredOrders?.reduce((sum, order) => {
   return sum + (order?.orderDetailArr?.reduce((innerSum, item) => innerSum + parseInt(item.quantity || 0), 0));
@@ -152,15 +153,15 @@ const tShirtQuantityForReturnOrders= returnOrders?.reduce((sum, order) => {
   return sum + (order?.orderDetailArr?.reduce((innerSum, item) => innerSum + parseInt(item.quantity || 0), 0));
 }, 0);
 const tShirtQuantityForDeliveredAndPaidOrders= paidAndDeliveredOrders?.reduce((sum, order) => {
-  return sum + (order?.orderDetailArr?.reduce((innerSum, item) => innerSum + parseInt(item.quantity || 0), 0));
+  return sum + (order?.orderDetailArr?.reduce((innerSum, item) => innerSum + parseInt(item.quantity? item?.quantity :item?.totalQuantity  || 0), 0));
 }, 0);
 
 const colorQuantitiesForReturn = returnOrders?.reduce((acc, order) => {
   return (order?.orderDetailArr || []).reduce((innerAcc, item) => {
       if (item.color === "white") {
-          innerAcc.white += parseInt(item.quantity || 0);
+          innerAcc.white += parseInt(item.quantity ? item?.quantity :item?.totalQuantity  || 0);
       } else if (item.color === "black") {
-          innerAcc.black += parseInt(item.quantity || 0);
+          innerAcc.black += parseInt(item.quantity? item?.quantity :item?.totalQuantity  || 0);
       }
       return innerAcc;
   }, acc);
@@ -168,19 +169,19 @@ const colorQuantitiesForReturn = returnOrders?.reduce((acc, order) => {
 const colorQuantitiesForOutForDelivery = outForDeliveryOrders?.reduce((acc, order) => {
   return (order?.orderDetailArr || []).reduce((innerAcc, item) => {
       if (item.color === "white") {
-          innerAcc.white += parseInt(item.quantity || 0);
+          innerAcc.white += parseInt(item.quantity ? item?.quantity :item?.totalQuantity || 0);
       } else if (item.color === "black") {
-          innerAcc.black += parseInt(item.quantity || 0);
+          innerAcc.black += parseInt(item.quantity ? item?.quantity :item?.totalQuantity  || 0);
       }
       return innerAcc;
   }, acc);
 }, { white: 0, black: 0 });
 const colorQuantitiesForDelivered = deliveredOrders?.reduce((acc, order) => {
   return (order?.orderDetailArr || []).reduce((innerAcc, item) => {
-      if (item.color === "white") {
-          innerAcc.white += parseInt(item.quantity || 0);
-      } else if (item.color === "black") {
-          innerAcc.black += parseInt(item.quantity || 0);
+      if (item.color === "white" || item.color === "White") {
+          innerAcc.white += parseInt(item.quantity ? item?.quantity :item?.totalQuantity  || 0);
+      } else if (item.color === "black" || item.color === "Black") {
+          innerAcc.black += parseInt(item.quantity ? item?.quantity :item?.totalQuantity  || 0);
       }
       return innerAcc;
   }, acc);
@@ -188,7 +189,6 @@ const colorQuantitiesForDelivered = deliveredOrders?.reduce((acc, order) => {
 
 const whiteQuantity = (colorQuantitiesForReturn?.white)+(colorQuantitiesForOutForDelivery?.white)+(colorQuantitiesForDelivered?.white) || 0;
 const blackQuantity = (colorQuantitiesForReturn?.black)+(colorQuantitiesForOutForDelivery?.black)+(colorQuantitiesForDelivered?.black) || 0;
-
     // in production black ,white tshirt size count 
     // const sizeCountsForInProduction = inProductionOrders?.reduce((acc, order) => {
     //   return (order?.orderDetailArr || []).reduce((innerAcc, item) => {
@@ -292,7 +292,7 @@ const blackQuantity = (colorQuantitiesForReturn?.black)+(colorQuantitiesForOutFo
       
           return innerAcc;
         }, acc);
-      }, { white: {}, black: {},green:{},maroon:{},nBlue:{},gray:{},red:{} /* Initialize other colors as needed */ });
+      }, { white: {}, black: {}, "bottle green": {},maroon:{},"nevy blue":{},gray:{},red:{} /* Initialize other colors as needed */ });
     };
     
     //previous function
@@ -370,8 +370,6 @@ const blackQuantity = (colorQuantitiesForReturn?.black)+(colorQuantitiesForOutFo
     // console.log("blackLNeeded:",  blackLNeeded);
     // console.log("blackXlNeeded:", blackXlNeeded);
     // console.log("blackXxlNeeded:",blackXxlNeeded);
-    
-
 let countTotalTshirtDispatched=tShirtQuantityForOutFOrDelivery+tShirtQuantityForDeliveredOrders+tShirtQuantityForReturnOrders
 const today = new Date();
 const options = { month: 'long', day: 'numeric', year: 'numeric' };
@@ -413,7 +411,7 @@ const totaldeliveredPBazCost = deliveredOrders?.reduce((acc, curr) => acc +parse
 const totalreturnPBazCost = returnOrders?.reduce((acc, curr) => acc +parseFloat (curr.printbazcost || 0), 0);
 const TotalODR= Number(totaldeliveredPBazCost+totaloutForDeliveryPBazCost+totalreturnPBazCost)
 const totalpaidAndDeliveredPBazCost = paidAndDeliveredOrders?.reduce((acc, curr) => acc +parseFloat (curr.printbazcost || 0), 0);
-
+console.log("sizeCountsForApprovedOrdersHoodie",sizeCountsForApprovedOrdersHoodie)
 const tShirtQuantityForOutForDeliveryToday = outForDeliveryOrdersToday?.reduce((sum, order) => {
   if (!order?.orderDetailArr) return sum;
   return sum + order.orderDetailArr.reduce((innerSum, item) => {
@@ -481,6 +479,7 @@ const handleInputChange = (event) => {
   }
   
 };
+
 return (
         <div>
         <meta charSet="UTF-8" />
@@ -497,732 +496,7 @@ return (
      <Navigationbar/>
         <div className="dashboard-container">
           <div className="dashboard-body">
-<div className="row">
-              <div className="col-md-3">
-               
-                <div className="card stat-card"  style={{height:"152px"}}>
-                <div className="" style={{display:"flex",justifyContent:"space-between",alignItem:"center"}}>
-                  <div className="card-body pb-0">
-                    <h5 className="">Total Pending Orders</h5>
-                    <h2 className="float-right">{totalpendingPBazCost} TK</h2>
-                    </div>
-                
-                  <div className="card-body" style={{display:"flex",justifyContent:"flex-end"}}>
-                   
-                    <h4 className="float-right" style={{marginTop:"2px"}}>{countPendingOrders}</h4>
-                    </div>
-                    </div>
-                  <div  style={{display:"flex",justifyContent:"flex-end",padding:"0px 20px"}}>
-                   
-                    <span style={{cursor:"pointer"}} onClick={downloadInfIntoXl} data-order-id="order-detail-pending"><img style={{width:"25px",hight:"25px"}} src="/images/download.png" alt='download'/></span>
-                <div id="order-detail-pending"style={{position: 'absolute', left: '-10000px', top: '-10000px'}}>
-                <GetOrdersXl orderList={[pendingOrders]}/>
-            </div> 
-              
-                  </div>
-                </div>
-               
-              
-
-              </div>  
-               
-              
-                <div className="col-md-3">
-               
-                <div className="card stat-card" style={{height:"152px"}}>
-                <div className="" style={{display:"flex",justifyContent:"space-between",alignItem:"center"}}>
-                  <div className="card-body">
-                    <h5 className="">Total Approved Orders</h5>
-                    <h2 className="float-right">{totalapprovedPBazCost} TK</h2>
-                    </div>
-                <div>
-                <div className="card-body" style={{display:"flex",justifyContent:"center"}}>
-                   
-                   <h4 className="float-right" style={{marginLeft:"40px",marginTop:"2px"}}>{countapprovedOrders}</h4>
-                   </div>
-                   <div  style={{display:"flex",justifyContent:"flex-end",padding:"0px 20px",marginTop:"35px"}}>
-                 
-                 <span style={{cursor:"pointer"}} onClick={downloadInfIntoXl} data-order-id="order-detail-approved"><img style={{width:"25px",hight:"25px"}} src="/images/download.png" alt='download'/></span>
-             <div id="order-detail-approved"style={{position: 'absolute', left: '-10000px', top: '-10000px'}}>
-             <GetOrdersXl orderList={[approvedOrders]}/>
-         </div> 
-           
-               </div>
-                </div>
-                
-                    </div>
-                  <div>
-                  
-                  </div>
-                </div>
-               
-              
-
-              </div>  
-              <div className="col-md-3">
-               
-                <div className="card stat-card" style={{height:"152px"}}>
-                <div className="" style={{display:"flex",justifyContent:"space-between",alignItem:"center"}}>
-                  <div className="card-body">
-                    <h5 className="">Total Confirmed Orders</h5>
-                    <h2 className="float-right">{totalconfirmedPBazCost} TK</h2>
-                    </div>
-                <div>
-                <div className="card-body" style={{display:"flex",justifyContent:"center"}}>
-                   
-                   <h4 className="float-right" style={{marginLeft:"40px",marginTop:"2px"}}>{countconfirmedOrders}</h4>
-                   </div>
-                   <div  style={{display:"flex",justifyContent:"flex-end",padding:"0px 20px",marginTop:"35px"}}>
-                
-                <span style={{cursor:"pointer"}} onClick={downloadInfIntoXl} data-order-id="order-detail-confirmed"><img style={{width:"25px",hight:"25px"}} src="/images/download.png" alt='download'/></span>
-            <div id="order-detail-confirmed"style={{position: 'absolute', left: '-10000px', top: '-10000px'}}>
-            <GetOrdersXl orderList={[confirmedOrders]}/>
-        </div> 
-          
-              </div>
-                </div>
-                 
-                    </div>
-                  <div>
-                  
-                  </div>
-                </div>
-               
-              
-
-              </div>  <div className="col-md-3">
-               
-                <div className="card stat-card" style={{height:"152px"}}>
-                <div className="" style={{display:"flex",justifyContent:"space-between",alignItem:"center"}}>
-                  <div className="card-body">
-                    <h5 className="">Total In Production Orders</h5>
-                    <h2 className="float-right">{totalinProductionPBazCost} TK</h2>
-                    </div>
-                <div>
-                <div className="card-body" style={{display:"flex",justifyContent:"center"}}>
-                   
-                   <h4 className="float-right" style={{marginLeft:"40px",marginTop:"2px"}}>{countinProductionOrders}</h4>
-                   </div>
-                   <div  style={{display:"flex",justifyContent:"flex-end",padding:"0px 20px",marginTop:"35px"}}>
-               
-               <span style={{cursor:"pointer"}} onClick={downloadInfIntoXl} data-order-id="order-detail-inProduction"><img style={{width:"25px",hight:"25px"}} src="/images/download.png" alt='download'/></span>
-           <div id="order-detail-inProduction"style={{position: 'absolute', left: '-10000px', top: '-10000px'}}>
-           <GetOrdersXl orderList={[inProductionOrders]}/>
-       </div> 
-         
-             </div>
-                </div>
-               
-                    </div>
-                  <div>
-                  
-                  </div>
-                </div>
-                </div>
-                <div className="col-md-3">
-               
-                <div className="card stat-card" style={{height:"152px"}}>
-                <div className="" style={{display:"flex",justifyContent:"space-between",alignItem:"center"}}>
-                  <div className="card-body">
-                    <h5 className="">Total Out For Delivery orders</h5>
-                    <h2 className="float-right">{totaloutForDeliveryPBazCost} TK</h2>
-                    </div>
-                <div>
-                    <div className="card-body" style={{display:"flex",justifyContent:"center"}}>
-                   
-                    <h4 className="float-right" style={{marginLeft:"40px",marginTop:"2px"}}>{countoutForDeliveryOrders}({tShirtQuantityForOutFOrDelivery})</h4>
-                    </div>
-                    <div  style={{display:"flex",justifyContent:"flex-end",padding:"0px 20px",marginTop:"35px"}}>
-               
-               <span style={{cursor:"pointer"}} onClick={downloadInfIntoXl} data-order-id="order-detail-outForDelivery"><img style={{width:"25px",hight:"25px"}} src="/images/download.png" alt='download'/></span>
-           <div id="order-detail-outForDelivery"style={{position: 'absolute', left: '-10000px', top: '-10000px'}}>
-           <GetOrdersXl orderList={[outForDeliveryOrders]}/>
-       </div> 
-         
-             </div>
-                </div>
-                
-                    </div>
-                  <div>
-                  
-                  </div>
-                </div>
-               
-              
-
-              </div>
-           
-              <div className="col-md-3">
-                <div className="card stat-card"  style={{height:"152px"}}>
-                <div className="" style={{display:"flex",justifyContent:"space-between",alignItem:"center"}}>
-                  <div className="card-body pb-0">
-                    <h5 className="">Total Dispatched</h5>
-                    <h2 className="float-right">{TotalODR} TK</h2>
-                    </div>
-                
-                  <div className="card-body" style={{display:"flex",justifyContent:"flex-end"}}>
-                   
-                    <h4 className="float-right" style={{marginTop:"2px"}}>{countODROrders}</h4>
-                    </div>
-                    </div>
-                  <div  style={{display:"flex",justifyContent:"flex-end",padding:"0px 25px"}}>
-                   
-                    <span style={{cursor:"pointer"}} onClick={downloadInfIntoXl} data-order-id="order-detail-ODI"><img style={{width:"25px",hight:"25px"}} src="/images/download.png" alt='download'/></span>
-                <div id="order-detail-ODI" style={{position: 'absolute', left: '-10000px', top: '-10000px'}}>
-                <GetOrdersXl orderList={[outForDeliveryOrders,deliveredOrders,returnOrders]}/>
-              
-            </div> 
-              
-                  </div>
-                </div>
-
-              </div> 
-              <div className="col-md-3">
-                <div className="card stat-card"  style={{height:"152px"}}>
-                <div className="" style={{display:"flex",justifyContent:"space-between",alignItem:"center"}}>
-                  <div className="card-body pb-0">
-                    <h5 className="">Total Delivered And Paid </h5>
-                    <h2 className="float-right">{totalpaidAndDeliveredPBazCost} TK</h2>
-                    </div>
-                
-                  <div className="card-body" style={{display:"flex",justifyContent:"flex-end"}}>
-                   
-                    <h4 className="float-right" style={{marginTop:"2px"}}>{countPaidAndDeliveredOrders}({tShirtQuantityForDeliveredAndPaidOrders})</h4>
-                    </div>
-                    </div>
-                  <div  style={{display:"flex",justifyContent:"flex-end",padding:"0px 25px"}}>
-                   
-                    <span style={{cursor:"pointer"}} onClick={downloadInfIntoXl} data-order-id="order-detail-ODI"><img style={{width:"25px",hight:"25px"}} src="/images/download.png" alt='download'/></span>
-                <div id="order-detail-ODI" style={{position: 'absolute', left: '-10000px', top: '-10000px'}}>
-                <GetOrdersXl orderList={[outForDeliveryOrders,deliveredOrders,returnOrders]}/>
-              
-            </div> 
-              
-                  </div>
-                </div>
-                
-
-              </div>
-           
-              <div className="col-md-3">
-               
-               <div className="card stat-card" style={{height:"152px"}}>
-               <div className="" style={{display:"flex",justifyContent:"space-between",alignItem:"center"}}>
-                 <div className="card-body ">
-                 <h5 className="">Total T-Shirt Dispatched</h5>
-                    <h5 className="float-right">White - {whiteQuantity}</h5>
-                    <h5 className="float-right">Black - {blackQuantity}</h5>
-                   </div>
-               <div>
-               <div className="card-body" style={{display:"flex",justifyContent:"center",height:"50%"}}>
-                  
-                  <h4 className="float-right" style={{marginLeft:"40px",marginTop:"2px"}}>{countTotalTshirtDispatched}</h4>
-                  </div>
-               <div  style={{display:"flex",justifyContent:"flex-end",padding:"0px 20px",marginTop:"35px"}}>
-                  
-                  <span style={{cursor:"pointer"}} onClick={downloadInfIntoXl} data-order-id="order-detail-totalTShirt"><img style={{width:"25px",hight:"25px"}} src="/images/download.png" alt='download'/></span>
-              <div id="order-detail-totalTShirt"style={{position: 'absolute', left: '-10000px', top: '-10000px'}}>
-              <GetTotalTshirtDispatched countTotalTshirtDispatched={countTotalTshirtDispatched} whiteQuantity={whiteQuantity} blackQuantity={blackQuantity}/>
-          </div> 
-            
-                </div>
-               </div>
-              
-                   </div>
-                  
-               </div>
-              
-             
-
-             </div> 
-            
-           
-              
-             <div className="col-md-3">
-               
-               <div className="card stat-card" style={{height:"152px"}}>
-               <div className="" style={{display:"flex",justifyContent:"space-between",alignItem:"center"}}>
-                 <div className="card-body">
-                   <h5 className="">Out for delivery Today</h5>
-                   {/* <h2 className="float-right">{totaldeliveredPBazCost} TK</h2> */}
-                   </div>
-               <div>
-<div className="card-body" style={{display:"flex",justifyContent:"center"}}>
-                  
-                   <h4 className="float-right" style={{marginLeft:"40px",marginTop:"2px"}}>{countOutForDeliveryOrdersToday}</h4>
-                   </div>
-
-                   <div  style={{display:"flex",justifyContent:"flex-end",padding:"0px 20px",marginTop:"35px"}}>
-               
-               <span style={{cursor:"pointer"}} onClick={downloadInfIntoXl} data-order-id="order-detail-outForDeliveryToday"><img style={{width:"25px",hight:"25px"}} src="/images/download.png" alt='download'/></span>
-           <div id="order-detail-outForDeliveryToday"style={{position: 'absolute', left: '-10000px', top: '-10000px'}}>
-           <GetTodaysOutForDeliveryOrders orderList={[outForDeliveryOrdersToday]} />
-       </div> 
-         
-             </div>
-               </div>
-                
-                   </div>
-                 <div>
-                 
-                 </div>
-               </div>
-              
-             
-
-             </div>
-
-             <div className="col-md-3">
-               
-               <div className="card stat-card" style={{height:"152px"}}>
-               <div className="" style={{display:"flex",justifyContent:"space-between",alignItem:"center"}}>
-                 <div className="card-body">
-                   <h5 className="">Total Pending Tickets</h5>
-                   {/* <h2 className="float-right">{totaldeliveredPBazCost} TK</h2> */}
-                   </div>
-               <div>
-<div className="card-body" style={{display:"flex",justifyContent:"center"}}>
-                  
-                   <h4 className="float-right" style={{marginLeft:"40px",marginTop:"2px"}}>{countpendingTickets}</h4>
-                   </div>
-
-                   <div  style={{display:"flex",justifyContent:"flex-end",padding:"0px 20px",marginTop:"35px"}}>
-              
-              {/* <span style={{cursor:"pointer"}} onClick={downloadInfIntoXl} data-order-id="order-detail-delivered"><img style={{width:"25px",hight:"25px"}} src="/images/download.png" alt='download'/></span> */}
-          <div id="order-detail-delivered"style={{position: 'absolute', left: '-10000px', top: '-10000px'}}>
-          <GetOrdersXl orderList={[deliveredOrders]}/>
-      </div> 
-        
-            </div>
-               </div>
-                
-                   </div>
-                 <div>
-                 
-                 </div>
-               </div>
-              
-             
-
-             </div>
-              <div className="col-md-3">
-               
-               <div className="card stat-card" style={{height:"152px"}}>
-               <div className="" style={{display:"flex",justifyContent:"space-between",alignItem:"center"}}>
-                 <div className="card-body">
-                   <h5 className="">Total Replied Tickets</h5>
-                   {/* <h2 className="float-right">{totaldeliveredPBazCost} TK</h2> */}
-                   </div>
-               <div>
-<div className="card-body" style={{display:"flex",justifyContent:"center"}}>
-                  
-                   <h4 className="float-right" style={{marginLeft:"40px",marginTop:"2px"}}>{countrepliedTickets}</h4>
-                   </div>
-
-                   <div  style={{display:"flex",justifyContent:"flex-end",padding:"0px 20px",marginTop:"35px"}}>
-              
-              {/* <span style={{cursor:"pointer"}} onClick={downloadInfIntoXl} data-order-id="order-detail-delivered"><img style={{width:"25px",hight:"25px"}} src="/images/download.png" alt='download'/></span> */}
-          <div id="order-detail-delivered"style={{position: 'absolute', left: '-10000px', top: '-10000px'}}>
-          <GetOrdersXl orderList={[deliveredOrders]}/>
-      </div> 
-        
-            </div>
-               </div>
-                
-                   </div>
-                 <div>
-                 
-                 </div>
-               </div>
-              
-             
-
-             </div>
-             <div className="col-md-3">
-               
-               <div className="card stat-card" style={{height:"152px"}}>
-               <div className="" style={{display:"flex",justifyContent:"space-between",alignItem:"center"}}>
-                 <div className="card-body">
-                   <h5 className="">Total Open Tickets</h5>
-                   {/* <h2 className="float-right">{totaldeliveredPBazCost} TK</h2> */}
-                   </div>
-               <div>
-<div className="card-body" style={{display:"flex",justifyContent:"center"}}>
-                  
-                   <h4 className="float-right" style={{marginLeft:"40px",marginTop:"2px"}}>{countopenTickets}</h4>
-                   </div>
-
-                   <div  style={{display:"flex",justifyContent:"flex-end",padding:"0px 20px",marginTop:"35px"}}>
-              
-              {/* <span style={{cursor:"pointer"}} onClick={downloadInfIntoXl} data-order-id="order-detail-delivered"><img style={{width:"25px",hight:"25px"}} src="/images/download.png" alt='download'/></span> */}
-          <div id="order-detail-delivered"style={{position: 'absolute', left: '-10000px', top: '-10000px'}}>
-          <GetOrdersXl orderList={[deliveredOrders]}/>
-      </div> 
-        
-            </div>
-               </div>
-                
-                   </div>
-                 <div>
-                 
-                 </div>
-               </div>
-              
-             
-
-             </div>
-             <div className="col-md-3">
-               
-               <div className="card stat-card" style={{height:"300px"}}>
-               
-                 <div className="card-body " >
-                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-    <h5 htmlFor="productType-filter" style={{ marginBottom: "8px" }}>T-Shirt In production</h5>
-    <select 
-        id="productType-filter" 
-        value={selectProductType} 
-        className="form-control mr-5" 
-        onChange={(e) => handleInputChange(e)} 
-        style={{ maxWidth: '150px' }}  // Adjust the width value accordingly
-    >
-        <option value='Round Neck'>Round Neck</option>
-        <option value="Drop Sholder">Drop Sholder</option>
-        <option value="Hoodie">Hoodie</option>
-    </select>
-</div>
-
-   
-
-
-                 {/* <div style={{display:"flex"}}>
-<div>
-<p className="float-right">M  - {sizeCountsForInProduction.white?.m?sizeCountsForInProduction.white?.m:0}</p>
-                    <p className="float-right">L  -  {sizeCountsForInProduction.white?.L?sizeCountsForInProduction.white?.L:0}</p>
-</div>
-<div style={{marginLeft:"20px"}}>
-<p className="float-right"> XL - {sizeCountsForInProduction.white?.XL?sizeCountsForInProduction.white?.XL:0}</p>
-                    <p className="float-right"> XXL  -  {sizeCountsForInProduction.white?.XXL?sizeCountsForInProduction.white?.XXL:0}</p>
-</div>
-                 </div> */}
-
-
-<table>
-  <thead>
-    <tr>
-      <th>Color</th>
-      <th></th>
-      <th>M</th>
-      <th></th>
-      <th>L</th>
-      <th></th>
-      <th>XL</th>
-      <th></th>
-      <th>XXL</th>
-    </tr>
-  </thead>
-
-  {
-    selectProductType==="Round Neck" &&
-    <tbody>
-    {["black","white", "maroon", "green"].map((color) => (
-      <tr 
-        style={{
-          backgroundColor: color,
-          color: ["black", "maroon", "green"].includes(color) ? "white" : "initial"
-        }}
-      >
-        <td>{(color)}</td>
-        <td></td>
-        <td>{sizeCountsForInProductionRoundNeck[color]?.m ?? 0}</td>
-        <td></td>
-        <td>{sizeCountsForInProductionRoundNeck[color]?.L ?? 0}</td>
-        <td></td>
-        <td>{sizeCountsForInProductionRoundNeck[color]?.XL ?? 0}</td>
-        <td></td>
-        <td>{sizeCountsForInProductionRoundNeck[color]?.XXL ?? 0}</td>
-      </tr>
-    ))}
-  </tbody>
-  } 
-  {
-    selectProductType==="Drop Sholder" &&
-    <tbody>
-    {["black","white", "maroon", "green"].map((color) => (
-      <tr 
-        style={{
-          backgroundColor: color,
-          color: ["black", "maroon", "green"].includes(color) ? "white" : "initial"
-        }}
-      >
-        <td>{(color)}</td>
-        <td>{sizeCountsForInProductionDropSholder[color]?.m ?? 0}</td>
-        <td></td>
-        <td>{sizeCountsForInProductionDropSholder[color]?.L ?? 0}</td>
-        <td></td>
-        <td>{sizeCountsForInProductionDropSholder[color]?.XL ?? 0}</td>
-        <td></td>
-        <td>{sizeCountsForInProductionDropSholder[color]?.XXL ?? 0}</td>
-      </tr>
-    ))}
-  </tbody>
-  }  
-  {
-    selectProductType==="Hoodie" &&
-    <tbody>
-    {["black","nblue","green", "gray","red"].map((color) => (
-      <tr 
-        style={{
-          backgroundColor: color,
-          color: ["black", "nblue", "green","gray","red"].includes(color) ? "white" : "initial"
-        }}
-      >
-        <td>{(color)}</td>
-        <td>hoodie</td>
-        <td>{sizeCountsForInProductionHoodie[color]?.m ?? 0}</td>
-        <td></td>
-        <td>{sizeCountsForInProductionHoodie[color]?.L ?? 0}</td>
-        <td></td>
-        <td>{sizeCountsForInProductionHoodie[color]?.XL ?? 0}</td>
-        <td></td>
-        <td>{sizeCountsForInProductionHoodie[color]?.XXL ?? 0}</td>
-      </tr>
-    ))}
-  </tbody>
-  }
-
-</table>
-     
-                   
-                   </div>
-               <div>
-               
-               {/* <div  style={{display:"flex",justifyContent:"flex-end",padding:"0px 20px",marginTop:"35px"}}>
-                <div id="order-detail-totalTShirt"style={{position: 'absolute', left: '-10000px', top: '-10000px'}}>
-              <GetTotalTshirtDispatched countTotalTshirtDispatched={countTotalTshirtDispatched} whiteQuantity={whiteQuantity} blackQuantity={blackQuantity}/>
-          </div> 
-            
-                </div> */}
-               </div>
-              
-                
-                  
-               </div>
-               </div>
-             <div className="col-md-3">
-               
-               <div className="card stat-card" style={{height:"325px"}}>
-               
-                 <div className="card-body " >
-                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-    <h5 htmlFor="productType-filterPAC" style={{ marginBottom: "8px" }}>T-Shirt (PAC)</h5>
-    <select 
-        id="productType-filterPAC" 
-        value={selectProductTypePAC} 
-        className="form-control mr-5" 
-        onChange={(e) => handleInputChangeForPAC(e)} 
-        style={{ maxWidth: '150px' }}  // Adjust the width value accordingly
-    >
-        <option value='Round Neck'>Round Neck</option>
-        <option value="Drop Sholder">Drop Sholder</option>
-        <option value="Hoodie">Hoodie</option>
-    </select>
-</div>
-
-   
-
-
-                 {/* <div style={{display:"flex"}}>
-<div>
-<p className="float-right">M  - {sizeCountsForInProduction.white?.m?sizeCountsForInProduction.white?.m:0}</p>
-                    <p className="float-right">L  -  {sizeCountsForInProduction.white?.L?sizeCountsForInProduction.white?.L:0}</p>
-</div>
-<div style={{marginLeft:"20px"}}>
-<p className="float-right"> XL - {sizeCountsForInProduction.white?.XL?sizeCountsForInProduction.white?.XL:0}</p>
-                    <p className="float-right"> XXL  -  {sizeCountsForInProduction.white?.XXL?sizeCountsForInProduction.white?.XXL:0}</p>
-</div>
-                 </div> */}
-
-
-<table>
-  <thead>
-    <tr>
-      <th>Color</th>
-      <th></th>
-      <th>M</th>
-      <th></th>
-      <th>L</th>
-      <th></th>
-      <th>XL</th>
-      <th></th>
-      <th>XXL</th>
-    </tr>
-  </thead>
-
-  {
-  selectProductTypePAC === "Round Neck" &&
-  <tbody>
-    {["black", "white", "maroon", "green"].map((color) => {
-      // Calculate the sum for each size for the given color
-      const mCount = 
-        (sizeCountsForConfirmedOrdersRoundNeck[color]?.m ?? 0) + 
-        (sizeCountsForPendingOrdersRoundNeck[color]?.m ?? 0) + 
-        (sizeCountsForApprovedOrdersRoundNeck[color]?.m ?? 0);
-
-      const lCount = 
-        (sizeCountsForConfirmedOrdersRoundNeck[color]?.L ?? 0) + 
-        (sizeCountsForPendingOrdersRoundNeck[color]?.L ?? 0) + 
-        (sizeCountsForApprovedOrdersRoundNeck[color]?.L ?? 0);
-
-      const xlCount = 
-        (sizeCountsForConfirmedOrdersRoundNeck[color]?.XL ?? 0) + 
-        (sizeCountsForPendingOrdersRoundNeck[color]?.XL ?? 0) + 
-        (sizeCountsForApprovedOrdersRoundNeck[color]?.XL ?? 0);
-
-      const xxlCount = 
-        (sizeCountsForConfirmedOrdersRoundNeck[color]?.XXL ?? 0) + 
-        (sizeCountsForPendingOrdersRoundNeck[color]?.XXL ?? 0) + 
-        (sizeCountsForApprovedOrdersRoundNeck[color]?.XXL ?? 0);
-
-      return (
-        <tr 
-          style={{
-            backgroundColor: color,
-            color: ["black", "maroon", "green"].includes(color) ? "white" : "initial"
-          }}
-        >
-          <td>{color}</td>
-          <td>round neck</td>
-          <td>{mCount}</td>
-          <td></td>
-          <td>{lCount}</td>
-          <td></td>
-          <td>{xlCount}</td>
-          <td></td>
-          <td>{xxlCount}</td>
-        </tr>
-      );
-    })}
-  </tbody>
-}
-
-  {
-    selectProductTypePAC==="Drop Sholder" &&
-    <tbody>
-    {["black", "white", "maroon", "green"].map((color) => {
-      // Calculate the sum for each size for the given color
-      const mCount = 
-        (sizeCountsForConfirmedOrdersDropSholder[color]?.m ?? 0) + 
-        (sizeCountsForPendingOrdersDropSholder[color]?.m ?? 0) + 
-        (sizeCountsForApprovedOrdersDropSholder[color]?.m ?? 0);
-
-      const lCount = 
-        (sizeCountsForConfirmedOrdersDropSholder[color]?.L ?? 0) + 
-        (sizeCountsForPendingOrdersDropSholder[color]?.L ?? 0) + 
-        (sizeCountsForApprovedOrdersDropSholder[color]?.L ?? 0);
-
-      const xlCount = 
-        (sizeCountsForConfirmedOrdersDropSholder[color]?.XL ?? 0) + 
-        (sizeCountsForPendingOrdersDropSholder[color]?.XL ?? 0) + 
-        (sizeCountsForApprovedOrdersDropSholder[color]?.XL ?? 0);
-
-      const xxlCount = 
-        (sizeCountsForConfirmedOrdersDropSholder[color]?.XXL ?? 0) + 
-        (sizeCountsForPendingOrdersDropSholder[color]?.XXL ?? 0) + 
-        (sizeCountsForApprovedOrdersDropSholder[color]?.XXL ?? 0);
-
-      return (
-        <tr 
-          style={{
-            backgroundColor: color,
-            color: ["black", "maroon", "green"].includes(color) ? "white" : "initial"
-          }}
-        >
-          <td>{color}</td>
-          <td>round neck</td>
-          <td>{mCount}</td>
-          <td></td>
-          <td>{lCount}</td>
-          <td></td>
-          <td>{xlCount}</td>
-          <td></td>
-          <td>{xxlCount}</td>
-        </tr>
-      );
-    })}
-  </tbody>
-  }  
-  {
-    selectProductTypePAC==="Hoodie" &&
-    <tbody>
-    {["black","nblue","green", "gray","red"].map((color) => {
-      // Calculate the sum for each size for the given color
-      const mCount = 
-        (sizeCountsForConfirmedOrdersHoodie[color]?.m ?? 0) + 
-        (sizeCountsForPendingOrdersHoodie[color]?.m ?? 0) + 
-        (sizeCountsForApprovedOrdersHoodie[color]?.m ?? 0);
-
-      const lCount = 
-        (sizeCountsForConfirmedOrdersHoodie[color]?.L ?? 0) + 
-        (sizeCountsForPendingOrdersHoodie[color]?.L ?? 0) + 
-        (sizeCountsForApprovedOrdersHoodie[color]?.L ?? 0);
-
-      const xlCount = 
-        (sizeCountsForConfirmedOrdersHoodie[color]?.XL ?? 0) + 
-        (sizeCountsForPendingOrdersHoodie[color]?.XL ?? 0) + 
-        (sizeCountsForApprovedOrdersHoodie[color]?.XL ?? 0);
-
-      const xxlCount = 
-        (sizeCountsForConfirmedOrdersHoodie[color]?.XXL ?? 0) + 
-        (sizeCountsForPendingOrdersHoodie[color]?.XXL ?? 0) + 
-        (sizeCountsForApprovedOrdersHoodie[color]?.XXL ?? 0);
-
-      return (
-        <tr 
-          style={{
-            backgroundColor: color,
-            color: ["black","nblue","green", "gray","red"].includes(color) ? "white" : "initial"
-          }}
-        >
-          <td>{color}</td>
-          <td>round neck</td>
-          <td>{mCount}</td>
-          <td></td>
-          <td>{lCount}</td>
-          <td></td>
-          <td>{xlCount}</td>
-          <td></td>
-          <td>{xxlCount}</td>
-        </tr>
-      );
-    })}
-  </tbody>
-  }
-
-</table>
-     
-                   
-                   </div>
-               <div>
-               
-               {/* <div  style={{display:"flex",justifyContent:"flex-end",padding:"0px 20px",marginTop:"35px"}}>
-                <div id="order-detail-totalTShirt"style={{position: 'absolute', left: '-10000px', top: '-10000px'}}>
-              <GetTotalTshirtDispatched countTotalTshirtDispatched={countTotalTshirtDispatched} whiteQuantity={whiteQuantity} blackQuantity={blackQuantity}/>
-          </div> 
-            
-                </div> */}
-               </div>
-              
-                
-                  
-               </div>
-              
-             
-
-             </div>
-          
-            </div>
-
-          
+ <DashboardCards/>
    
             <div className="row">
               <div className="col-md-12">

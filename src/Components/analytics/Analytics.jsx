@@ -14,6 +14,7 @@ import Col from 'react-bootstrap/Col';
 import GetOrdersXl from '../GetOrdersXl';
 import GetTotalTshirtDispatched from '../GetTotalTshirtDispatched';
 import useGetAllTickets from '../../hooks/useGetAllTickets';
+import DashboardCards from '../dashboard/dashboardCards/DashboardCards';
 const Analytics = () => {
   const {adminUser,loading,loginAdminUser,currentUser}=useContext(AuthContext);
   const { orderAll } = useGetMongoData();
@@ -121,7 +122,7 @@ const tShirtQuantityForDeliveredOrders= deliveredOrders?.reduce((sum, order) => 
 const tShirtQuantityForReturnOrders= returnOrders?.reduce((sum, order) => {
   return sum + (order?.orderDetailArr?.reduce((innerSum, item) => innerSum + parseInt(item.quantity || 0), 0));
 }, 0);
-
+console.log("cancelOrders",cancelOrders)
 const tShirtQuantityForDeliveredAndPaidOrders= paidAndDeliveredOrders?.reduce((sum, order) => {
   return sum + (order?.orderDetailArr?.reduce((innerSum, item) => innerSum + parseInt(item.quantity || 0), 0));
 }, 0);
@@ -215,14 +216,14 @@ const totalinProductionPBazCost = inProductionOrders?.reduce((acc, curr) => acc 
 const totaloutForDeliveryPBazCost = outForDeliveryOrders?.reduce((acc, curr) => acc +parseFloat (curr.printbazcost || 0), 0);
 const totaldeliveredPBazCost = deliveredOrders?.reduce((acc, curr) => acc +parseFloat (curr.printbazcost || 0), 0);
 const totalpaymentReleasedPBazCost = paymentReleaseddOrders?.reduce((acc, curr) => acc +parseFloat (curr.printbazcost || 0), 0);
-const totalcancelPBazCost = cancelOrders?.reduce((acc, curr) => acc +parseFloat (curr.printbazcost || 0), 0);
+const totalcancelPBazCost = cancelOrders?.reduce((acc, curr) => acc +parseFloat (Number(curr.printbazcost) || 0), 0);
 const totalreturnPBazCost = returnOrders?.reduce((acc, curr) => acc +parseFloat (curr.printbazcost || 0), 0);
 const totalpaidAndDeliveredPBazCost = paidAndDeliveredOrders?.reduce((acc, curr) => acc +parseFloat (curr.printbazcost || 0), 0);
 const TotalODR= Number(totaldeliveredPBazCost+totaloutForDeliveryPBazCost+totalreturnPBazCost)
 
 
 
-console.log("totalpaidAndDeliveredPBazCost",totalpaidAndDeliveredPBazCost);
+console.log("totalcancelPBazCost",totalcancelPBazCost);
 
 const downloadInfIntoXl = (event) => {
   const dynmamicId = event.currentTarget.dataset.orderId;
@@ -274,34 +275,10 @@ return (
      <Navigationbar/>
         <div className="dashboard-container">
           <div className="dashboard-body">
-<div className="row">
-              <div className="col-md-3">
-               
-                <div className="card stat-card"  style={{height:"152px"}}>
-                <div className="" style={{display:"flex",justifyContent:"space-between",alignItem:"center"}}>
-                  <div className="card-body pb-0">
-                    <h5 className="">Total Pending Orders</h5>
-                    <h2 className="float-right">{totalpendingPBazCost} TK</h2>
-                    </div>
-                
-                  <div className="card-body" style={{display:"flex",justifyContent:"flex-end"}}>
-                   
-                    <h4 className="float-right" style={{marginTop:"2px"}}>{countPendingOrders}</h4>
-                    </div>
-                    </div>
-                  <div  style={{display:"flex",justifyContent:"flex-end",padding:"0px 20px"}}>
-                   
-                    <span style={{cursor:"pointer"}} onClick={downloadInfIntoXl} data-order-id="order-detail-pending"><img style={{width:"25px",hight:"25px"}} src="/images/download.png" alt='download'/></span>
-                <div id="order-detail-pending"style={{position: 'absolute', left: '-10000px', top: '-10000px'}}>
-                <GetOrdersXl orderList={[pendingOrders]}/>
-            </div> 
-              
-                  </div>
-                </div>
-               
-              
+<DashboardCards/>
 
-              </div>  
+<div className="row">
+               
                <div className="col-md-3">
                
                 <div className="card stat-card" style={{height:"152px"}}>
@@ -396,133 +373,9 @@ return (
               
 
               </div>
-                <div className="col-md-3">
                
-                <div className="card stat-card" style={{height:"152px"}}>
-                <div className="" style={{display:"flex",justifyContent:"space-between",alignItem:"center"}}>
-                  <div className="card-body">
-                    <h5 className="">Total Approved Orders</h5>
-                    <h2 className="float-right">{totalapprovedPBazCost} TK</h2>
-                    </div>
-                <div>
-                <div className="card-body" style={{display:"flex",justifyContent:"center"}}>
-                   
-                   <h4 className="float-right" style={{marginLeft:"40px",marginTop:"2px"}}>{countapprovedOrders}</h4>
-                   </div>
-                   <div  style={{display:"flex",justifyContent:"flex-end",padding:"0px 20px",marginTop:"35px"}}>
-                 
-                 <span style={{cursor:"pointer"}} onClick={downloadInfIntoXl} data-order-id="order-detail-approved"><img style={{width:"25px",hight:"25px"}} src="/images/download.png" alt='download'/></span>
-             <div id="order-detail-approved"style={{position: 'absolute', left: '-10000px', top: '-10000px'}}>
-             <GetOrdersXl orderList={[approvedOrders]}/>
-         </div> 
-           
-               </div>
-                </div>
-                
-                    </div>
-                  <div>
-                  
-                  </div>
-                </div>
+            
                
-              
-
-              </div>  
-              <div className="col-md-3">
-               
-                <div className="card stat-card" style={{height:"152px"}}>
-                <div className="" style={{display:"flex",justifyContent:"space-between",alignItem:"center"}}>
-                  <div className="card-body">
-                    <h5 className="">Total Confirmed Orders</h5>
-                    <h2 className="float-right">{totalconfirmedPBazCost} TK</h2>
-                    </div>
-                <div>
-                <div className="card-body" style={{display:"flex",justifyContent:"center"}}>
-                   
-                   <h4 className="float-right" style={{marginLeft:"40px",marginTop:"2px"}}>{countconfirmedOrders}</h4>
-                   </div>
-                   <div  style={{display:"flex",justifyContent:"flex-end",padding:"0px 20px",marginTop:"35px"}}>
-                
-                <span style={{cursor:"pointer"}} onClick={downloadInfIntoXl} data-order-id="order-detail-confirmed"><img style={{width:"25px",hight:"25px"}} src="/images/download.png" alt='download'/></span>
-            <div id="order-detail-confirmed"style={{position: 'absolute', left: '-10000px', top: '-10000px'}}>
-            <GetOrdersXl orderList={[confirmedOrders]}/>
-        </div> 
-          
-              </div>
-                </div>
-                 
-                    </div>
-                  <div>
-                  
-                  </div>
-                </div>
-               
-              
-
-              </div>  <div className="col-md-3">
-               
-                <div className="card stat-card" style={{height:"152px"}}>
-                <div className="" style={{display:"flex",justifyContent:"space-between",alignItem:"center"}}>
-                  <div className="card-body">
-                    <h5 className="">Total In Production Orders</h5>
-                    <h2 className="float-right">{totalinProductionPBazCost} TK</h2>
-                    </div>
-                <div>
-                <div className="card-body" style={{display:"flex",justifyContent:"center"}}>
-                   
-                   <h4 className="float-right" style={{marginLeft:"40px",marginTop:"2px"}}>{countinProductionOrders}</h4>
-                   </div>
-                   <div  style={{display:"flex",justifyContent:"flex-end",padding:"0px 20px",marginTop:"35px"}}>
-               
-               <span style={{cursor:"pointer"}} onClick={downloadInfIntoXl} data-order-id="order-detail-inProduction"><img style={{width:"25px",hight:"25px"}} src="/images/download.png" alt='download'/></span>
-           <div id="order-detail-inProduction"style={{position: 'absolute', left: '-10000px', top: '-10000px'}}>
-           <GetOrdersXl orderList={[inProductionOrders]}/>
-       </div> 
-         
-             </div>
-                </div>
-               
-                    </div>
-                  <div>
-                  
-                  </div>
-                </div>
-               
-              
-
-              </div>
-                <div className="col-md-3">
-               
-                <div className="card stat-card" style={{height:"152px"}}>
-                <div className="" style={{display:"flex",justifyContent:"space-between",alignItem:"center"}}>
-                  <div className="card-body">
-                    <h5 className="">Total Out For Delivery orders</h5>
-                    <h2 className="float-right">{totaloutForDeliveryPBazCost} TK</h2>
-                    </div>
-                <div>
-                    <div className="card-body" style={{display:"flex",justifyContent:"center"}}>
-                   
-                    <h4 className="float-right" style={{marginLeft:"40px",marginTop:"2px"}}>{countoutForDeliveryOrders}({tShirtQuantityForOutFOrDelivery})</h4>
-                    </div>
-                    <div  style={{display:"flex",justifyContent:"flex-end",padding:"0px 20px",marginTop:"35px"}}>
-               
-               <span style={{cursor:"pointer"}} onClick={downloadInfIntoXl} data-order-id="order-detail-outForDelivery"><img style={{width:"25px",hight:"25px"}} src="/images/download.png" alt='download'/></span>
-           <div id="order-detail-outForDelivery"style={{position: 'absolute', left: '-10000px', top: '-10000px'}}>
-           <GetOrdersXl orderList={[outForDeliveryOrders]}/>
-       </div> 
-         
-             </div>
-                </div>
-                
-                    </div>
-                  <div>
-                  
-                  </div>
-                </div>
-               
-              
-
-              </div>
              <div className="col-md-3">
                
                 <div className="card stat-card" style={{height:"152px"}}>
@@ -556,7 +409,7 @@ return (
               
 
               </div>
-             <div className="col-md-3">
+             {/* <div className="col-md-3">
                
                 <div className="card stat-card" style={{height:"152px"}}>
                 <div className="" style={{display:"flex",justifyContent:"space-between",alignItem:"center"}}>
@@ -589,7 +442,7 @@ return (
                
               
 
-              </div>
+              </div> */}
              <div className="col-md-3">
                
                 <div className="card stat-card" style={{height:"152px"}}>
@@ -628,7 +481,7 @@ return (
                 <div className="" style={{display:"flex",justifyContent:"space-between",alignItem:"center"}}>
                   <div className="card-body">
                     <h5 className="">Total Canceled Orders</h5>
-                    <h2 className="float-right">{totalcancelPBazCost} TK</h2>
+                    <h2 className="float-right">{Number(totalcancelPBazCost)} TK</h2>
                     </div>
                 <div>
                 <div className="card-body" style={{display:"flex",justifyContent:"center"}}>
@@ -654,94 +507,9 @@ return (
               
 
               </div> 
-              <div className="col-md-3">
-               
-              
-               
-                <div className="card stat-card"  style={{height:"152px"}}>
-                <div className="" style={{display:"flex",justifyContent:"space-between",alignItem:"center"}}>
-                  <div className="card-body pb-0">
-                    <h5 className="">Total Dispatched</h5>
-                    <h2 className="float-right">{TotalODR} TK</h2>
-                    </div>
-                
-                  <div className="card-body" style={{display:"flex",justifyContent:"flex-end"}}>
-                   
-                    <h4 className="float-right" style={{marginTop:"2px"}}>{countODROrders}</h4>
-                    </div>
-                    </div>
-                  <div  style={{display:"flex",justifyContent:"flex-end",padding:"0px 25px"}}>
-                   
-                    <span style={{cursor:"pointer"}} onClick={downloadInfIntoXl} data-order-id="order-detail-ODI"><img style={{width:"25px",hight:"25px"}} src="/images/download.png" alt='download'/></span>
-                <div id="order-detail-ODI" style={{position: 'absolute', left: '-10000px', top: '-10000px'}}>
-                <GetOrdersXl orderList={[outForDeliveryOrders,deliveredOrders,returnOrders]}/>
-              
-            </div> 
-              
-                  </div>
-                </div>
-                
-
-              </div> 
-              <div className="col-md-3">
-                <div className="card stat-card"  style={{height:"152px"}}>
-                <div className="" style={{display:"flex",justifyContent:"space-between",alignItem:"center"}}>
-                  <div className="card-body pb-0">
-                    <h5 className="">Total Delivered And Paid </h5>
-                    <h2 className="float-right">{totalpaidAndDeliveredPBazCost} TK</h2>
-                    </div>
-                
-                  <div className="card-body" style={{display:"flex",justifyContent:"flex-end"}}>
-                   
-                    <h4 className="float-right" style={{marginTop:"2px"}}>{countPaidAndDeliveredOrders}({tShirtQuantityForDeliveredAndPaidOrders})</h4>
-                    </div>
-                    </div>
-                  <div  style={{display:"flex",justifyContent:"flex-end",padding:"0px 25px"}}>
-                   
-                    <span style={{cursor:"pointer"}} onClick={downloadInfIntoXl} data-order-id="order-detail-ODI"><img style={{width:"25px",hight:"25px"}} src="/images/download.png" alt='download'/></span>
-                <div id="order-detail-ODI" style={{position: 'absolute', left: '-10000px', top: '-10000px'}}>
-                <GetOrdersXl orderList={[outForDeliveryOrders,deliveredOrders,returnOrders]}/>
-              
-            </div> 
-              
-                  </div>
-                </div>
-                
-
-              </div>
-           
-              <div className="col-md-3">
-               
-               <div className="card stat-card" style={{height:"152px"}}>
-               <div className="" style={{display:"flex",justifyContent:"space-between",alignItem:"center"}}>
-                 <div className="card-body ">
-                 <h5 className="">Total T-Shirt Dispatched</h5>
-                    <h5 className="float-right">White - {whiteQuantity}</h5>
-                    <h5 className="float-right">Black - {blackQuantity}</h5>
-                   </div>
-               <div>
-               <div className="card-body" style={{display:"flex",justifyContent:"center",height:"50%"}}>
-                  
-                  <h4 className="float-right" style={{marginLeft:"40px",marginTop:"2px"}}>{countTotalTshirtDispatched}</h4>
-                  </div>
-               <div  style={{display:"flex",justifyContent:"flex-end",padding:"0px 20px",marginTop:"35px"}}>
-                  
-                  <span style={{cursor:"pointer"}} onClick={downloadInfIntoXl} data-order-id="order-detail-totalTShirt"><img style={{width:"25px",hight:"25px"}} src="/images/download.png" alt='download'/></span>
-              <div id="order-detail-totalTShirt"style={{position: 'absolute', left: '-10000px', top: '-10000px'}}>
-              <GetTotalTshirtDispatched countTotalTshirtDispatched={countTotalTshirtDispatched} whiteQuantity={whiteQuantity} blackQuantity={blackQuantity}/>
-          </div> 
             
-                </div>
-               </div>
               
-                   </div>
-                  
-               </div>
-              
-             
-
-             </div> 
-             <div className="col-md-3">
+             {/* <div className="col-md-3">
                
                <div className="card stat-card" style={{height:"152px"}}>
                <div className="" style={{display:"flex",justifyContent:"space-between",alignItem:"center"}}>
@@ -759,7 +527,7 @@ return (
                <div>
                <div className="card-body" style={{display:"flex",justifyContent:"center",height:"50%"}}>
                   
-                  {/* <h4 className="float-right" style={{marginLeft:"40px",marginTop:"2px"}}>{countTotalTshirtDispatched}</h4> */}
+              
                   </div>
                   <div  style={{display:"flex",justifyContent:"flex-end",padding:"0px 20px",marginTop:"35px"}}>
                
@@ -777,8 +545,8 @@ return (
               
              
 
-             </div>  
-             <div className="col-md-3">
+             </div>   */}
+             {/* <div className="col-md-3">
                
                <div className="card stat-card" style={{height:"152px"}}>
                <div className="" style={{display:"flex",justifyContent:"space-between",alignItem:"center"}}>
@@ -800,11 +568,10 @@ return (
                <div>
                <div className="card-body" style={{display:"flex",justifyContent:"center",height:"50%"}}>
                   
-                  {/* <h4 className="float-right" style={{marginLeft:"40px",marginTop:"2px"}}>{countTotalTshirtDispatched}</h4> */}
+              
                   </div>
                <div  style={{display:"flex",justifyContent:"flex-end",padding:"0px 20px",marginTop:"35px"}}>
-                  
-                  {/* <span style={{cursor:"pointer"}} onClick={downloadInfIntoXl} data-order-id="order-detail-totalTShirt"><img style={{width:"25px",hight:"25px"}} src="/images/download.png" alt='download'/></span> */}
+               
               <div id="order-detail-totalTShirt"style={{position: 'absolute', left: '-10000px', top: '-10000px'}}>
               <GetTotalTshirtDispatched countTotalTshirtDispatched={countTotalTshirtDispatched} whiteQuantity={whiteQuantity} blackQuantity={blackQuantity}/>
           </div> 
@@ -841,12 +608,11 @@ return (
                    </div>
                <div>
                <div className="card-body" style={{display:"flex",justifyContent:"center",height:"50%"}}>
-                  
-                  {/* <h4 className="float-right" style={{marginLeft:"40px",marginTop:"2px"}}>{countTotalTshirtDispatched}</h4> */}
+            
                   </div>
                <div  style={{display:"flex",justifyContent:"flex-end",padding:"0px 20px",marginTop:"35px"}}>
                   
-                  {/* <span style={{cursor:"pointer"}} onClick={downloadInfIntoXl} data-order-id="order-detail-totalTShirt"><img style={{width:"25px",hight:"25px"}} src="/images/download.png" alt='download'/></span> */}
+          
               <div id="order-detail-totalTShirt"style={{position: 'absolute', left: '-10000px', top: '-10000px'}}>
               <GetTotalTshirtDispatched countTotalTshirtDispatched={countTotalTshirtDispatched} whiteQuantity={whiteQuantity} blackQuantity={blackQuantity}/>
           </div> 
@@ -860,108 +626,9 @@ return (
               
              
 
-             </div>
+             </div> */}
 
-             <div className="col-md-3">
-               
-               <div className="card stat-card" style={{height:"152px"}}>
-               <div className="" style={{display:"flex",justifyContent:"space-between",alignItem:"center"}}>
-                 <div className="card-body">
-                   <h5 className="">Total Pending Tickets</h5>
-                   {/* <h2 className="float-right">{totaldeliveredPBazCost} TK</h2> */}
-                   </div>
-               <div>
-<div className="card-body" style={{display:"flex",justifyContent:"center"}}>
-                  
-                   <h4 className="float-right" style={{marginLeft:"40px",marginTop:"2px"}}>{countpendingTickets}</h4>
-                   </div>
-
-                   <div  style={{display:"flex",justifyContent:"flex-end",padding:"0px 20px",marginTop:"35px"}}>
-              
-              {/* <span style={{cursor:"pointer"}} onClick={downloadInfIntoXl} data-order-id="order-detail-delivered"><img style={{width:"25px",hight:"25px"}} src="/images/download.png" alt='download'/></span> */}
-          <div id="order-detail-delivered"style={{position: 'absolute', left: '-10000px', top: '-10000px'}}>
-          <GetOrdersXl orderList={[deliveredOrders]}/>
-      </div> 
-        
-            </div>
-               </div>
-                
-                   </div>
-                 <div>
-                 
-                 </div>
-               </div>
-              
              
-
-             </div>
-              <div className="col-md-3">
-               
-               <div className="card stat-card" style={{height:"152px"}}>
-               <div className="" style={{display:"flex",justifyContent:"space-between",alignItem:"center"}}>
-                 <div className="card-body">
-                   <h5 className="">Total Replied Tickets</h5>
-                   {/* <h2 className="float-right">{totaldeliveredPBazCost} TK</h2> */}
-                   </div>
-               <div>
-<div className="card-body" style={{display:"flex",justifyContent:"center"}}>
-                  
-                   <h4 className="float-right" style={{marginLeft:"40px",marginTop:"2px"}}>{countrepliedTickets}</h4>
-                   </div>
-
-                   <div  style={{display:"flex",justifyContent:"flex-end",padding:"0px 20px",marginTop:"35px"}}>
-              
-              {/* <span style={{cursor:"pointer"}} onClick={downloadInfIntoXl} data-order-id="order-detail-delivered"><img style={{width:"25px",hight:"25px"}} src="/images/download.png" alt='download'/></span> */}
-          <div id="order-detail-delivered"style={{position: 'absolute', left: '-10000px', top: '-10000px'}}>
-          <GetOrdersXl orderList={[deliveredOrders]}/>
-      </div> 
-        
-            </div>
-               </div>
-                
-                   </div>
-                 <div>
-                 
-                 </div>
-               </div>
-              
-             
-
-             </div>
-             <div className="col-md-3">
-               
-               <div className="card stat-card" style={{height:"152px"}}>
-               <div className="" style={{display:"flex",justifyContent:"space-between",alignItem:"center"}}>
-                 <div className="card-body">
-                   <h5 className="">Total Open Tickets</h5>
-                   {/* <h2 className="float-right">{totaldeliveredPBazCost} TK</h2> */}
-                   </div>
-               <div>
-<div className="card-body" style={{display:"flex",justifyContent:"center"}}>
-                  
-                   <h4 className="float-right" style={{marginLeft:"40px",marginTop:"2px"}}>{countopenTickets}</h4>
-                   </div>
-
-                   <div  style={{display:"flex",justifyContent:"flex-end",padding:"0px 20px",marginTop:"35px"}}>
-              
-              {/* <span style={{cursor:"pointer"}} onClick={downloadInfIntoXl} data-order-id="order-detail-delivered"><img style={{width:"25px",hight:"25px"}} src="/images/download.png" alt='download'/></span> */}
-          <div id="order-detail-delivered"style={{position: 'absolute', left: '-10000px', top: '-10000px'}}>
-          <GetOrdersXl orderList={[deliveredOrders]}/>
-      </div> 
-        
-            </div>
-               </div>
-                
-                   </div>
-                 <div>
-                 
-                 </div>
-               </div>
-              
-             
-
-             </div>
-            
             
             </div>
 

@@ -168,17 +168,22 @@ for(let i=0;i<orderStatusPaymentReleased?.length;i++){
 
 // }
 // Check if orderStatusReturned is an array before looping
+let totalReturn=0;
+let deliveryFee=0;
 if (Array.isArray(orderSatatusReturned)) {
   for (let i = 0; i < orderSatatusReturned.length; i++) {
-    const totalReturn = Number(orderSatatusReturned[i]?.returnedAmount);
-    const deliveryFee = Number(orderSatatusReturned[i]?.deliveryFee);
+     totalReturn = Number(orderSatatusReturned[i]?.returnedAmount);
+     deliveryFee = Number(orderSatatusReturned[i]?.deliveryFee);
     
     // If totalReturn and deliveryFee exist and are numbers, add them to totalReturnAmountBase
    
-      totalReturnAmmountBase += (totalReturn + deliveryFee+deliveryFee/2);
+      totalReturnAmmountBase += (totalReturn + deliveryFee + deliveryFee/2);
     
   }
 }
+console.log("totalReturn",totalReturn)
+console.log("deliveryFee",deliveryFee)
+console.log("totalReturnAmmountBase",totalReturnAmmountBase)
 
 // Now, totalReturnAmountBase contains the sum of all returnedAmounts and their associated deliveryFees
 
@@ -200,7 +205,7 @@ for(let i=0;i<PaymentStausPaid?.length;i++){
 
 // Calculate initial due amount
 let dueAmount = Number(statusPaidbase - (totalReceiveBase + totalReturnAmmountBase));
-
+console.log("getUserById",getUserById)
 // Fetch the latest payment made by user
 let lastPayementDetail = getUserById?.payments?.length > 0 ? 
                          getUserById.payments[getUserById.payments.length-1] : null;
@@ -229,7 +234,7 @@ useEffect(()=>{
       },[getUserById])
    
    useEffect(() => {
-    const getOrderById = async () => {
+    const getOrderByIdfromMerchant = async () => {
         // Ensure there's an ID before making a request
         console.log("totalBill test",statusPaidbase);
         console.log("dueAmount test",dueAmount);
@@ -271,7 +276,7 @@ useEffect(()=>{
         }
     };
   
-    getOrderById();
+    getOrderByIdfromMerchant();
   
   }, [viewClient?._id,statusPaidbase, totalReceiveBase, totalReturnAmmountBase, dueAmount]);
   
