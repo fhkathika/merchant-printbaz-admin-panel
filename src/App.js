@@ -30,6 +30,7 @@ import AllRcvAmount from './Components/allRcvAmount/AllRcvAmount';
 import PaymentHistory from './Components/paymentHistory/PaymentHistory';
 import AddBlogs from './Components/addBlogs/AddBlogs';
 import AllBlogs from './Components/allBlogs/AllBlogs';
+import UpdatePrice from './Components/updatePrice/UpdatePrice';
 function App() {
   return (
     <div className="">
@@ -63,6 +64,7 @@ function App() {
        <Route path="/allSoldTshirts" element={<AllSoldTshirt/>} />
        <Route path="/allRcvAmount" element={<AllRcvAmount/>} />
        <Route path="/paymentHistory/:merchantId" element={<PaymentHistory/>} />
+       <Route path="/updatePrice" element={<UpdatePrice/>} />
        <Route
   path="/registerAdminPage"
   element={
