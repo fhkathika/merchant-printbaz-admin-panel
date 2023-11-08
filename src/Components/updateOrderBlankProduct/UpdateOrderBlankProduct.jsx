@@ -12,6 +12,7 @@ import DeleteRoleAlert from '../alert/DeleteRoleAlert';
 import axios from 'axios';
 import deliveryCharge from '../../Formulas/deliveryCharge';
 import tshirtFormulaCustomDropSholder from '../../Formulas/tshirtFormulaCustomDropSholder';
+import useGetProductPrices from '../../hooks/useGetProductPrices';
 
 const UpdateOrderBlankProduct = ({ onClose,viewOrder,viewClient,getSpecificOrderById,setGetSpecificOrderById }) => {
   console.log("getSpecificOrderById from edit order page",getSpecificOrderById); 
@@ -21,7 +22,7 @@ const UpdateOrderBlankProduct = ({ onClose,viewOrder,viewClient,getSpecificOrder
     const [previewUrl, setPreviewUrl] = useState('');
     const [updateOrderArr, setUpdateOrderArr] = useState([]);
     const [indexNumber, setIndexNumber] = useState();
-
+    const {tshirtPrice}=useGetProductPrices()
     // console.log("getSpecificOrderById",getSpecificOrderById);
 
 // useEffect(()=>{
@@ -282,13 +283,13 @@ console.log("getSpecificOrderById out side delete func",getSpecificOrderById);
     if (formData?.quantity && formData?.orderDetailArr[i]?.totalQuantity ) {
         // perCategoryCost=formData?.orderDetailArr[i]?.totalQuantity  * 220
         if(formData?.category==="blankRoundNeck" || formData?.category==="Blank Round Neck"){
-            perCategoryCost=formData?.orderDetailArr[i]?.totalQuantity  * 220
+            perCategoryCost=formData?.orderDetailArr[i]?.totalQuantity  * tshirtPrice[20]?.frontSideprice
         }
        else  if(formData?.category==="Blank Drop Sholder"|| formData?.category==="blankDropsholder"){
-            perCategoryCost=formData?.orderDetailArr[i]?.totalQuantity  * 265
+            perCategoryCost=formData?.orderDetailArr[i]?.totalQuantity  * tshirtPrice[21]?.frontSideprice
         }
         else if(formData?.category==="Blank Hoodie"|| formData?.category==="blankHoodie"){
-            perCategoryCost=formData?.orderDetailArr[i]?.totalQuantity  * 400
+            perCategoryCost=formData?.orderDetailArr[i]?.totalQuantity  * tshirtPrice[22]?.frontSideprice
         }
         console.log("perCategoryCost",perCategoryCost);
         printbazcost +=perCategoryCost

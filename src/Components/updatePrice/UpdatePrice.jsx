@@ -130,6 +130,9 @@ const handleUpdatePopUp=(id)=>{
         <option value='Round Neck'>Round Neck </option>
         <option value="Drop Sholder">Drop Sholder</option>
         <option value="Hoodie">Hoodie</option>
+        <option value="Blank Round Neck">Blank Round Neck</option>
+        <option value="Blank Drop Sholder">Blank Drop Sholder</option>
+        <option value="Blank Hoodie">Blank Hoodie</option>
         {/* <option value="Blank Round Neck">Blank Round Neck</option>
         <option value="Blank Drop Sholder">Blank Drop Sholder</option>
         <option value="Blank Hoodie">Blank Hoodie</option> */}
@@ -144,7 +147,11 @@ const handleUpdatePopUp=(id)=>{
           selectProductType==="Blank Round Neck" ||
           selectProductType==="Blank Drop Sholder" ||
           selectProductType==="Blank Hoodie" ?
+          <>
           <th > Price</th>
+          <th > Action</th>
+          </>
+          
           :
           <>
            <th >Print Size (in inches)</th>
@@ -155,6 +162,7 @@ const handleUpdatePopUp=(id)=>{
           </>
          
         }
+     
           
       
        </tr>
@@ -228,7 +236,8 @@ roundNeck?.additionalCost
          }
      
      </tbody>
-     }   {
+     } 
+       {
          selectProductType==="Hoodie" &&
          <tbody>
          {
@@ -261,7 +270,8 @@ roundNeck?.additionalCost
        
    
      </tbody>
-     }  {
+     } 
+      {
          selectProductType==="Blank Round Neck" &&
          <tbody>
          {
@@ -270,7 +280,9 @@ roundNeck?.additionalCost
                 {/* <td>{roundNeck?.printSizeFront}</td> */}
                 <td>{roundNeck?.frontSideprice}</td>
                 {/* <td>{roundNeck?.backSideprice}</td> */}
-              
+                <td>
+                            <button onClick={()=> handleUpdatePopUp(roundNeck?._id)} style={{borderRadius:"5px", border: 'none', color: 'white',backgroundColor:"none"}}><img style={{width:"20px"}} src="/images/edit.png" alt='edit'/></button>
+                         </td>
                
              
             </tr>
@@ -289,7 +301,9 @@ roundNeck?.additionalCost
                 {/* <td>{roundNeck?.printSizeFront}</td> */}
                 <td>{roundNeck?.frontSideprice}</td>
                 {/* <td>{roundNeck?.backSideprice}</td> */}
-              
+                <td>
+                            <button onClick={()=> handleUpdatePopUp(roundNeck?._id)} style={{borderRadius:"5px", border: 'none', color: 'white',backgroundColor:"none"}}><img style={{width:"20px"}} src="/images/edit.png" alt='edit'/></button>
+                         </td>
                
              
             </tr>
@@ -308,7 +322,9 @@ roundNeck?.additionalCost
                 {/* <td>{roundNeck?.printSizeFront}</td> */}
                 <td>{roundNeck?.frontSideprice}</td>
                 {/* <td>{roundNeck?.backSideprice}</td> */}
-              
+                <td>
+                            <button onClick={()=> handleUpdatePopUp(roundNeck?._id)} style={{borderRadius:"5px", border: 'none', color: 'white',backgroundColor:"none"}}><img style={{width:"20px"}} src="/images/edit.png" alt='edit'/></button>
+                         </td>
                
              
             </tr>
@@ -328,6 +344,7 @@ roundNeck?.additionalCost
                     setTshirtDetail={setTshirtDetail}
                     tShirtDetail={tShirtDetail}
                     updatepopUp={updatepopUp}
+                    selectProductType={selectProductType}
                     message="Item has been updated successfully."
                     onClose={() => setUpdatepopUp(false)}
                   

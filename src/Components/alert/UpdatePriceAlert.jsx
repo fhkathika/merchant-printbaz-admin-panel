@@ -13,6 +13,7 @@ const UpdatePriceAlert = ({
     setTshirtDetail,
     tShirtDetail,
     updatepopUp,
+    selectProductType,
     message,
     onClose}) => {
   const [exitIdAlert, setExitIdAlert] = useState(false);
@@ -28,7 +29,9 @@ const UpdatePriceAlert = ({
       
     });
 }, [getUpdateTshirtById]);
-
+// selectProductType==="Blank Round Neck" ||
+// selectProductType==="Blank Drop Sholder" ||
+// selectProductType==="Blank Hoodie" ?
 console.log("tShirtDetail",tShirtDetail?.printSizeFront)
 const handleInputChange = (event, index) => {
     const { name, value } = event.target;
@@ -125,21 +128,41 @@ console.log("tshirtDetail",tShirtDetail);
             
       
        
- 
- 
-  <div className="col-4">
+ {
+   (selectProductType==="Round Neck" ||
+  selectProductType==="Drop Sholder" ||
+   selectProductType==="Hoodie") &&
+   <div className="col-4">
   <label className="mb-2">PrintSize (front)</label>
     <input style={{border: '1px solid #ececec', width: '100%', height: '50px', padding: '5px'}} type="text" value={tShirtDetail?.printSizeFront || ""} readOnly />
   </div>
-  <div className="col-4">
-  <label className="mb-2">front side print cost</label>
-    <input style={{border: '1px solid #ececec', width: '100%', height: '50px', padding: '5px'}} type="text" value={tShirtDetail?.frontSideprice || ""} onChange={(e) => updateField(e, "frontSideprice")} placeholder="" min="0" />
-  </div>
+ }
+ {
+   (selectProductType==="Round Neck" ||
+   selectProductType==="Drop Sholder" ||
+    selectProductType==="Hoodie") ?
+    <div className="col-4">
+    <label className="mb-2">front side print cost</label>
+      <input style={{border: '1px solid #ececec', width: '100%', height: '50px', padding: '5px'}} type="text" value={tShirtDetail?.frontSideprice || ""} onChange={(e) => updateField(e, "frontSideprice")} placeholder="" min="0" />
+    </div>
+    :
+    <div className="col-8 m-auto">
+    <label className="mb-2"> print cost</label>
+      <input style={{border: '1px solid #ececec', width: '100%',textAlign:"center", height: '50px', padding: '5px'}} type="text" value={tShirtDetail?.frontSideprice || ""} onChange={(e) => updateField(e, "frontSideprice")} placeholder="" min="0" />
+    </div>
+ }
+  
 
-  <div className="col-4">
-  <label className="mb-2">DTF Price</label>
-    <input style={{border: '1px solid #ececec', width: '100%', height: '50px', padding: '5px'}} type="text" value={tShirtDetail?.backSideprice || ""} onChange={(e) => updateField(e, "backSideprice")} placeholder="" min="0" />
-  </div>
+{
+     (selectProductType==="Round Neck" ||
+     selectProductType==="Drop Sholder" ||
+      selectProductType==="Hoodie") &&
+      <div className="col-4">
+      <label className="mb-2">DTF Price</label>
+        <input style={{border: '1px solid #ececec', width: '100%', height: '50px', padding: '5px'}} type="text" value={tShirtDetail?.backSideprice || ""} onChange={(e) => updateField(e, "backSideprice")} placeholder="" min="0" />
+      </div>
+}
+ 
 
   {/* <div className="col-3">
   <label className="mb-2">Additional Cost</label>
