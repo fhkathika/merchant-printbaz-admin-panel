@@ -4,12 +4,12 @@ const teeShirtFormula = (
     quantity,
     totalQuantity,
     printSize,
-    price_10x14,
-    price_10x10,
-    price_10x5,
-    price_5X5,
-    price_2p5X5,
-    price_2p5X2p5,
+    price_10x14CRoundNeck,
+    price_10x10CRoundNeck,
+    price_10x5CRoundNeck,
+    price_5X5CRoundNeck,
+    price_2p5X5CRoundNeck,
+    price_2p5X2p5CRoundNeck,
    
     ) => {
         const safeParseInt = (str) => {
@@ -26,36 +26,30 @@ let totalPrice2p5X5=0
 let totalPrice2p5X2p5=0
  // 10 x 14
     if(printSize==="10 x 14"){
-        console.log("  totalPrice=totalQuantity*price_10x14;",  totalPrice,"=",totalQuantity,"*",price_10x14);
-        totalPrice10x14=safeParseInt(totalQuantity*price_10x14);
+        totalPrice10x14=safeParseInt(totalQuantity*price_10x14CRoundNeck);
 
 } 
 // 10 x 10
 if(printSize==="10 x 10"){
-    console.log("  totalPrice=totalQuantity*price_10 x 10;",  totalPrice,"=",totalQuantity,"*",price_10x10);
-    totalPrice10x10=safeParseInt(totalQuantity*price_10x10);
+    totalPrice10x10=safeParseInt(totalQuantity*price_10x10CRoundNeck);
 
 } 
 // 10x5
 if(printSize==="10 x 5"){
-    console.log("  totalPrice=totalQuantity*price_10x5;",  totalPrice,"=",totalQuantity,"*",price_10x5);
-    totalPrice10x5=safeParseInt(totalQuantity*price_10x5);
+    totalPrice10x5=safeParseInt(totalQuantity*price_10x5CRoundNeck);
 
 } 
 
 if(printSize==="5 X 5"){
-    console.log("  totalPrice=totalQuantity*price_5X5;",  totalPrice,"=",totalQuantity,"*",price_5X5);
-    totalPrice5X5=safeParseInt(totalQuantity*price_5X5);
+    totalPrice5X5=safeParseInt(totalQuantity*price_5X5CRoundNeck);
 
 } 
 
 if(printSize==="2.5 X 5"){
-    console.log("  totalPrice=totalQuantity*price_2p5X5;",  totalPrice,"=",totalQuantity,"*",price_2p5X5);
-    totalPrice2p5X5=safeParseInt(totalQuantity*price_2p5X5);
+    totalPrice2p5X5=safeParseInt(totalQuantity*price_2p5X5CRoundNeck);
 
 }if(printSize==="2.5 X 2.5"){
-    console.log("  totalPrice=totalQuantity*price_2p5X2p5;",  totalPrice,"=",totalQuantity,"*",price_2p5X2p5);
-    totalPrice2p5X2p5=safeParseInt(totalQuantity*price_2p5X2p5);
+    totalPrice2p5X2p5=safeParseInt(totalQuantity*price_2p5X2p5CRoundNeck);
 
 }
 console.log("quantity",quantity)
