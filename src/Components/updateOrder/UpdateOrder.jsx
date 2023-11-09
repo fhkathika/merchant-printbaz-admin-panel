@@ -1627,7 +1627,7 @@ onChange={(e) => handleFileChange(e, index)}
                       <Form.Control
                         type="number"
                         name="printbazcost"
-                        value={finalPrintbazcost}
+                        value={printbazcost}
                         className="form-control"
                         onChange={(e) => {
                            handleInputChange(e);
