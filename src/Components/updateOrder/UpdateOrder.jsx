@@ -1038,7 +1038,7 @@ console.log("printbazcost",(printbazcost))
           }
 
       let finalPrintbazcost=0    
-      if((getSpecificOrderById?.quantity!==formData?.quantity)|| (getSpecificOrderById?.dsicount!==formData?.dsicount) || (getSpecificOrderById?.additionalCost!== formData?.additionalCost) || hasSize===true ){
+      if((getSpecificOrderById?.quantity!==formData?.quantity)|| (getSpecificOrderById?.dsicount!==formData?.dsicount) || (getSpecificOrderById?.additionalCost!== formData?.additionalCost) || hasSize===true || hasLogo===true ){
         finalPrintbazcost=printbazcost
         console.log("show printbazcost ")
 
