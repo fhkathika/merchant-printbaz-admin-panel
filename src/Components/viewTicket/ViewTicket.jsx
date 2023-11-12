@@ -82,7 +82,7 @@ const ViewTicket = () => {
       try {
         // const response = await axios.get(`http://localhost:5000/getTicketById/${id}`);
         const response = await axios.get(`https://mserver.printbaz.com/getTicketById/${id}`);
-        setFetchTicketById(response.data);
+        setFetchTicketById(response?.data);
      
       } catch (err) {
         console.error(err);
@@ -100,8 +100,8 @@ const ViewTicket = () => {
 
       // Clean up the interval on unmount
       return () => clearInterval(intervalId); 
-      }, [messagesEndRef.current?.scrollIntoView({ behavior: "smooth" })]);
-console.log("fetchTicketById",fetchTicketById)
+      }, [messagesEndRef.current?.scrollIntoView({ behavior: "smooth" }),fetchTicketById?.orderId]);
+console.log("fetchTicketById?.orderId",fetchTicketById?.orderId)
     
       console.log("getUserById",getUserById);
       const fetchOrderIddata = async () => {
@@ -109,7 +109,7 @@ console.log("fetchTicketById",fetchTicketById)
           // const response = await axios.get(`http://localhost:5000/getOrderIdmessages/${fetchTicketById?.orderId}`);
           const response = await axios.get(`https://mserver.printbaz.com/getOrderIdmessages/${fetchTicketById?.orderId}`);
  
-          setUsersStoredTickets(response.data.messages);
+          setUsersStoredTickets(response?.data?.messages);
        
         } catch (err) {
           console.error(err);
@@ -120,14 +120,15 @@ console.log("fetchTicketById",fetchTicketById)
           // const response = await axios.get(`http://localhost:5000/getuesrIdmessages/${fetchTicketById?.userId}`);
           const response = await axios.get(`https://mserver.printbaz.com/getuesrIdmessages/${fetchTicketById?.userId}`);
  
-          setUsersStoredTickets(response.data.messages);
+          setUsersStoredTickets(response?.data?.messages);
        
         } catch (err) {
           console.error(err);
         }
       };
-
-      let filterByTicketId=usersStoredTickets?.find(ticket=>ticket.ticketId===fetchTicketById?.ticketId)
+console.log("usersStoredTickets",usersStoredTickets)
+      let filterByTicketId=usersStoredTickets?.find(ticket=>ticket?.ticketId===fetchTicketById?.ticketId)
+      console.log("filterByTicketId",filterByTicketId)
       const SendTicketCopy = (ticketCopy) => {
         console.log("SendTicketCopy clicked");
         // axios.post('http://localhost:5000/sendTicketCopy', ticketCopy)
