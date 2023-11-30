@@ -480,3 +480,27 @@ tr:nth-child(even) {
     cursor: pointer;
 }
 
+.product-tag-container {
+  background-color: rgb(232, 227, 227);
+  border-radius: 20px; /* Adjust as needed for the desired roundness */
+  padding: 10px 20px;
+  display: inline-flex;
+  align-items: center;
+  color: rgb(18, 18, 44);
+  font-family: 'Arial', sans-serif; /* Or any sans-serif font you prefer */
+  font-size: 16px; /* Adjust as needed */
+  font-weight: bold;
+}
+
+.logo-circle {
+  background-color: red;
+  height: 20px; /* Adjust as needed */
+  width: 20px; /* Adjust as needed */
+  border-radius: 50%; /* This makes it a circle */
+  margin-right: 10px; /* Adjust as needed */
+}
+
+/* Adjustments for the text */
+.product-tag-text {
+  display: block;
+}

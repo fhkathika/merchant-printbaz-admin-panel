@@ -1638,12 +1638,35 @@ onChange={(e) => handleInputChange(e)}
 
   <div className="col-lg-12 col-md-12 mb-3">
   <div className="rec-info bg-white p-4 shadow-sm">
-    <div className="row">
+    {/* <div className="row">
       <div className="col-12">
         <h3 className="all-title">Order Details</h3>
+        </div>
+        <div class="product-tag-container " >
+  <div class="logo-circle"></div>
+  <span class="product-tag-text">Custom Round Neck</span>
+</div>
+    </div> */}
+    <div className="">
+ 
+  <div className="row">
+ 
+    <div className="col-md-2 text-start">
+    <h3 className="all-title  " >Order Details</h3>
+    </div>
+    <div className="col-md-3 text-start " style={{marginBottom:"30px"}}>
+      <div className="product-tag-container">
+        <div className="logo-circle"></div>
+        <span className="product-tag-text">{getSpecificOrderById?.category}</span>
       </div>
     </div>
- 
+    
+  <div className="col-md-7">
+   
+    </div>
+  </div>
+</div>
+
     <div className="row order-list-title d-none-phone">
       
       <div className="col-3">
