@@ -218,6 +218,16 @@ customHoodieinputBack2p5X2p5}=useFilterValueBasedonCategory()
       .catch((error) => console.error('Error fetching deliveryArea:', error));
   }
 }, [formData?.districts ,formData?.zones , formData?.areas]);
+useEffect(() => {
+  // Calculate newPrintbazcost based on formData
+
+  // Update the state with the new value
+  setFormData((prevState) => ({
+    ...prevState,
+
+    printbazcost: printbazcost,
+  }));
+}, [formData.quantity, formData.orderDetailArr,formData]); // Dependencies
 
 const [hasSize,setHasSize]=useState(false)
 const [hasLogo,setHasLogo]=useState(false)
@@ -367,7 +377,8 @@ let backSideDtfprice_2p5X2p5CustomHoodie=tshirtPrice[19]?.backSideprice
     item.totalQuantity = safeParseInt(item.quantityM) + 
                          safeParseInt(item.quantityL) + 
                          safeParseInt(item.quantityXL) + 
-                         safeParseInt(item.quantityXXL);
+                         safeParseInt(item.quantityXXL)+
+                         safeParseInt(item.quantityXXXL);
   });
 
   let updatedPrintbazcost=0
@@ -400,7 +411,7 @@ let backSideDtfprice_2p5X2p5CustomHoodie=tshirtPrice[19]?.backSideprice
       price_2p5X5CRoundNeck,
       price_2p5X2p5CRoundNeck
     ).totalPrice;
-  
+  console.log("totalPrice..................",totalPrice);
     // back side dtf cost plus additional cost 
 backSidePrintCost =backsideFormula(
     formData?.quantity,
@@ -634,7 +645,7 @@ console.log("printbazcost",(printbazcost))
     
      
    
-      if (name==="color" || name==="teshirtSize" || name==="quantityM" ||  name==="quantityL"|| name==="quantityXL"||  name==="quantityXXL"|| name==="printSize"|| name==="printSide" || name==="printSizeBack") {
+      if (name==="color" || name==="teshirtSize" || name==="quantityM" ||  name==="quantityL"|| name==="quantityXL"||  name==="quantityXXL"||  name==="quantityXXXL"|| name==="printSize"|| name==="printSide" || name==="printSizeBack") {
           if (size) {
               newOrderDetailArr[itemIndex].teshirtSize = { ...newOrderDetailArr[itemIndex].teshirtSize, [size]: value };
               setHasSize(true)
@@ -651,7 +662,8 @@ console.log("printbazcost",(printbazcost))
     acc + safeParseInt(item.quantityM) + 
           safeParseInt(item.quantityL) + 
           safeParseInt(item.quantityXL) + 
-          safeParseInt(item.quantityXXL), 
+          safeParseInt(item.quantityXXL)+ 
+          safeParseInt(item.quantityXXXL), 
   0);
   const updatedFormData = {
     ...formData,
@@ -665,6 +677,7 @@ console.log("printbazcost",(printbazcost))
     ...prevState,
     orderDetailArr: newOrderDetailArr,
     quantity: parseInt(newGrandQuantity),
+    printbazcost: printbazcost,
     // printbazcost: parseInt(finalPCOst) // Use the new calculated cost
   }));  } 
   
@@ -927,6 +940,7 @@ console.log("printbazcost",(printbazcost))
             formData2.append(`quantityL${index}`, item.quantityL);
             formData2.append(`quantityXL${index}`, item.quantityXL);
             formData2.append(`quantityXXL${index}`, item.quantityXXL);
+            formData2.append(`quantityXXXL${index}`, item.quantityXXXL);
             
                 formData2.append(`printSize${index}`, item.printSize);
                 formData2.append(`printSide${index}`, item.printSide);
@@ -1129,6 +1143,18 @@ console.log("printbazcost",(printbazcost))
                    onChange={(e) => handleInputChange(e, index)}
                />
            </ListGroup.Item>  
+              <ListGroup.Item className="d-flex align-items-center">
+               <span value="XXXL">3XL</span>
+               <input 
+                   data-size="XXXL"
+                   data-color={item.color}
+                   name="quantityXXXL"
+                   type="number"
+                   value={item.quantityXXXL}
+                   style={{marginLeft:"auto",height:"30px",border:"1px solid #ddd8d8"}}
+                   onChange={(e) => handleInputChange(e, index)}
+               />
+           </ListGroup.Item>  
        </ListGroup>
        <Card.Body>
        <Form.Group
@@ -1145,7 +1171,7 @@ console.log("printbazcost",(printbazcost))
                            handleInputChange(e,index);
                         }}
                         name="printSide"
-                        required={item.quantityM || item.quantityL || item.quantityXL || item.quantityXXL}
+                        required={item.quantityM || item.quantityL || item.quantityXL || item.quantityXXL|| item.quantityXXXL}
                         
                         
                       >
@@ -1171,7 +1197,7 @@ console.log("printbazcost",(printbazcost))
                            handleInputChange(e,index);
                         }}
                         name="printSize"
-                        required={item.quantityM || item.quantityL || item.quantityXL || item.quantityXXL}
+                        required={item.quantityM || item.quantityL || item.quantityXL || item.quantityXXL || item.quantityXXXL}
                       >
                        <option value="">select print size</option> 
                        {(getSpecificOrderById?.category==="Custom Hoodie" || getSpecificOrderById?.category==="customHoodie" || getSpecificOrderById?.category==="customDropSholder" || getSpecificOrderById?.category==="Custom Drop Sholder") &&    <option value="11.7 x 16.5">11.7″ x 16.5″</option> }
@@ -1200,7 +1226,7 @@ console.log("printbazcost",(printbazcost))
                            handleInputChange(e,index);
                         }}
                         name="printSize"
-                        required={item.quantityM || item.quantityL || item.quantityXL || item.quantityXXL}
+                        required={item.quantityM || item.quantityL || item.quantityXL || item.quantityXXL|| item.quantityXXXL}
                       >
                        <option value="">select print size</option> 
                        {(getSpecificOrderById?.category==="Custom Hoodie" || getSpecificOrderById?.category==="customHoodie" || getSpecificOrderById?.category==="customDropSholder" || getSpecificOrderById?.category==="Custom Drop Sholder") &&    <option value="11.7 x 16.5">11.7″ x 16.5″</option> }
@@ -1232,7 +1258,7 @@ console.log("printbazcost",(printbazcost))
                            handleInputChange(e,index);
                         }}
                         name="printSize"
-                        required={item.quantityM || item.quantityL || item.quantityXL || item.quantityXXL}
+                        required={item.quantityM || item.quantityL || item.quantityXL || item.quantityXXL|| item.quantityXXXL}
                       >
                        <option value="">select print size</option> 
                    
@@ -1258,7 +1284,7 @@ console.log("printbazcost",(printbazcost))
                          handleInputChange(e,index);
                       }}
                      
-                      required={item.quantityM || item.quantityL || item.quantityXL || item.quantityXXL}
+                      required={item.quantityM || item.quantityL || item.quantityXL || item.quantityXXL || item.quantityXXXL}
                     >
                      <option value="">select print size</option>
                      {(getSpecificOrderById?.category==="Custom Hoodie" || getSpecificOrderById?.category==="customHoodie" || getSpecificOrderById?.category==="customDropSholder" || getSpecificOrderById?.category==="Custom Drop Sholder") &&    <option value="11.7 x 16.5">11.7″ x 16.5″</option> } 
@@ -1628,6 +1654,7 @@ onChange={(e) => handleFileChange(e, index)}
                         type="number"
                         name="printbazcost"
                         value={printbazcost}
+                        // value={formData?.printbazcost}
                         className="form-control"
                         onChange={(e) => {
                            handleInputChange(e);
