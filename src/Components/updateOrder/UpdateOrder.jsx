@@ -88,8 +88,8 @@ const {
   customDropSholderinputFront5X5,
   customDropSholderinputFront2p5X5,
   customDropSholderinputFront2p5X2p5,
-  customDropSholderinputBack11p7X16p5,
-  customDropSholderinputBack10X14,
+customDropSholderinputBack11p7X16p5,
+customDropSholderinputBack10X14,
 customDropSholderinputBack10X10,
 customDropSholderinputBack10X5,
 customDropSholderinputBack5X5,
@@ -336,23 +336,23 @@ console.log("backSideDtfprice_10x10CustomRoundNeck",backSideDtfprice_10x10Custom
  
 
 
-let backSideDtfprice_11p7x16p5CustomDropSholder=tshirtPrice[6]?.backSideprice
-let backSideDtfprice_10x14CustomDropSholder=tshirtPrice[7]?.backSideprice
-let backSideDtfprice_10x10CustomDropSholder=tshirtPrice[8]?.backSideprice
-let backSideDtfprice_10x5CustomDropSholder=tshirtPrice[9]?.backSideprice
-let backSideDtfprice_5X5CustomDropSholder=tshirtPrice[10]?.backSideprice
-let backSideDtfprice_2p5X5CustomDropSholder=tshirtPrice[11]?.backSideprice
-let backSideDtfprice_2p5X2p5CustomDropSholder=tshirtPrice[12]?.backSideprice
+let backSideDtfprice_11p7x16p5CustomDropSholder=customDropSholderinputBack11p7X16p5?.backSideprice
+let backSideDtfprice_10x14CustomDropSholder=customDropSholderinputBack10X14?.backSideprice
+let backSideDtfprice_10x10CustomDropSholder=customDropSholderinputBack10X10?.backSideprice
+let backSideDtfprice_10x5CustomDropSholder=customDropSholderinputBack10X5?.backSideprice
+let backSideDtfprice_5X5CustomDropSholder=customDropSholderinputBack5X5?.backSideprice
+let backSideDtfprice_2p5X5CustomDropSholder=customDropSholderinputBack2p5X5?.backSideprice
+let backSideDtfprice_2p5X2p5CustomDropSholder=customDropSholderinputBack2p5X2p5?.backSideprice
 // let additionalCost=tshirtPrice[0]?.additionalCost
     // custom hoodie
 
-   const price_11p7x16p5CHoodie=tshirtPrice[13]?.frontSideprice
-   const price_10x14CHoodie=tshirtPrice[14]?.frontSideprice
-   const price_10x10CHoodie=tshirtPrice[15]?.frontSideprice
-   const price_10x5CHoodie=tshirtPrice[16]?.frontSideprice
-   const price_5X5CHoodie=tshirtPrice[17]?.frontSideprice
-   const price_2p5X5CHoodie=tshirtPrice[18]?.frontSideprice
-   const price_2p5X2p5CHoodie=tshirtPrice[19]?.frontSideprice
+   const price_11p7x16p5CHoodie=customHoodieinputFront11p7X16p5?.frontSideprice
+   const price_10x14CHoodie=customHoodieinputFront10X14?.frontSideprice
+   const price_10x10CHoodie=customHoodieinputFront10X10?.frontSideprice
+   const price_10x5CHoodie=customHoodieinputFront10X5?.frontSideprice
+   const price_5X5CHoodie=customHoodieinputFront5X5?.frontSideprice
+   const price_2p5X5CHoodie=customHoodieinputFront2p5X5?.frontSideprice
+   const price_2p5X2p5CHoodie=customHoodieinputFront2p5X2p5?.frontSideprice
 
 
 
@@ -365,13 +365,13 @@ let backSideDtfprice_2p5X2p5CustomDropSholder=tshirtPrice[12]?.backSideprice
 // let backSideDtfprice_2p5X2p5=4
 // let additionalCost=10
 
-let backSideDtfprice_11p7x16p5CustomHoodie=tshirtPrice[13]?.backSideprice
-let backSideDtfprice_10x14CustomHoodie=tshirtPrice[14]?.backSideprice
-let backSideDtfprice_10x10CustomHoodie=tshirtPrice[15]?.backSideprice
-let backSideDtfprice_10x5CustomHoodie=tshirtPrice[16]?.backSideprice
-let backSideDtfprice_5X5CustomHoodie=tshirtPrice[17]?.backSideprice
-let backSideDtfprice_2p5X5CustomHoodie=tshirtPrice[18]?.backSideprice
-let backSideDtfprice_2p5X2p5CustomHoodie=tshirtPrice[19]?.backSideprice
+let backSideDtfprice_11p7x16p5CustomHoodie=customHoodieinputBack11p7X16p5?.backSideprice
+let backSideDtfprice_10x14CustomHoodie=customHoodieinputBack10X14?.backSideprice
+let backSideDtfprice_10x10CustomHoodie=customHoodieinputBack10X10?.backSideprice
+let backSideDtfprice_10x5CustomHoodie=customHoodieinputBack10X5?.backSideprice
+let backSideDtfprice_5X5CustomHoodie=customHoodieinputBack5X5?.backSideprice
+let backSideDtfprice_2p5X5CustomHoodie=customHoodieinputBack2p5X5?.backSideprice
+let backSideDtfprice_2p5X2p5CustomHoodie=customHoodieinputBack2p5X2p5?.backSideprice
 
    formData?.orderDetailArr.forEach(item => {
     item.totalQuantity = safeParseInt(item.quantityM) + 
@@ -775,112 +775,7 @@ console.log("printbazcost",(printbazcost))
           }
         };
         
-       
-  //       const handleUpdate = async (e) => {
-  //           e.preventDefault()
-  //           setIsLoading(true)
-  //           // Validate the form here
-  //           if (validateForm()) {
-  //             setIsLoading(false) // Set loading status to false if form is invalid
-  //             return; // Exit the function if form is invalid
-  //           }
-  //           try {
-  //             const formData2 = new FormData();
-  //             const orderDetailArr = formData.orderDetailArr || [];
-  //             const filesAndImagesArr = [];
-  //         // console.log("formData.orderDetailArr",formData.orderDetailArr);
-  //             orderDetailArr?.forEach((item, index) => {
-  //               const fileAndImageData = {};
-  //              // Only append 'file' and 'image' fields if they have been updated:
-  //              if (item.file && item.file.length > 0) {
-  //               // console.log("item.file.length",item.file.length);
-  //               item.file.forEach((file, fileIndex) => {
-  //                 if (file instanceof File) {
-  //                   formData2.append(`file${index}_${fileIndex}`, file); // Append each file
-  //                 } else {
-  //                   // console.error(`item.file[${fileIndex}] is not a File object:`, file);
-  //                 }
-  //               });
-  //             }
-          
-  //               if (item.image && item.image.length > 0) {
-  //                 item.image.forEach((image, imageIndex) => {
-  //                   formData2.append(`image${index}_${imageIndex}`, image); // Append each image
-  //                 });
-  //               }
-          
-  //               // Append brandLogo
-  //               if (item.brandLogo ) {
-  //                 // console.log("item.brandLogo",item.brandLogo);
-  //                 formData2.append(`brandLogo${index}`, item.brandLogo);
-  //             }
-          
-  //               if (Object.keys(fileAndImageData).length) {
-  //                 filesAndImagesArr.push(fileAndImageData);
-  //               }
-          
-  //               formData2.append(`color${index}`, item.color);
-  //               formData2.append(`teshirtSize${index}`, item.teshirtSize);
-  //               formData2.append(`quantity${index}`, item.quantity);
-  //               formData2.append(`printSize${index}`, item.printSize);
-  //               formData2.append(`printSide${index}`, item.printSide);
-          
-  //               return item;
-  //             });
-  //          // Only append 'orderDetailArr' if it has been updated:
-  //   if (orderDetailArr.length > 0) {
-  //     formData2.append('orderDetailArr', JSON.stringify(orderDetailArr));
-  //   }
-  //             formData2.append('filesAndImages', JSON.stringify(filesAndImagesArr)); // Append the filesAndImagesArr as a JSON string
-          
-  //             // Append the remaining form data
-  //             // formData2.append('orderDetailArr', JSON.stringify(orderDetailArr));
-  //             formData2.append('name', formData.name);
-  //             formData2.append('phone', formData.phone);
-  //             formData2.append('address', formData.address);
-  //             formData2.append('instruction', formData.instruction);
-  //             formData2.append('area', formData.areas);
-  //             formData2.append('collectAmount', formData.collectAmount);
-  //             formData2.append('printbazcost', printbazcost);
-  //             formData2.append('deliveryFee', deliveryFee);
-  //             formData2.append('recvMoney', recvMoney);
-  //             formData2.append('userMail', getSpecificOrderById?.userMail);
-  //             // formData2.append('orderDetailArr', JSON.stringify(formData.orderDetailArr));  // Use the updated orderDetailArr
-  //             // const response = await fetch(`https://mserver.printbaz.com/updateorder/${viewOrder?._id}`, {
-  //             const response = await fetch(`http://localhost:5000/updateorder/${viewOrder?._id}`, {
-  //               method: "PUT",
-  //               body: formData2,
-  //             });
-          
-  //             if (response.ok) {
-  //               const result = await response.json();
-  //               // console.log("Success:", result);
-  //               // console.log('API response:', response);
-            
-  //            // Fetch the updated order details
-  // // const orderResponse = await fetch(`https://mserver.printbaz.com/getorder/${viewOrder?._id}`);
-  // const orderResponse = await fetch(`http://localhost:5000/getorder/${viewOrder?._id}`);
-  // if (orderResponse.ok) {
-  //   const updatedOrder = await orderResponse.json();
-  //   // console.log('Updated order:', updatedOrder);
-  // } 
-  // else {
-  //   throw new Error('Order fetch error: ' + orderResponse.status);
-  // }
-
-  //               setShowAlert(true);
-  //             } else {
-  //               throw new Error('API error: ' + response.status);
-  //             }
-  //           } catch (error) {
-  //             console.error('API error:', error.message);
-  //           }
-  //           finally {
-  //             setIsLoading(false); // Set loading status to false
-  //           }
-  //         };
-
-          const handleUpdate = async (e) => {
+        const handleUpdate = async (e) => {
             e.preventDefault();
           
             setIsLoading(true)

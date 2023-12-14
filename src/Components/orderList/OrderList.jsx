@@ -7,7 +7,7 @@ import Navigationbar from '../navigationBar/Navigationbar';
 import { useRoleAsignData } from '../../hooks/useRoleAsignData';
 
 const OrderList = () => {
-  const { orderAll } = useGetMongoData();
+  // const { orderAll } = useGetMongoData();
   const [allMerchant,setAllMerchant]=useState([])
   const {value_count}=useRoleAsignData()
   const [show, setShow] = useState({});
@@ -28,8 +28,12 @@ const OrderList = () => {
   const [filterBrand, setFilterBrand] = useState('');
   const [filterDeliveryAssignStatus, setFilterDeliveryAssignStatus] = useState('');
   const [filterTrackingId, setFilterTrackingId] = useState('');
-console.log("filterTrackingId",filterTrackingId);
- 
+  const [orderAll, setOrderAll] = useState([]);
+const [page,setPage]=useState(1);
+const [hasmore, setHasMore] = useState(false);
+  
+
+
   const [previousPath, setPreviousPath] = useState('');
   useEffect(() => {
     // Update the previousPath state when the location changes
@@ -92,10 +96,89 @@ const handleChangeEndDate = (date) => {
     
 };
 let matchingMerchant
-//  console.log("allMerchant",allMerchant);
 let date = new Date(orderAll?.createdAt); // create a new Date object
 
 let options = { month: 'long', day: 'numeric', year: 'numeric', hour: 'numeric', minute: 'numeric' }; // options for toLocaleDateString
+const fetchProduct = async (page) => {
+ const queryParams = new URLSearchParams({
+    filterStatus,
+    filterPaymentStatus,
+    filterProductType,
+    filterOrderId,
+    startDate,
+    endDate,
+    filterName,
+    filterBrand,
+    filterDeliveryAssignStatus,
+    filterTrackingId
+      });
+// Ensure this matches with the API expectations
+
+  // const response = await fetch(`http://localhost:5000/allOrderPagination?page=${page}&size=20&${queryParams.toString()}`);
+  const response = await fetch(`https://mserver.printbaz.com/allOrderPagination?page=${page}&size=20&${queryParams.toString()}`);
+    if (!response.ok) {
+      throw new Error('Network response was not ok');
+    }
+    const data = await response.json();
+    if (data.length > 0) {
+      setOrderAll(data);
+      setHasMore(true);
+    } else {
+      setOrderAll([]);
+      setHasMore(false);
+    }
+ }
+ useEffect(()=>{
+  fetchProduct(page)
+},[filterStatus,
+  filterPaymentStatus,
+  filterProductType,
+  filterOrderId,
+  startDate,
+  endDate,
+  filterName,
+  filterBrand,
+  filterDeliveryAssignStatus,
+  filterTrackingId
+  ])
+console.log("orderAll.............",orderAll)
+
+const nextPage=()=>{
+    if(hasmore){
+      setPage(page+1);
+      fetchProduct(page+1)
+    }
+ 
+}
+const prevPage=()=>{
+  if(page>1){
+      setPage(page-1)
+      fetchProduct(page-1)
+  }
+}
+const [totalCount, setTotalCount] = useState(0);
+const [statusCount, setStatusCount] = useState(0);
+
+const fetchCounts = async (statusFilter) => {
+    try {
+        // const response = await fetch(`http://localhost:5000/orderCounts?filterStatus=${statusFilter}`);
+        const response = await fetch(`https://mserver.printbaz.com/orderCounts?filterStatus=${statusFilter}`);
+        if (!response.ok) {
+            throw new Error('Network response was not ok');
+        }
+        const data = await response.json();
+        setTotalCount(data.totalCount);
+        setStatusCount(data.statusCount);
+    } catch (error) {
+        console.error('Error fetching counts:', error);
+        // Handle error
+    }
+};
+
+// Fetch counts on component mount or when status filter changes
+useEffect(() => {
+    fetchCounts(filterStatus);
+}, [filterStatus]);
 
 const applyFilters = () => {
   return orderAll.filter((order) => {
@@ -197,7 +280,9 @@ const applyFilters = () => {
 };
 
 
-const orderMap=applyFilters()
+// const orderMap=applyFilters()
+const orderMap=orderAll
+
 
 const getViewClientColor = (status) => {
   if (status === "Pending") {
@@ -263,7 +348,7 @@ const actualIndexOfLastItem = indexOfLastItem > orderMap.length ? orderMap.lengt
         return latestB - latestA; // Descending sort
       });
   }, [orderMap]);
-
+console.log("sortedOrders.............",sortedOrders)
   // Sliced array for pagination
   const currentOrders = sortedOrders.slice(indexOfFirstItem, indexOfLastItem);
 
@@ -363,10 +448,12 @@ const actualIndexOfLastItem = indexOfLastItem > orderMap.length ? orderMap.lengt
                
                  <div style={{textAlign:"right"}}>
                  <span style={{ marginRight: "20px" }}>
-        {indexOfFirstItem + 1} - {indexOfLastItem > orderMap.length ? orderMap.length : indexOfLastItem} of {orderMap.length}
+                 {orderMap.length } of {statusCount?statusCount:totalCount} 
       </span>
-           <button style={{marginRight:"20px",border:"none"}} onClick={() => setCurrentPage(currentPage - 1)} disabled={currentPage === 1} ><img style={{height:"10px",width:"15px"}} src='images/left-arrow.png' alt="left arrow"/></button>
-           <button style={{height:"40px",border:"none"}} onClick={() => setCurrentPage(currentPage + 1)} disabled={currentPage === Math.ceil(orderAll.length / itemsPerPage)}><img style={{height:"10px",width:"15px"}} src='images/right-arrow.png' alt="right arrow"/></button>
+           {/* <button style={{marginRight:"20px",border:"none"}} onClick={() => setCurrentPage(currentPage - 1)} disabled={currentPage === 1} ><img style={{height:"10px",width:"15px"}} src='images/left-arrow.png' alt="left arrow"/></button>
+           <button style={{height:"40px",border:"none"}} onClick={() => setCurrentPage(currentPage + 1)} disabled={currentPage === Math.ceil(orderAll.length / itemsPerPage)}><img style={{height:"10px",width:"15px"}} src='images/right-arrow.png' alt="right arrow"/></button> */}
+                <button style={{marginRight:"20px",border:"none"}} onClick={prevPage}><img style={{height:"10px",width:"15px"}} src='images/left-arrow.png' alt="left arrow"/></button>
+           <button style={{height:"40px",border:"none"}} onClick={nextPage} ><img style={{height:"10px",width:"15px"}} src='images/right-arrow.png' alt="right arrow"/></button>
           
                  </div>
                 
@@ -401,7 +488,7 @@ const actualIndexOfLastItem = indexOfLastItem > orderMap.length ? orderMap.lengt
               </div>
            
               {
-              currentOrders
+              sortedOrders
               ?.map((orders,index)=>{ 
                 matchingMerchant = allMerchant.find(merchant => merchant?.email === orders?.userMail)
             let  totalPrintBazCostWithoutDeliveryFee=Number(orders?.collectAmount)
