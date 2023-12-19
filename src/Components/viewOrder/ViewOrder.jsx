@@ -1685,7 +1685,7 @@ onChange={(e) => handleInputChange(e)}
         <h4>Main File</h4>
       </div> */}
       <div className="col-3" style={{display:"flex",justifyContent:"center"}}>
-        <h4>Picture</h4>
+        {/* <h4>Picture</h4> */}
       </div>
         {/* <div className="col-1">
         <h4>BrandLogo</h4>
@@ -2039,6 +2039,7 @@ orderDetail?.brandLogo ?
       ?.map((insideDetail,orderIndex)=> 
   
         insideDetail?.individualProductArr?.map((orderDetail,itemIndex)=>
+       
           orderDetail?.printSide  ?
           
           <>
@@ -2220,7 +2221,7 @@ orderDetail?.brandLogo ?
       </div>
       </>
 
-      :(!orderDetail?.printSide && orderDetail?.brandLogo?.fileId)&&
+      :((!orderDetail?.printSide && orderDetail?.brandLogo?.fileId)|| !orderDetail?.printSide)&&
       <>
       <div className="row order-tab  " key={orderIndex}>
       {/* <h3 style={{color:"orange"}}>Line Item: {itemIndex+1}</h3> */}
