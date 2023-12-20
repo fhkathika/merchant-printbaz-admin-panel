@@ -504,3 +504,8 @@ tr:nth-child(even) {
 .product-tag-text {
   display: block;
 }
+@media screen and (max-width: 700px){
+  .font10px{
+    font-size: 10px !important;
+  }
+}
