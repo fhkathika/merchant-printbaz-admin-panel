@@ -31,6 +31,7 @@ import PaymentHistory from './Components/paymentHistory/PaymentHistory';
 import AddBlogs from './Components/addBlogs/AddBlogs';
 import AllBlogs from './Components/allBlogs/AllBlogs';
 import UpdatePrice from './Components/updatePrice/UpdatePrice';
+import SizeStock from './Components/sizeStock/SizeStock';
 function App() {
   return (
     <div className="">
@@ -65,6 +66,7 @@ function App() {
        <Route path="/allRcvAmount" element={<AllRcvAmount/>} />
        <Route path="/paymentHistory/:merchantId" element={<PaymentHistory/>} />
        <Route path="/updatePrice" element={<UpdatePrice/>} />
+       <Route path="/sizeStock" element={<SizeStock/>} />
        <Route
   path="/registerAdminPage"
   element={

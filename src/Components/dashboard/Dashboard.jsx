@@ -10,7 +10,6 @@ import * as XLSX from 'xlsx';
 import GetOrdersXl from '../GetOrdersXl';
 import GetTotalTshirtDispatched from '../GetTotalTshirtDispatched';
 import useGetAllTickets from '../../hooks/useGetAllTickets';
-import GetTodaysOutForDeliveryOrders from '../GetTodaysOutForDeliveryOrders';
 import { Form } from 'react-bootstrap';
 import useAllMerchants from '../../hooks/useAllMerchants';
 import DashboardCards from './dashboardCards/DashboardCards';
@@ -265,7 +264,7 @@ const blackQuantity = (colorQuantitiesForReturn?.black)+(colorQuantitiesForOutFo
     // }, { white: {}, black: {} });
     const countSizeForOrders = (orders) => {
       return orders?.reduce((acc, order) => {
-        return (order?.orderDetailArr || []).reduce((innerAcc, item) => {
+        return (order?.orderDetailArr || [])?.reduce((innerAcc, item) => {
           const color = item.color.toLowerCase();
           
           // Initialize innerAcc[color] if it doesn't exist
@@ -414,7 +413,7 @@ const totalpaidAndDeliveredPBazCost = paidAndDeliveredOrders?.reduce((acc, curr)
 console.log("sizeCountsForApprovedOrdersHoodie",sizeCountsForApprovedOrdersHoodie)
 const tShirtQuantityForOutForDeliveryToday = outForDeliveryOrdersToday?.reduce((sum, order) => {
   if (!order?.orderDetailArr) return sum;
-  return sum + order.orderDetailArr.reduce((innerSum, item) => {
+  return sum + order.orderDetailArr?.reduce((innerSum, item) => {
     if (isNaN(item.quantity)) return innerSum;
     return innerSum + parseInt(item.quantity, 10);
   }, 0);

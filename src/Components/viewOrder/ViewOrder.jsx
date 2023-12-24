@@ -2032,31 +2032,20 @@ orderDetail?.brandLogo ?
       </>)
     }
 
-{
+
+
+    {/* new order pattern  */}
+
+    {
       getSpecificOrderById?.selectedItemsDetailArr
       ?.map((insideDetail,orderIndex)=> 
   
-        insideDetail?.individualProductArr?.map((orderDetail,itemIndex)=>{
-         
-          let lineItem = 0; // Initialize count to 0
-          
-            for (let i = 0; i <orderDetail?.length; i++) {
-            
-              if (orderDetail?.printSide) {
-                lineItem = lineItem+1; // If printSide, set count to 1
-              } else if ((!orderDetail?.printSide && orderDetail?.brandLogo?.fileId) || !orderDetail?.printSide) {
-                lineItem = lineItem + 1; // Increment count by 1 for the first true condition
-              }
-          
-              // Use lineItem as needed for each element in individualProductArr
-              console.log(`Item ${itemIndex + 1}: Line Item Count - ${lineItem}`);
-            }
-          
-       return(    orderDetail?.printSide  ?
+        insideDetail?.individualProductArr?.map((orderDetail,itemIndex)=>
+          orderDetail?.printSide  ?
           
           <>
           <div className="row order-tab  " key={orderIndex}>
-         {/* <h3 style={{color:"orange"}}>Line Item:{lineItem}</h3> */}
+          {/* <h3 style={{color:"orange"}}>Line Item: {itemIndex+1}</h3> */}
           
         <div className="col-3">
           <p  className='font12px'>{orderDetail?.color}</p>
@@ -2086,9 +2075,16 @@ orderDetail?.brandLogo ?
         </div>
    
       
-        <div className="col-lg-2" style={{display:"flex",justifyContent:"center"}}>
+        <div className="col-lg-2" style={{display:"block",justifyContent:"center"}}>
     
-      
+    {
+orderDetail?.image?.fileId ?
+
+
+
+<div className="col-lg-2" style={{display:"flex",justifyContent:"center"}}>
+
+
 <div className="file-info" style={{marginLeft:"",border:"none"}}>
 <iframe src={`https://drive.google.com/file/d/${orderDetail?.image?.fileId}/preview`}  style={{ textDecoration: "none",border:"none" }} height="auto" width="auto" title="orcode"></iframe>
 <a className="dropdown-item" href={`https://drive.google.com/uc?export=download&id=${orderDetail?.image?.fileId}`} download><p style={{cursor:"pointer"}} href={`https://drive.google.com/uc?export=download&id=${orderDetail?.image?.fileId}`} download>download</p></a>
@@ -2096,11 +2092,26 @@ orderDetail?.brandLogo ?
 </div>
 
 
+</div>
+
+
+:
+
+      orderDetail?.image?.map((images,fileIndex)=>
+      <div className="file-info" style={{marginLeft:"",border:"none"}}>
+<iframe src={`https://drive.google.com/file/d/${images?.fileId[0]}/preview`}  style={{ textDecoration: "none",border:"none" }} height="auto" width="auto" title="orcode"></iframe>
+<a className="dropdown-item" href={`https://drive.google.com/uc?export=download&id=${images?.fileId[0]}`} download><p style={{cursor:"pointer"}} href={`https://drive.google.com/uc?export=download&id=${images?.fileId[0]}`} download>download</p></a>
+
+</div>
+   ) }  
+
+
+
         </div>
       
       </div>
       <div className="row  " >
-        {/* <h3 style={{color:"orange"}}>Line Item: {lineItem+1}kk</h3> */}
+        {/* <h3 style={{color:"orange"}}>Line Item: {orderIndex+1}</h3> */}
         <div className="col-12 "  key={orderIndex}>
       
         {/* {orderDetail?.printSide} */}
@@ -2114,8 +2125,12 @@ orderDetail?.brandLogo ?
 
   <div className="col-lg-12" >
      <h4>Main File :</h4>
-      <div className='phone_flex_center' style={{display:"flex"}}>
-      <div  style={{display:"flex"}}>
+      <div className='phone_flex_center' style={{display:"block"}}>
+      <div  style={{display:"block"}}>
+{
+  orderDetail?.file?.fileId?
+  <div className='phone_flex_center' style={{display:"flex"}}>
+  <div  style={{display:"flex"}}>
 
 <div className="file-info" style={{marginLeft:"15px",border:"none"}}>
 <iframe src={`https://drive.google.com/file/d/${orderDetail?.file?.fileId}/preview`}  style={{ textDecoration: "none",border:"none" }} height="auto" width="auto" title="orcode"></iframe>
@@ -2124,15 +2139,29 @@ orderDetail?.brandLogo ?
 </div>
 </div>
 </div>
+:
+  orderDetail?.file?.map((files,fileIndex)=>
+  <div className="file-info" style={{marginLeft:"15px",border:"none"}}>
+  <iframe src={`https://drive.google.com/file/d/${files?.fileId[0]}/preview`}  style={{ textDecoration: "none",border:"none" }} height="auto" width="auto" title="orcode"></iframe>
+  <a className="dropdown-item" href={`https://drive.google.com/uc?export=download&id=${files?.fileId[0]}`} download><p style={{cursor:"pointer"}} href={`https://drive.google.com/uc?export=download&id=${files?.fileId[0]}`} download>download</p></a>
+  
+  </div> 
+  
+  )
+}
+
+</div>
+</div>
 
 </div>
        
  
-  {
-  orderDetail?.brandLogo &&
   <>
   <h4>Brang Logo :</h4>
   <div className="">
+{
+orderDetail?.brandLogo?.fileId ?
+<div className="">
 
 <div className="file-info" style={{marginLeft:"15px",border:"none"}}>
 <iframe src={`https://drive.google.com/file/d/${orderDetail?.brandLogo?.fileId}/preview`}  style={{ textDecoration: "none",border:"none" }} height="auto" width="auto" title="orcode"></iframe>
@@ -2140,9 +2169,19 @@ orderDetail?.brandLogo ?
 
 </div>
   </div>
+  :
+    orderDetail?.brandLogo?.map(logos=>
+      <div className="file-info" style={{marginLeft:"15px",border:"none"}}>
+<iframe src={`https://drive.google.com/file/d/${logos?.fileId[0]}/preview`}  style={{ textDecoration: "none",border:"none" }} height="auto" width="auto" title="orcode"></iframe>
+<a className="dropdown-item" href={`https://drive.google.com/uc?export=download&id=${logos?.fileId[0]}`} download><p style={{cursor:"pointer"}} href={`https://drive.google.com/uc?export=download&id=${logos?.fileId[0]}`} download>download</p></a>
+
+</div>
+)}
+
+  </div>
   </>
   
-  }
+  
   
         </div>
         <hr />
@@ -2154,7 +2193,7 @@ orderDetail?.brandLogo ?
       :((!orderDetail?.printSide && orderDetail?.brandLogo?.fileId)|| !orderDetail?.printSide)&&
       <>
       <div className="row order-tab  " key={orderIndex}>
-      {/* <h3 style={{color:"orange"}}>Line Item: {lineItem}</h3> */}
+    
     <div className="col-3">
 
       <p  className='font12px'>{orderDetail?.color}</p>
@@ -2212,8 +2251,7 @@ orderDetail?.brandLogo &&
     <hr />
   </div>
 
-  </>)
-        }
+  </>
         )
  )
     }

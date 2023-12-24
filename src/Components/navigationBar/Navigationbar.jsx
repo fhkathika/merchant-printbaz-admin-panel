@@ -166,6 +166,7 @@ const Navigationbar = () => {
                       <li><Link class="dropdown-item nav-dropdown-item" to="/addBlogs">Blog</Link></li>
                       <li><Link class="dropdown-item nav-dropdown-item" to="/allBlogs">All Blog</Link></li>
                       <li><Link class="dropdown-item nav-dropdown-item" to="/updatePrice"> Update Price</Link></li>
+                      <li><Link class="dropdown-item nav-dropdown-item" to="/sizeStock">Size Stock</Link></li>
                       <li>   <Link className="dropdown-item nav-dropdown-item" aria-current="page" to="/login">Log out</Link></li>
                      
                     </ul>

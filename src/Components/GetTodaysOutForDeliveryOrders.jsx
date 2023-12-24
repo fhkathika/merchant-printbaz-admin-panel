@@ -31,7 +31,7 @@ function GetTodaysOutForDeliveryOrders({orderList=[]}) {
                   <td>{pending?.phone}</td>
                   <td>{pending?.collectAmount}</td>
                   <td>
-                  {pending?.orderDetailArr.reduce(
+                  {pending?.orderDetailArr?.reduce(
                     (totalQuantity, item) =>
                       totalQuantity + parseInt(item.quantity, 10),
                     0
