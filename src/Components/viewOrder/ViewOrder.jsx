@@ -19,6 +19,7 @@ import useGetMongoData from '../../hooks/useGetMongoData';
 import { AuthContext } from '../../authProvider/AuthProvider';
 import axios from 'axios';
 import UpdateOrderBlankProduct from '../updateOrderBlankProduct/UpdateOrderBlankProduct';
+import NewUpdateOrder from '../newUpdateOrder/NewUpdateOrder';
 const ViewOrder = () => {
   let { id } = useParams();
   const {orderAll}=useGetMongoData()
@@ -67,6 +68,7 @@ const ViewOrder = () => {
   const [deliverAssign, setDeliverAssign] = useState();
   const [updateOrder, setUpdateOrder] = useState(false);
   const [updateOrderBlank, setUpdateOrderBlank] = useState(false);
+  const [updateNewOrder, setUpdateNewOrder] = useState(false);
   const [show, setShow] = useState(false);
   const target = useRef(null);
   console.log("deliverAssign",deliverAssign);
@@ -208,7 +210,7 @@ setTrackingId(e.target.value)
                 Number(getSpecificOrderById?.printbazcost) +
                 Number(getSpecificOrderById?.deliveryFee);
               const orderReturmed = status==="returned" ||  getSpecificOrderById?.orderStatus=== "returned";
-          console.log("orderReturmed",orderReturmed);
+          // console.log("orderReturmed",orderReturmed);
           if(orderReturmed===true){
             try {
               const response = await fetch(
@@ -496,9 +498,14 @@ setTrackingId(e.target.value)
   }
   const handleUpdatePopUp=(e)=>{
     e.preventDefault()
-
-    setUpdateOrder(true)
-    setUpdateOrderBlank(true)
+    if(getSpecificOrderById?.selectedItemsDetailArr){
+      setUpdateNewOrder(true)
+    }
+else{
+  setUpdateOrder(true)
+  setUpdateOrderBlank(true)
+}
+ 
     // console.log("setUpdateOrder",updateOrder);
   }
   const downloadShippingDetail = async () => {
@@ -2295,6 +2302,16 @@ orderDetail?.brandLogo &&
             setGetSpecificOrderById={setGetSpecificOrderById}
             viewClient={viewClient}/>
           }
+          {
+           updateNewOrder===true &&
+<NewUpdateOrder 
+            onClose={() => setUpdateNewOrder(false)}
+            viewOrder={viewOrder}
+            getSpecificOrderById={getSpecificOrderById}
+            setGetSpecificOrderById={setGetSpecificOrderById}
+            viewClient={viewClient}/>
+          }
+             
           {
             (updateOrderBlank===true && (getSpecificOrderById?.category==="blankRoundNeck"|| getSpecificOrderById?.category==="Blank Round Neck"|| getSpecificOrderById?.category==="Blank Drop Sholder"|| getSpecificOrderById?.category==="Blank Hoodie"))&&
             <UpdateOrderBlankProduct onClose={() => setUpdateOrderBlank(false)}

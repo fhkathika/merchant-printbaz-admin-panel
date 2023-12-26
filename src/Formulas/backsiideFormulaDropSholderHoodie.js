@@ -42,7 +42,7 @@ if(printSide==="bothSide" && printSizeBack==="11.7 x 16.5"){
   }  else if(printSide==="bothSide" && printSizeBack==="2.5 X 2.5"){
     backDtfAndAdditionalCost= totalQuantity * safeParseInt(backSideDtfprice_2p5X2p5)+safeParseInt(additionalCost)
   }
- console.log("backDtfAndAdditionalCost",backDtfAndAdditionalCost);  
+ console.log("backDtfAndAdditionalCost from c hoodie",backDtfAndAdditionalCost);  
   return ({ backDtfAndAdditionalCost: backDtfAndAdditionalCost });
 };
 

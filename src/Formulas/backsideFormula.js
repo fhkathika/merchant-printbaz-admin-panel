@@ -42,7 +42,7 @@ else if(printSide==="bothSide" && printSizeBack==="2.5 X 5"){
 
 
 
-  console.log("backDtfAndAdditionalCost",backDtfAndAdditionalCost);  
+  console.log("backDtfAndAdditionalCost from round neck",backDtfAndAdditionalCost);  
   return ({ backDtfAndAdditionalCost: backDtfAndAdditionalCost });
 };
 

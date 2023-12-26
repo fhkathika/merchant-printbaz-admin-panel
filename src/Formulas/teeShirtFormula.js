@@ -52,7 +52,6 @@ if(printSize==="2.5 X 5"){
     totalPrice2p5X2p5=safeParseInt(totalQuantity*price_2p5X2p5CRoundNeck);
 
 }
-console.log("quantity",quantity)
 totalPrice=
 totalPrice10x14+
 totalPrice10x10+
@@ -70,7 +69,7 @@ if (uPrice % 1 === 0) {
   unitPrice = parseFloat(uPrice).toFixed(2);
   console.log("unitPrice floating point", unitPrice);
 }
-  console.log("totalPrice",totalPrice);  
+  console.log("totalPrice round neck",totalPrice);  
   return ({ totalPrice: totalPrice ,unitPrice: unitPrice });
 };
 
