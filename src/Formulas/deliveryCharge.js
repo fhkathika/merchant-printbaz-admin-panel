@@ -25,7 +25,7 @@ const deliveryCharge = ({
   
   
 
-console.log("totalWeight",totalWeight)
+
     if(deliveryAreas==="outsideDhaka"){
      ///////////////round neck tshirt //////////////
     if(totalWeight>0 && totalWeight<=0.5){

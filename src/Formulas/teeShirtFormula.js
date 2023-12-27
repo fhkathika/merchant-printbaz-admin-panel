@@ -59,17 +59,14 @@ totalPrice10x5+
 totalPrice5X5+
 totalPrice2p5X5+
 totalPrice2p5X2p5
-console.log("totalPrice=totalPrice10x14+totalPrice10x10+totalPrice10x5+totalPrice5X5+totalPrice2p5X5+totalPrice2p5X2p5",totalPrice,"=",totalPrice10x14,"+",totalPrice10x10,"+",totalPrice10x5,"+",totalPrice5X5,"+",totalPrice2p5X5,"+",totalPrice2p5X2p5);
+
 const uPrice = totalPrice / quantity;
 let unitPrice = 0;
 if (uPrice % 1 === 0) {
   unitPrice = uPrice;
-  console.log("unitPrice", unitPrice);
 } else if (uPrice % 1 !== 0) {
   unitPrice = parseFloat(uPrice).toFixed(2);
-  console.log("unitPrice floating point", unitPrice);
-}
-  console.log("totalPrice round neck",totalPrice);  
+} 
   return ({ totalPrice: totalPrice ,unitPrice: unitPrice });
 };
 

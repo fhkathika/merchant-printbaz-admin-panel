@@ -8,7 +8,7 @@ import { AuthContext } from '../../authProvider/AuthProvider';
 import { useRoleAsignData } from '../../hooks/useRoleAsignData';
 function TabForViewOrder({orderId,email,viewClient,viewOrder,clientName,specificOrder}) {
   const {adminUser,loading,loginAdminUser,currentUser}=useContext(AuthContext);
-  console.log("specificOrder",specificOrder);
+ 
   // const {clientName}=viewOrder;
   const [activeTab, setActiveTab] = useState('tab1');
   const [showTicketPopUp, setShowTicketPopUp] = useState(false);
@@ -31,9 +31,9 @@ function TabForViewOrder({orderId,email,viewClient,viewOrder,clientName,specific
   // Check if statusHistory array is present and not empty
 if (specificOrder?.statusHistory && specificOrder?.statusHistory?.length > 0) {
    lastStatusChange = specificOrder?.statusHistory[specificOrder?.statusHistory?.length - 1];
-  console.log("Last status change:", lastStatusChange);
+ 
 } else {
-  console.log("No status history available.");
+ 
 }
 // fetch msg for support ticket 
 const fetchChatLog = async () => {

@@ -37,13 +37,11 @@ const ViewOrder = () => {
   const viewClient = location.state?.matchingMerchant;
   const {value_count}=useRoleAsignData()
   const {adminUser}=useContext(AuthContext);
-  console.log("getSpecificOrderById?.category",getSpecificOrderById?.category);
   const handleBack = () => {
-    console.log("back btn");
+
     navigate(previousPathLocation); // Go back to the previous page
   };
 
-  console.log("getSpecificOrderById",getSpecificOrderById);
   useEffect(()=>{
     const getOrderById=async()=>{
              // Fetch the updated order details
@@ -62,7 +60,6 @@ const ViewOrder = () => {
           // Update the previousPath state when the location changes
  
         },[getSpecificOrderById])
-      console.log("getSpecificOrderById",getSpecificOrderById);
   const [orderStatus, setOrderStatus] = useState();
   const [paymentStatus, setPaymentStatus] = useState();
   const [deliverAssign, setDeliverAssign] = useState();
@@ -71,7 +68,6 @@ const ViewOrder = () => {
   const [updateNewOrder, setUpdateNewOrder] = useState(false);
   const [show, setShow] = useState(false);
   const target = useRef(null);
-  console.log("deliverAssign",deliverAssign);
   const returnValue=Number(getSpecificOrderById?.printbazcost)+Number(getSpecificOrderById?.deliveryFee)
   let date = new Date(getSpecificOrderById?.createdAt); // create a new Date object
 
@@ -164,7 +160,6 @@ setTrackingId(e.target.value)
           const data = await response.json();
           if (response.status === 200) {
               // Handle success, for instance:
-              console.log("Total bill updated successfully:", data);
           } else {
               // Handle error
               console.error("Error updating the bill:", data.message);
@@ -367,7 +362,7 @@ setTrackingId(e.target.value)
   };
   const handleDeliverAssignChange = async (e) => {
     const status = e.target.value; // the new status
-  console.log("status",status);
+
 
     //   await fetch(`http://localhost:5000/update-approval/${viewClient?._id}`, { //for testing site
     try {

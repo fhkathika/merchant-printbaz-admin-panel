@@ -4,7 +4,6 @@ import useGetTshirtPrice from './useGetTshirtPrice';
 const useFilterValueBasedonCategory = () => {
     const { tshirtPrice } = useGetTshirtPrice();
       // custom round neck 
-   console.log("tshirtPrice",tshirtPrice)
    const customRoundNeckFilter=tshirtPrice?.filter(thsirt => thsirt.category === "Custom Round Neck")
   
 const customDropSholderFilter=tshirtPrice?.filter(thsirt => thsirt.category === "Custom Drop Sholder")

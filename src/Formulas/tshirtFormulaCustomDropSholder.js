@@ -74,7 +74,8 @@ if (uPrice % 1 === 0) {
 } else if (uPrice % 1 !== 0) {
   unitPrice = parseFloat(uPrice).toFixed(2);
 }
- 
+ console.log("totalQuantity......",totalQuantity)
+ console.log("totalPrice......",totalPrice)
   return ({ totalPrice: totalPrice ,unitPrice: unitPrice });
 };
 
