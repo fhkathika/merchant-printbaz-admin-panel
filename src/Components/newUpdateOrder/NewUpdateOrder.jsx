@@ -203,6 +203,7 @@ customHoodieinputBack2p5X2p5}=useFilterValueBasedonCategory()
       });
    
       const [filePreviews, setFilePreviews] = useState([]);
+// console.log("formData...",formData)
 
         let id = "resellerOrdersId";
        let collections = "resellerInfo";
@@ -236,6 +237,7 @@ customHoodieinputBack2p5X2p5}=useFilterValueBasedonCategory()
       const [addBrandLogoArray, setAddBrandLogoArray] = useState([]);
     // Fetch unique districts when the component mounts
   useEffect(() => {
+    console.log('Print Baz Cost Updated:', formData.printbazcost);
     // axios.get('http://localhost:5000/unique-districts')
     axios.get('https://mserver.printbaz.com/unique-districts')
       .then(response => {
@@ -244,7 +246,7 @@ customHoodieinputBack2p5X2p5}=useFilterValueBasedonCategory()
       .catch(error => {
         console.error('Error fetching unique districts:', error);
       });
-  }, []);
+  }, [formData?.selectedItemsDetailArr]);
   useEffect(() => {
     if (formData?.districts) {
       // axios.get(`http://localhost:5000/zones?district=${encodeURIComponent(formData?.districts)}`)
@@ -305,92 +307,45 @@ const [hasLogo,setHasLogo]=useState(false)
       };
       
      
-  
-      //   const handleFileChange = (event, orderIndex, fileIndex) => {
-         
-      //     const { name, files } = event.target;
-         
-      //     if (files.length > 0) {
-      //         setFormData(prevState => {
-      //             const newOrderDetailArr = prevState.orderDetailArr.map((item, index) => {
-      //                 if (index === orderIndex) {
-      //                     let updatedFilesOrImages;
-      //                     if (name === "file") {
-      //                         updatedFilesOrImages = [...item.file]; // Create a copy of the file array
-      //                         updatedFilesOrImages[fileIndex] = files[0]; // Update the file at the specified index
-      //                         return { ...item, file: updatedFilesOrImages }; // Update the file array in the item
-      //                     } else if (name === "image") {
-      //                         updatedFilesOrImages = [...item.image]; // Create a copy of the image array
-      //                         updatedFilesOrImages[fileIndex] = files[0]; // Update the image at the specified index
-      //                         return { ...item, image: updatedFilesOrImages }; // Update the image array in the item
-      //                     }
-      //                 }
-      //                 return item;
-      //             });
-      //             return { ...prevState, orderDetailArr: newOrderDetailArr }; // Update the orderDetailArr in the formData state
-      //         });
-      //     }
-      // };
-    
-      // const handleFileChange = (event, index) => {
-      //   const { name, files } = event.target;
-      //   const updatedBrandLogoArray = [...addBrandLogoArray];
-      //   if (name==="file" || name==="image" || name==="brandLogo") {
-      //     if (name === "brandLogo") {
-      //       updatedBrandLogoArray[index] = files && files.length > 0;;
-      //       setAddBrandLogoArray(updatedBrandLogoArray);
-      //   }
-      //     // const fieldName = name.split('.')[1];
-      //     const newOrderDetailArr = [...formData.orderDetailArr];
-      //      // Change from a single file to an array of files
-      //     newOrderDetailArr[index][[event.target.name]] =Array.from(files);
-      //     setFormData({ ...formData, orderDetailArr: newOrderDetailArr });
-      
-      //   }
-      // };
-      const handleFileChange = (event, orderIndex, productIndex, fileIndex) => {
-        const { name, files } = event.target;
-      
+      const handleFileChange = (event, orderIndex, productIndex, fileType, fileIndex) => {
+        const { files } = event.target;
+   
         setFormData((prevOrder) => {
           const newOrder = { ...prevOrder };
       
-          if (
-            newOrder.selectedItemsDetailArr[orderIndex] &&
-            newOrder.selectedItemsDetailArr[orderIndex].individualProductArr[productIndex]
-          ) {
-            const product = { ...newOrder.selectedItemsDetailArr[orderIndex].individualProductArr[productIndex] };
-            if (name === "file") {
-              // Assuming files is an array of files
-              const newFilesArray = Array.from(files);
+          const product = newOrder.selectedItemsDetailArr[orderIndex]?.individualProductArr[productIndex];
       
-              // Check if this is the second object in the array
-              
-                product.file[fileIndex] = newFilesArray[fileIndex];
-             
+          if (product) {
+            const updatedProduct = { ...product };
+      
+            // Assuming files is an array of files
+            // const newFilesArray = Array.from(files);
+            const newFilesArray = [...files];
+
+            let updatedFiles;
+   
+      if (fileType === "file") {
+        updatedFiles = updatedProduct.file.map((existingFile, idx) =>
+          idx === fileIndex  ? newFilesArray[0] : existingFile
+          // updatedProduct.file[fileIndex] = newFilesArray[fileIndex];
+        );
+       
+        updatedProduct.file = updatedFiles;
+      }  else if (fileType === "image") {
+              updatedFiles = updatedProduct.image.map((existingImage, idx) =>
+                idx === fileIndex ? newFilesArray[0] : existingImage
+              );
+              updatedProduct.image = updatedFiles;
+            } else if (fileType === "brandLogo") {
+              updatedFiles = updatedProduct.brandLogo.map((existingLogo, idx) =>
+                idx === fileIndex ? newFilesArray[0] : existingLogo
+              );
+              updatedProduct.brandLogo = updatedFiles;
             }
-            if (name === "image" ) {
-              // Assuming files is an array of files
-              const newFilesArray = Array.from(files);
-     
-              // Check if this is the second object in the array
-              
-                product.image[fileIndex] = newFilesArray[fileIndex];
-           }
-            if (name === "brandLogo") {
-               // Assuming files is an array of files
-               const newFilesArray = Array.from(files);
       
-               // Check if this is the second object in the array
-               
-                 product.brandLogo[fileIndex] = newFilesArray[fileIndex];
-            }
-           
-          
-      
-            // Create a new array for the product to trigger a state update
-            newOrder.selectedItemsDetailArr[orderIndex].individualProductArr[productIndex] = { ...product };
+            // Update the nested product within the order
+            newOrder.selectedItemsDetailArr[orderIndex].individualProductArr[productIndex] = updatedProduct;
           } else {
-            // Handle the case where the array or object is undefined
             console.error("Array or object is undefined at orderIndex:", orderIndex, "productIndex:", productIndex);
           }
       
@@ -401,6 +356,59 @@ const [hasLogo,setHasLogo]=useState(false)
       
       
       
+      // const handleFileChange = (event, orderIndex, productIndex, fileIndex) => {
+      //   const { name, files } = event.target;
+      
+      //   setFormData((prevOrder) => {
+      //     const newOrder = { ...prevOrder };
+      
+      //     if (
+      //       newOrder.selectedItemsDetailArr[orderIndex] &&
+      //       newOrder.selectedItemsDetailArr[orderIndex].individualProductArr[productIndex]
+      //     ) {
+      //       const product = { ...newOrder.selectedItemsDetailArr[orderIndex].individualProductArr[productIndex] };
+      //       if (name === "file") {
+      //         // Assuming files is an array of files
+      //         const newFilesArray = Array.from(files);
+      
+      //         // Check if this is the second object in the array
+              
+      //           product.file[fileIndex] = newFilesArray[fileIndex];
+             
+      //       }
+      //       if (name === "image" ) {
+      //         // Assuming files is an array of files
+      //         const newFilesArray = Array.from(files);
+     
+      //         // Check if this is the second object in the array
+              
+      //           product.image[fileIndex] = newFilesArray[fileIndex];
+      //      }
+      //       if (name === "brandLogo") {
+      //          // Assuming files is an array of files
+      //          const newFilesArray = Array.from(files);
+      
+      //          // Check if this is the second object in the array
+               
+      //            product.brandLogo[fileIndex] = newFilesArray[fileIndex];
+      //       }
+           
+          
+      
+      //       // Create a new array for the product to trigger a state update
+      //       newOrder.selectedItemsDetailArr[orderIndex].individualProductArr[productIndex] = { ...product };
+      //     } else {
+      //       // Handle the case where the array or object is undefined
+      //       console.error("Array or object is undefined at orderIndex:", orderIndex, "productIndex:", productIndex);
+      //     }
+      
+      //     return { ...newOrder };
+      //   });
+      // };
+
+
+      
+    
          
     
     
@@ -537,8 +545,10 @@ if (totalQuantityCustomDropSholder > 0) {
   let printbazcostbaseCRoundNeck = 0;
   let printbazcostCHoodie = 0;
   let printbazcostbaseCHoodie = 0;
+  let printbazcostCDropSholder= 0;
+  let printbazcostbaseCDropSholder = 0;
   let backSidePrintCost=0;
-  
+  let totalBrandLogoCost=0;
   for (let i = 0; i < formData?.selectedItemsDetailArr?.length; i++) {
       const selectedItem = formData?.selectedItemsDetailArr[i];
   
@@ -556,6 +566,8 @@ if (totalQuantityCustomDropSholder > 0) {
           price_2p5X5CHoodie &&
           price_2p5X2p5CHoodie
       ) {
+        let totalBackSidePrintCostCHoodie=0;
+        let totalFrontSidePrintCostCHoodie=0;
           selectedItem?.individualProductArr.forEach((individualProduct) => {
               const {
                   printSize,
@@ -563,14 +575,13 @@ if (totalQuantityCustomDropSholder > 0) {
                   // Added to get the size
                   // Add other properties as needed
               } = individualProduct;
-  
               // Your existing logic goes here
               const totalPrice = tshirtFormulaCustomDropSholder(
                   
                  
                   // formData?.quantity,
                   selectedItem?.perItemQuantity,
-                  totalQuantityCustomHoodie,
+                  totalQuantity,
                   printSize,
                   price_11p7x16p5CHoodie,
                   price_10x14CHoodie,
@@ -580,7 +591,7 @@ if (totalQuantityCustomDropSholder > 0) {
                   price_2p5X5CHoodie,
                   price_2p5X2p5CHoodie
               ).totalPrice;
-  
+              totalFrontSidePrintCostCHoodie+=totalPrice;
               // Back side dtf cost plus additional cost
               backSidePrintCost = backsiideFormulaDropSholderHoodie(
                 selectedItem?.perItemQuantity,
@@ -597,20 +608,98 @@ if (totalQuantityCustomDropSholder > 0) {
                   backSideDtfprice_2p5X2p5CustomHoodie,
                   additionalCost
               ).backDtfAndAdditionalCost;
-  
-              if (addBrandLogoArray[i]) {
+              totalBackSidePrintCostCHoodie+=backSidePrintCost
+              if (addBrandLogoArray[i] || individualProduct?.brandLogo !== null) {
                   let brandLogoCost = 5 * individualProduct?.totalQuantity;
-                  printbazcostbaseCHoodie = Number(totalPrice) + backSidePrintCost + brandLogoCost;
+                   totalBrandLogoCost+=brandLogoCost;
+                  printbazcostbaseCHoodie = Number(totalFrontSidePrintCostCHoodie) + Number(totalBackSidePrintCostCHoodie) + totalBrandLogoCost;
                   printbazcostCHoodie = printbazcostbaseCHoodie;
+                 
               } else {
-                printbazcostbaseCHoodie = Number(totalPrice) + Number(backSidePrintCost);
+                printbazcostbaseCHoodie = Number(totalFrontSidePrintCostCHoodie) + Number(totalBackSidePrintCostCHoodie);
                 printbazcostCHoodie = printbazcostbaseCHoodie;
+              
+          
               }
             
              
              
           });
       }
+      else  if (
+        (selectedItem?.productType === "orderDetailArrCustomDropSholder") &&
+        selectedItem?.perItemQuantity &&
+        totalQuantityCustomDropSholder &&
+        selectedItem?.individualProductArr &&
+        selectedItem?.individualProductArr.length &&
+        price_11p7x16p5CDropSholder &&
+        price_10x14CDropSholder &&
+        price_10x10CDropSholder &&
+        price_10x5CDropSholder &&
+        price_5X5CDropSholder &&
+        price_2p5X5CDropSholder &&
+        price_2p5X2p5CDropSholder 
+    ) {
+      let totalBackSidePrintCostCDropSholder=0;
+      let totalFrontSidePrintCostCDropSholder=0;
+        selectedItem?.individualProductArr.forEach((individualProduct) => {
+            const {
+                printSize,
+                printSizeBack,printSide,totalQuantity
+                // Added to get the size
+                // Add other properties as needed
+            } = individualProduct;
+            // Your existing logic goes here
+            const totalPrice = tshirtFormulaCustomDropSholder(
+                
+               
+                // formData?.quantity,
+                selectedItem?.perItemQuantity,
+                totalQuantity,
+                printSize,
+                price_11p7x16p5CDropSholder &&
+                price_10x14CDropSholder &&
+                price_10x10CDropSholder &&
+                price_10x5CDropSholder &&
+                price_5X5CDropSholder &&
+                price_2p5X5CDropSholder &&
+                price_2p5X2p5CDropSholder 
+            ).totalPrice;
+            totalFrontSidePrintCostCDropSholder+=totalPrice;
+            // Back side dtf cost plus additional cost
+            backSidePrintCost = backsiideFormulaDropSholderHoodie(
+              selectedItem?.perItemQuantity,
+           
+              sumofTQuansityForIndividualDetailArrCHoodie,
+                printSizeBack,
+               printSide,
+               backSideDtfprice_11p7x16p5CustomDropSholder,
+  backSideDtfprice_10x14CustomDropSholder,
+  backSideDtfprice_10x10CustomDropSholder,
+  backSideDtfprice_10x5CustomDropSholder,
+  backSideDtfprice_5X5CustomDropSholder,
+  backSideDtfprice_2p5X5CustomDropSholder,
+  backSideDtfprice_2p5X2p5CustomDropSholder,
+  additionalCost,
+            ).backDtfAndAdditionalCost;
+            totalBackSidePrintCostCDropSholder+=backSidePrintCost
+            if (addBrandLogoArray[i] || individualProduct?.brandLogo !== null) {
+                let brandLogoCost = 5 * individualProduct?.totalQuantity;
+                 totalBrandLogoCost+=brandLogoCost;
+                printbazcostbaseCHoodie = Number(totalFrontSidePrintCostCDropSholder) + Number(totalBackSidePrintCostCDropSholder) + totalBrandLogoCost;
+                printbazcostCDropSholder = printbazcostbaseCDropSholder;
+               
+            } else {
+              printbazcostbaseCHoodie = Number(totalFrontSidePrintCostCDropSholder) + Number(totalBackSidePrintCostCDropSholder);
+              printbazcostCDropSholder = printbazcostbaseCDropSholder;
+            
+        
+            }
+          
+           
+           
+        });
+    }
       else  if (
         (selectedItem?.productType === "orderDetailArr") &&
         selectedItem?.perItemQuantity &&
@@ -624,21 +713,21 @@ if (totalQuantityCustomDropSholder > 0) {
         price_2p5X5CRoundNeck &&
         price_2p5X2p5CRoundNeck
     ) {
+      let totalBackSidePrintCostCRoundNeck=0;
+      let totalFrontSidePrintCostCRoundNeck=0;
         selectedItem?.individualProductArr?.forEach((individualProduct) => {
             const {
                 printSize,
-                printSizeBack,printSide
+                printSizeBack,printSide,totalQuantity
                 // Added to get the size
                 // Add other properties as needed
             } = individualProduct;
 
             // Your existing logic goes here
             const totalPrice = teeShirtFormula(
-                
-               
-                // formData?.quantity,
+               // formData?.quantity,
                 selectedItem?.perItemQuantity,
-                totalQuantityCustomRoundNeck,
+                totalQuantity,
                 printSize,
                 price_10x14CRoundNeck,
       price_10x10CRoundNeck,
@@ -662,119 +751,304 @@ if (totalQuantityCustomDropSholder > 0) {
                backSideDtfprice_2p5X2p5CustomRoundNeck,
                additionalCost,
             ).backDtfAndAdditionalCost;
+            totalBackSidePrintCostCRoundNeck += backSidePrintCost;
+            totalFrontSidePrintCostCRoundNeck += totalPrice;
 
-            if (addBrandLogoArray[i]) {
+            if (addBrandLogoArray[i] || individualProduct?.brandLogo !== null) {
                 let brandLogoCost = 5 * individualProduct?.totalQuantity;
-                printbazcostbaseCRoundNeck = Number(totalPrice) + backSidePrintCost + brandLogoCost;
+                totalBrandLogoCost+=brandLogoCost;
+                printbazcostbaseCRoundNeck = Number(totalFrontSidePrintCostCRoundNeck) + Number(totalBackSidePrintCostCRoundNeck) + totalBrandLogoCost;
                 printbazcostCRoundNeck = printbazcostbaseCRoundNeck;
+              
+          
             } 
             else {
-              printbazcostbaseCRoundNeck = Number(totalPrice) + Number(backSidePrintCost);
+              printbazcostbaseCRoundNeck = Number(totalFrontSidePrintCostCRoundNeck) + Number(totalBackSidePrintCostCRoundNeck);
               printbazcostCRoundNeck = printbazcostbaseCRoundNeck;
+            
+          
             }
             
-            console.log("  custom round ...Number(totalPrice) + Number(backSidePrintCost).......",Number(totalPrice) , Number(backSidePrintCost))
-          
+           
         });
       
     }
    
      
   }
-  printbazcost=printbazcostCHoodie+printbazcostCRoundNeck
-  console.log("printbazcostCHoodie.......",printbazcostCHoodie)
- 
-  console.log("printbazcostCRoundNeck.......",printbazcostCRoundNeck)
+  printbazcost=printbazcostCHoodie+printbazcostCRoundNeck+printbazcostCDropSholder
+console.log("printbazcost from calculation",printbazcost)
+
 // Output results
-  if(formData.dsicount
-    ){
+  if(formData?.dsicount){
     printbazcost=printbazcost-Number(formData?.dsicount)
   }
   
-  if(formData.additionalCost){
+  if(formData?.additionalCost){
     printbazcost=printbazcost+Number(formData?.additionalCost)
   }
+  // console.log("printbazcost...",printbazcost)
+  const calculateIndividualPrintBazCost = (selectedItem,i,updatedtotalQuantity) => {
+    // const selectedItem = formData?.selectedItemsDetailArr[i];
+  
+      if (
+          (selectedItem?.productType === "orderDetailArrCustomHoodie") &&
+          selectedItem?.perItemQuantity &&
+          totalQuantityCustomHoodie &&
+          selectedItem?.individualProductArr &&
+          selectedItem?.individualProductArr.length &&
+          price_11p7x16p5CHoodie &&
+          price_10x14CHoodie &&
+          price_10x10CHoodie &&
+          price_10x5CHoodie &&
+          price_5X5CHoodie &&
+          price_2p5X5CHoodie &&
+          price_2p5X2p5CHoodie
+      ) {
+        let totalBackSidePrintCostCHoodie=0;
+        let totalFrontSidePrintCostCHoodie=0;
+          selectedItem?.individualProductArr.forEach((individualProduct) => {
+              const {
+                  printSize,
+                  printSizeBack,printSide
+                  // Added to get the size
+                  // Add other properties as needed
+              } = individualProduct;
+              // Your existing logic goes here
+              const totalPrice = tshirtFormulaCustomDropSholder(
+                  
+                 
+                  // formData?.quantity,
+                  selectedItem?.perItemQuantity,
+                  updatedtotalQuantity,
+                  printSize,
+                  price_11p7x16p5CHoodie,
+                  price_10x14CHoodie,
+                  price_10x10CHoodie,
+                  price_10x5CHoodie,
+                  price_5X5CHoodie,
+                  price_2p5X5CHoodie,
+                  price_2p5X2p5CHoodie
+              ).totalPrice;
+              totalFrontSidePrintCostCHoodie+=totalPrice;
+              // Back side dtf cost plus additional cost
+              backSidePrintCost = backsiideFormulaDropSholderHoodie(
+                selectedItem?.perItemQuantity,
+             
+                sumofTQuansityForIndividualDetailArrCHoodie,
+                  printSizeBack,
+                 printSide,
+                  backSideDtfprice_11p7x16p5CustomHoodie,
+                  backSideDtfprice_10x14CustomHoodie,
+                  backSideDtfprice_10x10CustomHoodie,
+                  backSideDtfprice_10x5CustomHoodie,
+                  backSideDtfprice_5X5CustomHoodie,
+                  backSideDtfprice_2p5X5CustomHoodie,
+                  backSideDtfprice_2p5X2p5CustomHoodie,
+                  additionalCost
+              ).backDtfAndAdditionalCost;
+              totalBackSidePrintCostCHoodie+=backSidePrintCost
+              if (addBrandLogoArray[i] || individualProduct?.brandLogo !== null) {
+                  let brandLogoCost = 5 * individualProduct?.totalQuantity;
+                   totalBrandLogoCost+=brandLogoCost;
+                  printbazcostbaseCHoodie = Number(totalPrice) + Number(totalBackSidePrintCostCHoodie) + totalBrandLogoCost;
+                  printbazcost += printbazcostbaseCHoodie;
+              
+                 
+              } else {
+                printbazcostbaseCHoodie = Number(totalPrice) + Number(totalBackSidePrintCostCHoodie);
+                printbazcost += printbazcostbaseCHoodie;
+            
+          
+              }
+            
+             
+             
+          });
+      }
+        if (
+        (selectedItem?.productType === "orderDetailArrCustomDropSholder") &&
+        selectedItem?.perItemQuantity &&
+        totalQuantityCustomDropSholder &&
+        selectedItem?.individualProductArr &&
+        selectedItem?.individualProductArr.length &&
+        price_11p7x16p5CDropSholder &&
+        price_10x14CDropSholder &&
+        price_10x10CDropSholder &&
+        price_10x5CDropSholder &&
+        price_5X5CDropSholder &&
+        price_2p5X5CDropSholder &&
+        price_2p5X2p5CDropSholder 
+    ) {
+      let totalBackSidePrintCostCDropSholder=0;
+      let totalFrontSidePrintCostCDropSholder=0;
+        selectedItem?.individualProductArr.forEach((individualProduct) => {
+            const {
+                printSize,
+                printSizeBack,printSide
+                // Added to get the size
+                // Add other properties as needed
+            } = individualProduct;
+            // Your existing logic goes here
+            const totalPrice = tshirtFormulaCustomDropSholder(
+                
+               
+                // formData?.quantity,
+                selectedItem?.perItemQuantity,
+                updatedtotalQuantity,
+                printSize,
+                price_11p7x16p5CDropSholder &&
+                price_10x14CDropSholder &&
+                price_10x10CDropSholder &&
+                price_10x5CDropSholder &&
+                price_5X5CDropSholder &&
+                price_2p5X5CDropSholder &&
+                price_2p5X2p5CDropSholder 
+            ).totalPrice;
+            totalFrontSidePrintCostCDropSholder+=totalPrice;
+            // Back side dtf cost plus additional cost
+            backSidePrintCost = backsiideFormulaDropSholderHoodie(
+              selectedItem?.perItemQuantity,
+           
+              sumofTQuansityForIndividualDetailArrCHoodie,
+                printSizeBack,
+               printSide,
+               backSideDtfprice_11p7x16p5CustomDropSholder,
+  backSideDtfprice_10x14CustomDropSholder,
+  backSideDtfprice_10x10CustomDropSholder,
+  backSideDtfprice_10x5CustomDropSholder,
+  backSideDtfprice_5X5CustomDropSholder,
+  backSideDtfprice_2p5X5CustomDropSholder,
+  backSideDtfprice_2p5X2p5CustomDropSholder,
+  additionalCost,
+            ).backDtfAndAdditionalCost;
+            totalBackSidePrintCostCDropSholder+=backSidePrintCost
+            if (addBrandLogoArray[i] || individualProduct?.brandLogo !== null) {
+                let brandLogoCost = 5 * individualProduct?.totalQuantity;
+                 totalBrandLogoCost+=brandLogoCost;
+                printbazcostbaseCHoodie = Number(totalPrice) + Number(totalBackSidePrintCostCDropSholder) + totalBrandLogoCost;
+                printbazcost += printbazcostbaseCDropSholder;
+               
+            } else {
+              printbazcostbaseCHoodie = Number(totalPrice) + Number(totalBackSidePrintCostCDropSholder);
+              printbazcost += printbazcostbaseCDropSholder;
+            
+        
+            }
+          
+           
+           
+        });
+    }
+        if (
+        (selectedItem?.productType === "orderDetailArr") &&
+        selectedItem?.perItemQuantity &&
+        totalQuantityCustomRoundNeck &&
+        selectedItem?.individualProductArr &&
+        selectedItem?.individualProductArr.length &&
+        price_10x14CRoundNeck &&
+        price_10x10CRoundNeck &&
+        price_10x5CRoundNeck &&
+        price_5X5CRoundNeck &&
+        price_2p5X5CRoundNeck &&
+        price_2p5X2p5CRoundNeck
+    ) {
+      let totalBackSidePrintCostCRoundNeck=0;
+      let totalFrontSidePrintCostCRoundNeck=0;
+        selectedItem?.individualProductArr?.forEach((individualProduct) => {
+            const {
+                printSize,
+                printSizeBack,printSide
+                // Added to get the size
+                // Add other properties as needed
+            } = individualProduct;
 
-console.log("formData?.printbazcost",(formData?.printbazcost))
-console.log("printbazcost",printbazcost)
-console.log("formData",formData)
+            // Your existing logic goes here
+            const totalPrice = teeShirtFormula(
+               // formData?.quantity,
+                selectedItem?.perItemQuantity,
+                updatedtotalQuantity,
+                printSize,
+                price_10x14CRoundNeck,
+      price_10x10CRoundNeck,
+      price_10x5CRoundNeck,
+      price_5X5CRoundNeck,
+      price_2p5X5CRoundNeck,
+      price_2p5X2p5CRoundNeck
+            ).totalPrice;
 
-// const handleInputChange = (event, orderIndex, productIndex) => {
-//   const { name, value } = event.target;
-//   const color = event.target.closest('.card-title')?.getAttribute('data-color');
+            // Back side dtf cost plus additional cost
+            backSidePrintCost = backsideFormula(
+              selectedItem?.perItemQuantity,
+              sumofTQuansityForIndividualDetailArrCRoundNeck,
+                printSizeBack,
+               printSide,
+               backSideDtfprice_10x14CustomRoundNeck,
+               backSideDtfprice_10x10CustomRoundNeck,
+               backSideDtfprice_10x5CustomRoundNeck,
+               backSideDtfprice_5X5CustomRoundNeck,
+               backSideDtfprice_2p5X5CustomRoundNeck,
+               backSideDtfprice_2p5X2p5CustomRoundNeck,
+               additionalCost,
+            ).backDtfAndAdditionalCost;
+            totalBackSidePrintCostCRoundNeck += backSidePrintCost;
+            totalFrontSidePrintCostCRoundNeck += totalPrice;
 
-//   setFormData((prevState) => {
-//     let newSelectedItemsDetailArr = prevState.selectedItemsDetailArr.map((item, i) => {
-//       if (i === orderIndex && item.color === color) {
-//         const updatedItem = {
-//           ...item,
-//           individualProductArr: item.individualProductArr.map((product, j) => {
-//             if (j === productIndex) {
-//               if (name === 'color' || name === 'teshirtSize' || name === 'printSize' || name === 'printSide' || name === 'printSizeBack') {
-//                 // Handle different properties individually
-//                 if (name === 'teshirtSize') {
-//                   return {
-//                     ...product,
-//                     [name]: {
-//                       ...product[name],
-//                       [event.target.getAttribute('data-size')]: value,
-//                     },
-//                   };
-//                 } else {
-//                   return { ...product, [name]: value };
-//                 }
-//               } else if (name.startsWith('quantity')) {
-//                 return { ...product, [name]: value };
-//               }
-//             }
-//             return product;
-//           }),
-//         };
-
-//         // Update perItemQuantity based on the updated item
-//         updatedItem.perItemQuantity = calculatePerItemQuantity(updatedItem);
-//         if (item?.productType === "orderDetailArr" && totalQuantityCustomRoundNeck>0) {
-//           updatedItem.printbazcost = printbazcostCRoundNeck;
-//         }
-//         // Update printbazcost based on the updated item
-//         if (item?.productType === "orderDetailArrCustomHoodie" && totalQuantityCustomHoodie>0) {
-//           updatedItem.printbazcost = printbazcostCHoodie;
-//         }
+            if (addBrandLogoArray[i] || individualProduct?.brandLogo !== null) {
+                let brandLogoCost = 5 * individualProduct?.totalQuantity;
+                totalBrandLogoCost+=brandLogoCost;
+                printbazcostbaseCRoundNeck = Number(totalPrice) + Number(totalBackSidePrintCostCRoundNeck) + totalBrandLogoCost;
+                printbazcost += printbazcostbaseCRoundNeck;
+              
+          
+            } 
+            else {
+              printbazcostbaseCRoundNeck = Number(totalPrice) + Number(totalBackSidePrintCostCRoundNeck);
+              printbazcost += printbazcostbaseCRoundNeck;
+            
+          
+            }
+            
+           
+        });
       
+    }
+    let returnCost=0
+   if (printbazcostCHoodie>0){
+    returnCost= printbazcostCHoodie
+   }
+   if (printbazcostCRoundNeck>0){
+    returnCost= printbazcostCRoundNeck
+   }
+   if (printbazcostCDropSholder>0){
+    returnCost= printbazcostCDropSholder
+   }
+   console.log("printbazcostCHoodie+printbazcostCRoundNeck +printbazcostCDropSholder",printbazcostbaseCHoodie,printbazcostbaseCRoundNeck ,printbazcostbaseCDropSholder)
+    // Handle other cases if needed
+    return printbazcost;
+    // return returnCost;
 
-//         console.log('Updated Per Item Quantity:', updatedItem.perItemQuantity);
-//         console.log('Updated Print Baz Cost:', updatedItem.printbazcost);
-//         console.log("updatedItem......",updatedItem)
-//         return updatedItem; // Return the updated item
-//       }
-     
-//       return item;
-//     });
+    // Default value if no match
+  };
 
-//     // Calculate new grand quantity based on the updated data
-//     const newGrandQuantity = newSelectedItemsDetailArr.reduce((acc, item) => acc + item.perItemQuantity, 0);
+ 
 
-//     // Calculate new printbazcost based on the updated data
-//     const newPrintBazCost = newSelectedItemsDetailArr.reduce((acc, item) => acc + item.printbazcost, 0);
 
-//     console.log('Updated State:', { ...prevState, selectedItemsDetailArr: newSelectedItemsDetailArr, quantity: newGrandQuantity, printbazcost: newPrintBazCost });
-
-//     return { ...prevState, selectedItemsDetailArr: newSelectedItemsDetailArr, quantity: newGrandQuantity, printbazcost: newPrintBazCost };
-//   });
-// };
-
+ 
 const handleInputChange = (event, orderIndex, productIndex) => {
   const { name, value } = event.target;
   const color = event.target.closest('.card-title')?.getAttribute('data-color');
 
   setFormData((prevState) => {
-    let newSelectedItemsDetailArr = prevState.selectedItemsDetailArr.map((item, i) => {
+  let updatedItem;
+    let newSelectedItemsDetailArr = prevState?.selectedItemsDetailArr?.map((item, i) => {
+      let updatedProduct;
       if (i === orderIndex && item.color === color) {
-        const updatedItem = {
+         updatedItem = {
           ...item,
           individualProductArr: item.individualProductArr.map((product, j) => {
             if (j === productIndex) {
-              let updatedProduct;
+            
               if (name === 'color' || name === 'teshirtSize' || name === 'printSize' || name === 'printSide' || name === 'printSizeBack') {
                 // Handle different properties individually
                 if (name === 'teshirtSize') {
@@ -801,15 +1075,23 @@ const handleInputChange = (event, orderIndex, productIndex) => {
             return product;
           }),
         };
-
+        
         // Update perItemQuantity based on the updated item
         updatedItem.perItemQuantity = calculatePerItemQuantity(updatedItem);
+        // updatedItem.printbazcost = calculateIndividualPrintBazCost(item,i,updatedProduct.totalQuantity);
+
         if (item?.productType === "orderDetailArr" && totalQuantityCustomRoundNeck > 0) {
-          updatedItem.printbazcost = printbazcostCRoundNeck;
+          console.log("from handleinput  change printbazcostCRoundNeck",printbazcostCRoundNeck)
+          updatedItem.printbazcost =printbazcostCRoundNeck;
         }
         // Update printbazcost based on the updated item
         if (item?.productType === "orderDetailArrCustomHoodie" && totalQuantityCustomHoodie > 0) {
-          updatedItem.printbazcost = printbazcostCHoodie;
+          console.log("from handleinput  change printbazcostCHoodie,",printbazcostCHoodie)
+          updatedItem.printbazcost =printbazcostCHoodie;
+        }
+        if (item?.productType === "orderDetailArrCustomDropSholder" && totalQuantityCustomDropSholder > 0) {
+          console.log("from handleinput  change printbazcostCdropsholder,",printbazcostCDropSholder)
+          updatedItem.printbazcost =printbazcostCDropSholder;
         }
 
         console.log('Updated Per Item Quantity:', updatedItem.perItemQuantity);
@@ -828,13 +1110,14 @@ const handleInputChange = (event, orderIndex, productIndex) => {
     // Calculate new printbazcost based on the updated data
     const newPrintBazCost = newSelectedItemsDetailArr.reduce((acc, item) => acc + item.printbazcost, 0);
 
-    console.log('Updated State:', { ...prevState, selectedItemsDetailArr: newSelectedItemsDetailArr, quantity: newGrandQuantity, printbazcost: newPrintBazCost });
+    console.log('Updated State:', { ...prevState, selectedItemsDetailArr: newSelectedItemsDetailArr, quantity: newGrandQuantity, printbazcost: printbazcost });
 
-    return { ...prevState, selectedItemsDetailArr: newSelectedItemsDetailArr, quantity: newGrandQuantity, printbazcost: newPrintBazCost };
+    return { ...prevState, [name]: value,selectedItemsDetailArr: newSelectedItemsDetailArr, quantity: newGrandQuantity, printbazcost: printbazcost};
   });
+  // setFormData({ ...formData, [name]: value});
 };
+console.log("fomrData?.printbazcost",formData?.printbazcost)
 
-// Function to calculate totalQuantity based on quantity fields
 // Function to calculate totalQuantity based on quantity fields
 const calculateTotalQuantity = (product) => {
   // Add your logic here based on your quantity fields
@@ -855,16 +1138,6 @@ const calculatePerItemQuantity = (orderItem) => {
   }, 0);
 };
 
-// Function to calculate printbazcost based on individual product quantities
-const calculatePrintBazCost = (orderItem) => {
-  return orderItem.individualProductArr?.reduce((total, product) => {
-      return total + safeParseInt(product?.quantityM) * safeParseInt(orderItem?.printbazcost) +
-          safeParseInt(product?.quantityL) * safeParseInt(orderItem?.printbazcost) +
-          safeParseInt(product?.quantityXL) * safeParseInt(orderItem?.printbazcost) +
-          safeParseInt(product?.quantityXXL) * safeParseInt(orderItem?.printbazcost) +
-          safeParseInt(product?.quantityXXXL) * safeParseInt(orderItem?.printbazcost);
-  }, 0);
-};
 
 
 
@@ -933,7 +1206,8 @@ const calculatePrintBazCost = (orderItem) => {
         };
       
         
-  const handleUpdate=async()=>{
+  const handleUpdate=async(e)=>{
+    e.preventDefault()
 try{
   const formDataSendOrdertoServer = new FormData();
 
@@ -1326,9 +1600,10 @@ try{
              let fileId, filePreviewURLDrive,filePreviewURL;
            
    
-    if (singleFile instanceof File) { // singleFile is a file object
-      filePreviewURL = URL.createObjectURL(singleFile);
-     }
+             if (singleFile instanceof File) {
+              // Local file
+              filePreviewURL = URL.createObjectURL(singleFile);
+            }
               else{
                 filePreviewURL =`https://drive.google.com/file/d/${singleFile?.fileId}/preview`;
            
@@ -1358,7 +1633,7 @@ try{
                    id={`fileInput-${fileIndex}`}
                   
                    style={{position:"absolute",width:"85%",margin:"auto",display:"" }}
-                   onChange={(e) => handleFileChange(e, orderIndex, index, fileIndex)}
+                   onChange={(e) => handleFileChange(e, orderIndex, index,"file", fileIndex)}
                    accept=".ai,.eps,.psd,.pdf,.svg,.png"
                    multiple
                  />
@@ -1409,7 +1684,7 @@ try{
                                          id={`imageInput-${imageIndex}`}
                                         
                                          style={{position:"absolute",width:"85%",display:"" }}
-                                         onChange={(e) => handleFileChange(e, orderIndex, index, imageIndex)}
+                                         onChange={(e) => handleFileChange(e, orderIndex, index,"image",imageIndex)}
                                          accept=".ai,.eps,.psd,.pdf,.svg,.png"
                                          multiple
                                        />
@@ -1531,7 +1806,7 @@ try{
                                          id={`logoInput-${logoIndex}`}
                                         
                                          style={{position:"absolute",width:"85%",display:"" }}
-                                         onChange={(e) => handleFileChange(e, orderIndex, index, logoIndex)}
+                                         onChange={(e) => handleFileChange(e, orderIndex, index,"brandLogo", logoIndex)}
                                          accept=".ai,.eps,.psd,.pdf,.svg,.png"
                                          
                                        />

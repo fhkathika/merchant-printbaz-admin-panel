@@ -66,7 +66,7 @@ if(printSize==="2.5 X 5"){
 
 }
 totalPrice=Number(totalPrice11p7x16p5+totalPrice10x14+totalPrice10x10+totalPrice10x5+totalPrice5X5+totalPrice2p5X5+totalPrice2p5X2p5)
-
+console.log("totalQuantity",totalQuantity)
 const uPrice = totalPrice / quantity;
 let unitPrice = 0;
 if (uPrice % 1 === 0) {
@@ -74,8 +74,7 @@ if (uPrice % 1 === 0) {
 } else if (uPrice % 1 !== 0) {
   unitPrice = parseFloat(uPrice).toFixed(2);
 }
- console.log("totalQuantity......",totalQuantity)
- console.log("totalPrice......",totalPrice)
+
   return ({ totalPrice: totalPrice ,unitPrice: unitPrice });
 };
 
