@@ -25,7 +25,6 @@ const NewUpdateOrder = ({ onClose,viewOrder,viewClient,getSpecificOrderById,setG
     const [previewUrl, setPreviewUrl] = useState('');
     const [updateOrderArr, setUpdateOrderArr] = useState([]);
     const [indexNumber, setIndexNumber] = useState();
-
  
 // useEffect(()=>{
 //   const getOrderById=async()=>{
@@ -290,6 +289,16 @@ customHoodieinputBack2p5X2p5}=useFilterValueBasedonCategory()
       .catch((error) => console.error('Error fetching deliveryArea:', error));
   }
 }, [formData?.districts ,formData?.zones , formData?.areas]);
+useEffect(() => {
+  // Calculate newPrintbazcost based on formData
+
+  // Update the state with the new value
+  setFormData((prevState) => ({
+    ...prevState,
+...prevState?.selectedItemsDetailArr,
+    printbazcost: printbazcost>0?printbazcost:formData?.printbazcost,
+  }));
+}, [formData?.printbazcost,formData?.selectedItemsDetailArr]); // Dependencies
 
 const [hasSize,setHasSize]=useState(false)
 const [hasLogo,setHasLogo]=useState(false)
@@ -549,6 +558,7 @@ if (totalQuantityCustomDropSholder > 0) {
   let printbazcostbaseCDropSholder = 0;
   let backSidePrintCost=0;
   let totalBrandLogoCost=0;
+
   for (let i = 0; i < formData?.selectedItemsDetailArr?.length; i++) {
       const selectedItem = formData?.selectedItemsDetailArr[i];
   
@@ -611,8 +621,8 @@ if (totalQuantityCustomDropSholder > 0) {
               totalBackSidePrintCostCHoodie+=backSidePrintCost
               if (addBrandLogoArray[i] || individualProduct?.brandLogo !== null) {
                   let brandLogoCost = 5 * individualProduct?.totalQuantity;
-                   totalBrandLogoCost+=brandLogoCost;
-                  printbazcostbaseCHoodie = Number(totalFrontSidePrintCostCHoodie) + Number(totalBackSidePrintCostCHoodie) + totalBrandLogoCost;
+                  //  totalBrandLogoCost+=brandLogoCost;
+                  printbazcostbaseCHoodie = Number(totalFrontSidePrintCostCHoodie) + Number(totalBackSidePrintCostCHoodie) + brandLogoCost;
                   printbazcostCHoodie = printbazcostbaseCHoodie;
                  
               } else {
@@ -685,8 +695,8 @@ if (totalQuantityCustomDropSholder > 0) {
             totalBackSidePrintCostCDropSholder+=backSidePrintCost
             if (addBrandLogoArray[i] || individualProduct?.brandLogo !== null) {
                 let brandLogoCost = 5 * individualProduct?.totalQuantity;
-                 totalBrandLogoCost+=brandLogoCost;
-                printbazcostbaseCHoodie = Number(totalFrontSidePrintCostCDropSholder) + Number(totalBackSidePrintCostCDropSholder) + totalBrandLogoCost;
+                //  totalBrandLogoCost+=brandLogoCost;
+                printbazcostbaseCHoodie = Number(totalFrontSidePrintCostCDropSholder) + Number(totalBackSidePrintCostCDropSholder) + brandLogoCost;
                 printbazcostCDropSholder = printbazcostbaseCDropSholder;
                
             } else {
@@ -756,8 +766,8 @@ if (totalQuantityCustomDropSholder > 0) {
 
             if (addBrandLogoArray[i] || individualProduct?.brandLogo !== null) {
                 let brandLogoCost = 5 * individualProduct?.totalQuantity;
-                totalBrandLogoCost+=brandLogoCost;
-                printbazcostbaseCRoundNeck = Number(totalFrontSidePrintCostCRoundNeck) + Number(totalBackSidePrintCostCRoundNeck) + totalBrandLogoCost;
+                // totalBrandLogoCost+=brandLogoCost;
+                printbazcostbaseCRoundNeck = Number(totalFrontSidePrintCostCRoundNeck) + Number(totalBackSidePrintCostCRoundNeck) + brandLogoCost;
                 printbazcostCRoundNeck = printbazcostbaseCRoundNeck;
               
           
@@ -787,249 +797,7 @@ console.log("printbazcost from calculation",printbazcost)
   if(formData?.additionalCost){
     printbazcost=printbazcost+Number(formData?.additionalCost)
   }
-  // console.log("printbazcost...",printbazcost)
-  const calculateIndividualPrintBazCost = (selectedItem,i,updatedtotalQuantity) => {
-    // const selectedItem = formData?.selectedItemsDetailArr[i];
-  
-      if (
-          (selectedItem?.productType === "orderDetailArrCustomHoodie") &&
-          selectedItem?.perItemQuantity &&
-          totalQuantityCustomHoodie &&
-          selectedItem?.individualProductArr &&
-          selectedItem?.individualProductArr.length &&
-          price_11p7x16p5CHoodie &&
-          price_10x14CHoodie &&
-          price_10x10CHoodie &&
-          price_10x5CHoodie &&
-          price_5X5CHoodie &&
-          price_2p5X5CHoodie &&
-          price_2p5X2p5CHoodie
-      ) {
-        let totalBackSidePrintCostCHoodie=0;
-        let totalFrontSidePrintCostCHoodie=0;
-          selectedItem?.individualProductArr.forEach((individualProduct) => {
-              const {
-                  printSize,
-                  printSizeBack,printSide
-                  // Added to get the size
-                  // Add other properties as needed
-              } = individualProduct;
-              // Your existing logic goes here
-              const totalPrice = tshirtFormulaCustomDropSholder(
-                  
-                 
-                  // formData?.quantity,
-                  selectedItem?.perItemQuantity,
-                  updatedtotalQuantity,
-                  printSize,
-                  price_11p7x16p5CHoodie,
-                  price_10x14CHoodie,
-                  price_10x10CHoodie,
-                  price_10x5CHoodie,
-                  price_5X5CHoodie,
-                  price_2p5X5CHoodie,
-                  price_2p5X2p5CHoodie
-              ).totalPrice;
-              totalFrontSidePrintCostCHoodie+=totalPrice;
-              // Back side dtf cost plus additional cost
-              backSidePrintCost = backsiideFormulaDropSholderHoodie(
-                selectedItem?.perItemQuantity,
-             
-                sumofTQuansityForIndividualDetailArrCHoodie,
-                  printSizeBack,
-                 printSide,
-                  backSideDtfprice_11p7x16p5CustomHoodie,
-                  backSideDtfprice_10x14CustomHoodie,
-                  backSideDtfprice_10x10CustomHoodie,
-                  backSideDtfprice_10x5CustomHoodie,
-                  backSideDtfprice_5X5CustomHoodie,
-                  backSideDtfprice_2p5X5CustomHoodie,
-                  backSideDtfprice_2p5X2p5CustomHoodie,
-                  additionalCost
-              ).backDtfAndAdditionalCost;
-              totalBackSidePrintCostCHoodie+=backSidePrintCost
-              if (addBrandLogoArray[i] || individualProduct?.brandLogo !== null) {
-                  let brandLogoCost = 5 * individualProduct?.totalQuantity;
-                   totalBrandLogoCost+=brandLogoCost;
-                  printbazcostbaseCHoodie = Number(totalPrice) + Number(totalBackSidePrintCostCHoodie) + totalBrandLogoCost;
-                  printbazcost += printbazcostbaseCHoodie;
-              
-                 
-              } else {
-                printbazcostbaseCHoodie = Number(totalPrice) + Number(totalBackSidePrintCostCHoodie);
-                printbazcost += printbazcostbaseCHoodie;
-            
-          
-              }
-            
-             
-             
-          });
-      }
-        if (
-        (selectedItem?.productType === "orderDetailArrCustomDropSholder") &&
-        selectedItem?.perItemQuantity &&
-        totalQuantityCustomDropSholder &&
-        selectedItem?.individualProductArr &&
-        selectedItem?.individualProductArr.length &&
-        price_11p7x16p5CDropSholder &&
-        price_10x14CDropSholder &&
-        price_10x10CDropSholder &&
-        price_10x5CDropSholder &&
-        price_5X5CDropSholder &&
-        price_2p5X5CDropSholder &&
-        price_2p5X2p5CDropSholder 
-    ) {
-      let totalBackSidePrintCostCDropSholder=0;
-      let totalFrontSidePrintCostCDropSholder=0;
-        selectedItem?.individualProductArr.forEach((individualProduct) => {
-            const {
-                printSize,
-                printSizeBack,printSide
-                // Added to get the size
-                // Add other properties as needed
-            } = individualProduct;
-            // Your existing logic goes here
-            const totalPrice = tshirtFormulaCustomDropSholder(
-                
-               
-                // formData?.quantity,
-                selectedItem?.perItemQuantity,
-                updatedtotalQuantity,
-                printSize,
-                price_11p7x16p5CDropSholder &&
-                price_10x14CDropSholder &&
-                price_10x10CDropSholder &&
-                price_10x5CDropSholder &&
-                price_5X5CDropSholder &&
-                price_2p5X5CDropSholder &&
-                price_2p5X2p5CDropSholder 
-            ).totalPrice;
-            totalFrontSidePrintCostCDropSholder+=totalPrice;
-            // Back side dtf cost plus additional cost
-            backSidePrintCost = backsiideFormulaDropSholderHoodie(
-              selectedItem?.perItemQuantity,
-           
-              sumofTQuansityForIndividualDetailArrCHoodie,
-                printSizeBack,
-               printSide,
-               backSideDtfprice_11p7x16p5CustomDropSholder,
-  backSideDtfprice_10x14CustomDropSholder,
-  backSideDtfprice_10x10CustomDropSholder,
-  backSideDtfprice_10x5CustomDropSholder,
-  backSideDtfprice_5X5CustomDropSholder,
-  backSideDtfprice_2p5X5CustomDropSholder,
-  backSideDtfprice_2p5X2p5CustomDropSholder,
-  additionalCost,
-            ).backDtfAndAdditionalCost;
-            totalBackSidePrintCostCDropSholder+=backSidePrintCost
-            if (addBrandLogoArray[i] || individualProduct?.brandLogo !== null) {
-                let brandLogoCost = 5 * individualProduct?.totalQuantity;
-                 totalBrandLogoCost+=brandLogoCost;
-                printbazcostbaseCHoodie = Number(totalPrice) + Number(totalBackSidePrintCostCDropSholder) + totalBrandLogoCost;
-                printbazcost += printbazcostbaseCDropSholder;
-               
-            } else {
-              printbazcostbaseCHoodie = Number(totalPrice) + Number(totalBackSidePrintCostCDropSholder);
-              printbazcost += printbazcostbaseCDropSholder;
-            
-        
-            }
-          
-           
-           
-        });
-    }
-        if (
-        (selectedItem?.productType === "orderDetailArr") &&
-        selectedItem?.perItemQuantity &&
-        totalQuantityCustomRoundNeck &&
-        selectedItem?.individualProductArr &&
-        selectedItem?.individualProductArr.length &&
-        price_10x14CRoundNeck &&
-        price_10x10CRoundNeck &&
-        price_10x5CRoundNeck &&
-        price_5X5CRoundNeck &&
-        price_2p5X5CRoundNeck &&
-        price_2p5X2p5CRoundNeck
-    ) {
-      let totalBackSidePrintCostCRoundNeck=0;
-      let totalFrontSidePrintCostCRoundNeck=0;
-        selectedItem?.individualProductArr?.forEach((individualProduct) => {
-            const {
-                printSize,
-                printSizeBack,printSide
-                // Added to get the size
-                // Add other properties as needed
-            } = individualProduct;
 
-            // Your existing logic goes here
-            const totalPrice = teeShirtFormula(
-               // formData?.quantity,
-                selectedItem?.perItemQuantity,
-                updatedtotalQuantity,
-                printSize,
-                price_10x14CRoundNeck,
-      price_10x10CRoundNeck,
-      price_10x5CRoundNeck,
-      price_5X5CRoundNeck,
-      price_2p5X5CRoundNeck,
-      price_2p5X2p5CRoundNeck
-            ).totalPrice;
-
-            // Back side dtf cost plus additional cost
-            backSidePrintCost = backsideFormula(
-              selectedItem?.perItemQuantity,
-              sumofTQuansityForIndividualDetailArrCRoundNeck,
-                printSizeBack,
-               printSide,
-               backSideDtfprice_10x14CustomRoundNeck,
-               backSideDtfprice_10x10CustomRoundNeck,
-               backSideDtfprice_10x5CustomRoundNeck,
-               backSideDtfprice_5X5CustomRoundNeck,
-               backSideDtfprice_2p5X5CustomRoundNeck,
-               backSideDtfprice_2p5X2p5CustomRoundNeck,
-               additionalCost,
-            ).backDtfAndAdditionalCost;
-            totalBackSidePrintCostCRoundNeck += backSidePrintCost;
-            totalFrontSidePrintCostCRoundNeck += totalPrice;
-
-            if (addBrandLogoArray[i] || individualProduct?.brandLogo !== null) {
-                let brandLogoCost = 5 * individualProduct?.totalQuantity;
-                totalBrandLogoCost+=brandLogoCost;
-                printbazcostbaseCRoundNeck = Number(totalPrice) + Number(totalBackSidePrintCostCRoundNeck) + totalBrandLogoCost;
-                printbazcost += printbazcostbaseCRoundNeck;
-              
-          
-            } 
-            else {
-              printbazcostbaseCRoundNeck = Number(totalPrice) + Number(totalBackSidePrintCostCRoundNeck);
-              printbazcost += printbazcostbaseCRoundNeck;
-            
-          
-            }
-            
-           
-        });
-      
-    }
-    let returnCost=0
-   if (printbazcostCHoodie>0){
-    returnCost= printbazcostCHoodie
-   }
-   if (printbazcostCRoundNeck>0){
-    returnCost= printbazcostCRoundNeck
-   }
-   if (printbazcostCDropSholder>0){
-    returnCost= printbazcostCDropSholder
-   }
-   console.log("printbazcostCHoodie+printbazcostCRoundNeck +printbazcostCDropSholder",printbazcostbaseCHoodie,printbazcostbaseCRoundNeck ,printbazcostbaseCDropSholder)
-    // Handle other cases if needed
-    return printbazcost;
-    // return returnCost;
-
-    // Default value if no match
-  };
 
  
 
@@ -1111,7 +879,7 @@ const handleInputChange = (event, orderIndex, productIndex) => {
     const newPrintBazCost = newSelectedItemsDetailArr.reduce((acc, item) => acc + item.printbazcost, 0);
 
     console.log('Updated State:', { ...prevState, selectedItemsDetailArr: newSelectedItemsDetailArr, quantity: newGrandQuantity, printbazcost: printbazcost });
-
+console.log("printbazcost from inputchange.........",newGrandQuantity ,printbazcost)
     return { ...prevState, [name]: value,selectedItemsDetailArr: newSelectedItemsDetailArr, quantity: newGrandQuantity, printbazcost: printbazcost};
   });
   // setFormData({ ...formData, [name]: value});
@@ -1204,10 +972,20 @@ const calculatePerItemQuantity = (orderItem) => {
             return false;
           }
         };
-      
+        let orderTotalCalculation=printbazcost+deliveryFee-Number(formData?.dsicount);
         
+        let grandCost=Math.ceil(orderTotalCalculation+(orderTotalCalculation*0.03))
+         
+      
   const handleUpdate=async(e)=>{
     e.preventDefault()
+    
+    setIsLoading(true)
+    // Validate the form here
+    if (validateForm()) {
+      setIsLoading(false);
+      return; 
+    }
 try{
   const formDataSendOrdertoServer = new FormData();
 
@@ -1269,20 +1047,22 @@ try{
    formDataSendOrdertoServer.append("userMail",formData?.userMail);
    formDataSendOrdertoServer.append("regId",formData?.regId);
    formDataSendOrdertoServer.append('createdAt', formattedDate);
-  
    formDataSendOrdertoServer.append('clientName', formData?.clientName);
    formDataSendOrdertoServer.append('clientbrandName', formData?.clientbrandName);
-   formDataSendOrdertoServer.append('clientPhone', formData?.clientPhone);
+  //  formDataSendOrdertoServer.append('clientPhone', formData?.clientPhone);
    formDataSendOrdertoServer.append("address",formData?.address);
    formDataSendOrdertoServer.append("instruction",formData?.instruction);
    formDataSendOrdertoServer.append("districts",formData?.districts);
    formDataSendOrdertoServer.append("zones",formData?.zones);
    formDataSendOrdertoServer.append("areas",formData?.areas);
    formDataSendOrdertoServer.append("grandQuantity",formData?.quantity);
-   formDataSendOrdertoServer.append("grandCost",formData?.grandCost);
+   formDataSendOrdertoServer.append("grandCost",grandCost);
    formDataSendOrdertoServer.append("printbazcost",printbazcost);
    formDataSendOrdertoServer.append("deliveryFee",formData?.deliveryFee);
-   formDataSendOrdertoServer.append("discount",formData?.dsicount);
+   formDataSendOrdertoServer.append("dsicount",formData?.dsicount);
+   formDataSendOrdertoServer.append("additionalCost",formData?.additionalCost);
+   formDataSendOrdertoServer.append("discountNote",formData?.discountNote);
+   formDataSendOrdertoServer.append("additionalCostNote",formData?.additionalCostNote);
    formDataSendOrdertoServer.append("collectAmount",formData?.collectAmount);
    formDataSendOrdertoServer.append("recvMoney",recvMoney);
   //  formDataSendOrdertoServer.append("orderCreatedAt",formData?.orderCreatedAt);
@@ -1291,7 +1071,8 @@ try{
   //  formDataSendOrdertoServer.append("paymentStatus",formData?.paymentStatus);
  
   //  const response = await fetch(`https://mserver.printbaz.com/updateorder/${getSpecificOrderById?._id}`, {
-                 const response = await fetch(`http://localhost:5000/updateneworder/${getSpecificOrderById?._id}`, {
+                 const response = await fetch(`https://mserver.printbaz.com/updateneworder/${getSpecificOrderById?._id}`, {
+                //  const response = await fetch(`http://localhost:5000/updateneworder/${getSpecificOrderById?._id}`, {
                    method: "PUT",
                    body: formDataSendOrdertoServer,
                  });
@@ -1300,7 +1081,7 @@ try{
                    const result = await response.json();
                    // console.log("Success:", result);
                    // console.log('API response:', response);
-               
+                   setShowAlert(true);
                  } else {
                    throw new Error('API error: ' + response.status);
                  }
@@ -1308,7 +1089,9 @@ try{
  catch  (error){
   console.error('API error:', error.message);
  }   
-
+ finally {
+  setIsLoading(false); // Set loading status to false
+}
   }  
        
         
@@ -2233,7 +2016,16 @@ try{
                     >
                       Cancel
                     </Button> */}
-                    {
+        
+                  </div>
+</div>
+
+
+</Form> 
+             
+          
+      </div>
+      {
   isLoading===true &&(
     <>
      <div className="alert-overlay"  />
@@ -2246,16 +2038,7 @@ try{
     </>
   )
   
-} 
-                  </div>
-</div>
-
-
-</Form> 
-             
-          
-      </div>
-
+}
       {showAlert===true && (
           
           <OrderUpdateAlert
