@@ -236,7 +236,7 @@ customHoodieinputBack2p5X2p5}=useFilterValueBasedonCategory()
       const [addBrandLogoArray, setAddBrandLogoArray] = useState([]);
     // Fetch unique districts when the component mounts
   useEffect(() => {
-    console.log('Print Baz Cost Updated:', formData.printbazcost);
+   
     // axios.get('http://localhost:5000/unique-districts')
     axios.get('https://mserver.printbaz.com/unique-districts')
       .then(response => {
@@ -333,21 +333,51 @@ const [hasLogo,setHasLogo]=useState(false)
 
             let updatedFiles;
    
-      if (fileType === "file") {
-        updatedFiles = updatedProduct.file.map((existingFile, idx) =>
-          idx === fileIndex  ? newFilesArray[0] : existingFile
-          // updatedProduct.file[fileIndex] = newFilesArray[fileIndex];
-        );
-       
-        updatedProduct.file = updatedFiles;
-      }  else if (fileType === "image") {
+            if (fileType === "file") {
+              updatedFiles = updatedProduct.file.map((existingFile, idx) => {
+                let uniqueIdentifier = existingFile.uniqueIdentifier;
+                console.log("existingFile.uniqueIdentifier", uniqueIdentifier);
+              if(idx === fileIndex){
+                newFilesArray[0].uniqueIdentifier=uniqueIdentifier
+              }
+                return idx === fileIndex
+                ? 
+                    newFilesArray[0]   // include uniqueIdentifier from existingFile
+                  
+                : existingFile;
+              });
+              updatedProduct.file = updatedFiles;
+              console.log("updatedProduct",updatedProduct)
+            } else if (fileType === "image") {
               updatedFiles = updatedProduct.image.map((existingImage, idx) =>
-                idx === fileIndex ? newFilesArray[0] : existingImage
+              {
+                let uniqueIdentifier = existingImage.uniqueIdentifier;
+                console.log("existingImage.uniqueIdentifier", uniqueIdentifier);
+              if(idx === fileIndex){
+                newFilesArray[0].uniqueIdentifier=uniqueIdentifier
+              }
+                return idx === fileIndex
+                ? 
+                    newFilesArray[0]   // include uniqueIdentifier from existingFile
+                  
+                : existingImage;
+              }
               );
               updatedProduct.image = updatedFiles;
             } else if (fileType === "brandLogo") {
               updatedFiles = updatedProduct.brandLogo.map((existingLogo, idx) =>
-                idx === fileIndex ? newFilesArray[0] : existingLogo
+              {
+                let uniqueIdentifier = existingLogo.uniqueIdentifier;
+                console.log("existingLogo.uniqueIdentifier", uniqueIdentifier);
+              if(idx === fileIndex){
+                newFilesArray[0].uniqueIdentifier=uniqueIdentifier
+              }
+                return idx === fileIndex
+                ? 
+                    newFilesArray[0]   // include uniqueIdentifier from existingFile
+                  
+                : existingLogo;
+              }
               );
               updatedProduct.brandLogo = updatedFiles;
             }
@@ -426,7 +456,9 @@ const [hasLogo,setHasLogo]=useState(false)
     
     
     const { tshirtPrice } = useGetTshirtPrice();
-  
+    const blankRoundNeckFilter=tshirtPrice?.find(thsirt => thsirt.category === "Blank Round Neck")
+    const blankDropSholderFilter=tshirtPrice?.find(thsirt => thsirt.category === "Blank Drop Sholder")
+    const blankHoodieFilter=tshirtPrice?.find(thsirt => thsirt.category === "Blank Hoodie")
 const price_10x14CRoundNeck=customRoundNeckinputFront10X14?.frontSideprice
 const price_10x10CRoundNeck=customRoundNeckinputFront10X10?.frontSideprice
 const price_10x5CRoundNeck=customRoundNeckinputFront10X5?.frontSideprice
@@ -515,6 +547,11 @@ const calculateTotalQuantityForProductType = (productType) => {
 const totalQuantityCustomHoodie = calculateTotalQuantityForProductType("orderDetailArrCustomHoodie");
 const totalQuantityCustomRoundNeck = calculateTotalQuantityForProductType("orderDetailArr");
 const totalQuantityCustomDropSholder = calculateTotalQuantityForProductType("orderDetailArrCustomDropSholder");
+const totalQuantityBlankRNeck = calculateTotalQuantityForProductType("orderDetailArrBlankRoundNeck");
+
+const totalQuantityBlankDropSholder = calculateTotalQuantityForProductType("orderDetailArrBlankDropSholder");
+const totalQuantityBlankHoodie = calculateTotalQuantityForProductType("orderDetailArrBlankHoodie");
+
 let sumofTQuansityForIndividualDetailArrCRoundNeck = 0;
 let sumofTQuansityForIndividualDetailArrCHoodie = 0;
 let sumofTQuansityForIndividualDetailArrCDropsholder = 0;
@@ -556,6 +593,14 @@ if (totalQuantityCustomDropSholder > 0) {
   let printbazcostbaseCHoodie = 0;
   let printbazcostCDropSholder= 0;
   let printbazcostbaseCDropSholder = 0;
+
+  let printbazcostbaseBlankDropSholder = 0;
+  let printbazcostbaseBlankHoodie = 0;
+  let printbazcostbaseBlankRoundNeck = 0;
+
+  let printbazcostBHoodie = 0;
+  let printbazcostBRoundNeck= 0;
+  let printbazcostBDropsholder = 0;
   let backSidePrintCost=0;
   let totalBrandLogoCost=0;
 
@@ -783,11 +828,46 @@ if (totalQuantityCustomDropSholder > 0) {
         });
       
     }
-   
+   else if (
+      selectedItem?.productType === "orderDetailArrBlankRoundNeck" &&
+      selectedItem?.perItemQuantity &&
+      totalQuantityBlankRNeck &&
+      selectedItem?.individualProductArr &&
+      selectedItem?.individualProductArr.length 
+    ){
+      printbazcostbaseBlankRoundNeck=selectedItem?.perItemQuantity * blankRoundNeckFilter?.frontSideprice
+    
+      printbazcostBRoundNeck =printbazcostbaseBlankRoundNeck
+      
+    }
+   else if (
+      selectedItem?.productType === "orderDetailArrBlankHoodie" &&
+      selectedItem?.perItemQuantity &&
+      totalQuantityBlankHoodie &&
+      selectedItem?.individualProductArr &&
+      selectedItem?.individualProductArr.length 
+    ){
+      printbazcostbaseBlankHoodie=selectedItem?.perItemQuantity * blankHoodieFilter?.frontSideprice
+    
+      printbazcostBHoodie =printbazcostbaseBlankHoodie
+      
+    }
+   else if (
+      selectedItem?.productType === "orderDetailArrBlankDropSholder" &&
+      selectedItem?.perItemQuantity &&
+      totalQuantityBlankDropSholder &&
+      selectedItem?.individualProductArr &&
+      selectedItem?.individualProductArr.length 
+    ){
+      printbazcostbaseBlankDropSholder=selectedItem?.perItemQuantity * blankDropSholderFilter?.frontSideprice
+     
+      printbazcostBDropsholder =printbazcostbaseBlankDropSholder
+      
+    }
      
   }
-  printbazcost=printbazcostCHoodie+printbazcostCRoundNeck+printbazcostCDropSholder
-console.log("printbazcost from calculation",printbazcost)
+  printbazcost=printbazcostCHoodie+printbazcostCRoundNeck+printbazcostCDropSholder+printbazcostBRoundNeck+printbazcostBHoodie+printbazcostBDropsholder
+
 
 // Output results
   if(formData?.dsicount){
@@ -849,22 +929,20 @@ const handleInputChange = (event, orderIndex, productIndex) => {
         // updatedItem.printbazcost = calculateIndividualPrintBazCost(item,i,updatedProduct.totalQuantity);
 
         if (item?.productType === "orderDetailArr" && totalQuantityCustomRoundNeck > 0) {
-          console.log("from handleinput  change printbazcostCRoundNeck",printbazcostCRoundNeck)
+         
           updatedItem.printbazcost =printbazcostCRoundNeck;
         }
         // Update printbazcost based on the updated item
         if (item?.productType === "orderDetailArrCustomHoodie" && totalQuantityCustomHoodie > 0) {
-          console.log("from handleinput  change printbazcostCHoodie,",printbazcostCHoodie)
+          
           updatedItem.printbazcost =printbazcostCHoodie;
         }
         if (item?.productType === "orderDetailArrCustomDropSholder" && totalQuantityCustomDropSholder > 0) {
-          console.log("from handleinput  change printbazcostCdropsholder,",printbazcostCDropSholder)
+         
           updatedItem.printbazcost =printbazcostCDropSholder;
         }
 
-        console.log('Updated Per Item Quantity:', updatedItem.perItemQuantity);
-        console.log('Updated Print Baz Cost:', updatedItem.printbazcost);
-        console.log('Updated Item:', updatedItem);
+       
 
         return updatedItem; // Return the updated item
       }
@@ -878,13 +956,12 @@ const handleInputChange = (event, orderIndex, productIndex) => {
     // Calculate new printbazcost based on the updated data
     const newPrintBazCost = newSelectedItemsDetailArr.reduce((acc, item) => acc + item.printbazcost, 0);
 
-    console.log('Updated State:', { ...prevState, selectedItemsDetailArr: newSelectedItemsDetailArr, quantity: newGrandQuantity, printbazcost: printbazcost });
-console.log("printbazcost from inputchange.........",newGrandQuantity ,printbazcost)
+
     return { ...prevState, [name]: value,selectedItemsDetailArr: newSelectedItemsDetailArr, quantity: newGrandQuantity, printbazcost: printbazcost};
   });
   // setFormData({ ...formData, [name]: value});
 };
-console.log("fomrData?.printbazcost",formData?.printbazcost)
+
 
 // Function to calculate totalQuantity based on quantity fields
 const calculateTotalQuantity = (product) => {
@@ -931,7 +1008,10 @@ const calculatePerItemQuantity = (orderItem) => {
     let deliveryFee = 0; // Initialize fees as 0
    let totalWeight=(totalQuantityCustomHoodie*weightPerHoodie)+
   (totalQuantityCustomRoundNeck*weightPerShirt)+
- (totalQuantityCustomDropSholder*weightPerDropSholder)
+ (totalQuantityCustomDropSholder*weightPerDropSholder)+
+ (totalQuantityBlankDropSholder*weightPerDropSholder)+
+ (totalQuantityBlankHoodie*weightPerHoodie)+
+ (totalQuantityBlankRNeck*weightPerShirt)
     // Check if grandQuantity is defined and greater than 0
     if (grandQuantity && grandQuantity > 0) {
       deliveryFee = deliveryCharge({
@@ -995,23 +1075,26 @@ try{
    const filesAndImagesArr = [];
            
    // Iterate over each individual product in individualProductArr
-   item?.individualProductArr?.forEach((product, productIndex) => {
+   item?.individualProductArr?.forEach(async(product, productIndex) => {
      const fileAndImageData = {};
      // console.log("item.brandLogo",item.brandLogo);
      if (product.file) {
-       product.file.forEach((file, fileIndex) => {
-         formDataSendOrdertoServer.append(`file${index}_${fileIndex}`, file); // Append each file
-       });
-     }
-     
+      product.file.forEach((files, fileIndex) => {
+       
+  
+        console.log("files...",files)
+        formDataSendOrdertoServer.append(`file${index}_${fileIndex}_${files?.uniqueIdentifier}`, files); // Append each image
+      });
+    }
+    
      if (product.image) {
-       product.image.forEach((image, imageIndex) => {
-         formDataSendOrdertoServer.append(`image${index}_${imageIndex}`, image); // Append each image
+       product.image.forEach((images, imageIndex) => {
+         formDataSendOrdertoServer.append(`image${index}_${imageIndex}_${images?.uniqueIdentifier}`, images); // Append each image
        });
      }   
      if (product.brandLogo) {
        product.brandLogo.forEach((logo, logoIndex) => {
-         formDataSendOrdertoServer.append(`brandLogo${index}_${logoIndex}`, logo); // Append each image
+         formDataSendOrdertoServer.append(`brandLogo${index}_${logoIndex}_${logo?.uniqueIdentifier}`, logo); // Append each image
        });
      }   
   
@@ -1020,8 +1103,7 @@ try{
  if (Object.keys(fileAndImageData).length) {
        filesAndImagesArr.push(fileAndImageData);
      }
- 
- 
+
      formDataSendOrdertoServer.append(`color${index}_${productIndex}`, product.color);
      formDataSendOrdertoServer.append(`productType${index}_${productIndex}`, product.productType);
      formDataSendOrdertoServer.append(`teshirtSize${index}_${productIndex}`, product.teshirtSize);
@@ -1070,7 +1152,7 @@ try{
   //  formDataSendOrdertoServer.append("orderStatus",formData?.orderStatus);
   //  formDataSendOrdertoServer.append("paymentStatus",formData?.paymentStatus);
  
-  //  const response = await fetch(`https://mserver.printbaz.com/updateorder/${getSpecificOrderById?._id}`, {
+
                  const response = await fetch(`https://mserver.printbaz.com/updateneworder/${getSpecificOrderById?._id}`, {
                 //  const response = await fetch(`http://localhost:5000/updateneworder/${getSpecificOrderById?._id}`, {
                    method: "PUT",
@@ -1094,7 +1176,8 @@ try{
 }
   }  
        
-        
+
+     
           const numObjects = formData?.selectedItemsDetailArr?.length;
 
           // Define default values for xs and md
@@ -1178,7 +1261,7 @@ try{
                 <Card.Title className='m-auto p-3' style={{backgroundColor:"#001846",color:"white",width:"100%",textAlign:"center"}}>{item.color}
                     <input data-color={item.color} name="color" type="hidden" value={item.color} />
                     <p style={{color:"orange",textAlign:"center"}}>{item?.productType}</p>
-                    <p style={{color:"orange",textAlign:"center"}}>{index}{uniqueIndex}</p>
+                    {/* <p style={{color:"orange",textAlign:"center"}}>{index}{uniqueIndex}</p> */}
                 </Card.Title>
             
                 <ListGroup className="list-group-flush pl-0 pr-0">
@@ -1243,7 +1326,12 @@ try{
                         />
                     </ListGroup.Item>  
                 </ListGroup>
-                <Card.Body>
+               
+                {
+                (  insideDetail?.productType==="orderDetailArr"||
+                   insideDetail?.productType==="orderDetailArrCustomDropSholder"||
+                   insideDetail?.productType==="orderDetailArrCustomHoodie") &&
+                  <Card.Body>
                 <Form.Group
                                className="mb-3 Print Side w-100 m-auto"
                                controlId="wccalcPrintSide"
@@ -1550,7 +1638,11 @@ try{
          </Form.Group>
           */}
              <Form.Group  className="mb-3">
-                               <Form.Label>BrandLogo(optional)</Form.Label>
+              {
+                item?.brandLogo &&
+                <Form.Label>BrandLogo(optional)</Form.Label>
+              }
+                        
                                {
                                     item?.brandLogo?.map((logo,logoIndex)=>{
                                      let fileId, logoPreviewURL;
@@ -1603,6 +1695,8 @@ try{
                     
          
                 </Card.Body>
+                }
+                
             </Card>
             </Col>
           )

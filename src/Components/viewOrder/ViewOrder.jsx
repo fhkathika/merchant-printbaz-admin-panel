@@ -1921,7 +1921,7 @@ orderDetail?.brandLogo ?
      <p >Quantity : <span className='bold'> {orderDetail?.totalQuantity}</span></p>
      <p >Print Size : <span className='bold'>{orderDetail?.printSize}</span></p>
      <div className="col-lg-12" >
-     <p>Main File :</p>
+     <p>Main File:</p>
       <div className="card file">
 {
 orderDetail?.file?.map((fileUrl,fileIndex) => {
@@ -2041,9 +2041,13 @@ orderDetail?.brandLogo ?
     {
       getSpecificOrderById?.selectedItemsDetailArr
       ?.map((insideDetail,orderIndex)=> 
-  
-        insideDetail?.individualProductArr?.map((orderDetail,itemIndex)=>
-          orderDetail?.printSide  ?
+      
+        insideDetail?.individualProductArr?.map((orderDetail,itemIndex)=>{ 
+          const maxIndex = insideDetail?.individualProductArr?.length || 1;
+      const uniqueIndex = orderIndex * maxIndex + itemIndex;
+        return(
+
+            orderDetail?.printSide  ?
           
           <>
           <div className="row order-tab  " key={orderIndex}>
@@ -2159,7 +2163,11 @@ orderDetail?.image?.fileId ?
        
  
   <>
-  <h4>Brang Logo :</h4>
+  {
+    orderDetail?.brandLogo?.fileId &&
+<h4>Brang Logo :</h4>
+  }
+  
   <div className="">
 {
 orderDetail?.brandLogo?.fileId ?
@@ -2255,6 +2263,8 @@ orderDetail?.brandLogo &&
 
   </>
         )
+        
+   }   )
  )
     }
   
