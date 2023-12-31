@@ -51,6 +51,7 @@ const ViewOrder = () => {
     .then(data => {setGetSpecificOrderById(data)
       setOrderStatus(data.orderStatus);
       setPaymentStatus(data.paymentStatus);
+      setClientPaymentStatus(data.clientPaymentStatus);
       setDeliverAssign(data?.deliveryAssignTo);
       setFetchtrackingId(data?.trackingId);
     })
@@ -62,6 +63,7 @@ const ViewOrder = () => {
         },[getSpecificOrderById])
   const [orderStatus, setOrderStatus] = useState();
   const [paymentStatus, setPaymentStatus] = useState();
+  const [clientPaymentStatus, setClientPaymentStatus] = useState();
   const [deliverAssign, setDeliverAssign] = useState();
   const [updateOrder, setUpdateOrder] = useState(false);
   const [updateOrderBlank, setUpdateOrderBlank] = useState(false);
@@ -351,6 +353,36 @@ setTrackingId(e.target.value)
         // console.log("Success:", getSpecificOrderById);
         // Update your state or perform any other necessary operations with the updated viewClient object
     }
+      } else {
+        console.error("status Error:", response);
+        // Handle error here
+      }
+    } catch (error) {
+      console.error("Error:", error.message);
+      // Handle error here
+    }
+  };
+  const handleInputClientPaymentChange = async (e) => {
+    const status = e.target.value; // the new status
+  
+    try {
+      const response = await fetch(
+        
+        // `https://mserver.printbaz.com/clientPaymentStatus/${id}`,
+      `http://localhost:5000/clientPaymentStatus/${id}`,
+        {
+          method: "PUT",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({ clientPaymentStatus: status }),
+        }
+      );
+  
+      if (response.ok) {
+        // Update the approval status in the viewClient object
+        setClientPaymentStatus(status);
+      
       } else {
         console.error("status Error:", response);
         // Handle error here
@@ -726,7 +758,7 @@ else{
               <div className="col-12">
                 <div className="order-id bg-white p-4  shadow-sm" >
                 <div style={{display:""}} className="row">
-                  <div className='col-lg-6'>
+                  <div className='col-lg-5'>
                   <h3 className=" font-weight-bold col-lg-12 font_16" onClick={copyOrderId}>ORDER ID: {id} &nbsp;<span style={{cursor:"pointer",padding:"5px",fontSize:"16px"}} ref={target}  onClick={copyOrderId}><i class="fa fa-copy ml-2 mt-1 text-green cursor-pointer text-sm"></i></span> 
                 <h5 className='font_16' style={{marginTop:"10px"}}>{formattedDate}</h5>
                 </h3>
@@ -787,10 +819,33 @@ else{
 }
     
                   <div
-                        className="   font-weight-bold col-lg-4 "
+                        className="   font-weight-bold col-lg-5 "
                         style={{ marginBottom: "20px",display:"flex",justifyContent:"flex-end" }}
                       >
                         <div style={{display:""}}>
+                        <select
+                          id="status-filter"
+                          className="status-btn"
+                       
+                          style={{
+                            border: "none",
+                            padding: "8px",
+                          
+                            marginRight:'20px',
+                            marginBottom:"5px",
+                            backgroundColor: getViewClientColor(
+                              clientPaymentStatus
+                            ),
+                          }}
+                          onChange={(e) => handleInputClientPaymentChange(e)}
+                        >
+                        {/* <option selected>Select Print Size</option> */}
+                       <option selected value="unpaidToClient">Unpaid Client</option>
+                       
+                          <option value="paidToClient">Paid Client</option>
+
+                        </select>
+                          
                           {
                             value_count?.payment_Status ?
                             <select
@@ -1349,6 +1404,7 @@ onChange={(e) => handleInputChange(e)}
                
 
                       </div>
+                
                 </div>
               
                      

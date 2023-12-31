@@ -12,8 +12,11 @@ import { AuthContext } from "../../authProvider/AuthProvider";
 import { Button } from "react-bootstrap";
 import PaymentReleasedPopUp from "../alert/PaymentReleasedPopUp";
 import axios from "axios";
+import ConfirmationPopUp from "../alert/ConfirmationPopUp";
 const ViewClient = () => {
-  const { orderAll } = useGetMongoData();
+  // const { orderAll } = useGetMongoData();
+  const [orderAll, setOrderAll] = useState([]);
+
   const { merchantOrder } = useSingleMercahntorder();
   const location = useLocation();
   const viewClient = location.state ? location?.state?.merchants :location.state ? location?.state?.getDataById : null;
@@ -22,8 +25,17 @@ const ViewClient = () => {
   const {value_count}=useRoleAsignData()
   const {adminUser}=useContext(AuthContext);
   const navigate=useNavigate()
+  useEffect(()=>{
+    const getOrders = async () => {
+    //  await fetch(`https://mserver.printbaz.com/getmyorder/${viewClient?.email}`) //for main site
+    await fetch(`https://mserver.printbaz.com/getmyorder/${viewClient?.email}`)
+  
+    .then(res=>res.json())
+    .then(data => setOrderAll(data))
+    }
+    getOrders()
+},[])
 
-  // console.log("getUserById",getUserById);
   const [registeredInfo,setRegisteredInfo]=useState({
       _id: adminUser?._id,
       name: adminUser?.name,
@@ -181,9 +193,9 @@ if (Array.isArray(orderSatatusReturned)) {
     
   }
 }
-console.log("totalReturn",totalReturn)
-console.log("deliveryFee",deliveryFee)
-console.log("totalReturnAmmountBase",totalReturnAmmountBase)
+// console.log("totalReturn",totalReturn)
+// console.log("deliveryFee",deliveryFee)
+// console.log("totalReturnAmmountBase",totalReturnAmmountBase)
 
 // Now, totalReturnAmountBase contains the sum of all returnedAmounts and their associated deliveryFees
 
@@ -205,11 +217,11 @@ for(let i=0;i<PaymentStausPaid?.length;i++){
 
 // Calculate initial due amount
 let dueAmount = Number(statusPaidbase - (totalReceiveBase + totalReturnAmmountBase));
-console.log("getUserById",getUserById)
+
 // Fetch the latest payment made by user
 let lastPayementDetail = getUserById?.payments?.length > 0 ? 
                          getUserById.payments[getUserById.payments.length-1] : null;
-
+console.log("getUserById",getUserById)
 // Calculate the grand due amount
 let grandDueNow = dueAmount;
 
@@ -217,9 +229,9 @@ if (lastPayementDetail && lastPayementDetail.paymentReleasedAmount) {
     grandDueNow -= lastPayementDetail.totalReleasedAmount;
 }
 
-console.log("Initial dueAmount:", dueAmount);
-console.log("Last payment amount:", lastPayementDetail?.paymentReleasedAmount || 0);
-console.log("Grand Due Amount:", grandDueNow);
+// console.log("Initial dueAmount:", dueAmount);
+// console.log("Last payment amount:", lastPayementDetail?.paymentReleasedAmount || 0);
+// console.log("Grand Due Amount:", grandDueNow);
 
 
 useEffect(()=>{
@@ -236,11 +248,11 @@ useEffect(()=>{
    useEffect(() => {
     const getOrderByIdfromMerchant = async () => {
         // Ensure there's an ID before making a request
-        console.log("totalBill test",statusPaidbase);
-        console.log("dueAmount test",dueAmount);
-        console.log("totalReceiveBase test",totalReceiveBase);
-        console.log("totalReturnAmmountBase test",totalReturnAmmountBase);
-        console.log("totalReturnAmmountBase test",totalReturnAmmountBase);
+        // console.log("totalBill test",statusPaidbase);
+        // console.log("dueAmount test",dueAmount);
+        // console.log("totalReceiveBase test",totalReceiveBase);
+        // console.log("totalReturnAmmountBase test",totalReturnAmmountBase);
+        // console.log("totalReturnAmmountBase test",totalReturnAmmountBase);
         if (viewClient?._id) {
             try {
           
@@ -339,6 +351,91 @@ const handlePaymentHistory=()=>{
   const merchantId = viewClient?._id;
   navigate(`/paymentHistory/${merchantId}`);
 }
+ // State to store selected orders
+ const [selectedOrders, setSelectedOrders] = useState([]);
+
+ // Function to handle order selection
+ const handleOrderSelect = (orderInfo) => {
+   // Check if the order is already selected
+   const isSelected = selectedOrders.some((selectedOrder) => selectedOrder.orderId === orderInfo._id);
+
+   // If not selected, add it to the array; if selected, remove it
+   if (!isSelected) {
+     const selectedOrderData = {
+       orderId: orderInfo._id,
+       reciepientFirstname: orderInfo.name,
+       clientName: orderInfo.clientName,
+       regId: orderInfo.regId,
+       userMail: orderInfo.userMail,
+       recvMoney: orderInfo.recvMoney,
+       collectAmount: orderInfo.collectAmount,
+       address: orderInfo.address,
+       areas: orderInfo.areas,
+       districts: orderInfo.districts,
+       zones: orderInfo.zones,
+       phone: orderInfo.phone,
+       printbazcost: orderInfo.printbazcost,
+       reciepientLastname: orderInfo.lastName,
+       discountToClient: orderInfo.discount,
+       additionalCost: orderInfo.additionalCost,
+       companyName: orderInfo.companyName,
+       clientbrandName: orderInfo.clientbrandName,
+       
+       // Add other properties you want to store
+     };
+
+     // Update state with the new selected order
+     setSelectedOrders([...selectedOrders, selectedOrderData]);
+   } else {
+     // If already selected, remove it from the array
+     const updatedSelectedOrders = selectedOrders.filter((selectedOrder) => selectedOrder.orderId !== orderInfo._id);
+     setSelectedOrders(updatedSelectedOrders);
+   }
+ };
+ console.log("selectedOrders.....",selectedOrders)
+ let selectedRcvAMounToPaymentRelease = 0;
+
+if (selectedOrders?.length !== 0) {
+  selectedRcvAMounToPaymentRelease = selectedOrders?.reduce((sum, receiveAmount) => {
+    let amount = parseInt(receiveAmount?.recvMoney);
+    return sum + (isNaN(amount) ? 0 : amount);
+  }, 0); // Initialize sum to 0
+}
+const [showPopUp,setShowPopUp]=useState(false)
+const  showReleasePaymentpopUP=()=>{
+  setShowPopUp(true)
+}
+
+const  handleReleasePayment=async()=>{
+  try {
+          
+    const response = await fetch(
+        // `https://mserver.printbaz.com/sendpaymentReleasedOrders`,
+        `http://localhost:5000/sendpaymentReleasedOrders`,
+        {
+          method: "POST",
+          headers: {
+              "Content-Type": "application/json",
+          },
+          body: JSON.stringify(selectedOrders),
+      }
+    );
+
+    const data = await response.json();
+    if (response.status === 200) {
+        // Handle success, for instance:
+        console.log("Total bill updated successfully:", data);
+    } else {
+        // Handle error
+        console.error("Error updating the bill:", data.message);
+    }
+
+} catch (error) {
+    console.error("Network or server error:", error);
+}
+}
+
+
   return (
     <div>
       <meta charSet="UTF-8" />
@@ -724,6 +821,39 @@ const handlePaymentHistory=()=>{
                   value_count?.orderList &&
                   
                   <div className="client-order-list">
+             <div>
+  {selectedOrders.length !== 0 ? (
+    <button
+    onClick={showReleasePaymentpopUP}
+      style={{
+        backgroundColor: '#4CAF50', // Green color for enabled state
+        color: 'white',
+        padding: '10px 20px',
+        border: 'none',
+        borderRadius: '4px',
+        cursor: 'pointer',
+      }}
+    >
+      Release Payment
+    </button>
+  ) : (
+    <button
+      disabled
+      style={{
+        backgroundColor: '#ccc', // Light gray color for disabled state
+        color: '#666',
+        padding: '10px 20px',
+        border: 'none',
+        borderRadius: '4px',
+        cursor: 'not-allowed',
+      }}
+    >
+      Release Payment
+    </button>
+  )}
+</div>
+
+
                      <div  style={{display:"flex",justifyContent:"flex-end",padding:"0px ",marginBottom:"10px"}}>
                   
                   <span style={{cursor:"pointer",border:"1px solid #dad5d5",padding:"5px",borderRadius:"4px"}} onClick={downloadInfIntoXl} data-order-id="view-order-detail"><img style={{width:"30px",hight:"25px"}} src="/images/download.png" alt='download'/></span>
@@ -752,15 +882,20 @@ const handlePaymentHistory=()=>{
                       <h4>Status</h4>
                     </div>
                   </div>
-                  {orderAll
-                    ?.filter((order) => order.userMail === viewClient?.email)
-                    ?.map((orderInfo, index) => {
+                  {orderAll?.map((orderInfo, index) => {
      // You can conditionally update returnedAmount based on the orderStatus
      if (orderInfo?.orderStatus === "returned") {
       updateReturnedAmount(orderInfo._id, orderInfo.printbazcost, orderInfo.deliveryFee);
     }
      return(
                       <div className="row client-list">
+                         <div className="col-lg-1 col-sm-12">
+            <input
+              type="checkbox"
+              checked={selectedOrders.some((selectedOrder) => selectedOrder.orderId === orderInfo._id)}
+              onChange={() => handleOrderSelect(orderInfo)}
+            />
+          </div>
                         <div className="col-lg-2 col-sm-12">
                           <p>{orderInfo?.name}</p>
                         </div>
@@ -778,7 +913,7 @@ const handlePaymentHistory=()=>{
                             {orderInfo?.paymentStatus}
                           </p>
                         </div>
-                        <div className="col-lg-2 col-sm-12">
+                        <div className="col-lg-1 col-sm-12">
                           <p>{Math.floor(orderInfo?.recvMoney)}TK</p>
                         </div>
                         <div className="col-lg-1 col-sm-12">
@@ -791,6 +926,15 @@ const handlePaymentHistory=()=>{
               
               </div>
             </div>
+            {
+              showPopUp &&
+              <ConfirmationPopUp
+                isOpen={()=>setShowPopUp(true)}
+                onClose={()=>setShowPopUp(false)}
+                onConfirm={handleReleasePayment}
+                message ="Do you want to release payment?"
+              />
+            }
           </div>
         </div>
       </div>
