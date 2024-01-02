@@ -42,8 +42,8 @@ const [hasmore, setHasMore] = useState(false);
   
   useEffect(()=>{
     const getOrders = async () => {
-     await fetch('https://mserver.printbaz.com/alluser') //for main site
-    //  await fetch('http://localhost:5000/alluser') //for testing site
+    //  await fetch('https://mserver.printbaz.com/alluser') //for main site
+     await fetch('http://localhost:5000/alluser') //for testing site
     .then(res=>res.json())
     .then(data => setAllMerchant(data))
     }
@@ -114,8 +114,8 @@ const fetchProduct = async (page) => {
       });
 // Ensure this matches with the API expectations
 
-  // const response = await fetch(`http://localhost:5000/allOrderPagination?page=${page}&size=20&${queryParams.toString()}`);
-  const response = await fetch(`https://mserver.printbaz.com/allOrderPagination?page=${page}&size=20&${queryParams.toString()}`);
+  const response = await fetch(`http://localhost:5000/allOrderPagination?page=${page}&size=20&${queryParams.toString()}`);
+  // const response = await fetch(`https://mserver.printbaz.com/allOrderPagination?page=${page}&size=20&${queryParams.toString()}`);
     if (!response.ok) {
       throw new Error('Network response was not ok');
     }

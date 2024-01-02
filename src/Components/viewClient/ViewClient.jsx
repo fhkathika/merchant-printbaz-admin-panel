@@ -17,7 +17,7 @@ const ViewClient = () => {
   // const { orderAll } = useGetMongoData();
   const [orderAll, setOrderAll] = useState([]);
 
-  const { merchantOrder } = useSingleMercahntorder();
+ 
   const location = useLocation();
   const viewClient = location.state ? location?.state?.merchants :location.state ? location?.state?.getDataById : null;
   const [getUserById, setGetUserById] = useState();
@@ -25,14 +25,15 @@ const ViewClient = () => {
   const {value_count}=useRoleAsignData()
   const {adminUser}=useContext(AuthContext);
   const navigate=useNavigate()
-  useEffect(()=>{
-    const getOrders = async () => {
+  const getOrders = async () => {
     //  await fetch(`https://mserver.printbaz.com/getmyorder/${viewClient?.email}`) //for main site
-    await fetch(`https://mserver.printbaz.com/getmyorder/${viewClient?.email}`)
+    await fetch(`http://localhost:5000/getmyorder/${viewClient?.email}`)
   
     .then(res=>res.json())
     .then(data => setOrderAll(data))
     }
+  useEffect(()=>{
+ 
     getOrders()
 },[])
 
@@ -221,78 +222,167 @@ let dueAmount = Number(statusPaidbase - (totalReceiveBase + totalReturnAmmountBa
 // Fetch the latest payment made by user
 let lastPayementDetail = getUserById?.payments?.length > 0 ? 
                          getUserById.payments[getUserById.payments.length-1] : null;
-console.log("getUserById",getUserById)
+// console.log("getUserById",getUserById)
 // Calculate the grand due amount
 let grandDueNow = dueAmount;
 
 if (lastPayementDetail && lastPayementDetail.paymentReleasedAmount) {
     grandDueNow -= lastPayementDetail.totalReleasedAmount;
 }
+// State to store selected orders
+const [selectedOrders, setSelectedOrders] = useState([]);
 
-// console.log("Initial dueAmount:", dueAmount);
-// console.log("Last payment amount:", lastPayementDetail?.paymentReleasedAmount || 0);
-// console.log("Grand Due Amount:", grandDueNow);
+// Function to handle order selection
+const handleOrderSelect = (orderInfo) => {
+  // Check if the order is already selected
+  const isSelected = selectedOrders.some((selectedOrder) => selectedOrder.orderId === orderInfo._id);
+
+  // If not selected, add it to the array; if selected, remove it
+  if (!isSelected) {
+    const selectedOrderData = {
+      orderId: orderInfo._id,
+      reciepientFirstname: orderInfo.name,
+      clientName: orderInfo.clientName,
+      regId: orderInfo.regId,
+      userMail: orderInfo.userMail,
+      recvMoney: orderInfo.recvMoney,
+      collectAmount: orderInfo.collectAmount,
+      address: orderInfo.address,
+      areas: orderInfo.areas,
+      districts: orderInfo.districts,
+      zones: orderInfo.zones,
+      phone: orderInfo.phone,
+      printbazcost: orderInfo.printbazcost,
+      reciepientLastname: orderInfo.lastName,
+      discountToClient: orderInfo.discount,
+      additionalCost: orderInfo.additionalCost,
+      companyName: orderInfo.companyName,
+      clientbrandName: orderInfo.clientbrandName,
+      clientPaymentStatus:orderInfo.clientPaymentStatus,
+      paymentStatus:orderInfo.paymentStatus,
+      orderStatus:orderInfo.orderStatus,
+      deliveryFee:orderInfo.deliveryFee
+      
 
 
+      
+      // Add other properties you want to store
+    };
+
+    // Update state with the new selected order
+    setSelectedOrders([...selectedOrders, selectedOrderData]);
+  } else {
+    // If already selected, remove it from the array
+    const updatedSelectedOrders = selectedOrders.filter((selectedOrder) => selectedOrder.orderId !== orderInfo._id);
+    setSelectedOrders(updatedSelectedOrders);
+  }
+};
+ //sum of selected orders rcv amount
+ let sumOfselectedRcvAMounToPaymentRelease = 0;
+ let newTotalBill=0
+if (selectedOrders?.length !== 0) {
+  sumOfselectedRcvAMounToPaymentRelease = selectedOrders?.reduce((sum, receiveAmount) => {
+    let amount = parseInt(receiveAmount?.recvMoney);
+    return sum + (isNaN(amount) ? 0 : amount);
+  }, 0); // Initialize sum to 0
+}
+console.log("sumOfselectedRcvAMounToPaymentRelease",sumOfselectedRcvAMounToPaymentRelease)
+//totalbill is sum of all rcv money
+if (PaymentStausPaid?.length !== 0) {
+  newTotalBill = PaymentStausPaid?.reduce((sum, receiveAmount) => {
+    let amount = parseInt(receiveAmount?.recvMoney);
+    return sum + (isNaN(amount) ? 0 : amount);
+  }, 0); // Initialize sum to 0
+}
+//total payment released
+let getreleasedreleseAmountFromDb=0
+if(getUserById?.paymentReleasedAmount){
+  getreleasedreleseAmountFromDb=getUserById?.paymentReleasedAmount
+}
+else{
+  getreleasedreleseAmountFromDb=0
+}
+let newReleasePaym=parseInt(getreleasedreleseAmountFromDb)+parseInt(sumOfselectedRcvAMounToPaymentRelease)
+let newTotalPaymentReleased=(newReleasePaym>0?newReleasePaym:0);
+// total return [sumofPrintbazcost+deliveryFee+deliveryFee/2]
+let sumofReturnOrderPrintbazcost=0;
+let sumofReturnOrderDeliveryFee=0
+if (orderSatatusReturned?.length !== 0) {
+  sumofReturnOrderPrintbazcost = orderSatatusReturned?.reduce((sum, pbCost) => {
+    let amount = parseInt(pbCost?.printbazcost);
+    return sum + (isNaN(amount) ? 0 : amount);
+  }, 0); // Initialize sum to 0
+}
+if (orderSatatusReturned?.length !== 0) {
+  sumofReturnOrderDeliveryFee = orderSatatusReturned?.reduce((sum, delivFee) => {
+    let amount = parseInt(delivFee?.deliveryFee);
+    return sum + (isNaN(amount) ? 0 : amount);
+  }, 0); // Initialize sum to 0
+}
+let newTotalReturn=sumofReturnOrderPrintbazcost+sumofReturnOrderDeliveryFee+sumofReturnOrderDeliveryFee/2
+//due amount=totalbill-(totalPaymentReleased+totalReturn)
+let newTotalDue=newTotalBill-(newTotalPaymentReleased+newTotalReturn)
+let totalnewDueAmount=newTotalDue>0?newTotalDue:0
+const getOrderById=async()=>{
+  // Fetch the updated order details
+// await fetch(`https://mserver.printbaz.com/getUser/${viewClient?._id}`)
+await fetch(`http://localhost:5000/getUser/${viewClient?._id}`)
+.then(res=>res.json())
+.then(data => {setGetUserById(data)})
+}
 useEffect(()=>{
-  const getOrderById=async()=>{
-           // Fetch the updated order details
-  await fetch(`https://mserver.printbaz.com/getUser/${viewClient?._id}`)
-  // await fetch(`http://localhost:5000/getUser/${viewClient?._id}`)
-  .then(res=>res.json())
-  .then(data => {setGetUserById(data)})
-    }
+
        getOrderById()
       },[getUserById])
    
-   useEffect(() => {
-    const getOrderByIdfromMerchant = async () => {
-        // Ensure there's an ID before making a request
-        // console.log("totalBill test",statusPaidbase);
-        // console.log("dueAmount test",dueAmount);
-        // console.log("totalReceiveBase test",totalReceiveBase);
-        // console.log("totalReturnAmmountBase test",totalReturnAmmountBase);
-        // console.log("totalReturnAmmountBase test",totalReturnAmmountBase);
-        if (viewClient?._id) {
-            try {
+  //  useEffect(() => {
+  //   const getOrderByIdfromMerchant = async () => {
+  //       // Ensure there's an ID before making a request
+  //       // console.log("totalBill test",statusPaidbase);
+  //       // console.log("dueAmount test",dueAmount);
+  //       // console.log("totalReceiveBase test",totalReceiveBase);
+  //       // console.log("totalReturnAmmountBase test",totalReturnAmmountBase);
+  //       // console.log("totalReturnAmmountBase test",totalReturnAmmountBase);
+  //       if (viewClient?._id) {
+  //           try {
           
-                const response = await fetch(
-                    `https://mserver.printbaz.com/updateBill/${viewClient._id}`,
-                    // `http://localhost:5000/updateBill/${viewClient._id}`,
-                    {
-                      method: "PUT",
-                      headers: {
-                          "Content-Type": "application/json",
-                      },
-                      body: JSON.stringify({ 
-                          totalBill: statusPaidbase, 
-                          totalReceiveBase: totalReceiveBase,
-                          totalReturnAmmountBase: totalReturnAmmountBase,
-                          dueAmount:  grandDueNow 
-                      }),
-                  }
-                );
+  //               const response = await fetch(
+  //                   // `https://mserver.printbaz.com/updateBill/${viewClient._id}`,
+  //                   `http://localhost:5000/updateBill/${viewClient._id}`,
+  //                   {
+  //                     method: "PUT",
+  //                     headers: {
+  //                         "Content-Type": "application/json",
+  //                     },
+  //                     body: JSON.stringify({ 
+  //                         totalBill: newTotalBill, 
+  //                         // totalReceiveBase: totalReceiveBase,
+  //                         // totalReturnAmmountBase: totalReturnAmmountBase,
+  //                         // dueAmount:  grandDueNow 
+  //                     }),
+  //                 }
+  //               );
   
-                const data = await response.json();
-                if (response.status === 200) {
-                    // Handle success, for instance:
-                    console.log("Total bill updated successfully:", data);
-                } else {
-                    // Handle error
-                    console.error("Error updating the bill:", data.message);
-                }
+  //               const data = await response.json();
+  //               if (response.status === 200) {
+  //                   // Handle success, for instance:
+  //                   console.log("Total bill updated successfully:", data);
+  //               } else {
+  //                   // Handle error
+  //                   console.error("Error updating the bill:", data.message);
+  //               }
   
-            } catch (error) {
-                console.error("Network or server error:", error);
-            }
-        }
-    };
+  //           } catch (error) {
+  //               console.error("Network or server error:", error);
+  //           }
+  //       }
+  //   };
   
-    getOrderByIdfromMerchant();
+  //   getOrderByIdfromMerchant();
   
-  }, [viewClient?._id,statusPaidbase, totalReceiveBase, totalReturnAmmountBase, dueAmount]);
+  // }, [viewClient?._id,statusPaidbase, totalReceiveBase, totalReturnAmmountBase, dueAmount]);
   
-  
+  console.log("getUserById",getUserById)
 
   const handleInputChange = async (e) => {
     const status = e.target.value; // the new status
@@ -305,8 +395,8 @@ useEffect(()=>{
     //   await fetch(`http://localhost:5000/update-approval/${viewClient?._id}`, { //for testing site
     try {
       const response = await fetch(
-        `https://mserver.printbaz.com/update-approval/${viewClient?._id}`,
-        // `http://localhost:5000/update-approval/${viewClient?._id}`,
+        // `https://mserver.printbaz.com/update-approval/${viewClient?._id}`,
+        `http://localhost:5000/update-approval/${viewClient?._id}`,
         {
           method: "PUT",
           headers: {
@@ -341,6 +431,19 @@ useEffect(()=>{
     if (status === "ban") {
       return "red";
     }
+    if (status === "paidToClient") {
+      return "blue";
+    }
+    if (status === "returned") {
+      return "red";
+    }
+    if (status === "cancel") {
+      return "maroon";
+    }
+    if (status === "Pending") {
+      return "orange";
+    }
+
     // you can add more conditions here or just return a default color
     return "defaultColor";
   };
@@ -351,88 +454,136 @@ const handlePaymentHistory=()=>{
   const merchantId = viewClient?._id;
   navigate(`/paymentHistory/${merchantId}`);
 }
- // State to store selected orders
- const [selectedOrders, setSelectedOrders] = useState([]);
-
- // Function to handle order selection
- const handleOrderSelect = (orderInfo) => {
-   // Check if the order is already selected
-   const isSelected = selectedOrders.some((selectedOrder) => selectedOrder.orderId === orderInfo._id);
-
-   // If not selected, add it to the array; if selected, remove it
-   if (!isSelected) {
-     const selectedOrderData = {
-       orderId: orderInfo._id,
-       reciepientFirstname: orderInfo.name,
-       clientName: orderInfo.clientName,
-       regId: orderInfo.regId,
-       userMail: orderInfo.userMail,
-       recvMoney: orderInfo.recvMoney,
-       collectAmount: orderInfo.collectAmount,
-       address: orderInfo.address,
-       areas: orderInfo.areas,
-       districts: orderInfo.districts,
-       zones: orderInfo.zones,
-       phone: orderInfo.phone,
-       printbazcost: orderInfo.printbazcost,
-       reciepientLastname: orderInfo.lastName,
-       discountToClient: orderInfo.discount,
-       additionalCost: orderInfo.additionalCost,
-       companyName: orderInfo.companyName,
-       clientbrandName: orderInfo.clientbrandName,
-       
-       // Add other properties you want to store
-     };
-
-     // Update state with the new selected order
-     setSelectedOrders([...selectedOrders, selectedOrderData]);
-   } else {
-     // If already selected, remove it from the array
-     const updatedSelectedOrders = selectedOrders.filter((selectedOrder) => selectedOrder.orderId !== orderInfo._id);
-     setSelectedOrders(updatedSelectedOrders);
-   }
- };
+ 
  console.log("selectedOrders.....",selectedOrders)
- let selectedRcvAMounToPaymentRelease = 0;
 
-if (selectedOrders?.length !== 0) {
-  selectedRcvAMounToPaymentRelease = selectedOrders?.reduce((sum, receiveAmount) => {
-    let amount = parseInt(receiveAmount?.recvMoney);
-    return sum + (isNaN(amount) ? 0 : amount);
-  }, 0); // Initialize sum to 0
-}
 const [showPopUp,setShowPopUp]=useState(false)
 const  showReleasePaymentpopUP=()=>{
   setShowPopUp(true)
 }
+// Create a new date object for the current date and time
+const now = new Date();
 
+// Define month names for formatting
+const monthNames = ["January", "February", "March", "April", "May", "June",
+  "July", "August", "September", "October", "November", "December"
+];
+
+// Extract required components
+const month = monthNames[now.getMonth()];
+const day = now.getDate();
+const year = now.getFullYear();
+const hours = now.getHours();
+const minutes = now.getMinutes() < 10 ? '0' + now.getMinutes() : now.getMinutes(); // add a zero prefix if minutes is less than 10
+const ampm = hours >= 12 ? 'PM' : 'AM';
+
+// Convert 24-hour time format to 12-hour format
+const hours12 = hours % 12 || 12;
+
+// Format the date
+const formattedCurrentDate = `${month} ${day}, ${year} at ${hours12}:${minutes} ${ampm}`;
 const  handleReleasePayment=async()=>{
+  console.log("totalnewDueAmount",totalnewDueAmount)
+  console.log("newTotalPaymentReleased",newTotalPaymentReleased)
+  console.log("newTotalBill",newTotalBill)
+  console.log("newTotalReturn",newTotalReturn)
+  
   try {
-          
+
+    // Create the repeated data structure
+    const paymentData = {
+      totalReturnAmmountBase: totalReturnAmmountBase,
+      totalBill: newTotalBill,
+      paymentReleasedAmount: newTotalPaymentReleased,
+      paymentReleasedBy: adminUser?.email,
+      paymentReleasedDate:formattedCurrentDate,
+      dueAmountNow:totalnewDueAmount
+    };
+  
+     // Filter orders based on criteria (orderStatus delivered, payment status paid, and no clientPaymentStatus)
+     const filteredOrders = selectedOrders.filter(
+      (order) =>
+        order.orderStatus === 'delivered' &&
+        order.paymentStatus === 'paid' &&
+        // order.clientPaymentStatus ==="paidToClient" 
+         !order.clientPaymentStatus 
+    );
+  
+    fetch(`http://localhost:5000/updateUserbyReleasedPay/${viewClient?._id}`, {
+    // fetch(`https://mserver.printbaz.com/updateUserbyReleasedPay/${viewClient?._id}`, {
+      method: 'PUT',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify(paymentData)
+    })
+    .then(response => {
+      if (!response.ok) {
+        throw new Error(`Server responded with a ${response.status} status.`);
+      }
+     if(response.ok){
+      getOrderById()
+      // Update clientPaymentStatus for specific orders in orderAll
+    const updatedOrderAll = orderAll.map((orderAllData) => {
+      // Check if orderAllData contains any orders that match the criteria
+      if (filteredOrders.some((filteredOrder) => filteredOrder.orderId === orderAllData._id)) {
+        orderAllData.clientPaymentStatus = "paidToClient";
+      }
+      return orderAllData;
+    });
+
+    // Send updated orderAll to the server or handle as needed
+    const sendOrderAllResponse =  fetch(
+      "http://localhost:5000/sendUpdatedOrderAll",
+      {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(updatedOrderAll),
+      }
+    );
+
+    if (sendOrderAllResponse.ok) {
+      console.log("Orders and orderAll updated successfully:", updatedOrderAll);
+      getOrders()
+    } else {
+      console.error("Error sending orders and orderAll:", sendOrderAllResponse.message);
+    }
+     }
+      return response.json();
+    })
+    .then(data => {
+      console.log(data);
+    })
+    filteredOrders.forEach(async (order) => {
+      order.clientPaymentStatus = 'paidToClient';
+    });
+
     const response = await fetch(
-        // `https://mserver.printbaz.com/sendpaymentReleasedOrders`,
-        `http://localhost:5000/sendpaymentReleasedOrders`,
-        {
-          method: "POST",
-          headers: {
-              "Content-Type": "application/json",
-          },
-          body: JSON.stringify(selectedOrders),
+      // Replace the URL with your actual endpoint
+      'http://localhost:5000/sendpaymentReleasedOrders',
+      {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(filteredOrders),
       }
     );
 
     const data = await response.json();
     if (response.status === 200) {
-        // Handle success, for instance:
-        console.log("Total bill updated successfully:", data);
-    } else {
-        // Handle error
-        console.error("Error updating the bill:", data.message);
-    }
+      // Handle success, for instance:
 
-} catch (error) {
-    console.error("Network or server error:", error);
-}
+  
+    } else {
+      // Handle error
+      console.error('Error sending orders:', data.message);
+    }
+  } catch (error) {
+    console.error('Network or server error:', error);
+  }
 }
 
 
@@ -766,27 +917,27 @@ const  handleReleasePayment=async()=>{
                       <h3 className="all-title">Payments</h3>
                       <div className='flex'>
                       <h6>Total Payment Released:</h6>
-                      <span style={{marginTop:"10px",color:"orange",fontSize:'16px'}}>{lastPayementDetail?.totalReleasedAmount?lastPayementDetail?.totalReleasedAmount:0} TK</span>
+                      <span style={{marginTop:"10px",color:"orange",fontSize:'16px'}}>{getUserById?.paymentReleasedAmount?getUserById?.paymentReleasedAmount:0} TK</span>
                       </div>
                       <div className='flex'>
                       <h6>Total Bill:</h6>
-                      <span style={{marginTop:"10px",color:"orange",fontSize:'16px'}}>{parseInt(lastPayementDetail?.totalBill)} TK</span>
+                      <span style={{marginTop:"10px",color:"orange",fontSize:'16px'}}>{parseInt(getUserById?.totalBill?getUserById?.totalBill:0)} TK</span>
                       {/* <span style={{marginTop:"10px",color:"orange",fontSize:'16px'}}>{parseInt(getUserById?.totalBill?getUserById?.totalBill :statusPaidbase)} TK</span> */}
                       </div> 
                       <div className='flex'>
                       <h6>Return Value:</h6>
-                      <span style={{marginTop:"10px",color:"orange",fontSize:'16px'}}> {Number(lastPayementDetail?.totalReturnAmmountBase)} TK</span>
+                      <span style={{marginTop:"10px",color:"orange",fontSize:'16px'}}> {Number(getUserById?.totalReturnAmmountBase?getUserById?.totalReturnAmmountBase:0)} TK</span>
                       </div> 
                       <div className='flex'>
                       
                       <h6>Due Amount:</h6>
-                      <span style={{marginTop:"10px",color:"orange",fontSize:'16px'}}>{Math.floor(getUserById?.dueAmountNow)} TK</span>
+                      <span style={{marginTop:"10px",color:"orange",fontSize:'16px'}}>{Math.floor(getUserById?.dueAmount?getUserById?.dueAmount:0)} TK</span>
                       </div>
                    
                       
                     </div>
-                    <div className="flex mt-3">
-                    {/* <Button onClick={handleDoPaymentPopUp} style={{width:"40%",backgroundColor:"orange",border:"none"}}>Pay</Button> */}
+                    {/* <div className="flex mt-3">
+              
                       {
                         getUserById?.dueAmountNow<1000 || dueAmount<1000 ?
                         <Button onClick={handleDoPaymentPopUp} style={{width:"40%",backgroundColor:"gray",border:"none", cursor: "not-allowed"}} disabled>Pay</Button>
@@ -809,7 +960,7 @@ const  handleReleasePayment=async()=>{
                   onClose={() => setPaymentReleasedPopUp(false)}
                   />
                 }
-                </div>
+                </div> */}
                   </div>
                 </div>
               
@@ -909,15 +1060,20 @@ const  handleReleasePayment=async()=>{
                           <p>{orderInfo?.phone}</p>
                         </div>
                         <div className="col-lg-2 col-sm-12">
-                          <p className="p-status-btn">
-                            {orderInfo?.paymentStatus}
+                          <p className="p-status-btn" style={{backgroundColor: getViewClientColor(
+                              orderInfo?.clientPaymentStatus
+                            )}}>
+                            {/* {orderInfo?.paymentStatus} */}
+                            {orderInfo?.clientPaymentStatus?orderInfo?.clientPaymentStatus:"Unpaid To Client"}
                           </p>
                         </div>
                         <div className="col-lg-1 col-sm-12">
                           <p>{Math.floor(orderInfo?.recvMoney)}TK</p>
                         </div>
                         <div className="col-lg-1 col-sm-12">
-                          <p className="status-btn">{orderInfo?.orderStatus}</p>
+                          <p className="status-btn" style={{backgroundColor: getViewClientColor(
+                              orderInfo?.orderStatus
+                            )}}>{orderInfo?.orderStatus}</p>
                         </div>
                       </div>
                     )})}

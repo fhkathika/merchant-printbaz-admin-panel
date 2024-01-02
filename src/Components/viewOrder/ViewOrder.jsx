@@ -45,8 +45,8 @@ const ViewOrder = () => {
   useEffect(()=>{
     const getOrderById=async()=>{
              // Fetch the updated order details
-    await fetch(`https://mserver.printbaz.com/getorder/${id}`)
-    // await fetch(`http://localhost:5000/getorder/${id}`)
+    // await fetch(`https://mserver.printbaz.com/getorder/${id}`)
+    await fetch(`http://localhost:5000/getorder/${id}`)
     .then(res=>res.json())
     .then(data => {setGetSpecificOrderById(data)
       setOrderStatus(data.orderStatus);
@@ -135,7 +135,43 @@ setTrackingId(e.target.value)
  }
  
  let dueAmount=Number(statusPaidbase-(totalReceiveBase+totalReturnAmmountBase))
- 
+// /////////////////// new billing system//////////////////// 
+//totalbill is sum of all rcv money///
+let newTotalBill=0
+if (PaymentStausPaid?.length !== 0) {
+  newTotalBill = PaymentStausPaid?.reduce((sum, receiveAmount) => {
+    let amount = parseInt(receiveAmount?.recvMoney);
+    return sum + (isNaN(amount) ? 0 : amount);
+  }, 0); // Initialize sum to 0
+}
+//total payment released
+// let newReleasePaym=newTotalBill-sumOfselectedRcvAMounToPaymentRelease
+// let newTotalPaymentReleased=(newReleasePaym>0?newReleasePaym:0);
+// total return [sumofPrintbazcost+deliveryFee+deliveryFee/2]
+let sumofReturnOrderPrintbazcost=0;
+let sumofReturnOrderDeliveryFee=0
+if (orderSatatusReturned?.length !== 0) {
+  sumofReturnOrderPrintbazcost = orderSatatusReturned?.reduce((sum, pbCost) => {
+    let amount = parseInt(pbCost?.printbazcost);
+    return sum + (isNaN(amount) ? 0 : amount);
+  }, 0); // Initialize sum to 0
+}
+if (orderSatatusReturned?.length !== 0) {
+  sumofReturnOrderDeliveryFee = orderSatatusReturned?.reduce((sum, delivFee) => {
+    let amount = parseInt(delivFee?.deliveryFee);
+    return sum + (isNaN(amount) ? 0 : amount);
+  }, 0); // Initialize sum to 0
+}
+let newTotalReturn=sumofReturnOrderPrintbazcost+sumofReturnOrderDeliveryFee+sumofReturnOrderDeliveryFee/2
+//due amount=totalbill-(totalPaymentReleased+totalReturn)
+let newTotalDue=newTotalBill
+let totalnewDueAmount=newTotalDue>0?newTotalDue:0
+//total payment released
+// let newReleasePaym=newTotalBill-sumOfselectedRcvAMounToPaymentRelease
+// let newTotalPaymentReleased=(newReleasePaym>0?newReleasePaym:0);
+console.log("totalnewDueAmount",totalnewDueAmount)
+console.log("newTotalBill",newTotalBill)
+console.log("newTotalReturn",newTotalReturn)
  const getOrderById = async () => {
   // Ensure there's an ID before making a request
  
@@ -143,18 +179,21 @@ setTrackingId(e.target.value)
       try {
     
           const response = await fetch(
-              `https://mserver.printbaz.com/updateBill/${viewClient._id}`,
-              // `http://localhost:5000/updateBill/${viewClient._id}`,
+              // `https://mserver.printbaz.com/updateBill/${viewClient._id}`,
+              `http://localhost:5000/updateBill/${viewClient._id}`,
               {
                 method: "PUT",
                 headers: {
                     "Content-Type": "application/json",
                 },
                 body: JSON.stringify({ 
-                    totalBill: statusPaidbase, 
-                    totalReceiveBase: totalReceiveBase,
-                    totalReturnAmmountBase: totalReturnAmmountBase,
-                    dueAmount: dueAmount
+                    // totalBill: statusPaidbase, 
+                    // totalReceiveBase: totalReceiveBase,
+                    // totalReturnAmmountBase: totalReturnAmmountBase,
+                    // dueAmount: dueAmount
+                    totalBill: newTotalBill 
+                    // totalReturnAmmountBase: newTotalReturn,
+                    // dueAmount: totalnewDueAmount
                 }),
             }
           );
@@ -173,21 +212,21 @@ setTrackingId(e.target.value)
   }
 };
  
- useEffect(() => {
-  if (getSpecificOrderById?.paymentStatus === "paid" && getSpecificOrderById?.orderStatus === "delivered") {
-    getOrderById();
-}
+//  useEffect(() => {
+//   if (getSpecificOrderById?.paymentStatus === "paid" && getSpecificOrderById?.orderStatus === "delivered") {
+//     getOrderById();
+// }
 
-  getOrderById();
+//   getOrderById();
 
-}, [viewClient?._id,statusPaidbase, totalReceiveBase, totalReturnAmmountBase, dueAmount]);
+// }, [viewClient?._id]);
 
  const handleInputChange = async (e) => {
     const status = e.target.value;
     try {
         const response = await fetch(
-           `https://mserver.printbaz.com/updateOrderStatus/${id}`,{ 
-      // `http://localhost:5000/updateOrderStatus/${id}`, {
+          //  `https://mserver.printbaz.com/updateOrderStatus/${id}`,{ 
+      `http://localhost:5000/updateOrderStatus/${id}`, {
             method: "PUT",
             headers: {
                 "Content-Type": "application/json",
@@ -304,8 +343,8 @@ setTrackingId(e.target.value)
     try {
       const response = await fetch(
         
-        `https://mserver.printbaz.com/updatePaymentStatus/${id}`,
-      // `http://localhost:5000/updatePaymentStatus/${id}`,
+        // `https://mserver.printbaz.com/updatePaymentStatus/${id}`,
+      `http://localhost:5000/updatePaymentStatus/${id}`,
         {
           method: "PUT",
           headers: {
@@ -318,6 +357,10 @@ setTrackingId(e.target.value)
       if (response.ok) {
         // Update the approval status in the viewClient object
         setPaymentStatus(status);
+        if(paymentStatus==="paid"){
+          getOrderById()
+        }
+     
         const deliveryData = {
           // add your delivery list data here,
           orderId:getSpecificOrderById?._id,
@@ -394,8 +437,6 @@ setTrackingId(e.target.value)
   };
   const handleDeliverAssignChange = async (e) => {
     const status = e.target.value; // the new status
-
-
     //   await fetch(`http://localhost:5000/update-approval/${viewClient?._id}`, { //for testing site
     try {
       const response = await fetch(

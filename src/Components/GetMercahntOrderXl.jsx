@@ -2,7 +2,7 @@
 import Table from 'react-bootstrap/Table';
 
 function GetMercahntOrderXl({merchOrders=[]}) {
-  console.log("object",merchOrders);
+  // console.log("object",merchOrders);
   return (
     <div>
     
