@@ -1,6 +1,8 @@
-import React, { useContext, useEffect, useState } from "react";
+import React, { useContext, useEffect, useMemo, useState } from "react";
 import { Form, Link, useLocation, useNavigate } from "react-router-dom";
 import "../../css/style.css";
+import ReactDOM from 'react-dom';
+
 import useGetMongoData from "../../hooks/useGetMongoData";
 import { useRoleAsignData } from "../../hooks/useRoleAsignData";
 import Navigationbar from "../navigationBar/Navigationbar";
@@ -9,34 +11,53 @@ import * as XLSX from 'xlsx';
 import GetMercahntOrderXl from "../GetMercahntOrderXl";
 import useSingleMercahntorder from "../../hooks/useSingleMercahntorder";
 import { AuthContext } from "../../authProvider/AuthProvider";
-import { Button } from "react-bootstrap";
+import { Button, Spinner, Table } from "react-bootstrap";
 import PaymentReleasedPopUp from "../alert/PaymentReleasedPopUp";
 import axios from "axios";
 import ConfirmationPopUp from "../alert/ConfirmationPopUp";
+import MsgALert from "../alert/MsgALert";
+import OrderUpdateAlert from "../alert/OrderUpdateAlert";
+import GetReleaseOrderXl from "../GetReleaseOrderXl";
+import html2canvas from "html2canvas";
+import jsPDF from "jspdf";
+import InvoiceDetail from "../invoiceDetail/InvoiceDetail";
 const ViewClient = () => {
   // const { orderAll } = useGetMongoData();
+  
   const [orderAll, setOrderAll] = useState([]);
-
- 
   const location = useLocation();
   const viewClient = location.state ? location?.state?.merchants :location.state ? location?.state?.getDataById : null;
   const [getUserById, setGetUserById] = useState();
   const [paymentReleasedPopUp, setPaymentReleasedPopUp] = useState(false);
+  const [paymentRelasedOrders, setPaymentRelasedOrders] = useState([]);
+  const [getPaymentDetailById, setGetPaymentDetailById] = useState([]);
   const {value_count}=useRoleAsignData()
   const {adminUser}=useContext(AuthContext);
   const navigate=useNavigate()
   const getOrders = async () => {
     //  await fetch(`https://mserver.printbaz.com/getmyorder/${viewClient?.email}`) //for main site
     await fetch(`http://localhost:5000/getmyorder/${viewClient?.email}`)
-  
     .then(res=>res.json())
     .then(data => setOrderAll(data))
     }
+    const getPaymentReleasedOrdersByRefId = async () => {
+      //  await fetch(`https://mserver.printbaz.com/getPaymentReleasedOrderByRegId/${viewClient?._id}`) //for main site
+      await fetch(`http://localhost:5000/getPaymentReleasedOrderByRegId/${viewClient?._id}`)
+      .then(res=>res.json())
+      .then(data => setPaymentRelasedOrders(data))
+      }
+      console.log("paymentRelasedOrders....",paymentRelasedOrders)
+      console.log("viewClient....",viewClient)
   useEffect(()=>{
  
     getOrders()
+    // getPaymentReleasedOrdersByRefId()
+},[orderAll])
+  useEffect(()=>{
+ getPaymentReleasedOrdersByRefId()
 },[])
-
+console.log("paymentRelasedOrders")
+const [isenableOrderToReleasepaym,setIsenableOrderToReleasepaym]=useState(false)
   const [registeredInfo,setRegisteredInfo]=useState({
       _id: adminUser?._id,
       name: adminUser?.name,
@@ -243,7 +264,7 @@ const handleOrderSelect = (orderInfo) => {
       orderId: orderInfo._id,
       reciepientFirstname: orderInfo.name,
       clientName: orderInfo.clientName,
-      regId: orderInfo.regId,
+      regId: viewClient._id,
       userMail: orderInfo.userMail,
       recvMoney: orderInfo.recvMoney,
       collectAmount: orderInfo.collectAmount,
@@ -279,14 +300,37 @@ const handleOrderSelect = (orderInfo) => {
 };
  //sum of selected orders rcv amount
  let sumOfselectedRcvAMounToPaymentRelease = 0;
+ let sumOfCollectAmount = 0;
+ let sumOfdeliveryFee = 0;
  let newTotalBill=0
-if (selectedOrders?.length !== 0) {
-  sumOfselectedRcvAMounToPaymentRelease = selectedOrders?.reduce((sum, receiveAmount) => {
+ const filteredOrdersOfSelectOrder = selectedOrders.filter(
+  (order) =>
+    order.orderStatus === 'delivered' &&
+    order.paymentStatus === 'paid' 
+    // order.clientPaymentStatus ==="paidToClient" 
+    //  !order.clientPaymentStatus 
+);
+if (filteredOrdersOfSelectOrder?.length !== 0) {
+  sumOfselectedRcvAMounToPaymentRelease = filteredOrdersOfSelectOrder?.reduce((sum, receiveAmount) => {
     let amount = parseInt(receiveAmount?.recvMoney);
     return sum + (isNaN(amount) ? 0 : amount);
   }, 0); // Initialize sum to 0
 }
-console.log("sumOfselectedRcvAMounToPaymentRelease",sumOfselectedRcvAMounToPaymentRelease)
+if (filteredOrdersOfSelectOrder?.length !== 0) {
+  sumOfCollectAmount= filteredOrdersOfSelectOrder?.reduce((sum, collectAmount) => {
+    let amount = parseInt(collectAmount?.collectAmount);
+    return sum + (isNaN(amount) ? 0 : amount);
+  }, 0); // Initialize sum to 0
+}
+if (filteredOrdersOfSelectOrder?.length !== 0) {
+  sumOfdeliveryFee = filteredOrdersOfSelectOrder?.reduce((sum, delivfee) => {
+    let amount = parseInt(delivfee?.deliveryFee);
+    return sum + (isNaN(amount) ? 0 : amount);
+  }, 0); // Initialize sum to 0
+}
+console.log("sumOfselectedRcvAMounToPaymentRelease.....",sumOfselectedRcvAMounToPaymentRelease)
+console.log("sumOfCollectAmount......",sumOfCollectAmount)
+console.log("sumOfdeliveryFee......",sumOfdeliveryFee)
 //totalbill is sum of all rcv money
 if (PaymentStausPaid?.length !== 0) {
   newTotalBill = PaymentStausPaid?.reduce((sum, receiveAmount) => {
@@ -330,59 +374,19 @@ await fetch(`http://localhost:5000/getUser/${viewClient?._id}`)
 .then(res=>res.json())
 .then(data => {setGetUserById(data)})
 }
+const getPerSegmentPaymentDetailById=async()=>{
+  // Fetch the updated order details
+// await fetch(`https://mserver.printbaz.com/getPaymentDetailRegId/${viewClient?._id}`)
+await fetch(`http://localhost:5000/getPaymentDetailRegId/${viewClient?._id}`)
+.then(res=>res.json())
+.then(data => {setGetPaymentDetailById(data)})
+}
+console.log("getPaymentDetailById.........",getPaymentDetailById)
 useEffect(()=>{
-
+  getPerSegmentPaymentDetailById()
        getOrderById()
       },[getUserById])
-   
-  //  useEffect(() => {
-  //   const getOrderByIdfromMerchant = async () => {
-  //       // Ensure there's an ID before making a request
-  //       // console.log("totalBill test",statusPaidbase);
-  //       // console.log("dueAmount test",dueAmount);
-  //       // console.log("totalReceiveBase test",totalReceiveBase);
-  //       // console.log("totalReturnAmmountBase test",totalReturnAmmountBase);
-  //       // console.log("totalReturnAmmountBase test",totalReturnAmmountBase);
-  //       if (viewClient?._id) {
-  //           try {
-          
-  //               const response = await fetch(
-  //                   // `https://mserver.printbaz.com/updateBill/${viewClient._id}`,
-  //                   `http://localhost:5000/updateBill/${viewClient._id}`,
-  //                   {
-  //                     method: "PUT",
-  //                     headers: {
-  //                         "Content-Type": "application/json",
-  //                     },
-  //                     body: JSON.stringify({ 
-  //                         totalBill: newTotalBill, 
-  //                         // totalReceiveBase: totalReceiveBase,
-  //                         // totalReturnAmmountBase: totalReturnAmmountBase,
-  //                         // dueAmount:  grandDueNow 
-  //                     }),
-  //                 }
-  //               );
-  
-  //               const data = await response.json();
-  //               if (response.status === 200) {
-  //                   // Handle success, for instance:
-  //                   console.log("Total bill updated successfully:", data);
-  //               } else {
-  //                   // Handle error
-  //                   console.error("Error updating the bill:", data.message);
-  //               }
-  
-  //           } catch (error) {
-  //               console.error("Network or server error:", error);
-  //           }
-  //       }
-  //   };
-  
-  //   getOrderByIdfromMerchant();
-  
-  // }, [viewClient?._id,statusPaidbase, totalReceiveBase, totalReturnAmmountBase, dueAmount]);
-  
-  console.log("getUserById",getUserById)
+ 
 
   const handleInputChange = async (e) => {
     const status = e.target.value; // the new status
@@ -447,6 +451,32 @@ useEffect(()=>{
     // you can add more conditions here or just return a default color
     return "defaultColor";
   };
+  const styles = {
+    tabContainer: {
+      display: 'flex',
+      // justifyContent: 'space-between',
+      marginBottom: '20px',
+    },
+    tabButton: {
+      flex: 1,
+      padding: '10px',
+      textAlign: 'center',
+      cursor: 'pointer',
+      border: '1px solid #ddd',
+      backgroundColor: '#f9f9f9',
+      color: '#333',
+      borderRadius:"10px",
+      width:"100%",
+      marginLeft:"10px"
+    },
+    activeTab: {
+      backgroundColor: '#0d1552',
+      color: 'white',
+      borderRadius:"10px",
+      width:"100%",
+      marginLeft:"10px"
+    },
+  };
 const handleDoPaymentPopUp=()=>{
   setPaymentReleasedPopUp(true)
 }
@@ -455,9 +485,10 @@ const handlePaymentHistory=()=>{
   navigate(`/paymentHistory/${merchantId}`);
 }
  
- console.log("selectedOrders.....",selectedOrders)
 
 const [showPopUp,setShowPopUp]=useState(false)
+const [isSuccess,setIsSuccess]=useState(false)
+const [isLoading, setIsLoading] = useState(false);
 const  showReleasePaymentpopUP=()=>{
   setShowPopUp(true)
 }
@@ -482,32 +513,55 @@ const hours12 = hours % 12 || 12;
 
 // Format the date
 const formattedCurrentDate = `${month} ${day}, ${year} at ${hours12}:${minutes} ${ampm}`;
-const  handleReleasePayment=async()=>{
-  console.log("totalnewDueAmount",totalnewDueAmount)
-  console.log("newTotalPaymentReleased",newTotalPaymentReleased)
-  console.log("newTotalBill",newTotalBill)
-  console.log("newTotalReturn",newTotalReturn)
+
+  //  released order amiunt oer segment 
+
   
+const  handleReleasePayment=async()=>{
+  // console.log("totalnewDueAmount",totalnewDueAmount)
+  // console.log("newTotalPaymentReleased",newTotalPaymentReleased)
+  // console.log("newTotalBill",newTotalBill)
+  // console.log("newTotalReturn",newTotalReturn)
+  setIsLoading(true)
   try {
 
     // Create the repeated data structure
     const paymentData = {
-      totalReturnAmmountBase: totalReturnAmmountBase,
+      totalReturnAmmountBase: newTotalReturn,
       totalBill: newTotalBill,
       paymentReleasedAmount: newTotalPaymentReleased,
-      paymentReleasedBy: adminUser?.email,
+      paymentReleasedBy: viewClient?.email,
       paymentReleasedDate:formattedCurrentDate,
       dueAmountNow:totalnewDueAmount
     };
+    const perSegmetReleasedOrderAmount={
+      totalRecvableAmount:sumOfselectedRcvAMounToPaymentRelease,
+      totalCollectAmount:sumOfCollectAmount,
+      totalDeliveryFee:sumOfdeliveryFee,
+      paymentReleasedBy: viewClient?.email,
+      regId: viewClient?._id,
+      clientNumber: viewClient?.phone,
+      clinetBrandName: viewClient?.brandName,
+      clientBrandLogo: viewClient?.brandLogoURL,
+      clientName: viewClient?.name,
+      clientAddress: viewClient?.address,
+      clientEmail: viewClient?.email,
+      paymentReleasedDate:formattedCurrentDate,
+      segmentPayStatus:"Paid"
+    }
   
      // Filter orders based on criteria (orderStatus delivered, payment status paid, and no clientPaymentStatus)
      const filteredOrders = selectedOrders.filter(
       (order) =>
         order.orderStatus === 'delivered' &&
-        order.paymentStatus === 'paid' &&
+        order.paymentStatus === 'paid' 
         // order.clientPaymentStatus ==="paidToClient" 
-         !order.clientPaymentStatus 
+        //  !order.clientPaymentStatus 
     );
+    if(filteredOrders.length===0){
+      setIsenableOrderToReleasepaym(true)
+      return
+    }
   
     fetch(`http://localhost:5000/updateUserbyReleasedPay/${viewClient?._id}`, {
     // fetch(`https://mserver.printbaz.com/updateUserbyReleasedPay/${viewClient?._id}`, {
@@ -558,6 +612,8 @@ const  handleReleasePayment=async()=>{
     })
     filteredOrders.forEach(async (order) => {
       order.clientPaymentStatus = 'paidToClient';
+      order.paymentReleasedBy= adminUser?.email;
+      order.paymentReleasedDate=formattedCurrentDate
     });
 
     const response = await fetch(
@@ -575,7 +631,19 @@ const  handleReleasePayment=async()=>{
     const data = await response.json();
     if (response.status === 200) {
       // Handle success, for instance:
-
+      setIsSuccess(true)
+      const sendTotalPaymentReleasedData = await fetch(
+        // Replace the URL with your actual endpoint
+        'http://localhost:5000/sendpaymentDetail',
+        {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify(perSegmetReleasedOrderAmount),
+        }
+      );
+      const reselasedPayDetail = await sendTotalPaymentReleasedData.json();
   
     } else {
       // Handle error
@@ -584,7 +652,149 @@ const  handleReleasePayment=async()=>{
   } catch (error) {
     console.error('Network or server error:', error);
   }
+  finally {
+    setIsLoading(false); // Set loading status to false
+  }
 }
+const [filterStatus, setFilterStatus] = useState('all');
+  const [filterPaymentStatus, setFilterPaymentStatus] = useState('');
+  const [filterOrderId, setFilterOrderId] = useState('');
+  const [filterName, setFilterName] = useState('');
+const applyFilters = () => {
+  return orderAll.filter((order) => {
+    // Filter by status
+    if (filterStatus !== 'all' && order.orderStatus !== filterStatus) {
+      return false;
+    }
+
+
+    // Filter by payment status
+    if (filterPaymentStatus && order.clientPaymentStatus !== filterPaymentStatus) {
+      return false;
+    }
+
+    // Filter by order ID
+    if (filterOrderId && !order._id.includes(filterOrderId)) {
+      return false;
+    } 
+  
+   
+  
+    // Filter by recipient name
+    // if (filterName && !order.phone.includes(filterName)) {
+    //   return false;
+    // }
+    if (filterName && order.phone.indexOf(filterName) === -1) return false;
+
+    return true;
+  });
+};
+const orderMap=applyFilters()
+const sortedOrders = useMemo(() => {
+  return orderMap
+    .sort((a, b) => {
+      const statusDateA = new Date(a.updatedAt || a.statusDate?.replace(" at ", " "));
+      const statusDateB = new Date(b.updatedAt || b.statusDate?.replace(" at ", " "));
+      const createdAtA = new Date(a.createdAt);
+      const createdAtB = new Date(b.createdAt);
+
+      const latestA = statusDateA > createdAtA ? statusDateA : createdAtA;
+      const latestB = statusDateB > createdAtB ? statusDateB : createdAtB;
+
+      return latestB - latestA; // Descending sort
+    });
+}, [orderMap]);
+const handleInputSearchChange = (event) => {
+  const { id, value } = event.target;
+  switch (id) {
+    case 'status-filter':
+      setFilterStatus(value);
+      break; 
+       case 'paymentStatus-filter':
+      setFilterPaymentStatus(value);
+      break; 
+       
+    case 'id-filter':
+      setFilterOrderId(value);
+      break;
+      case 'name-filter':
+  setFilterName(value);
+  break; 
+ 
+    // ...other cases
+    default:
+      break;
+  }
+  
+};
+console.log("sortedOrders",sortedOrders)
+ // State to track the active tab
+ const [activeTab, setActiveTab] = useState('allOrders'); // 'allOrders' or 'invoice'
+
+ // Function to handle tab change
+ const handleTabChange = (tab) => {
+   setActiveTab(tab);
+ };
+ const [showInvoiceDetail, setShowInvoiceDetail] = useState(false);
+ const [selectedReleaseOrderId, setSelectedReleaseOrderId] = useState(null);
+ const [selectedReleaseOrderRegId, setSelectedReleaseOrderRegId] = useState(null);
+ 
+// Inside InvoiceDetail component
+useEffect(() => {
+  // Signal that the component has been rendered
+  window.dispatchEvent(new Event('component-rendered'));
+}, [selectedReleaseOrderId,
+  selectedReleaseOrderRegId]);
+
+// Inside your downloadInvoiceDetail function
+const downloadInvoiceDetail = async (releaseOrderId, releaseOrderRegId) => {
+  const tempElement = document.createElement('div');
+  document.body.appendChild(tempElement);
+
+  // Render InvoiceDetail in the temporary element
+  ReactDOM.render(
+    <InvoiceDetail
+      releaseOrderId={releaseOrderId}
+      releaseOrderRegId={releaseOrderRegId}
+    />,
+    tempElement
+  );
+
+  // Wait for the component to be rendered
+  await new Promise(resolve => setTimeout(resolve, 1000));
+  // Capture a screenshot of the temporary element with html2canvas
+  html2canvas(tempElement, { scale: 1 })
+    .then((canvas) => {
+      // Convert the canvas to a data URL
+      const imgData = canvas.toDataURL('image/png');
+
+      // Create a new PDF with jsPDF
+      const pdf = new jsPDF('p', 'mm', 'a4');
+      const imgProps = pdf.getImageProperties(imgData);
+      const pdfWidth = pdf.internal.pageSize.getWidth();
+      const pdfHeight = (imgProps.height * pdfWidth) / imgProps.width;
+      pdf.addImage(imgData, 'PNG', 0, 0, pdfWidth, pdfHeight);
+
+      // Set the selected release order IDs before saving the PDF
+      setSelectedReleaseOrderId(releaseOrderId);
+      setSelectedReleaseOrderRegId(releaseOrderRegId);
+
+      // Show the InvoiceDetail component
+      setShowInvoiceDetail(true);
+
+      // Save the PDF
+      pdf.save("InvoiceDetail.pdf");
+
+      // Remove the temporary element
+      document.body.removeChild(tempElement);
+    });
+};
+
+
+
+console.log("selectedReleaseOrderId",selectedReleaseOrderId)
+console.log("selectedReleaseOrderRegId",selectedReleaseOrderRegId)
+
 
 
   return (
@@ -617,6 +827,7 @@ const  handleReleasePayment=async()=>{
                     Merchants Details
                   </Link>
                 </div>
+                
               </div>
             </div>
             <div className="row m-2">
@@ -757,8 +968,7 @@ const  handleReleasePayment=async()=>{
                         </div>
                       </div>
                       }
-                      {
-                        value_count?.personalInformation &&
+                   
 <div className="accordion-item">
                         <h2 className="accordion-header" id="headingTwo">
                           <button
@@ -794,9 +1004,8 @@ const  handleReleasePayment=async()=>{
                           </div>
                         </div>
                       </div>
-                      }
-                    {
-                         value_count?.brandInformation &&
+                      
+                   
                          <div className="accordion-item">
                          <h2 className="accordion-header" id="headingThree">
                            <button
@@ -834,9 +1043,8 @@ const  handleReleasePayment=async()=>{
                            </div>
                          </div>
                        </div>
-                    }
-                      {
-                        value_count?.paymentInformation &&
+                    
+                     
                         <div className="accordion-item">
                         <h2 className="accordion-header" id="headingFour">
                           <button
@@ -903,7 +1111,7 @@ const  handleReleasePayment=async()=>{
                           </div>
                         </div>
                       </div>
-                      }
+                      
                     
                     
                     </div>
@@ -915,105 +1123,156 @@ const  handleReleasePayment=async()=>{
                   <div className="row amu-title">
                     <div className="col-12">
                       <h3 className="all-title">Payments</h3>
-                      <div className='flex'>
+                      <div className='flex' style={{alignItems:"center",justifyContent:"space-between"}}>
                       <h6>Total Payment Released:</h6>
-                      <span style={{marginTop:"10px",color:"orange",fontSize:'16px'}}>{getUserById?.paymentReleasedAmount?getUserById?.paymentReleasedAmount:0} TK</span>
+                      <span style={{marginTop:"",color:"orange",fontSize:'16px'}}>{getUserById?.paymentReleasedAmount?getUserById?.paymentReleasedAmount:0} TK</span>
                       </div>
-                      <div className='flex'>
+                      {
+                      (lastPayementDetail &&  lastPayementDetail?.paymentReleasedAmount ) &&
+                      <div className='flex' style={{alignItems:"center",justifyContent:"space-between"}}>
+                      <p style={{color:"gray"}}>Previous Payment Released:</p>
+                      <span style={{marginTop:"",color:"gray",fontSize:'16px'}}>{lastPayementDetail?.paymentReleasedAmount} TK</span>
+                      </div>
+                      }
+                    <hr style={{color:"#c8c5c5"}}/>
+                      <div className='flex' style={{alignItems:"center",justifyContent:"space-between"}}>
                       <h6>Total Bill:</h6>
-                      <span style={{marginTop:"10px",color:"orange",fontSize:'16px'}}>{parseInt(getUserById?.totalBill?getUserById?.totalBill:0)} TK</span>
+                      <span style={{marginTop:"",color:"orange",fontSize:'16px'}}>{parseInt(getUserById?.totalBill?getUserById?.totalBill:0)} TK</span>
                       {/* <span style={{marginTop:"10px",color:"orange",fontSize:'16px'}}>{parseInt(getUserById?.totalBill?getUserById?.totalBill :statusPaidbase)} TK</span> */}
                       </div> 
-                      <div className='flex'>
+                      <hr  style={{color:"#c8c5c5"}}/>
+                      <div className='flex' style={{alignItems:"center",justifyContent:"space-between"}}>
                       <h6>Return Value:</h6>
-                      <span style={{marginTop:"10px",color:"orange",fontSize:'16px'}}> {Number(getUserById?.totalReturnAmmountBase?getUserById?.totalReturnAmmountBase:0)} TK</span>
+                      <span style={{marginTop:"",color:"orange",fontSize:'16px'}}> {Number(getUserById?.totalReturnAmmountBase?getUserById?.totalReturnAmmountBase:0)} TK</span>
                       </div> 
-                      <div className='flex'>
+                 <hr style={{color:"#c8c5c5"}}/>
+                      <div className='flex'style={{alignItems:"center",justifyContent:"space-between"}}>
                       
                       <h6>Due Amount:</h6>
-                      <span style={{marginTop:"10px",color:"orange",fontSize:'16px'}}>{Math.floor(getUserById?.dueAmount?getUserById?.dueAmount:0)} TK</span>
+                      <span style={{marginTop:"",color:"orange",fontSize:'16px'}}>{Math.floor(getUserById?.dueAmount?getUserById?.dueAmount:0)} TK</span>
                       </div>
                    
                       
                     </div>
-                    {/* <div className="flex mt-3">
-              
-                      {
-                        getUserById?.dueAmountNow<1000 || dueAmount<1000 ?
-                        <Button onClick={handleDoPaymentPopUp} style={{width:"40%",backgroundColor:"gray",border:"none", cursor: "not-allowed"}} disabled>Pay</Button>
-                        :
-                        <Button onClick={handleDoPaymentPopUp} style={{width:"40%",backgroundColor:"orange",border:"none"}}>Pay</Button>
-                      }
-                  
-                  <Button style={{width:"40%",backgroundColor:"#0c0c30",border:"none"}}  onClick={handlePaymentHistory}>Payment History</Button>
-                {
-                  paymentReleasedPopUp===true &&
-                  <PaymentReleasedPopUp
-                  paymentReleasedPopUp={paymentReleasedPopUp}
-                  setPaymentReleasedPopUp={setPaymentReleasedPopUp}
-                  dueAmount={grandDueNow}
-                  mercahantDetail={getUserById}
-                  totalReturnAmmountBase={totalReturnAmmountBase}
-                  totalBill={statusPaidbase}
-                  totalReceiveBase={totalReceiveBase}
-                  merchantsId={viewClient?._id}
-                  onClose={() => setPaymentReleasedPopUp(false)}
-                  />
-                }
-                </div> */}
+                    
                   </div>
                 </div>
               
               </div>
              
+             {/* ///////////////////////////////// */}
               <div className="col-lg-9 col-sm-12">
+      <div className="client-order-list">
+        <div className="mb-3">
+     
+        <div style={styles.tabContainer}>
+            {/* Tab for All Orders */}
+            <div className="col-lg-2 col-sm-12">
+              <button
+                style={{ ...styles.tabButton, ...(activeTab === 'allOrders' ? styles.activeTab : {}) }}
+                onClick={() => handleTabChange('allOrders')}
+              >
+                All Orders
+              </button>
+            </div>
+            {/* Tab for Invoice */}
+            <div className="col-lg-2 col-sm-12">
+              <button
+                style={{ ...styles.tabButton, ...(activeTab === 'invoice' ? styles.activeTab : {}) }}
+                onClick={() => handleTabChange('invoice')}
+              >
+                Invoice
+              </button>
+            </div>
+          </div>
+          {/* Content based on the active tab */}
+          {activeTab === 'allOrders' && (
+            <div className="allOrders">
+              {/* ... (your existing code for displaying all orders) */}
+              <div className="row mt-4 mb-4">
+              <div className="col-12">
+                <h2>All Orders</h2>
+              </div>
+            </div>
+              <div className="row order-filter">
              
-                {
-                  value_count?.orderList &&
-                  
-                  <div className="client-order-list">
-             <div>
-  {selectedOrders.length !== 0 ? (
-    <button
-    onClick={showReleasePaymentpopUP}
-      style={{
-        backgroundColor: '#4CAF50', // Green color for enabled state
-        color: 'white',
-        padding: '10px 20px',
-        border: 'none',
-        borderRadius: '4px',
-        cursor: 'pointer',
-      }}
-    >
-      Release Payment
-    </button>
-  ) : (
-    <button
-      disabled
-      style={{
-        backgroundColor: '#ccc', // Light gray color for disabled state
-        color: '#666',
-        padding: '10px 20px',
-        border: 'none',
-        borderRadius: '4px',
-        cursor: 'not-allowed',
-      }}
-    >
-      Release Payment
-    </button>
-  )}
-</div>
-
-
-                     <div  style={{display:"flex",justifyContent:"flex-end",padding:"0px ",marginBottom:"10px"}}>
-                  
-                  <span style={{cursor:"pointer",border:"1px solid #dad5d5",padding:"5px",borderRadius:"4px"}} onClick={downloadInfIntoXl} data-order-id="view-order-detail"><img style={{width:"30px",hight:"25px"}} src="/images/download.png" alt='download'/></span>
-              <div id="view-order-detail"style={{position: 'absolute', left: '-10000px', top: '-10000px'}}>
-              <GetMercahntOrderXl merchOrders={[merchOrders]}/>
-          </div> 
+             <div className="col-lg-3 col-sm-12">
+               <label htmlFor="id-filter" style={{marginBottom:"8px"}}>Order Id:</label>
+               <input type="text" id="id-filter" className="form-control" value={filterOrderId}  onChange={handleInputSearchChange} />
+             </div>
+           
+             <div className="col-lg-2 col-sm-12">
+               <label htmlFor="paymentStatus-filter" style={{marginBottom:"8px"}}>Payment:</label>
+               <select id="paymentStatus-filter" value={filterPaymentStatus} className="form-control" onChange={(e) =>  handleInputSearchChange(e)}>
+                 <option value=''>none</option>
+                 {/* <option value="">Unpaid</option> */}
+                 <option value="paidToClient">Paid To Client</option>
+               </select>
+             </div>  
             
-                </div>
-                  <div className="row" style={{ marginBottom: "30px" }}>
+             <div className="col-lg-3 col-sm-12">
+               <label htmlFor="status-filter" style={{marginBottom:"8px"}}>Status:</label>
+               <select id="status-filter"  className="form-control" value={filterStatus} onChange={(e) =>  handleInputSearchChange(e)}>
+                 <option   value="all">All</option>
+                 <option value="Pending">Pending</option>
+                 <option value="on hold artwork issue">On hold -  Artwork issue</option>
+                 <option value="on hold billing issue">On hold - Billing Issue</option>
+                 <option value="on hold out of stock">On hold - Out of Stock</option>
+                 <option value="Approved">Approved</option>
+                 <option value="confirmed">Confirmed</option>
+                 <option value="in-production">In Production</option>
+                 <option value="out for delivery">Out for delivery</option>
+                <option value="delivered">Delivered</option>
+                 {/* <option value="payment-released">Payment Released</option> */}
+                 <option value="returned">Returned</option>
+                 <option value="cancel">Cancel</option>
+                 
+               </select>
+             </div>
+             <div className="col-lg-3 col-sm-12">
+             <div style={{marginBottom:"6px"}}></div>
+             <br />
+             {selectedOrders.length !== 0 ? (
+   <button
+   onClick={showReleasePaymentpopUP}
+     style={{
+       backgroundColor: '#4CAF50', // Green color for enabled state
+       color: 'white',
+       padding: '8px 20px',
+       border: 'none',
+       borderRadius: '4px',
+       cursor: 'pointer',
+       width:"100%"
+     }}
+   >
+     Release Payment
+   </button>
+ ) : (
+   <button
+     disabled
+     style={{
+       backgroundColor: '#ccc', // Light gray color for disabled state
+       color: '#666',
+       padding: '8px 20px',
+       border: 'none',
+       borderRadius: '4px',
+       cursor: 'not-allowed',
+       width:"100%"
+     }}
+   >
+     Release Payment
+   </button>
+ )}
+             </div>  
+              <div className="col-lg-1 col-sm-12 " style={{marginTop:"36px"}} >
+             <span style={{cursor:"pointer",border:"1px solid #dad5d5",padding:"10px",borderRadius:"4px"}} onClick={downloadInfIntoXl} data-order-id="view-order-detail"><img style={{width:"30px",hight:"25px"}} src="/images/download.png" alt='download'/></span>
+             <div id="view-order-detail"style={{position: 'absolute', left: '-10000px', top: '-10000px'}}>
+             <GetMercahntOrderXl merchOrders={[merchOrders]}/>
+         </div> 
+         </div> 
+             </div>
+              <div className="allOrders">
+<div className="row" style={{ marginBottom: "30px" }}>
                     <div className="col-lg-2 col-sm-12">
                       <h4>Name</h4>
                     </div>
@@ -1033,7 +1292,7 @@ const  handleReleasePayment=async()=>{
                       <h4>Status</h4>
                     </div>
                   </div>
-                  {orderAll?.map((orderInfo, index) => {
+                  {sortedOrders?.map((orderInfo, index) => {
      // You can conditionally update returnedAmount based on the orderStatus
      if (orderInfo?.orderStatus === "returned") {
       updateReturnedAmount(orderInfo._id, orderInfo.printbazcost, orderInfo.deliveryFee);
@@ -1077,10 +1336,80 @@ const  handleReleasePayment=async()=>{
                         </div>
                       </div>
                     )})}
-                </div>
-                }
+
+</div>
+            </div>
+          )}
+
+          {activeTab === 'invoice' && (
+            <div className="invoice">
+          {/* <div className="col-lg-1 col-sm-12 " style={{marginTop:"36px"}} >
+             <span style={{cursor:"pointer",border:"1px solid #dad5d5",padding:"10px",borderRadius:"4px"}} onClick={downloadInfIntoXl} data-order-id="view-order-detail"><img style={{width:"30px",hight:"25px"}} src="/images/download.png" alt='download'/></span>
+             <div id="view-order-detail"style={{position: 'absolute', left: '-10000px', top: '-10000px'}}>
+             <GetReleaseOrderXl paymentRelasedOrders={paymentRelasedOrders}/>
+         </div> 
+         </div>  */}
+                   <Table responsive>
+  <thead>
+    <tr>
+      <th>Payment Release Date</th>
+      <th>Collect Amount</th>
+      <th>Delivery Fee</th>
+      <th>Rcv Amount</th>
+      <th>Payment Status</th>
+      <th>Action</th>
+    </tr>
+  </thead>
+  <tbody>
+    {getPaymentDetailById?.map((releaseOrder, index) => (
+     
+        <tr key={index}>
+          
+          <td>{releaseOrder?.paymentReleasedDate}</td>
+          <td style={{ textAlign: "center" }}>{releaseOrder?.totalCollectAmount}</td>
+          <td style={{ textAlign: "center" }}>{releaseOrder?.totalDeliveryFee}</td>
+          <td style={{ textAlign: "center" }}>{releaseOrder?.totalRecvableAmount}</td>
+          <td style={{ textAlign: "center" }}>{releaseOrder?.segmentPayStatus}</td>
+          <td style={{ textAlign: "center" }}>
+            <div className="view-client-title " style={{ marginRight: "10px" }}>
+         
+              <Button variant="warning" onClick={() => downloadInvoiceDetail(releaseOrder?._id, releaseOrder?.regId)}>
+                <span><img style={{ width: "23px", height: "20px" }} src="/images/download.png" alt='download' /></span>PDF
+              </Button>
+           
+             
+             
+              <Link to={`/invoice/${releaseOrder?._id}/${releaseOrder?.regId}`} state={{ releaseOrder }} key={index}> 
+            
+              <Button style={{backgroundColor:"#012970",marginTop:"8px",marginLeft:"5px"}} >
+               View
+              </Button>
+              </Link>
+             
+            </div>
+            {showInvoiceDetail && (
+                <div  style={{ position: 'absolute', left: '-10000px', top: '-10000px' }}> 
+        <InvoiceDetail
+      
+          releaseOrderId={selectedReleaseOrderId}
+          releaseOrderRegId={selectedReleaseOrderRegId}
+        />
+        </div>
+      )}
+          </td>
+        </tr>
+    
+    ))}
+  </tbody>
+</Table>
+
               
-              </div>
+              {/* ... (your code for displaying invoices) */}
+            </div>
+          )}
+        </div>
+      </div>
+    </div>
             </div>
             {
               showPopUp &&
@@ -1091,6 +1420,43 @@ const  handleReleasePayment=async()=>{
                 message ="Do you want to release payment?"
               />
             }
+            {
+              isenableOrderToReleasepaym &&
+              <MsgALert 
+              message="you can release payments only for delivered,paid and unpaid to client orders!"
+              onClose={()=>setIsenableOrderToReleasepaym(false)}
+              />
+            }
+               {
+  isLoading===true &&(
+    <>
+     <div className="alert-overlay"  />
+       <div className="alert-box" >
+     
+         <Spinner  style={{padding:"20px"}} animation="grow" variant="warning" />
+         
+         <h2>Please wait!</h2>
+       </div>
+    </>
+  )
+  
+}
+      {isSuccess===true && (
+          
+          <OrderUpdateAlert
+          message="Payment released successfully!"
+          onClose={() => setIsSuccess(false)}
+       
+          
+          
+          />
+          
+          
+          )
+          
+          
+          }
+            
           </div>
         </div>
       </div>

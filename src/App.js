@@ -32,6 +32,8 @@ import AddBlogs from './Components/addBlogs/AddBlogs';
 import AllBlogs from './Components/allBlogs/AllBlogs';
 import UpdatePrice from './Components/updatePrice/UpdatePrice';
 import SizeStock from './Components/sizeStock/SizeStock';
+import Invoice from './Components/invoice/Invoice';
+import InvoiceDetail from './Components/invoiceDetail/InvoiceDetail';
 function App() {
   return (
     <div className="">
@@ -41,6 +43,9 @@ function App() {
     
      <Route path="/orderList"    element={<PrivateRoute><OrderList /> </PrivateRoute>} />
        <Route path="/viewOrder/:id"element={<PrivateRoute><ViewOrder /> </PrivateRoute>} />
+       <Route path="/invoice/:id/:regId" element={<PrivateRoute><Invoice /></PrivateRoute>} />
+       <Route path="/invoiceDetail/:id/:regId" element={<PrivateRoute><InvoiceDetail /></PrivateRoute>} />
+
       
        <Route path="/filemanager"  element={<PrivateRoute><Filemanager /> </PrivateRoute>} />
        <Route path="/liveChat"     element={<PrivateRoute><LiveChat /> </PrivateRoute>} />

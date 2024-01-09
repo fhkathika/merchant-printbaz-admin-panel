@@ -41,7 +41,7 @@ const ViewOrder = () => {
 
     navigate(previousPathLocation); // Go back to the previous page
   };
-
+const [getUserByDetail,setGetUserByDetail]=useState()
   useEffect(()=>{
     const getOrderById=async()=>{
              // Fetch the updated order details
@@ -61,6 +61,19 @@ const ViewOrder = () => {
           // Update the previousPath state when the location changes
  
         },[getSpecificOrderById])
+        const getUserById=async()=>{
+          // Fetch the updated order details
+        // await fetch(`https://mserver.printbaz.com/getUser/${viewClient?._id}`)
+        await fetch(`http://localhost:5000/getUser/${viewClient?._id}`)
+        .then(res=>res.json())
+        .then(data => {setGetUserByDetail(data)})
+        }
+        useEffect(()=>{
+        
+          getUserById()
+         
+              },[getUserByDetail])  
+              console.log("getUserByDetail............",getUserByDetail?.totalReturnAmmountBase)  
   const [orderStatus, setOrderStatus] = useState();
   const [paymentStatus, setPaymentStatus] = useState();
   const [clientPaymentStatus, setClientPaymentStatus] = useState();
@@ -104,7 +117,7 @@ setTrackingId(e.target.value)
  const orderSatatusReturned=orderAll
  ?.filter(order =>order.userMail === viewClient?.email && order.orderStatus==="returned" )
  // console.log("orderStatus pament released",orderStatusPaymentReleased);
-
+console.log("orderSatatusReturned",orderSatatusReturned)
  if (Array.isArray(orderSatatusReturned)) {
    for (let i = 0; i < orderSatatusReturned.length; i++) {
      const totalReturn = Number(orderSatatusReturned[i]?.returnedAmount);
@@ -144,6 +157,7 @@ if (PaymentStausPaid?.length !== 0) {
     return sum + (isNaN(amount) ? 0 : amount);
   }, 0); // Initialize sum to 0
 }
+console.log("totalbill",newTotalBill)
 //total payment released
 // let newReleasePaym=newTotalBill-sumOfselectedRcvAMounToPaymentRelease
 // let newTotalPaymentReleased=(newReleasePaym>0?newReleasePaym:0);
@@ -163,6 +177,9 @@ if (orderSatatusReturned?.length !== 0) {
   }, 0); // Initialize sum to 0
 }
 let newTotalReturn=sumofReturnOrderPrintbazcost+sumofReturnOrderDeliveryFee+sumofReturnOrderDeliveryFee/2
+if(newTotalBill<newTotalReturn){
+newTotalBill=0
+}
 //due amount=totalbill-(totalPaymentReleased+totalReturn)
 let newTotalDue=newTotalBill
 let totalnewDueAmount=newTotalDue>0?newTotalDue:0
@@ -191,8 +208,8 @@ console.log("newTotalReturn",newTotalReturn)
                     // totalReceiveBase: totalReceiveBase,
                     // totalReturnAmmountBase: totalReturnAmmountBase,
                     // dueAmount: dueAmount
-                    totalBill: newTotalBill 
-                    // totalReturnAmmountBase: newTotalReturn,
+                    totalBill: newTotalBill,
+                    totalReturnAmmountBase: newTotalReturn,
                     // dueAmount: totalnewDueAmount
                 }),
             }
@@ -211,15 +228,12 @@ console.log("newTotalReturn",newTotalReturn)
       }
   }
 };
- 
-//  useEffect(() => {
-//   if (getSpecificOrderById?.paymentStatus === "paid" && getSpecificOrderById?.orderStatus === "delivered") {
-//     getOrderById();
-// }
+useEffect(()=>{
+        
 
-//   getOrderById();
+  getOrderById()
+      },[getUserByDetail]) 
 
-// }, [viewClient?._id]);
 
  const handleInputChange = async (e) => {
     const status = e.target.value;
@@ -233,9 +247,12 @@ console.log("newTotalReturn",newTotalReturn)
             },
             body: JSON.stringify({ orderStatus: status,statusChangedBy:adminUser?.email,statusChangeTime:statusChangeTimeRecord }),
         });
-
+       
         if (response.ok) {
             setOrderStatus(status);
+          if(orderStatus){
+            getOrderById()
+          } 
             SendOrderStatusMail({
               status: status,
               _id: getSpecificOrderById?._id,
@@ -244,14 +261,20 @@ console.log("newTotalReturn",newTotalReturn)
           
               const returnedAmm =
                 Number(getSpecificOrderById?.printbazcost) +
-                Number(getSpecificOrderById?.deliveryFee);
+                Number(getSpecificOrderById?.deliveryFee)+Number(getSpecificOrderById?.deliveryFee)/2;
               const orderReturmed = status==="returned" ||  getSpecificOrderById?.orderStatus=== "returned";
           // console.log("orderReturmed",orderReturmed);
+    
+           
+          
           if(orderReturmed===true){
+           
+               
             try {
+             
               const response = await fetch(
-                // `http://localhost:5000/returnOrderAddition/${id}`,
-                `https://mserver.printbaz.com/returnOrderAddition/${id}`,
+                `http://localhost:5000/returnOrderAddition/${id}`,
+                // `https://mserver.printbaz.com/returnOrderAddition/${id}`,
                 {
                   method: "PUT",
                   headers: {
@@ -264,6 +287,7 @@ console.log("newTotalReturn",newTotalReturn)
               if (response.ok) {
                 // Update the approval status in the viewClient object
                 // You can update the state or do whatever you want here
+               
               } else {
                 console.error("Status Error:", response);
                 // Handle error here
@@ -357,7 +381,7 @@ console.log("newTotalReturn",newTotalReturn)
       if (response.ok) {
         // Update the approval status in the viewClient object
         setPaymentStatus(status);
-        if(paymentStatus==="paid"){
+        if(paymentStatus==="paid" ){
           getOrderById()
         }
      

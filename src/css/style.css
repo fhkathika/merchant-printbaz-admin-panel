@@ -509,3 +509,7 @@ tr:nth-child(even) {
     font-size: 10px !important;
   }
 }
+.highlightedrow {
+  background: rgb(24, 1, 61) !important;
+  color: white !important;
+}
