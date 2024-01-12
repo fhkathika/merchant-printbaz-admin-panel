@@ -42,8 +42,8 @@ const [hasmore, setHasMore] = useState(false);
   
   useEffect(()=>{
     const getOrders = async () => {
-    //  await fetch('https://mserver.printbaz.com/alluser') //for main site
-     await fetch('http://localhost:5000/alluser') //for testing site
+     await fetch('https://mserver.printbaz.com/alluser') //for main site
+    //  await fetch('http://localhost:5000/alluser') //for testing site
     .then(res=>res.json())
     .then(data => setAllMerchant(data))
     }
@@ -114,8 +114,8 @@ const fetchProduct = async (page) => {
       });
 // Ensure this matches with the API expectations
 
-  const response = await fetch(`http://localhost:5000/allOrderPagination?page=${page}&size=20&${queryParams.toString()}`);
-  // const response = await fetch(`https://mserver.printbaz.com/allOrderPagination?page=${page}&size=20&${queryParams.toString()}`);
+  // const response = await fetch(`http://localhost:5000/allOrderPagination?page=${page}&size=20&${queryParams.toString()}`);
+  const response = await fetch(`https://mserver.printbaz.com/allOrderPagination?page=${page}&size=20&${queryParams.toString()}`);
     if (!response.ok) {
       throw new Error('Network response was not ok');
     }
@@ -490,8 +490,9 @@ console.log("sortedOrders.............",sortedOrders)
               {
               sortedOrders
               ?.map((orders,index)=>{ 
-                matchingMerchant = allMerchant.find(merchant => merchant?.email === orders?.userMail)
-            let  totalPrintBazCostWithoutDeliveryFee=Number(orders?.collectAmount)
+                matchingMerchant = allMerchant?.find(merchant => merchant?.email === orders?.userMail)
+                console.log("matchingMerchant........",matchingMerchant)
+            let totalPrintBazCostWithoutDeliveryFee=Number(orders?.collectAmount)
                  return (
                   value_count?.OrderView ?
                   <Link to={`/viewOrder/${orders?._id}`} state={{orders,previousPath,matchingMerchant}} key={index}>
@@ -499,6 +500,7 @@ console.log("sortedOrders.............",sortedOrders)
                     <div className="col-lg-2 col-sm-12">
                      {/* Display the corresponding allMerchant name */}
                      <p>{orders?.clientName}</p>
+                     <p>{matchingMerchant?._id}</p>
           {/* {index < allMerchant.length && <p>{allMerchant[index]?.name}</p>} */}
                    
                     </div>

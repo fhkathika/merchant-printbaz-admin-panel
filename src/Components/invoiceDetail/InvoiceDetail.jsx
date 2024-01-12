@@ -8,29 +8,28 @@ const InvoiceDetail = ({releaseOrderId,releaseOrderRegId}) => {
   const [paymentRelasedOrders,setPaymentRelasedOrders]=useState([])
   const [getPaymentDetailById, setGetPaymentDetailById] = useState([]);
     const getPaymentReleasedOrdersByRefId = async () => {
-        //  await fetch(`https://mserver.printbaz.com/getPaymentReleasedOrderByRegId/${regId?._id}`) //for main site
-        await fetch(`http://localhost:5000/getPaymentReleasedOrderByRegId/${releaseOrderRegId}`)
+         await fetch(`https://mserver.printbaz.com/getPaymentReleasedOrderByRegId/${releaseOrderRegId}`) //for main site
+        // await fetch(`http://localhost:5000/getPaymentReleasedOrderByRegId/${releaseOrderRegId}`)
         .then(res=>res.json())
         .then(data => setPaymentRelasedOrders(data))
         }
-        useEffect(()=>{
-            getPaymentReleasedOrdersByRefId()
-        },[])
+      
 
         const getPerSegmentPaymentDetailById=async()=>{
           // Fetch the updated order details
-        // await fetch(`https://mserver.printbaz.com/getPaymentDetailRegId/${viewClient?._id}`)
-        await fetch(`http://localhost:5000/getPaymentDetailRegId/${releaseOrderRegId}`)
+        await fetch(`https://mserver.printbaz.com/getPaymentDetailbyId/${releaseOrderId}`)
+        // await fetch(`http://localhost:5000/getPaymentDetailRegId/${releaseOrderRegId}`)
         .then(res=>res.json())
         .then(data => {setGetPaymentDetailById(data)})
         }
         console.log("getPaymentDetailById.........",getPaymentDetailById)
         useEffect(()=>{
+          getPaymentReleasedOrdersByRefId()
           getPerSegmentPaymentDetailById()
             
-              },[])
+              },[getPaymentDetailById,paymentRelasedOrders])
          
-        const specificPayDetail=getPaymentDetailById?.find(detail=>detail?.regId===releaseOrderRegId && detail?._id===releaseOrderId)
+        const specificPayDetail=getPaymentDetailById?.find(detail=> detail?._id===releaseOrderId)
         // console.log("specificPayDetail",specificPayDetail)
       const filterByDate=paymentRelasedOrders?.filter(order=>order?.paymentReleasedDate===specificPayDetail?.paymentReleasedDate)
       console.log("filterByDate..........",filterByDate)
@@ -39,13 +38,15 @@ const InvoiceDetail = ({releaseOrderId,releaseOrderRegId}) => {
       <div style={{display:"flex"}}>
   <div >
   {/* <img style={{width:"20px",height:"20px"}} src="https://i.ibb.co/N1NY2D2/favicon2.jpg" alt="Company Logo"/> */}
+ <h2>Printbaz</h2>
   <p style={{marginTop:"5px",fontSize:"12px"}}>Banani Breeze,</p>
   <p style={{lineHeight:"1px",fontSize:"12px"}}> House 76 Rd No 2, Dhaka 1213</p>
- 
+  <p style={{marginTop:"5px",fontSize:"12px"}}>01927-854949</p>
+
 </div>
   <div  style={{marginLeft:"40px",borderLeft:"1px solid black"}}>
   {/* <img style={{width:"20px",height:"20px",marginLeft:"20px"}} src="https://i.ibb.co/zJTM5Zk/call-1.png" alt="phone logo"/> */}
-  <p style={{marginTop:"5px",fontSize:"12px",marginLeft:"20px"}}>01927-854949</p>
+  {/* <p style={{marginTop:"5px",fontSize:"12px",marginLeft:"20px"}}>01927-854949</p> */}
 
   {/* <img style={{textAlign:"center"}} src='https://i.ibb.co/zJTM5Zk/call-1.png'/> 
   <p style={{fontSize:"15px"}}>01927-854949</p> */}

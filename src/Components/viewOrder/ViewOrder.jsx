@@ -34,19 +34,22 @@ const ViewOrder = () => {
   const [fetchTrackingId, setFetchtrackingId] = useState();
   const viewOrder = location.state ? location?.state?.orders : null;
   const previousPathLocation = location.state ? location?.state?.previousPath : null;
-  const viewClient = location.state?.matchingMerchant;
+  const viewClient = location?.state &&location?.state?.matchingMerchant;
   const {value_count}=useRoleAsignData()
   const {adminUser}=useContext(AuthContext);
+
+
   const handleBack = () => {
 
     navigate(previousPathLocation); // Go back to the previous page
   };
+  
 const [getUserByDetail,setGetUserByDetail]=useState()
   useEffect(()=>{
     const getOrderById=async()=>{
              // Fetch the updated order details
-    // await fetch(`https://mserver.printbaz.com/getorder/${id}`)
-    await fetch(`http://localhost:5000/getorder/${id}`)
+    await fetch(`https://mserver.printbaz.com/getorder/${id}`)
+    // await fetch(`http://localhost:5000/getorder/${id}`)
     .then(res=>res.json())
     .then(data => {setGetSpecificOrderById(data)
       setOrderStatus(data.orderStatus);
@@ -63,8 +66,8 @@ const [getUserByDetail,setGetUserByDetail]=useState()
         },[getSpecificOrderById])
         const getUserById=async()=>{
           // Fetch the updated order details
-        // await fetch(`https://mserver.printbaz.com/getUser/${viewClient?._id}`)
-        await fetch(`http://localhost:5000/getUser/${viewClient?._id}`)
+        await fetch(`https://mserver.printbaz.com/getUser/${viewClient?._id}`)
+        // await fetch(`http://localhost:5000/getUser/${viewClient?._id}`)
         .then(res=>res.json())
         .then(data => {setGetUserByDetail(data)})
         }
@@ -73,7 +76,7 @@ const [getUserByDetail,setGetUserByDetail]=useState()
           getUserById()
          
               },[getUserByDetail])  
-              console.log("getUserByDetail............",getUserByDetail?.totalReturnAmmountBase)  
+              
   const [orderStatus, setOrderStatus] = useState();
   const [paymentStatus, setPaymentStatus] = useState();
   const [clientPaymentStatus, setClientPaymentStatus] = useState();
@@ -189,15 +192,17 @@ let totalnewDueAmount=newTotalDue>0?newTotalDue:0
 console.log("totalnewDueAmount",totalnewDueAmount)
 console.log("newTotalBill",newTotalBill)
 console.log("newTotalReturn",newTotalReturn)
- const getOrderById = async () => {
+console.log("viewClient",viewClient?._id)
+
+ const getUpdateBillByRegidId = async () => {
   // Ensure there's an ID before making a request
  
   if (viewClient?._id) {
       try {
     
           const response = await fetch(
-              // `https://mserver.printbaz.com/updateBill/${viewClient._id}`,
-              `http://localhost:5000/updateBill/${viewClient._id}`,
+              `https://mserver.printbaz.com/updateBill/${viewClient?._id}`,
+              // `http://localhost:5000/updateBill/${viewClient._id}`,
               {
                 method: "PUT",
                 headers: {
@@ -218,6 +223,7 @@ console.log("newTotalReturn",newTotalReturn)
           const data = await response.json();
           if (response.status === 200) {
               // Handle success, for instance:
+              console.log("update bill called")
           } else {
               // Handle error
               console.error("Error updating the bill:", data.message);
@@ -229,18 +235,20 @@ console.log("newTotalReturn",newTotalReturn)
   }
 };
 useEffect(()=>{
-        
+   if(!getUserById?.totalBill && PaymentStausPaid.length>0 )  {
+    getUpdateBillByRegidId()
+   }   
 
-  getOrderById()
-      },[getUserByDetail]) 
+
+      },[getUserByDetail,getUserById]) 
 
 
  const handleInputChange = async (e) => {
     const status = e.target.value;
     try {
         const response = await fetch(
-          //  `https://mserver.printbaz.com/updateOrderStatus/${id}`,{ 
-      `http://localhost:5000/updateOrderStatus/${id}`, {
+           `https://mserver.printbaz.com/updateOrderStatus/${id}`,{ 
+      // `http://localhost:5000/updateOrderStatus/${id}`, {
             method: "PUT",
             headers: {
                 "Content-Type": "application/json",
@@ -251,7 +259,7 @@ useEffect(()=>{
         if (response.ok) {
             setOrderStatus(status);
           if(orderStatus){
-            getOrderById()
+            getUpdateBillByRegidId()
           } 
             SendOrderStatusMail({
               status: status,
@@ -273,8 +281,8 @@ useEffect(()=>{
             try {
              
               const response = await fetch(
-                `http://localhost:5000/returnOrderAddition/${id}`,
-                // `https://mserver.printbaz.com/returnOrderAddition/${id}`,
+                // `http://localhost:5000/returnOrderAddition/${id}`,
+                `https://mserver.printbaz.com/returnOrderAddition/${id}`,
                 {
                   method: "PUT",
                   headers: {
@@ -367,8 +375,8 @@ useEffect(()=>{
     try {
       const response = await fetch(
         
-        // `https://mserver.printbaz.com/updatePaymentStatus/${id}`,
-      `http://localhost:5000/updatePaymentStatus/${id}`,
+        `https://mserver.printbaz.com/updatePaymentStatus/${id}`,
+      // `http://localhost:5000/updatePaymentStatus/${id}`,
         {
           method: "PUT",
           headers: {
@@ -381,8 +389,8 @@ useEffect(()=>{
       if (response.ok) {
         // Update the approval status in the viewClient object
         setPaymentStatus(status);
-        if(paymentStatus==="paid" ){
-          getOrderById()
+        if(paymentStatus){
+          getUpdateBillByRegidId()
         }
      
         const deliveryData = {
@@ -435,8 +443,8 @@ useEffect(()=>{
     try {
       const response = await fetch(
         
-        // `https://mserver.printbaz.com/clientPaymentStatus/${id}`,
-      `http://localhost:5000/clientPaymentStatus/${id}`,
+        `https://mserver.printbaz.com/clientPaymentStatus/${id}`,
+      // `http://localhost:5000/clientPaymentStatus/${id}`,
         {
           method: "PUT",
           headers: {
@@ -710,8 +718,9 @@ else{
       &lt; Back
     </span>
                 </div> 
+               
                 <div className='flex col-lg-2 col-sm-2 mt-3'>
-               <p style={{fontWeight:"600",color:"white",backgroundColor:"orange",padding:"7px",borderRadius:"5px"}}>{getSpecificOrderById?.category}</p>
+               <p style={{fontWeight:"600",color:"white",backgroundColor:"#160138",padding:"7px",borderRadius:"5px"}}>{getSpecificOrderById?.clientPaymentStatus}</p>
              </div>
                 <div className='flex col-lg-4 col-sm-2 '>
              
@@ -888,29 +897,7 @@ else{
                         style={{ marginBottom: "20px",display:"flex",justifyContent:"flex-end" }}
                       >
                         <div style={{display:""}}>
-                        <select
-                          id="status-filter"
-                          className="status-btn"
                        
-                          style={{
-                            border: "none",
-                            padding: "8px",
-                          
-                            marginRight:'20px',
-                            marginBottom:"5px",
-                            backgroundColor: getViewClientColor(
-                              clientPaymentStatus
-                            ),
-                          }}
-                          onChange={(e) => handleInputClientPaymentChange(e)}
-                        >
-                        {/* <option selected>Select Print Size</option> */}
-                       <option selected value="unpaidToClient">Unpaid Client</option>
-                       
-                          <option value="paidToClient">Paid Client</option>
-
-                        </select>
-                          
                           {
                             value_count?.payment_Status ?
                             <select

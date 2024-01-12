@@ -9,38 +9,46 @@ const Invoice = () => {
 
     const [getPaymentDetailById, setGetPaymentDetailById] = useState([]);
     const [paymentRelasedOrders,setPaymentRelasedOrders]=useState([])
+    const getPerSegmentPaymentDetailById = async () => {
+      try {
+        const response = await fetch(`https://mserver.printbaz.com/getPaymentDetailbyId/${id}`);
+        const data = await response.json();
+        setGetPaymentDetailById(data);
+      } catch (error) {
+        console.error("Error fetching data:", error);
+      }
+    };
+    
+    useEffect(() => {
+      getPerSegmentPaymentDetailById();
+    }, [regId,getPaymentDetailById]); // Include regId as a dependency
+    
+          console.log("getPaymentDetailById.........",getPaymentDetailById)
+  
   
     const getPaymentReleasedOrdersByRefId = async () => {
-        //  await fetch(`https://mserver.printbaz.com/getPaymentReleasedOrderByRegId/${regId?._id}`) //for main site
-        await fetch(`http://localhost:5000/getPaymentReleasedOrderByRegId/${regId}`)
+         await fetch(`https://mserver.printbaz.com/getPaymentReleasedOrderByRegId/${regId}`) //for main site
+        // await fetch(`http://localhost:5000/getPaymentReleasedOrderByRegId/${regId}`)
         .then(res=>res.json())
         .then(data => setPaymentRelasedOrders(data))
         }
+       
         useEffect(()=>{
-            getPaymentReleasedOrdersByRefId()
-        },[paymentRelasedOrders])
-
-        const getPerSegmentPaymentDetailById=async()=>{
-            // Fetch the updated order details
-          // await fetch(`https://mserver.printbaz.com/getPaymentDetailRegId/${viewClient?._id}`)
-          await fetch(`http://localhost:5000/getPaymentDetailRegId/${regId}`)
-          .then(res=>res.json())
-          .then(data => {setGetPaymentDetailById(data)})
-          }
-          console.log("getPaymentDetailById.........",getPaymentDetailById)
-          useEffect(()=>{
-            getPerSegmentPaymentDetailById()
-              
-                },[getPaymentDetailById])
-           
-          const specificPayDetail=getPaymentDetailById?.find(detail=>detail?.regId===regId && detail?._id===id)
+          getPaymentReleasedOrdersByRefId()
+      
+            
+              },[paymentRelasedOrders])
+              console.log("paymentRelasedOrders.........",paymentRelasedOrders)
+      
+                const specificPayDetail=getPaymentDetailById?.find(detail=>detail?._id===id)
        
         const filterByDate=paymentRelasedOrders?.filter(order=>order?.paymentReleasedDate===specificPayDetail?.paymentReleasedDate)
-  
+  // console.log("specificPayDetail......",specificPayDetail)
+  // console.log("filterByDate......",filterByDate)
         return (
             <>
         <Navigationbar/>
-            <Container className="invoice mt-5">
+        <Container className="invoice mt-5">
                 <div style={{display:"flex"}}>
             <div >
             <img style={{width:"20px",height:"20px"}} src="https://i.ibb.co/N1NY2D2/favicon2.jpg" alt="Company Logo"/>

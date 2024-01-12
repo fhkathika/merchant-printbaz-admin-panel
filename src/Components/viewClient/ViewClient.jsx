@@ -1,5 +1,5 @@
 import React, { useContext, useEffect, useMemo, useState } from "react";
-import { Form, Link, useLocation, useNavigate } from "react-router-dom";
+import { Form, Link, useLocation, useNavigate, useParams } from "react-router-dom";
 import "../../css/style.css";
 import ReactDOM from 'react-dom';
 
@@ -23,10 +23,11 @@ import jsPDF from "jspdf";
 import InvoiceDetail from "../invoiceDetail/InvoiceDetail";
 const ViewClient = () => {
   // const { orderAll } = useGetMongoData();
-  
+  const {id}=useParams()
   const [orderAll, setOrderAll] = useState([]);
   const location = useLocation();
   const viewClient = location.state ? location?.state?.merchants :location.state ? location?.state?.getDataById : null;
+ 
   const [getUserById, setGetUserById] = useState();
   const [paymentReleasedPopUp, setPaymentReleasedPopUp] = useState(false);
   const [paymentRelasedOrders, setPaymentRelasedOrders] = useState([]);
@@ -34,55 +35,44 @@ const ViewClient = () => {
   const {value_count}=useRoleAsignData()
   const {adminUser}=useContext(AuthContext);
   const navigate=useNavigate()
+  const getOrderById=async()=>{
+    // Fetch the updated order details
+  await fetch(`https://mserver.printbaz.com/getUser/${id}`)
+  // await fetch(`http://localhost:5000/getUser/${viewClient?._id}`)
+  .then(res=>res.json())
+  .then(data => {setGetUserById(data)})
+  }
+ 
+  useEffect(()=>{
+ 
+         getOrderById()
+        },[getUserById])
+  
   const getOrders = async () => {
-    //  await fetch(`https://mserver.printbaz.com/getmyorder/${viewClient?.email}`) //for main site
-    await fetch(`http://localhost:5000/getmyorder/${viewClient?.email}`)
+     await fetch(`https://mserver.printbaz.com/getmyorder/${getUserById?.email}`) //for main site
+    // await fetch(`http://localhost:5000/getmyorder/${viewClient?.email}`)
     .then(res=>res.json())
     .then(data => setOrderAll(data))
     }
+    useEffect(()=>{
+ 
+      getOrders()
+      // getPaymentReleasedOrdersByRefId()
+  },[orderAll])
+ 
     const getPaymentReleasedOrdersByRefId = async () => {
-      //  await fetch(`https://mserver.printbaz.com/getPaymentReleasedOrderByRegId/${viewClient?._id}`) //for main site
-      await fetch(`http://localhost:5000/getPaymentReleasedOrderByRegId/${viewClient?._id}`)
+       await fetch(`https://mserver.printbaz.com/getPaymentReleasedOrderByRegId/${id}`) //for main site
+      // await fetch(`http://localhost:5000/getPaymentReleasedOrderByRegId/${viewClient?._id}`)
       .then(res=>res.json())
       .then(data => setPaymentRelasedOrders(data))
       }
-      console.log("paymentRelasedOrders....",paymentRelasedOrders)
-      console.log("viewClient....",viewClient)
-  useEffect(()=>{
- 
-    getOrders()
-    // getPaymentReleasedOrdersByRefId()
-},[orderAll])
+    
   useEffect(()=>{
  getPaymentReleasedOrdersByRefId()
-},[])
-console.log("paymentRelasedOrders")
+},[paymentRelasedOrders])
+
 const [isenableOrderToReleasepaym,setIsenableOrderToReleasepaym]=useState(false)
-  const [registeredInfo,setRegisteredInfo]=useState({
-      _id: adminUser?._id,
-      name: adminUser?.name,
-      fbPageLink: adminUser?.fbPageLink,
-      fbAccount:adminUser?.fbAccount,
-      phone: adminUser?.phone,
-      whatsapp: adminUser?.whatsapp,
-      address: adminUser?.address,
-      email: adminUser?.email,
-      password: adminUser?.password,
-      businessDuration: adminUser?.businessDuration,
-      brandName: adminUser?.brandName,
-      bankName:adminUser?.bankName,
-      accountName: adminUser?.accountName,
-      accountNumber: adminUser?.accountNumber,
-      routingNumber: adminUser?.routingNumber,
-      branchName: adminUser?.branchName,
-      bkashAccount: adminUser?.bkashAccount,
-      nagadAccount:adminUser?.nagadAccount,
-      rocketAccount:adminUser?.rocketAccount,
-      brandLogo:adminUser?.brandLogo,
-      brandLogoURL:adminUser?.brandLogoURL,
-      approval: adminUser?.approval
-    
-  })
+
 
 const downloadInfIntoXl = (event) => {
     const dynmamicId = event.currentTarget.dataset.orderId;
@@ -147,16 +137,16 @@ const downloadInfIntoXl = (event) => {
 
   // Payment Released
    const orderStatusPaymentReleased=orderAll
-  ?.filter(order => order.userMail === viewClient?.email && order.orderStatus==="payment-released" ) 
+  ?.filter(order => order.userMail === getUserById?.email && order.orderStatus==="payment-released" ) 
   //return amount
  
     const orderSatatusReturned=orderAll
-  ?.filter(order =>order.userMail === viewClient?.email && order.orderStatus==="returned" )
+  ?.filter(order =>order.userMail === getUserById?.email && order.orderStatus==="returned" )
   // console.log("orderStatus pament released",orderStatusPaymentReleased);
 
 
 const merchOrders=orderAll
-?.filter(order =>order.userMail === viewClient?.email  )
+?.filter(order =>order.userMail === getUserById?.email  )
 
 
 
@@ -215,17 +205,14 @@ if (Array.isArray(orderSatatusReturned)) {
     
   }
 }
-// console.log("totalReturn",totalReturn)
-// console.log("deliveryFee",deliveryFee)
-// console.log("totalReturnAmmountBase",totalReturnAmmountBase)
 
 // Now, totalReturnAmountBase contains the sum of all returnedAmounts and their associated deliveryFees
 
 
 //patmnet status =paid,orderstatus :delivered
 const PaymentStausPaid=orderAll
-?.filter(order => order.userMail === viewClient?.email && order.paymentStatus==="paid" && order?.orderStatus==="delivered")
-const returnValueFilter=orderAll?.filter(order =>  order.userMail === viewClient?.email&& order?.orderStatus==="returned")
+?.filter(order => order.userMail === getUserById?.email && order.paymentStatus==="paid" && order?.orderStatus==="delivered")
+const returnValueFilter=orderAll?.filter(order =>  order.userMail === getUserById?.email&& order?.orderStatus==="returned")
 
 
 let statusPaidbase=0; let totalpaid
@@ -243,7 +230,7 @@ let dueAmount = Number(statusPaidbase - (totalReceiveBase + totalReturnAmmountBa
 // Fetch the latest payment made by user
 let lastPayementDetail = getUserById?.payments?.length > 0 ? 
                          getUserById.payments[getUserById.payments.length-1] : null;
-// console.log("getUserById",getUserById)
+
 // Calculate the grand due amount
 let grandDueNow = dueAmount;
 
@@ -264,7 +251,7 @@ const handleOrderSelect = (orderInfo) => {
       orderId: orderInfo._id,
       reciepientFirstname: orderInfo.name,
       clientName: orderInfo.clientName,
-      regId: viewClient._id,
+      regId: getUserById._id,
       userMail: orderInfo.userMail,
       recvMoney: orderInfo.recvMoney,
       collectAmount: orderInfo.collectAmount,
@@ -306,9 +293,9 @@ const handleOrderSelect = (orderInfo) => {
  const filteredOrdersOfSelectOrder = selectedOrders.filter(
   (order) =>
     order.orderStatus === 'delivered' &&
-    order.paymentStatus === 'paid' 
+    order.paymentStatus === 'paid' &&
     // order.clientPaymentStatus ==="paidToClient" 
-    //  !order.clientPaymentStatus 
+     !order.clientPaymentStatus 
 );
 if (filteredOrdersOfSelectOrder?.length !== 0) {
   sumOfselectedRcvAMounToPaymentRelease = filteredOrdersOfSelectOrder?.reduce((sum, receiveAmount) => {
@@ -328,9 +315,7 @@ if (filteredOrdersOfSelectOrder?.length !== 0) {
     return sum + (isNaN(amount) ? 0 : amount);
   }, 0); // Initialize sum to 0
 }
-console.log("sumOfselectedRcvAMounToPaymentRelease.....",sumOfselectedRcvAMounToPaymentRelease)
-console.log("sumOfCollectAmount......",sumOfCollectAmount)
-console.log("sumOfdeliveryFee......",sumOfdeliveryFee)
+
 //totalbill is sum of all rcv money
 if (PaymentStausPaid?.length !== 0) {
   newTotalBill = PaymentStausPaid?.reduce((sum, receiveAmount) => {
@@ -367,26 +352,70 @@ let newTotalReturn=sumofReturnOrderPrintbazcost+sumofReturnOrderDeliveryFee+sumo
 //due amount=totalbill-(totalPaymentReleased+totalReturn)
 let newTotalDue=newTotalBill-(newTotalPaymentReleased+newTotalReturn)
 let totalnewDueAmount=newTotalDue>0?newTotalDue:0
-const getOrderById=async()=>{
-  // Fetch the updated order details
-// await fetch(`https://mserver.printbaz.com/getUser/${viewClient?._id}`)
-await fetch(`http://localhost:5000/getUser/${viewClient?._id}`)
-.then(res=>res.json())
-.then(data => {setGetUserById(data)})
-}
+useEffect(()=>{
+  const getUpdatebillinMerchantProfile= async () => {
+    // Ensure there's an ID before making a request
+   
+    if (id) {
+        try {
+      
+            const response = await fetch(
+                `https://mserver.printbaz.com/updateBill/${id}`,
+                // `http://localhost:5000/updateBill/${viewClient._id}`,
+                {
+                  method: "PUT",
+                  headers: {
+                      "Content-Type": "application/json",
+                  },
+                  body: JSON.stringify({ 
+                      // totalBill: statusPaidbase, 
+                      // totalReceiveBase: totalReceiveBase,
+                      // totalReturnAmmountBase: totalReturnAmmountBase,
+                      // dueAmount: dueAmount
+                      totalBill: newTotalBill,
+                      totalReturnAmmountBase: newTotalReturn,
+                      // dueAmount: totalnewDueAmount
+                  }),
+              }
+            );
+  
+            const data = await response.json();
+            if (response.status === 200) {
+                // Handle success, for instance:
+            } else {
+                // Handle error
+                console.error("Error updating the bill:", data.message);
+            }
+  
+        } catch (error) {
+            console.error("Network or server error:", error);
+        }
+    }
+  };
+ 
+  // if (!getUserById?.totalBill && PaymentStausPaid.length > 0) {
+   
+    getUpdatebillinMerchantProfile();
+  // }
+ 
+  
+
+ },[getUserById])
 const getPerSegmentPaymentDetailById=async()=>{
   // Fetch the updated order details
-// await fetch(`https://mserver.printbaz.com/getPaymentDetailRegId/${viewClient?._id}`)
-await fetch(`http://localhost:5000/getPaymentDetailRegId/${viewClient?._id}`)
+await fetch(`https://mserver.printbaz.com/getPaymentDetailRegId/${id}`)
+// await fetch(`http://localhost:5000/getPaymentDetailRegId/${viewClient?._id}`)
 .then(res=>res.json())
 .then(data => {setGetPaymentDetailById(data)})
 }
-console.log("getPaymentDetailById.........",getPaymentDetailById)
+
+
+
 useEffect(()=>{
   getPerSegmentPaymentDetailById()
-       getOrderById()
+      
       },[getUserById])
- 
+
 
   const handleInputChange = async (e) => {
     const status = e.target.value; // the new status
@@ -399,8 +428,8 @@ useEffect(()=>{
     //   await fetch(`http://localhost:5000/update-approval/${viewClient?._id}`, { //for testing site
     try {
       const response = await fetch(
-        // `https://mserver.printbaz.com/update-approval/${viewClient?._id}`,
-        `http://localhost:5000/update-approval/${viewClient?._id}`,
+        `https://mserver.printbaz.com/update-approval/${id}`,
+        // `http://localhost:5000/update-approval/${viewClient?._id}`,
         {
           method: "PUT",
           headers: {
@@ -412,9 +441,9 @@ useEffect(()=>{
   
       if (response.ok) {
         // Update the approval status in the viewClient object
-        viewClient.approval = status;
+        getUserById.approval = status;
   
-        SendUserApproveMail({email:viewClient?.email,requestStatus:viewClient?.approval})
+        SendUserApproveMail({email:getUserById?.email,requestStatus:getUserById?.approval})
         // Update your state or perform any other necessary operations with the updated viewClient object
       } else {
         console.error("Error:", response.status);
@@ -437,6 +466,12 @@ useEffect(()=>{
     }
     if (status === "paidToClient") {
       return "blue";
+    }
+    if (status === "paid") {
+      return "#5226e1";
+    }
+    if (status === "Unpaid") {
+      return "#7990c3";
     }
     if (status === "returned") {
       return "red";
@@ -481,7 +516,7 @@ const handleDoPaymentPopUp=()=>{
   setPaymentReleasedPopUp(true)
 }
 const handlePaymentHistory=()=>{
-  const merchantId = viewClient?._id;
+  const merchantId = getUserById?._id;
   navigate(`/paymentHistory/${merchantId}`);
 }
  
@@ -518,10 +553,7 @@ const formattedCurrentDate = `${month} ${day}, ${year} at ${hours12}:${minutes} 
 
   
 const  handleReleasePayment=async()=>{
-  // console.log("totalnewDueAmount",totalnewDueAmount)
-  // console.log("newTotalPaymentReleased",newTotalPaymentReleased)
-  // console.log("newTotalBill",newTotalBill)
-  // console.log("newTotalReturn",newTotalReturn)
+
   setIsLoading(true)
   try {
 
@@ -530,7 +562,7 @@ const  handleReleasePayment=async()=>{
       totalReturnAmmountBase: newTotalReturn,
       totalBill: newTotalBill,
       paymentReleasedAmount: newTotalPaymentReleased,
-      paymentReleasedBy: viewClient?.email,
+      paymentReleasedBy: getUserById?.email,
       paymentReleasedDate:formattedCurrentDate,
       dueAmountNow:totalnewDueAmount
     };
@@ -538,14 +570,15 @@ const  handleReleasePayment=async()=>{
       totalRecvableAmount:sumOfselectedRcvAMounToPaymentRelease,
       totalCollectAmount:sumOfCollectAmount,
       totalDeliveryFee:sumOfdeliveryFee,
-      paymentReleasedBy: viewClient?.email,
-      regId: viewClient?._id,
-      clientNumber: viewClient?.phone,
-      clinetBrandName: viewClient?.brandName,
-      clientBrandLogo: viewClient?.brandLogoURL,
-      clientName: viewClient?.name,
-      clientAddress: viewClient?.address,
-      clientEmail: viewClient?.email,
+      totalDueAmount:totalnewDueAmount,
+      paymentReleasedBy: getUserById?.email,
+      regId: getUserById?._id,
+      clientNumber: getUserById?.phone,
+      clinetBrandName: getUserById?.brandName,
+      clientBrandLogo: getUserById?.brandLogoURL,
+      clientName: getUserById?.name,
+      clientAddress: getUserById?.address,
+      clientEmail: getUserById?.email,
       paymentReleasedDate:formattedCurrentDate,
       segmentPayStatus:"Paid"
     }
@@ -554,17 +587,17 @@ const  handleReleasePayment=async()=>{
      const filteredOrders = selectedOrders.filter(
       (order) =>
         order.orderStatus === 'delivered' &&
-        order.paymentStatus === 'paid' 
+        order.paymentStatus === 'paid' &&
         // order.clientPaymentStatus ==="paidToClient" 
-        //  !order.clientPaymentStatus 
+         !order.clientPaymentStatus 
     );
     if(filteredOrders.length===0){
       setIsenableOrderToReleasepaym(true)
       return
     }
   
-    fetch(`http://localhost:5000/updateUserbyReleasedPay/${viewClient?._id}`, {
-    // fetch(`https://mserver.printbaz.com/updateUserbyReleasedPay/${viewClient?._id}`, {
+    // fetch(`http://localhost:5000/updateUserbyReleasedPay/${viewClient?._id}`, {
+    fetch(`https://mserver.printbaz.com/updateUserbyReleasedPay/${id}`, {
       method: 'PUT',
       headers: {
         'Content-Type': 'application/json'
@@ -587,8 +620,10 @@ const  handleReleasePayment=async()=>{
     });
 
     // Send updated orderAll to the server or handle as needed
+    // const sendOrderAllResponse =  fetch(
+    //   "http://localhost:5000/sendUpdatedOrderAll",
     const sendOrderAllResponse =  fetch(
-      "http://localhost:5000/sendUpdatedOrderAll",
+      "https://mserver.printbaz.com/sendUpdatedOrderAll",
       {
         method: "POST",
         headers: {
@@ -608,7 +643,7 @@ const  handleReleasePayment=async()=>{
       return response.json();
     })
     .then(data => {
-      console.log(data);
+     
     })
     filteredOrders.forEach(async (order) => {
       order.clientPaymentStatus = 'paidToClient';
@@ -616,9 +651,12 @@ const  handleReleasePayment=async()=>{
       order.paymentReleasedDate=formattedCurrentDate
     });
 
+    // const response = await fetch(
+    //   // Replace the URL with your actual endpoint
+    //   'http://localhost:5000/sendpaymentReleasedOrders',
     const response = await fetch(
       // Replace the URL with your actual endpoint
-      'http://localhost:5000/sendpaymentReleasedOrders',
+      "https://mserver.printbaz.com/sendpaymentReleasedOrders",
       {
         method: 'POST',
         headers: {
@@ -632,9 +670,12 @@ const  handleReleasePayment=async()=>{
     if (response.status === 200) {
       // Handle success, for instance:
       setIsSuccess(true)
+      // const sendTotalPaymentReleasedData = await fetch(
+      //   // Replace the URL with your actual endpoint
+      //   'http://localhost:5000/sendpaymentDetail',
       const sendTotalPaymentReleasedData = await fetch(
         // Replace the URL with your actual endpoint
-        'http://localhost:5000/sendpaymentDetail',
+        'https://mserver.printbaz.com/sendpaymentDetail',
         {
           method: 'POST',
           headers: {
@@ -644,7 +685,7 @@ const  handleReleasePayment=async()=>{
         }
       );
       const reselasedPayDetail = await sendTotalPaymentReleasedData.json();
-  
+      getPerSegmentPaymentDetailById()
     } else {
       // Handle error
       console.error('Error sending orders:', data.message);
@@ -658,20 +699,33 @@ const  handleReleasePayment=async()=>{
 }
 const [filterStatus, setFilterStatus] = useState('all');
   const [filterPaymentStatus, setFilterPaymentStatus] = useState('');
+  const [filterPaymentStatusByRecp, setFilterPaymentStatusByRecp] = useState('');
   const [filterOrderId, setFilterOrderId] = useState('');
   const [filterName, setFilterName] = useState('');
+  const [filterPaymentReleasedDate, setFilterPaymentReleasedDate] = useState();
+ 
 const applyFilters = () => {
-  return orderAll.filter((order) => {
+  return orderAll?.filter((order) => {
     // Filter by status
     if (filterStatus !== 'all' && order.orderStatus !== filterStatus) {
       return false;
     }
 
 
-    // Filter by payment status
-    if (filterPaymentStatus && order.clientPaymentStatus !== filterPaymentStatus) {
+    // // Filter by payment status
+    if (filterPaymentStatusByRecp && order.paymentStatus !== filterPaymentStatusByRecp) {
       return false;
     }
+    // Filter by payment status
+    if (filterPaymentStatus === 'paidToClient' && order.clientPaymentStatus !== 'paidToClient') {
+      return false;
+    }
+
+    // Include orders with no clientPaymentStatus when "unPaidToClient" is selected
+    if (filterPaymentStatus === 'unPaidToClient' && order.clientPaymentStatus) {
+      return false;
+    }
+    
 
     // Filter by order ID
     if (filterOrderId && !order._id.includes(filterOrderId)) {
@@ -689,7 +743,62 @@ const applyFilters = () => {
     return true;
   });
 };
+const applyFiltersInvoice = () => {
+  return  getPaymentDetailById?.length>0 && getPaymentDetailById?.filter((order) => {
+    // Include orders with no clientPaymentStatus when "unPaidToClient" is selected
+    if (filterPaymentReleasedDate && order.paymentReleasedDate) {
+      // Parse the order's paymentReleasedDate using a custom parsing function
+      const orderDate = parseCustomDate(order.paymentReleasedDate);
+
+      // Convert the filterPaymentReleasedDate to a Date object for proper comparison
+      const filterDate = new Date(filterPaymentReleasedDate);
+
+      // Extract the year, month, and date parts from orderDate
+      const orderYear = orderDate.getFullYear();
+      const orderMonth = orderDate.getMonth() + 1; // Adding 1 to get the correct month
+      const orderDay = orderDate.getDate();
+
+      // Extract the year, month, and date parts from filterDate
+      const filterYear = filterDate.getFullYear();
+      const filterMonth = filterDate.getMonth() + 1; // Adding 1 to get the correct month
+      const filterDay = filterDate.getDate();
+
+     
+
+      // Compare the dates (ignoring the time part)
+      return orderMonth === filterMonth && orderDay === filterDay && orderYear === filterYear;
+    }
+
+    return true; // Include all orders when no specific date is selected
+  });
+};
+
+// Custom parsing function for the non-standard date format
+const parseCustomDate = (dateString) => {
+  const parts = dateString.split(' ');
+  const monthName = parts[0];
+  const day = parseInt(parts[1].replace(',', ''), 10);
+  const year = parseInt(parts[2], 10);
+
+  // Note: JavaScript months are zero-based, so we need to subtract 1 from the month
+  const month = new Date(Date.parse(monthName + ' 1, 2000')).getMonth();
+
+  return new Date(year, month, day);
+};
+
+
+
+
 const orderMap=applyFilters()
+const invoiceMap=applyFiltersInvoice()
+
+
+const sortedInvoiceData = invoiceMap?.length>0 && invoiceMap?.sort((a, b) => {
+  const timeA = new Date(a.paymentReleasedDate?.replace(" at ", " "));
+  const timeB = new Date(b.paymentReleasedDate?.replace(" at ", " "));
+
+  return timeB - timeA;
+});
 const sortedOrders = useMemo(() => {
   return orderMap
     .sort((a, b) => {
@@ -704,6 +813,7 @@ const sortedOrders = useMemo(() => {
       return latestB - latestA; // Descending sort
     });
 }, [orderMap]);
+
 const handleInputSearchChange = (event) => {
   const { id, value } = event.target;
   switch (id) {
@@ -713,6 +823,9 @@ const handleInputSearchChange = (event) => {
        case 'paymentStatus-filter':
       setFilterPaymentStatus(value);
       break; 
+       case 'paymentStatusByRecipent-filter':
+      setFilterPaymentStatusByRecp(value);
+      break; 
        
     case 'id-filter':
       setFilterOrderId(value);
@@ -720,14 +833,16 @@ const handleInputSearchChange = (event) => {
       case 'name-filter':
   setFilterName(value);
   break; 
- 
+  case 'date-filter':
+      setFilterPaymentReleasedDate(value); // Assuming you have a state variable for the paymentReleasedDate filter
+      break;
     // ...other cases
     default:
       break;
   }
   
 };
-console.log("sortedOrders",sortedOrders)
+
  // State to track the active tab
  const [activeTab, setActiveTab] = useState('allOrders'); // 'allOrders' or 'invoice'
 
@@ -761,7 +876,7 @@ const downloadInvoiceDetail = async (releaseOrderId, releaseOrderRegId) => {
   );
 
   // Wait for the component to be rendered
-  await new Promise(resolve => setTimeout(resolve, 1000));
+  await new Promise(resolve => setTimeout(resolve, 2000));
   // Capture a screenshot of the temporary element with html2canvas
   html2canvas(tempElement, { scale: 1 })
     .then((canvas) => {
@@ -789,11 +904,6 @@ const downloadInvoiceDetail = async (releaseOrderId, releaseOrderRegId) => {
       document.body.removeChild(tempElement);
     });
 };
-
-
-
-console.log("selectedReleaseOrderId",selectedReleaseOrderId)
-console.log("selectedReleaseOrderRegId",selectedReleaseOrderRegId)
 
 
 
@@ -837,14 +947,14 @@ console.log("selectedReleaseOrderRegId",selectedReleaseOrderRegId)
                     <div className="col-lg-12 cd01">
                       <img
                         src={
-                          viewClient?.brandLogo
-                            ? viewClient?.brandLogo
-                            : viewClient?.brandLogoURL
+                          getUserById?.brandLogo
+                            ? getUserById?.brandLogo
+                            : getUserById?.brandLogoURL
                         }
                         alt=""
                       />
-                      <h3>{viewClient?.name}</h3>
-                      <p>{viewClient?.createdAt?.slice(0,10)}</p>
+                      <h3>{getUserById?.name}</h3>
+                      <p>{getUserById?.createdAt?.slice(0,10)}</p>
                       <div
                         className="col-lg-12 col-sm-12"
                         style={{ marginBottom: "20px" }}
@@ -858,29 +968,29 @@ console.log("selectedReleaseOrderRegId",selectedReleaseOrderRegId)
                             border: "none",
                             padding: "8px",
                             backgroundColor: getViewClientColor(
-                              viewClient?.approval
+                              getUserById?.approval
                             ),
                           }}
                           onChange={(e) => handleInputChange(e)}
                         >
-                          <option value={viewClient?.approval}>
-                            {viewClient?.approval=== "approved"&& "Approved" }
-                            {viewClient?.approval=== "request"&& "Request" }
-                            {viewClient?.approval=== "ban"&& "Ban" }
+                          <option value={getUserById?.approval}>
+                            {getUserById?.approval=== "approved"&& "Approved" }
+                            {getUserById?.approval=== "request"&& "Request" }
+                            {getUserById?.approval=== "ban"&& "Ban" }
                           </option>
-                          {viewClient?.approval === "approved" && (
+                          {getUserById?.approval === "approved" && (
                             <>
                               <option value="ban">Ban</option>
                               <option value="request">Request</option>
                             </>
                           )}
-                          {viewClient?.approval === "request" && (
+                          {getUserById?.approval === "request" && (
                             <>
                               <option value="approved">Approved</option>
                               <option value="ban">Ban</option>
                             </>
                           )}
-                          {viewClient?.approval === "ban" && (
+                          {getUserById?.approval === "ban" && (
                             <>
                               <option value="approved">Approved</option>
                               <option value="request">Request</option>
@@ -896,29 +1006,29 @@ console.log("selectedReleaseOrderRegId",selectedReleaseOrderRegId)
                           border: "none",
                           padding: "8px",
                           backgroundColor: getViewClientColor(
-                            viewClient?.approval
+                            getUserById?.approval
                           ),
                         }}
                         onChange={(e) => handleInputChange(e)}
                       >
-                        <option value={viewClient?.approval}>
-                          {viewClient?.approval=== "approved"&& "Approved" }
-                          {viewClient?.approval=== "request"&& "Request" }
-                          {viewClient?.approval=== "ban"&& "Ban" }
+                        <option value={getUserById?.approval}>
+                          {getUserById?.approval=== "approved"&& "Approved" }
+                          {getUserById?.approval=== "request"&& "Request" }
+                          {getUserById?.approval=== "ban"&& "Ban" }
                         </option>
-                        {viewClient?.approval === "approved" && (
+                        {getUserById?.approval === "approved" && (
                           <>
                             <option value="ban">Ban</option>
                             <option value="request">Request</option>
                           </>
                         )}
-                        {viewClient?.approval === "request" && (
+                        {getUserById?.approval === "request" && (
                           <>
                             <option value="approved">Approved</option>
                             <option value="ban">Ban</option>
                           </>
                         )}
-                        {viewClient?.approval === "ban" && (
+                        {getUserById?.approval === "ban" && (
                           <>
                             <option value="approved">Approved</option>
                             <option value="request">Request</option>
@@ -955,14 +1065,14 @@ console.log("selectedReleaseOrderRegId",selectedReleaseOrderRegId)
                         >
                           <div className="accordion-body">
                             <h5>Account ID</h5>
-                            <p>{viewClient?._id}</p>
+                            <p>{getUserById?._id}</p>
                             <h5>Email</h5>
-                            <p>{viewClient?.email}</p>
+                            <p>{getUserById?.email}</p>
                             <h5>Password</h5>
-                            {viewClient?.password.length > 8 ? (
-                              <p className="new-line">{viewClient?.password}</p>
+                            {getUserById?.password.length > 8 ? (
+                              <p className="new-line">{getUserById?.password}</p>
                             ) : (
-                              <p>{viewClient?.password}</p>
+                              <p>{getUserById?.password}</p>
                             )}
                           </div>
                         </div>
@@ -990,17 +1100,17 @@ console.log("selectedReleaseOrderRegId",selectedReleaseOrderRegId)
                         >
                           <div className="accordion-body">
                             <h5>Name</h5>
-                            <p>{viewClient?.name}</p>
+                            <p>{getUserById?.name}</p>
                             <h5>Phone Number</h5>
-                            <p>{viewClient?.phone}</p>
+                            <p>{getUserById?.phone}</p>
                             <h5>Whatsapp Number</h5>
-                            <p>{viewClient?.whatsapp}</p>
+                            <p>{getUserById?.whatsapp}</p>
                             <h5>Facebook/Instagram Profile Link</h5>
-                            <p>{viewClient?.fbAccount}</p>
+                            <p>{getUserById?.fbAccount}</p>
                             <h5>Duration of Business</h5>
-                            <p>{viewClient?.businessDuration}</p>
+                            <p>{getUserById?.businessDuration}</p>
                             <h5>Address</h5>
-                            <p>{viewClient?.address}</p>
+                            <p>{getUserById?.address}</p>
                           </div>
                         </div>
                       </div>
@@ -1027,16 +1137,16 @@ console.log("selectedReleaseOrderRegId",selectedReleaseOrderRegId)
                          >
                            <div className="accordion-body">
                              <h5>Brand Name</h5>
-                             <p>{viewClient?.brandName}</p>
+                             <p>{getUserById?.brandName}</p>
                              <h5>Facebook/Instagram Page Link</h5>
-                             <p>{viewClient?.fbPageLink}</p>
+                             <p>{getUserById?.fbPageLink}</p>
                              <h5>Logo</h5>
                              <img
                                style={{ width: "50%" }}
                                src={
-                                 viewClient?.brandLogo
-                                   ? viewClient?.brandLogo
-                                   : viewClient?.brandLogoURL
+                                getUserById?.brandLogo
+                                   ? getUserById?.brandLogo
+                                   : getUserById?.brandLogoURL
                                }
                                alt=""
                              />
@@ -1065,44 +1175,44 @@ console.log("selectedReleaseOrderRegId",selectedReleaseOrderRegId)
                           data-bs-parent="#accordionExample"
                         >
                           <div className="accordion-body">
-                            {viewClient?.rocketAccount && (
+                            {getUserById?.rocketAccount && (
                               <>
                                 <h5>Rocket</h5>{" "}
-                                <p>{viewClient?.rocketAccount}</p>
+                                <p>{getUserById?.rocketAccount}</p>
                               </>
                             )}
-                            {viewClient?.bkashAccount && (
+                            {getUserById?.bkashAccount && (
                               <>
                                 <h5>Bkash</h5>
-                                <p>{viewClient?.bkashAccount}</p>{" "}
+                                <p>{getUserById?.bkashAccount}</p>{" "}
                               </>
                             )}
-                            {viewClient?.nagadAccount && (
+                            {getUserById?.nagadAccount && (
                               <>
-                                <h5>Nagad</h5> <p>{viewClient?.nagadAccount}</p>
+                                <h5>Nagad</h5> <p>{getUserById?.nagadAccount}</p>
                               </>
                             )}
-                            {viewClient?.bankName && (
+                            {getUserById?.bankName && (
                               <table style={{ width: "100%" }}>
                                 <tr>
                                   <th>bankName</th>
-                                  <td>{viewClient?.bankName}</td>
+                                  <td>{getUserById?.bankName}</td>
                                 </tr>
                                 <tr>
                                   <th>accountName</th>
-                                  <td>{viewClient?.accountName}</td>
+                                  <td>{getUserById?.accountName}</td>
                                 </tr>
                                 <tr>
                                   <th>branchName</th>
-                                  <td>{viewClient?.branchName}</td>
+                                  <td>{getUserById?.branchName}</td>
                                 </tr>
                                 <tr>
                                   <th>accountNumber</th>
-                                  <td>{viewClient?.accountNumber}</td>
+                                  <td>{getUserById?.accountNumber}</td>
                                 </tr>
                                 <tr>
                                   <th>routingNumber</th>
-                                  <td>{viewClient?.routingNumber}</td>
+                                  <td>{getUserById?.routingNumber}</td>
                                 </tr>
                               </table>
                             )}
@@ -1194,23 +1304,31 @@ console.log("selectedReleaseOrderRegId",selectedReleaseOrderRegId)
                 <h2>All Orders</h2>
               </div>
             </div>
-              <div className="row order-filter">
+              <div className="row order-filter mb-5">
              
-             <div className="col-lg-3 col-sm-12">
+             <div className="col-lg-2 col-sm-12">
                <label htmlFor="id-filter" style={{marginBottom:"8px"}}>Order Id:</label>
                <input type="text" id="id-filter" className="form-control" value={filterOrderId}  onChange={handleInputSearchChange} />
              </div>
            
              <div className="col-lg-2 col-sm-12">
-               <label htmlFor="paymentStatus-filter" style={{marginBottom:"8px"}}>Payment:</label>
+               <label htmlFor="paymentStatus-filter" style={{marginBottom:"8px"}}>Client Payment:</label>
                <select id="paymentStatus-filter" value={filterPaymentStatus} className="form-control" onChange={(e) =>  handleInputSearchChange(e)}>
                  <option value=''>none</option>
-                 {/* <option value="">Unpaid</option> */}
+                 <option value="unPaidToClient">Unpaid To Client</option>
                  <option value="paidToClient">Paid To Client</option>
                </select>
              </div>  
+             <div className="col-lg-2 col-sm-12">
+               <label htmlFor="paymentStatusByRecipent-filter" style={{marginBottom:"8px"}}>Payment:</label>
+               <select id="paymentStatusByRecipent-filter" value={filterPaymentStatusByRecp} className="form-control" onChange={(e) =>  handleInputSearchChange(e)}>
+                 <option value=''>none</option>
+                 <option value="paid">Paid</option>
+                 <option value="Unpaid">Unpaid</option>
+               </select>
+             </div>  
             
-             <div className="col-lg-3 col-sm-12">
+             <div className="col-lg-2 col-sm-12">
                <label htmlFor="status-filter" style={{marginBottom:"8px"}}>Status:</label>
                <select id="status-filter"  className="form-control" value={filterStatus} onChange={(e) =>  handleInputSearchChange(e)}>
                  <option   value="all">All</option>
@@ -1271,25 +1389,28 @@ console.log("selectedReleaseOrderRegId",selectedReleaseOrderRegId)
          </div> 
          </div> 
              </div>
-              <div className="allOrders">
+              <div className="allOrders ">
 <div className="row" style={{ marginBottom: "30px" }}>
                     <div className="col-lg-2 col-sm-12">
-                      <h4>Name</h4>
+                      <h5>Name</h5>
                     </div>
                     <div className="col-lg-2 col-sm-12">
-                      <h4>Order Id</h4>
+                      <h5>Order Id</h5>
                     </div>
                     <div className="col-lg-3 col-sm-12">
-                      <h4>Recipient Info</h4>
+                      <h5>Recipient Info</h5>
                     </div>
                     <div className="col-lg-2 col-sm-12">
-                      <h4>Payment</h4>
-                    </div>
-                    <div className="col-lg-2 col-sm-12">
-                      <h4>Amount</h4>
+                      <h5 >Payment To Client</h5>
                     </div>
                     <div className="col-lg-1 col-sm-12">
-                      <h4>Status</h4>
+                      <h5 >Payment</h5>
+                    </div>
+                    <div className="col-lg-1 col-sm-12">
+                    <h5 style={{textAlign:"center"}}>Rcv Amount</h5>
+                    </div>
+                    <div className="col-lg-1 col-sm-12">
+                    <h5 style={{fontSize:"20px"}}>Status</h5>
                     </div>
                   </div>
                   {sortedOrders?.map((orderInfo, index) => {
@@ -1298,16 +1419,19 @@ console.log("selectedReleaseOrderRegId",selectedReleaseOrderRegId)
       updateReturnedAmount(orderInfo._id, orderInfo.printbazcost, orderInfo.deliveryFee);
     }
      return(
+      <>
+     
                       <div className="row client-list">
-                         <div className="col-lg-1 col-sm-12">
+                         <div className="col-lg-2 col-sm-12" >
             <input
               type="checkbox"
               checked={selectedOrders.some((selectedOrder) => selectedOrder.orderId === orderInfo._id)}
+              
               onChange={() => handleOrderSelect(orderInfo)}
+              onClick={(e) => e.stopPropagation()}  
+              style={{marginRight:"3px",border:"1px solid black"}}
             />
-          </div>
-                        <div className="col-lg-2 col-sm-12">
-                          <p>{orderInfo?.name}</p>
+         <span>{orderInfo?.name}</span>
                         </div>
                         <div className="col-lg-2 col-sm-12">
                           {orderInfo?._id.length > 8 && (
@@ -1327,6 +1451,15 @@ console.log("selectedReleaseOrderRegId",selectedReleaseOrderRegId)
                           </p>
                         </div>
                         <div className="col-lg-1 col-sm-12">
+                          <p className="p-status-btn" style={{backgroundColor: getViewClientColor(
+                              orderInfo?.paymentStatus
+                              
+                            )}}>
+                            {/* {orderInfo?.paymentStatus} */}
+                            {orderInfo?.paymentStatus}
+                          </p>
+                        </div>
+                        <div className="col-lg-1 col-sm-12">
                           <p>{Math.floor(orderInfo?.recvMoney)}TK</p>
                         </div>
                         <div className="col-lg-1 col-sm-12">
@@ -1335,6 +1468,8 @@ console.log("selectedReleaseOrderRegId",selectedReleaseOrderRegId)
                             )}}>{orderInfo?.orderStatus}</p>
                         </div>
                       </div>
+                     
+                      </>
                     )})}
 
 </div>
@@ -1343,65 +1478,73 @@ console.log("selectedReleaseOrderRegId",selectedReleaseOrderRegId)
 
           {activeTab === 'invoice' && (
             <div className="invoice">
+               <div className="col-lg-3 col-sm-12">
+               <label htmlFor="date-filter" style={{marginBottom:"8px"}}>Payment Released Date:</label>
+               <input type="date" id="date-filter" className="form-control" value={filterPaymentReleasedDate}  onChange={handleInputSearchChange} />
+             </div>
           {/* <div className="col-lg-1 col-sm-12 " style={{marginTop:"36px"}} >
              <span style={{cursor:"pointer",border:"1px solid #dad5d5",padding:"10px",borderRadius:"4px"}} onClick={downloadInfIntoXl} data-order-id="view-order-detail"><img style={{width:"30px",hight:"25px"}} src="/images/download.png" alt='download'/></span>
              <div id="view-order-detail"style={{position: 'absolute', left: '-10000px', top: '-10000px'}}>
              <GetReleaseOrderXl paymentRelasedOrders={paymentRelasedOrders}/>
          </div> 
          </div>  */}
-                   <Table responsive>
-  <thead>
-    <tr>
-      <th>Payment Release Date</th>
-      <th>Collect Amount</th>
-      <th>Delivery Fee</th>
-      <th>Rcv Amount</th>
-      <th>Payment Status</th>
-      <th>Action</th>
-    </tr>
-  </thead>
-  <tbody>
-    {getPaymentDetailById?.map((releaseOrder, index) => (
-     
-        <tr key={index}>
-          
-          <td>{releaseOrder?.paymentReleasedDate}</td>
-          <td style={{ textAlign: "center" }}>{releaseOrder?.totalCollectAmount}</td>
-          <td style={{ textAlign: "center" }}>{releaseOrder?.totalDeliveryFee}</td>
-          <td style={{ textAlign: "center" }}>{releaseOrder?.totalRecvableAmount}</td>
-          <td style={{ textAlign: "center" }}>{releaseOrder?.segmentPayStatus}</td>
-          <td style={{ textAlign: "center" }}>
-            <div className="view-client-title " style={{ marginRight: "10px" }}>
-         
-              <Button variant="warning" onClick={() => downloadInvoiceDetail(releaseOrder?._id, releaseOrder?.regId)}>
-                <span><img style={{ width: "23px", height: "20px" }} src="/images/download.png" alt='download' /></span>PDF
-              </Button>
-           
+         {
+          sortedInvoiceData?.length>0 &&
+          <Table responsive>
+          <thead>
+            <tr>
+              <th>Payment Release Date</th>
+              <th>Collect Amount</th>
+              <th>Delivery Fee</th>
+              <th>Rcv Amount</th>
+              <th>Payment Status</th>
+              <th>Action</th>
+            </tr>
+          </thead>
+          <tbody>
+            {sortedInvoiceData?.map((releaseOrder, index) => (
              
-             
-              <Link to={`/invoice/${releaseOrder?._id}/${releaseOrder?.regId}`} state={{ releaseOrder }} key={index}> 
+                <tr key={index}>
+                  
+                  <td>{releaseOrder?.paymentReleasedDate}</td>
+                  <td style={{ textAlign: "center" }}>{releaseOrder?.totalCollectAmount}</td>
+                  <td style={{ textAlign: "center" }}>{releaseOrder?.totalDeliveryFee}</td>
+                  <td style={{ textAlign: "center" }}>{releaseOrder?.totalRecvableAmount}</td>
+                  <td style={{ textAlign: "center" }}>{releaseOrder?.segmentPayStatus}</td>
+                  <td style={{ textAlign: "center" }}>
+                    <div className="view-client-title " style={{ marginRight: "10px" }}>
+                 
+                      <Button variant="warning" onClick={() => downloadInvoiceDetail(releaseOrder?._id, releaseOrder?.regId)}>
+                        <span><img style={{ width: "23px", height: "20px" }} src="/images/download.png" alt='download' /></span>PDF
+                      </Button>
+                   
+                     
+                     
+                      <Link to={`/invoice/${releaseOrder?._id}/${releaseOrder?.regId}`} state={{ releaseOrder }} key={index}> 
+                    
+                      <Button style={{backgroundColor:"#012970",marginTop:"8px",marginLeft:"5px"}} >
+                       View
+                      </Button>
+                      </Link>
+                     
+                    </div>
+                    {/* {showInvoiceDetail && (
+                        <div  style={{ position: 'absolute', left: '-10000px', top: '-10000px' }}> 
+                <InvoiceDetail
+              
+                  releaseOrderId={selectedReleaseOrderId}
+                  releaseOrderRegId={selectedReleaseOrderRegId}
+                />
+                </div>
+              )} */}
+                  </td>
+                </tr>
             
-              <Button style={{backgroundColor:"#012970",marginTop:"8px",marginLeft:"5px"}} >
-               View
-              </Button>
-              </Link>
-             
-            </div>
-            {showInvoiceDetail && (
-                <div  style={{ position: 'absolute', left: '-10000px', top: '-10000px' }}> 
-        <InvoiceDetail
-      
-          releaseOrderId={selectedReleaseOrderId}
-          releaseOrderRegId={selectedReleaseOrderRegId}
-        />
-        </div>
-      )}
-          </td>
-        </tr>
-    
-    ))}
-  </tbody>
-</Table>
+            ))}
+          </tbody>
+        </Table>
+         }
+        
 
               
               {/* ... (your code for displaying invoices) */}

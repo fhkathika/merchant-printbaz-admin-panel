@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import countSizePerDay from '../../Formulas/countSizePerDay';
 import useDeliveryList from '../../hooks/usePaidDeliveryList';
@@ -23,6 +23,7 @@ const SalesReport = () => {
   console.log("paidOrderDelivList",paidOrderDelivList);
   const dueAbove1000=allMercahnts?.filter(merchant =>  merchant.dueAmountNow>=1000)
   const [selectProductType, setSelectProductType] = useState('Round Neck');
+  const [getAllPaymentDetail, setGetAllPaymentDetail] = useState([]);
   const [inputRcvAmount, setInputRcvAmount] = useState('');
   const navigation=useNavigate()
   const handleInputChange = (event) => {
@@ -50,7 +51,7 @@ const SalesReport = () => {
                                        .reduce((acc, curr) => acc + curr, 0);
                                      
                                      console.log("sumOfPaymentReleased",sumOfPaymentReleased);  // This will print the sum of the last index of totalReleasedAmount for all objects
-
+                                   
 
   const handleRcvInput = (event) => {
     const { id, value } = event.target;
@@ -96,6 +97,27 @@ const handleGotoTotalSoldThsirt=()=>{
 const handleGotoTotalRcvPage=()=>{
   navigation("/allRcvAmount")
 }
+
+const getPerSegmentPaymentDetailById=async()=>{
+  // Fetch the updated order details
+await fetch('https://mserver.printbaz.com/getAllPaymentDetail')
+// await fetch('http://localhost:5000/getAllPaymentDetail')
+.then(res=>res.json())
+.then(data => {setGetAllPaymentDetail(data)})
+}
+
+useEffect(()=>{
+  getPerSegmentPaymentDetailById()
+    
+      },[getAllPaymentDetail])
+      const sortedData = getAllPaymentDetail?.sort((a, b) => {
+        const timeA = new Date(a.paymentReleasedDate?.replace(" at ", " "));
+        const timeB = new Date(b.paymentReleasedDate?.replace(" at ", " "));
+     
+        return timeB - timeA;
+      });
+      const newSumOfTotalReleasedAmount = getAllPaymentDetail.reduce((sum, item) => sum + item.totalRecvableAmount, 0);
+
 return (
         <div>
           <meta charSet="UTF-8" />
@@ -155,7 +177,8 @@ return (
                   <div className="statistic-box">
                     <h3>Brand Cost Released Payment</h3>
                     <div className="counter-number pull-right">
-                      <span className="count-number">{ Math.floor(sumOfPaymentReleased)}</span>
+                      {/* <span className="count-number">{ Math.floor(sumOfPaymentReleased)}</span> */}
+                      <span className="count-number">{ Math.floor(newSumOfTotalReleasedAmount)}</span>
                       <span className="slight" style={{fontWeight: 'bolder'}}>৳</span>
                     </div>
                   </div>
@@ -310,7 +333,7 @@ return (
               <div className="col-xs-12 col-sm-6 col-md-6 col-lg-6">
                 <div className="lobipanel">
                   <div className="panel-title">
-                    <h4>Brand Payment released<span style={{float: 'right'}}>{ Math.floor(sumOfPaymentReleased)}৳</span></h4>
+                    <h4>Brand Payment released<span style={{float: 'right'}}>{ Math.floor(newSumOfTotalReleasedAmount)}৳</span></h4>
                   </div>
                   <div className="panel-body">
                   <table className="table">
@@ -324,7 +347,7 @@ return (
                 </tr>
             </thead>
             <tbody>
-    {dueAbove1000?.map(merchant => {
+    {/* {dueAbove1000?.map(merchant => {
         if (!merchant?.payments || merchant.payments.length === 0) {
             // This merchant has no payments, so return null or a placeholder row
             return null;
@@ -343,8 +366,21 @@ return (
                 <td>{Math.floor(merchant.dueAmountNow)}</td>
             </tr>
         );
-    })}
+    })} */}
+
+    {
+      sortedData?.map(orders=>
+        <tr>
+          <td>{orders?.paymentReleasedDate}</td>
+          <td>{orders?.clinetBrandName}</td>
+          <td>{orders?.clientNumber}</td>
+          <td>{orders?.totalRecvableAmount}</td>
+          <td>{orders?.totalDueAmount}</td>
+        </tr>
+      )
+    }
 </tbody>
+
 
         </table>
                   </div>
