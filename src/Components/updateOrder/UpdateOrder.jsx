@@ -26,7 +26,7 @@ const UpdateOrder = ({ onClose,viewOrder,viewClient,getSpecificOrderById,setGetS
     const [updateOrderArr, setUpdateOrderArr] = useState([]);
     const [indexNumber, setIndexNumber] = useState();
 
-    // console.log("getSpecificOrderById",getSpecificOrderById);
+    console.log("getSpecificOrderById...........",getSpecificOrderById);
 
 // useEffect(()=>{
 //   const getOrderById=async()=>{

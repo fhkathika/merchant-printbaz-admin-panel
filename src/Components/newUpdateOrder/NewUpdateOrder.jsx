@@ -25,7 +25,7 @@ const NewUpdateOrder = ({ onClose,viewOrder,viewClient,getSpecificOrderById,setG
     const [previewUrl, setPreviewUrl] = useState('');
     const [updateOrderArr, setUpdateOrderArr] = useState([]);
     const [indexNumber, setIndexNumber] = useState();
- 
+ console.log("getSpecificOrderById......",getSpecificOrderById)
 // useEffect(()=>{
 //   const getOrderById=async()=>{
 //     // Fetch the updated order details
@@ -483,8 +483,6 @@ let additionalCost=tshirtPrice[0]?.additionalCost
     const price_2p5X5CDropSholder=customDropSholderinputFront2p5X5?.frontSideprice
     const price_2p5X2p5CDropSholder=customDropSholderinputFront2p5X2p5?.frontSideprice
 
- 
-
 
 let backSideDtfprice_11p7x16p5CustomDropSholder=customDropSholderinputBack11p7X16p5?.backSideprice
 let backSideDtfprice_10x14CustomDropSholder=customDropSholderinputBack10X14?.backSideprice
@@ -583,7 +581,7 @@ if (totalQuantityCustomDropSholder > 0) {
     });
   });
 }
-
+console.log("sumofTQuansityForIndividualDetailArrCDropsholder...",sumofTQuansityForIndividualDetailArrCDropsholder)
 
   let printbazcost = 0;
   let printbazcostbase = 0;
@@ -664,6 +662,8 @@ if (totalQuantityCustomDropSholder > 0) {
                   additionalCost
               ).backDtfAndAdditionalCost;
               totalBackSidePrintCostCHoodie+=backSidePrintCost
+              console.log("totalFrontSidePrintCostCHoodie...",totalFrontSidePrintCostCHoodie)
+              console.log("totalBackSidePrintCostCHoodie...",totalBackSidePrintCostCHoodie)
               if (addBrandLogoArray[i] || individualProduct?.brandLogo !== null) {
                   let brandLogoCost = 5 * individualProduct?.totalQuantity;
                   //  totalBrandLogoCost+=brandLogoCost;
@@ -712,20 +712,20 @@ if (totalQuantityCustomDropSholder > 0) {
                 selectedItem?.perItemQuantity,
                 totalQuantity,
                 printSize,
-                price_11p7x16p5CDropSholder &&
+               ( price_11p7x16p5CDropSholder &&
                 price_10x14CDropSholder &&
                 price_10x10CDropSholder &&
                 price_10x5CDropSholder &&
                 price_5X5CDropSholder &&
                 price_2p5X5CDropSholder &&
-                price_2p5X2p5CDropSholder 
+                price_2p5X2p5CDropSholder )
             ).totalPrice;
             totalFrontSidePrintCostCDropSholder+=totalPrice;
             // Back side dtf cost plus additional cost
             backSidePrintCost = backsiideFormulaDropSholderHoodie(
               selectedItem?.perItemQuantity,
            
-              sumofTQuansityForIndividualDetailArrCHoodie,
+              sumofTQuansityForIndividualDetailArrCDropsholder,
                 printSizeBack,
                printSide,
                backSideDtfprice_11p7x16p5CustomDropSholder,
@@ -738,14 +738,17 @@ if (totalQuantityCustomDropSholder > 0) {
   additionalCost,
             ).backDtfAndAdditionalCost;
             totalBackSidePrintCostCDropSholder+=backSidePrintCost
+            console.log("totalBackSidePrintCostCDropSholder....",totalBackSidePrintCostCDropSholder)
+console.log("price_11p7x16p5CDropSholder....",price_11p7x16p5CDropSholder)
+ 
             if (addBrandLogoArray[i] || individualProduct?.brandLogo !== null) {
                 let brandLogoCost = 5 * individualProduct?.totalQuantity;
                 //  totalBrandLogoCost+=brandLogoCost;
-                printbazcostbaseCHoodie = Number(totalFrontSidePrintCostCDropSholder) + Number(totalBackSidePrintCostCDropSholder) + brandLogoCost;
+                printbazcostbaseCDropSholder = Number(totalFrontSidePrintCostCDropSholder) + Number(totalBackSidePrintCostCDropSholder) + brandLogoCost;
                 printbazcostCDropSholder = printbazcostbaseCDropSholder;
                
             } else {
-              printbazcostbaseCHoodie = Number(totalFrontSidePrintCostCDropSholder) + Number(totalBackSidePrintCostCDropSholder);
+              printbazcostbaseCDropSholder = Number(totalFrontSidePrintCostCDropSholder) + Number(totalBackSidePrintCostCDropSholder);
               printbazcostCDropSholder = printbazcostbaseCDropSholder;
             
         
@@ -882,7 +885,6 @@ if (totalQuantityCustomDropSholder > 0) {
  
 
 
- 
 const handleInputChange = (event, orderIndex, productIndex) => {
   const { name, value } = event.target;
   const color = event.target.closest('.card-title')?.getAttribute('data-color');
@@ -962,7 +964,7 @@ const handleInputChange = (event, orderIndex, productIndex) => {
   // setFormData({ ...formData, [name]: value});
 };
 
-
+console.log("printbazcostCDropSholder.......",printbazcostCDropSholder)
 // Function to calculate totalQuantity based on quantity fields
 const calculateTotalQuantity = (product) => {
   // Add your logic here based on your quantity fields

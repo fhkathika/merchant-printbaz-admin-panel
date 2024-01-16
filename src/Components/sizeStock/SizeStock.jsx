@@ -335,7 +335,7 @@ const SizeStock = () => {
           
 
 
- <select onChange={(e) => handleSizeSelect(e.target.value)} style={{marginTop:"10px",height:"30px",width:"120px",backgroundColor:"#21175b",color:""}}>
+ <select onChange={(e) => handleSizeSelect(e.target.value)} style={{marginTop:"10px",height:"30px",width:"120px",backgroundColor:"#21175b",color:"white"}}>
         <option value="">Select Size</option>
         {sizeData.map((size) => (
           <option key={size.size} value={size.size}>

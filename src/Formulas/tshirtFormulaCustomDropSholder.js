@@ -26,9 +26,9 @@ let totalPrice10x5=0
 let totalPrice5X5=0
 let totalPrice2p5X5=0
 let totalPrice2p5X2p5=0
-
+console.log("price_11p7x16p5......",price_11p7x16p5)
     if(printSize==="11.7 x 16.5"){
-       
+       console.log('get 11.7 x 16.5...')
         totalPrice11p7x16p5=safeParseInt(totalQuantity*price_11p7x16p5);
 
 } // 10 x 14
@@ -74,7 +74,8 @@ if (uPrice % 1 === 0) {
 } else if (uPrice % 1 !== 0) {
   unitPrice = parseFloat(uPrice).toFixed(2);
 }
-
+console.log("totalPrice11p7x16p5......",totalPrice11p7x16p5)
+console.log("totalPrice......",totalPrice)
   return ({ totalPrice: totalPrice ,unitPrice: unitPrice });
 };
 
