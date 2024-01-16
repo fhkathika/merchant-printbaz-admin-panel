@@ -215,7 +215,7 @@ console.log("viewClient",viewClient?._id)
                     // dueAmount: dueAmount
                     totalBill: newTotalBill,
                     totalReturnAmmountBase: newTotalReturn,
-                    // dueAmount: totalnewDueAmount
+                    dueAmount: totalnewDueAmount
                 }),
             }
           );

@@ -374,7 +374,7 @@ useEffect(()=>{
                       // dueAmount: dueAmount
                       totalBill: newTotalBill,
                       totalReturnAmmountBase: newTotalReturn,
-                      // dueAmount: totalnewDueAmount
+                      dueAmount: totalnewDueAmount
                   }),
               }
             );

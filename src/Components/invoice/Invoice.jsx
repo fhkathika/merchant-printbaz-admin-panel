@@ -23,9 +23,7 @@ const Invoice = () => {
       getPerSegmentPaymentDetailById();
     }, [regId,getPaymentDetailById]); // Include regId as a dependency
     
-          console.log("getPaymentDetailById.........",getPaymentDetailById)
-  
-  
+       
     const getPaymentReleasedOrdersByRefId = async () => {
          await fetch(`https://mserver.printbaz.com/getPaymentReleasedOrderByRegId/${regId}`) //for main site
         // await fetch(`http://localhost:5000/getPaymentReleasedOrderByRegId/${regId}`)
@@ -38,13 +36,11 @@ const Invoice = () => {
       
             
               },[paymentRelasedOrders])
-              console.log("paymentRelasedOrders.........",paymentRelasedOrders)
-      
+           
                 const specificPayDetail=getPaymentDetailById?.find(detail=>detail?._id===id)
        
         const filterByDate=paymentRelasedOrders?.filter(order=>order?.paymentReleasedDate===specificPayDetail?.paymentReleasedDate)
-  // console.log("specificPayDetail......",specificPayDetail)
-  // console.log("filterByDate......",filterByDate)
+ 
         return (
             <>
         <Navigationbar/>

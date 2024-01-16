@@ -22,7 +22,7 @@ const InvoiceDetail = ({releaseOrderId,releaseOrderRegId}) => {
         .then(res=>res.json())
         .then(data => {setGetPaymentDetailById(data)})
         }
-        console.log("getPaymentDetailById.........",getPaymentDetailById)
+      
         useEffect(()=>{
           getPaymentReleasedOrdersByRefId()
           getPerSegmentPaymentDetailById()
@@ -32,7 +32,7 @@ const InvoiceDetail = ({releaseOrderId,releaseOrderRegId}) => {
         const specificPayDetail=getPaymentDetailById?.find(detail=> detail?._id===releaseOrderId)
         // console.log("specificPayDetail",specificPayDetail)
       const filterByDate=paymentRelasedOrders?.filter(order=>order?.paymentReleasedDate===specificPayDetail?.paymentReleasedDate)
-      console.log("filterByDate..........",filterByDate)
+
     return (
       <Container className="invoice mt-5">
       <div style={{display:"flex"}}>
