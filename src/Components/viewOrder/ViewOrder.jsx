@@ -64,6 +64,7 @@ const [getUserByDetail,setGetUserByDetail]=useState()
           // Update the previousPath state when the location changes
  
         },[getSpecificOrderById])
+        console.log("getSpecificOrderById.......",getSpecificOrderById)
         const getUserById=async()=>{
           // Fetch the updated order details
         await fetch(`https://mserver.printbaz.com/getUser/${viewClient?._id}`)
@@ -86,7 +87,7 @@ const [getUserByDetail,setGetUserByDetail]=useState()
   const [updateNewOrder, setUpdateNewOrder] = useState(false);
   const [show, setShow] = useState(false);
   const target = useRef(null);
-  const returnValue=Number(getSpecificOrderById?.printbazcost)+Number(getSpecificOrderById?.deliveryFee)
+  const returnValue=Number(getSpecificOrderById?.printbazcost)+Number(getSpecificOrderById?.deliveryFee)+Number(getSpecificOrderById?.deliveryFee/2)
   let date = new Date(getSpecificOrderById?.createdAt); // create a new Date object
 
   let options = {month: 'long', day: 'numeric', year: 'numeric', hour: 'numeric', minute: 'numeric'  }; // options for toLocaleDateString
@@ -2047,6 +2048,7 @@ const previewURL = `https://drive.google.com/file/d/${fileId}/preview`;
 // Construct the direct download link
 //  const downloadUrl = `https://drive.google.com/uc?export=download&id=${fileId}`;
 let dropdownId = `dropdown${orderIndex}-${fileIndex}`;
+console.log("getSpecificOrderById........",getSpecificOrderById)
 return (
 <div key={fileIndex}>
 

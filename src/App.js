@@ -55,7 +55,7 @@ function App() {
     
       <Route path="/viewTicket/:id"element={<PrivateRoute><ViewTicket/> </PrivateRoute>} />
       <Route path="/deliverySystem"element={<PrivateRoute><AllDeliveryList/></PrivateRoute>} />
-      <Route path="/alldeliveries"element={<PrivateRoute><AllDeliveryList/> </PrivateRoute>} />
+      {/* <Route path="/alldeliveries"element={<PrivateRoute><AllDeliveryList/> </PrivateRoute>} /> */}
       <Route path="/allRcvMoney"element={<PrivateRoute><AllRcvList/> </PrivateRoute>} />
        <Route path="/invitaionPage"element={<PrivateRoute><SendInvitationPage/></PrivateRoute> } />
        <Route path="/login" element={<LoginPage/>} />

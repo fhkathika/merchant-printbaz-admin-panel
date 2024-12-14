@@ -11,7 +11,6 @@ import Navigationbar from '../navigationBar/Navigationbar';
 const DeliverySystem = () => {
   const {orderAll}=useGetMongoData()
   const {deliveryAll}=useGetDeliveryList()
-
   const {rcvAll}=useGetRcvList()
   const [showAlert, setShowAlert] = useState(false);
   const [deliveryExist, setDeliveryExist] = useState(false);
@@ -88,7 +87,7 @@ console.log("totalRcvAmount",totalRcvAmount);
  
     }
     
-  console.log("orders from d system pop up",inputOrderIdfind);
+  console.log("deliveryAll.......",deliveryAll);
    
   const returnValue=Number(searchByOrderId?.printbazcost)+Number(searchByOrderId?.deliveryFee)
   const handleInputColAmount = (e, idx) => {
@@ -183,7 +182,12 @@ function syncArrays(sourceArray, targetItem) {
 }
 // Using the function
 deliveriesDeliverySystem = syncArrays(ordersForDeliverySystem, deliveriesDeliverySystem);
+const sortedDeliveryData = deliveryAll?.length>0 && deliveryAll?.sort((a, b) => {
+  const timeA = new Date(a.statusDate?.replace(" at ", " "));
+  const timeB = new Date(b.statusDate?.replace(" at ", " "));
 
+  return timeB - timeA;
+});
     return (
         <div>
           <meta charSet="UTF-8" />
@@ -244,9 +248,7 @@ deliveriesDeliverySystem = syncArrays(ordersForDeliverySystem, deliveriesDeliver
    deliveryAll?.slice(0,5).map((list, index) => {
     const syncedListItem = syncArrays(orderAll, list);
     console.log("syncedListItem",syncedListItem);
-       let date = new Date(list?.date); 
-       let options = { year: 'numeric', month: 'long', day: 'numeric' }; 
-       let formattedDate = date.toLocaleDateString('en-US', options); 
+    
        let printbazRcv=0
        if(list?.orderStatus==="returned"){
          printbazRcv=0-(list?.deliveryFeeForAdmin)

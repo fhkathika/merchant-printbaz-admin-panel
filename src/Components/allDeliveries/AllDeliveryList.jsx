@@ -465,6 +465,13 @@ console.log("Total Receivable: ", totalReceivable);
   
   const totalCollectAmountByCourier = deliveryMap?.reduce((acc, curr) => acc + parseFloat(curr.cashCollectNyCourier || 0), 0);
   const totalReturnAmount = deliveryMap?.reduce((acc, curr) => acc + parseFloat(curr.returnValue || 0), 0);
+  const sortedInvoiceData = deliveryMap?.length>0 && deliveryMap?.sort((a, b) => {
+    const timeA = new Date(a.statusDate?.replace(" at ", " "));
+    const timeB = new Date(b.statusDate?.replace(" at ", " "));
+  
+    return timeB - timeA;
+  });
+  console.log("sortedInvoiceData......",sortedInvoiceData)
    return (
         <div>
         <meta charSet="UTF-8" />
@@ -580,20 +587,21 @@ console.log("Total Receivable: ", totalReceivable);
                     <tbody>
                    
                     {
-   deliveryMap
+                      sortedInvoiceData?.length>0 &&
+   sortedInvoiceData
    ?.slice(indexOfFirstItem, indexOfLastItem)
-   .sort((a, b) => {
-    const dateA = convertDatabaseDateToJSDate(a?.statusDate);
-    const dateB = convertDatabaseDateToJSDate(b?.statusDate);
-    if(dateA && dateB) {
-      return dateB - dateA; // sort in descending order
-    } else if (dateA) {
-      return -1; // If dateA exists but dateB does not, place A before B
-    } else if (dateB) {
-      return 1; // If dateB exists but dateA does not, place B before A
-    }
-    return 0; // If neither exist, don't sort them
-  })
+  //  .sort((a, b) => {
+  //   const dateA = convertDatabaseDateToJSDate(a?.statusDate);
+  //   const dateB = convertDatabaseDateToJSDate(b?.statusDate);
+  //   if(dateA && dateB) {
+  //     return dateB - dateA; // sort in descending order
+  //   } else if (dateA) {
+  //     return -1; // If dateA exists but dateB does not, place A before B
+  //   } else if (dateB) {
+  //     return 1; // If dateB exists but dateA does not, place B before A
+  //   }
+  //   return 0; // If neither exist, don't sort them
+  // })
    ?.map((list, index) => {
     // const syncedListItem = syncArrays(orderAll, list);
     // console.log("syncedListItem",syncedListItem);
@@ -711,45 +719,8 @@ if(list?.orderStatus==="returned"){
                <td>{list?.collectAmount} TK</td>
                <td>{list?.deliveryArea}</td>
                <td>{list?.deliveryAssignTo}</td>
-               <td>
-  {(() => {
-    if (list?.deliveryAssignTo==="others") {
-      return deliveryFeeForOthers;
-    } else if (list?.deliveryAssignTo==="delivery tiger") {
-      return editing === list?.orderId ? (
-        <input
-          type="number"
-          defaultValue={list?.deliveryFeeForDeliveryTiger}
-          onBlur={() => toggleEditing(null)} // Stop editing when focus is lost
-          onChange={(e) => handleEditChange(e, list?.orderId)}
-        />
-      )
-       : (
-        `${list?.deliveryFeeForDeliveryTiger?list?.deliveryFeeForDeliveryTiger : ''} TK`
-      );
-    } 
-    else if (list?.deliveryAssignTo==="pathao") {
-      return deliveryFeeForPathao;
-    }
-  })()}
-  {
-    list?.deliveryAssignTo==="delivery tiger" &&
-    <button
-    style={{
-      fontSize: "15px",
-      color: "black",
-      cursor: "pointer",
-      border: "none",
-      backgroundColor: "none",
-      marginLeft: "10px",
-    }}
-    onClick={() => toggleEditing(list?.orderId)}
-  >
-    {editing === list?.orderId ? "Save" : <i className="fa fa-edit"></i>}
-  </button>
-  }
-
-</td>
+               <td>{list?.deliveryFeeForClient}</td>
+     
     {
       list?.orderStatus==="returned" &&
       <td><p className="status-btn" style={{backgroundColor:"red",color:"white"}}>{list?.orderStatus}</p></td>
@@ -766,7 +737,8 @@ if(list?.orderStatus==="returned"){
    
     }
              
-               <td>{printbazRcv ? printbazRcv: Number(0)} TK</td>
+               {/* <td>{printbazRcv ? printbazRcv: Number(0)} TK</td> */}
+               <td>{list?.printbazcost} TK</td>
            
                <td > <p className="status-btn" > {list?.paymentStatus}</p> </td>
                <td style={{color:"red"}}>{list?.returnValue} TK</td>
